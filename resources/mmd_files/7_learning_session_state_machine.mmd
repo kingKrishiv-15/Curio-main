@@ -1,0 +1,31 @@
+stateDiagram-v2
+    [*] --> Assigned
+
+    Assigned --> Downloading: Child or app requests activity
+    Downloading --> Downloaded: Content cached successfully
+    Downloading --> DownloadFailed: Network or storage failure
+    DownloadFailed --> Downloading: Retry requested
+
+    Downloaded --> InProgress: Child starts activity
+    InProgress --> Paused: Child pauses or app closes
+    Paused --> InProgress: Child resumes
+
+    InProgress --> PendingSync: Response saved while offline
+    PendingSync --> InProgress: Server accepts response
+    PendingSync --> SyncConflict: Server state has changed
+    SyncConflict --> InProgress: State reconciled
+    SyncConflict --> Rejected: Event cannot be reconciled
+
+    InProgress --> Submitted: Final response sent
+    Submitted --> Evaluating: Server validates completion
+    Evaluating --> Completed: Completion is valid
+    Evaluating --> InProgress: Retryable validation issue
+    Evaluating --> Rejected: Invalid or tampered request
+
+    Completed --> Rewarding: Begin atomic reward transaction
+    Rewarding --> Rewarded: XP, streak and rewards committed
+    Rewarding --> Completed: Retryable transaction failure
+    Rewarded --> Reviewed: Explanation or recap viewed
+    Reviewed --> [*]
+
+    Rejected --> [*]

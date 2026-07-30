@@ -1,0 +1,61 @@
+sequenceDiagram
+    autonumber
+
+    actor Child
+    participant App as Flutter App
+    participant Cache as Firestore Cache and Local Store
+    participant Queue as Sync Queue
+    participant API as Callable Cloud Functions
+    participant DB as Cloud Firestore
+
+    Child->>App: Start or resume a cached activity
+    App->>Cache: Read activity, session and last known server version
+    Cache-->>App: Cached playable state
+
+    Note over App,API: Connection becomes unavailable
+
+    Child->>App: Submit response while offline
+    App->>Cache: Save response locally
+    App->>Queue: Enqueue event with idempotency key and base version
+    Queue-->>App: Pending event recorded
+    App-->>Child: Show saved-offline status
+
+    loop Additional offline responses
+        Child->>App: Continue permitted offline activity
+        App->>Cache: Persist response and progress
+        App->>Queue: Append ordered pending event
+    end
+
+    Note over App,API: Connection is restored
+    App->>Queue: Start synchronization
+
+    loop Oldest pending event first
+        Queue->>API: Send event with idempotency key and base version
+        API->>DB: Verify identity, ownership and session state
+
+        alt Duplicate event already accepted
+            DB-->>API: Existing authoritative result
+            API-->>Queue: Success with existing result
+            Queue->>Cache: Apply result and remove event
+        else Server state matches base version
+            API->>DB: Validate and commit with a Firestore transaction
+            DB-->>API: Updated session state and version
+            API-->>Queue: Accepted authoritative result
+            Queue->>Cache: Apply result and remove event
+        else Server state changed
+            DB-->>API: Current authoritative state
+            API-->>Queue: Conflict with recovery instructions
+            Queue->>Cache: Preserve local event and apply server state
+            Cache-->>App: Conflict requires reconciliation
+            App-->>Child: Explain changed activity state
+            App->>API: Retry compatible event or discard invalid event
+        else Authentication expired
+            API-->>Queue: Reauthentication required
+            Queue-->>App: Pause synchronization
+            App-->>Child: Ask parent to sign in again
+        end
+    end
+
+    Queue-->>App: Synchronization complete
+    App->>Cache: Mark session fully synchronized
+    App-->>Child: Remove offline indicator

@@ -1,0 +1,49 @@
+flowchart TD
+    A["Open Curio"] --> B{"Valid parent session?"}
+
+    B -- No --> C["Register or Sign In"]
+    C --> D["Verify Email"]
+    D --> E["Accept Parent Consent and Privacy Terms"]
+    E --> F["Create Child Profile"]
+
+    B -- Yes --> G{"Onboarding complete?"}
+    G -- No --> E
+    G -- Yes --> H{"Active child selected?"}
+    F --> H
+    H -- No --> I["Select or Create Child"]
+    I --> J["Open Child Home"]
+    H -- Yes --> J
+
+    J --> K{"Choose Learning Path"}
+
+    K -- Recommended --> L["Start Adaptive Maths Quest"]
+    K -- Daily Game --> M["Play Squeeze"]
+    K -- Story --> N["Enter Story World"]
+    K -- Critical Thinking --> O["Choose Encounter, Dissection or Debate"]
+    K -- Exam Practice --> P["Open IPM and MAT Practice"]
+    K -- Collection --> Q["View Discoveries and Rewards"]
+
+    L --> R["Load or Resume Server-Created Session"]
+    M --> R
+    N --> R
+    O --> R
+    P --> R
+
+    R --> S["Complete Questions or Choices"]
+    S --> T{"Online?"}
+
+    T -- Yes --> U["Validate Response on Server"]
+    T -- No --> V["Save Response to Offline Queue"]
+    V --> W["Reconnect and Synchronize Idempotently"]
+    W --> U
+
+    U --> X{"Activity complete?"}
+    X -- No --> S
+    X -- Yes --> Y["Finalize Session Transactionally"]
+    Y --> Z["Update Mastery, XP, Streak and Rewards"]
+    Z --> AA["Show Recap and Next Recommendation"]
+    AA --> J
+
+    J --> AB["Parent Unlocks Parent Area"]
+    AB --> AC["View Progress, Misconceptions and Controls"]
+    AC --> J

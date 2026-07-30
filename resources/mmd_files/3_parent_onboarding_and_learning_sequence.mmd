@@ -1,0 +1,75 @@
+sequenceDiagram
+    autonumber
+
+    actor Parent
+    actor Child
+    participant App as Flutter App
+    participant Auth as Firebase Authentication
+    participant API as Callable Cloud Functions
+    participant DB as Cloud Firestore
+    participant Cache as Firestore Cache and Local Store
+
+    rect rgb(18, 19, 18)
+        Note over Parent,DB: Parent account and family setup
+        Parent->>App: Register with email and password
+        App->>Auth: Create account
+        Auth-->>App: Session and verification state
+        Parent->>App: Verify email and accept privacy terms
+        App->>API: Complete onboarding with consent version
+        API->>DB: Transactionally create parent profile and consent
+        DB-->>API: Parent onboarding completed
+        API-->>App: Continue to child setup
+
+        Parent->>App: Enter child name, age band, language and avatar
+        App->>API: Create child profile
+        API->>DB: Verify parent and create child with initial skills
+        DB-->>API: Child and starter recommendations
+        API-->>App: Child profile created and selected
+        App->>Cache: Store active child reference
+    end
+
+    rect rgb(60, 56, 47)
+        Note over Child,DB: Daily learning journey
+        Child->>App: Open Curio
+        App->>Cache: Load active child and cached home summary
+        App->>DB: Read authorized home summary and assignments
+        DB-->>App: Streak, XP, companion, mastery and recommendations
+        App->>Cache: Cache authoritative summary
+        App-->>Child: Show recommended activity
+
+        Child->>App: Start activity
+        App->>API: Request activity instance with request ID
+        API->>DB: Verify ownership and select published content version
+        API->>DB: Create or resume learning session
+        DB-->>API: Session and protected activity payload
+        API-->>App: Questions without protected answers
+        App->>Cache: Persist activity and session state
+
+        loop Each question or story choice
+            Child->>App: Submit response
+            App->>Cache: Save pending response with idempotency key
+            App->>API: Validate response
+        API->>DB: Transactionally reject duplicate requests
+        API->>DB: Validate response and update session progress
+            DB-->>API: Feedback, hint and mastery delta
+            API-->>App: Authoritative response result
+            App->>Cache: Mark response synchronized
+            App-->>Child: Explain result and show next step
+        end
+
+        Child->>App: Complete activity
+        App->>API: Finalize session
+        API->>DB: Validate completion and award rewards atomically
+        DB-->>API: XP, streak, mastery and next recommendation
+        API-->>App: Completion summary
+        App->>Cache: Store final state
+        App-->>Child: Show celebration and learning recap
+    end
+
+    rect rgb(29, 24, 45)
+        Note over Parent,DB: Parent insight
+        Parent->>App: Unlock parent area with PIN
+        App->>DB: Request selected child's progress summary
+        DB-->>App: Trends, effort, strengths and misconceptions
+        App-->>Parent: Display parent dashboard
+    end

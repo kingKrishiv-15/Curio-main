@@ -1,0 +1,51 @@
+sequenceDiagram
+    autonumber
+
+    actor Child
+    participant App as Flutter App
+    participant Cache as Firestore Cache and Local Store
+    participant API as Callable Squeeze Function
+    participant DB as Cloud Firestore
+
+    Child->>App: Open Daily Squeeze
+    App->>Cache: Load cached attempt for active child and local date
+    App->>API: Start puzzle with child ID, timezone and request ID
+    API->>DB: Verify parent owns child
+    API->>DB: Resolve canonical daily puzzle date
+    API->>DB: Get or create today's protected puzzle
+    API->>DB: Get or create child's attempt idempotently
+    DB-->>API: Attempt state without target answer
+    API-->>App: Attempt ID, range, guesses left and public facts
+    App->>Cache: Persist authoritative attempt state
+
+    loop Until solved or guesses exhausted
+        Child->>App: Enter whole-number guess
+        App->>Cache: Queue guess with idempotency key
+        App->>API: Submit guess
+        API->>DB: Run transaction and reject duplicate request
+        API->>API: Validate guess against protected target
+        API->>DB: Save guess and update remaining range atomically
+        DB-->>API: Guess transaction committed
+        API-->>App: Higher, lower or correct plus next fact
+        App->>Cache: Apply state and clear queued event
+        App-->>Child: Show feedback and mathematical explanation
+    end
+
+    alt Puzzle solved
+        API->>DB: Finalize attempt and calculate trusted score
+        API->>DB: Update streak, XP, mastery and reward ledger atomically
+        DB-->>API: Completion and rewards
+        API-->>App: Solved summary and share-safe result
+        App->>Cache: Store completed result
+        App-->>Child: Show celebration, streak and recap
+    else Guesses exhausted
+        API->>DB: Finalize unsuccessful attempt
+        DB-->>API: Completion without solved reward
+        API-->>App: Reveal answer and worked reasoning
+        App->>Cache: Store completed result
+        App-->>Child: Show reflection and practice suggestion
+    else Network unavailable
+        App->>Cache: Preserve in-progress UI and queued guess
+        App-->>Child: Explain that validation needs a connection
+        Cache->>API: Retry with same idempotency key after reconnecting
+    end

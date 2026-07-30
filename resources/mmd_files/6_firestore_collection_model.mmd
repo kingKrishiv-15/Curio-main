@@ -1,0 +1,89 @@
+flowchart TB
+    ROOT[("Cloud Firestore")]
+
+    subgraph Family["Family-Owned Documents"]
+        USER["users/{uid}<br/>displayName, role, language,<br/>accountStatus, createdAt"]
+        CONSENTS["users/{uid}/consents/{consentId}<br/>type, policyVersion,<br/>grantedAt, revokedAt"]
+        DEVICES["users/{uid}/devices/{deviceId}<br/>platform, pushToken,<br/>appVersion, lastSeenAt"]
+
+        CHILD["children/{childId}<br/>parentUid, displayName, avatarKey,<br/>ageBand, language, active"]
+        SUMMARY["children/{childId}/private/summary<br/>totalXp, companionStage,<br/>currentStreak, recommendation"]
+        MASTERY["children/{childId}/skillMastery/{skillId}<br/>masteryScore, confidenceScore,<br/>attemptsCount, lastPracticedAt"]
+        SESSIONS["children/{childId}/sessions/{sessionId}<br/>activityVersionId, status, stateVersion,<br/>score, xpAwarded, timestamps"]
+        RESPONSES[".../sessions/{sessionId}/responses/{responseId}<br/>questionVersionId, responseValue,<br/>isCorrect, attemptNumber, idempotencyKey"]
+        LEDGER["children/{childId}/rewardLedger/{entryId}<br/>rewardId, sessionId, xpDelta,<br/>reason, idempotencyKey, awardedAt"]
+        STREAKS["children/{childId}/streaks/{streakType}<br/>currentCount, longestCount,<br/>lastQualifiedDate, updatedAt"]
+        COLLECTED["children/{childId}/collectedFacts/{factId}<br/>sourceSessionId, collectedAt"]
+        ATTEMPTS["children/{childId}/squeezeAttempts/{attemptId}<br/>puzzleId, status, guessesUsed,<br/>score, startedAt, completedAt"]
+        GUESSES[".../squeezeAttempts/{attemptId}/guesses/{guessId}<br/>guessValue, result, revealedFact,<br/>idempotencyKey, createdAt"]
+    end
+
+    subgraph Published["Published Child-Safe Content"]
+        SKILLS["skills/{skillId}<br/>code, category, name,<br/>description, active"]
+        ACTIVITIES["activityVersions/{versionId}<br/>contentItemId, mode, ageBand,<br/>difficulty, rules, questionVersionIds"]
+        QUESTIONS["questionVersions/{versionId}<br/>questionId, prompt, options,<br/>explanation, skillWeights"]
+        FACTS["facts/{factId}<br/>stableKey, theme, language,<br/>title, content, status"]
+        REWARDS["rewards/{rewardId}<br/>code, type, name,<br/>metadata, active"]
+        CONFIG["publicConfig/app<br/>minimumVersion, featureFlags,<br/>support and maintenance state"]
+    end
+
+    subgraph Protected["Function-Only and Admin Documents"]
+        CONTENT["contentItems/{contentId}<br/>stableKey, contentType,<br/>lifecycleStatus, createdBy"]
+        VERSIONS["contentItems/{contentId}/versions/{versionId}<br/>versionNumber, language, body,<br/>reviewStatus, publishedAt"]
+        QUESTION_SOURCE["questions/{questionId}/versions/{versionId}<br/>validationRule, protectedAnswer,<br/>explanation, difficulty"]
+        PUZZLES["dailyPuzzles/{dateKey}<br/>timezonePolicy, puzzleType,<br/>protectedAnswer, publicConfig"]
+        IDEMPOTENCY["operationReceipts/{idempotencyKey}<br/>uid, childId, operationType,<br/>resultReference, createdAt"]
+        AUDIT["adminAuditLogs/{logId}<br/>actorUid, action, entityType,<br/>entityId, changes, createdAt"]
+    end
+
+    ROOT --> USER
+    USER --> CONSENTS
+    USER --> DEVICES
+    USER -->|"parentUid ownership"| CHILD
+
+    CHILD --> SUMMARY
+    CHILD --> MASTERY
+    CHILD --> SESSIONS
+    SESSIONS --> RESPONSES
+    CHILD --> LEDGER
+    CHILD --> STREAKS
+    CHILD --> COLLECTED
+    CHILD --> ATTEMPTS
+    ATTEMPTS --> GUESSES
+
+    ROOT --> SKILLS
+    ROOT --> ACTIVITIES
+    ROOT --> QUESTIONS
+    ROOT --> FACTS
+    ROOT --> REWARDS
+    ROOT --> CONFIG
+
+    ROOT --> CONTENT
+    CONTENT --> VERSIONS
+    ROOT --> QUESTION_SOURCE
+    ROOT --> PUZZLES
+    ROOT --> IDEMPOTENCY
+    ROOT --> AUDIT
+
+    ACTIVITIES -. "references" .-> QUESTIONS
+    MASTERY -. "references" .-> SKILLS
+    COLLECTED -. "references" .-> FACTS
+    LEDGER -. "references" .-> REWARDS
+    SESSIONS -. "references" .-> ACTIVITIES
+    ATTEMPTS -. "references" .-> PUZZLES
+
+    FUNCTIONS["Callable Cloud Functions<br/>Admin SDK plus transactions"]
+    RULES["Firestore Security Rules<br/>identity, ownership and role checks"]
+
+    RULES --> Family
+    RULES --> Published
+    FUNCTIONS --> SUMMARY
+    FUNCTIONS --> MASTERY
+    FUNCTIONS --> SESSIONS
+    FUNCTIONS --> RESPONSES
+    FUNCTIONS --> LEDGER
+    FUNCTIONS --> STREAKS
+    FUNCTIONS --> COLLECTED
+    FUNCTIONS --> ATTEMPTS
+    FUNCTIONS --> GUESSES
+    FUNCTIONS --> Protected

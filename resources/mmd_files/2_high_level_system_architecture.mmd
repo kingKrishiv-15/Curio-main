@@ -1,0 +1,105 @@
+flowchart TB
+    subgraph Clients["Client Applications"]
+        FLUTTER["Flutter Child and Parent App"]
+        WEB["Optional Flutter or React Web Client"]
+        ADMIN["Web Content Admin Portal"]
+    end
+
+    subgraph FlutterLayers["Flutter Application"]
+        APP["Bootstrap, Routing and Theme"]
+        FEATURES["Feature Presentation and State"]
+        DOMAIN["Entities and Use Cases"]
+        REPOSITORIES["Repository Contracts"]
+        FIREBASE_DS["Firebase Data Sources"]
+        FIRESTORE_CACHE["Firestore Persistent Cache"]
+        LOCAL["Encrypted Local App Database"]
+        SYNC["Domain Sync and Conflict Handler"]
+        SECURE["Secure Local Secrets"]
+    end
+
+    subgraph Firebase["Firebase Platform"]
+        AUTH["Firebase Authentication"]
+        FIRESTORE[("Cloud Firestore")]
+        FUNCTIONS["Callable and Event-Driven Cloud Functions<br/>TypeScript Runtime"]
+        STORAGE[("Cloud Storage")]
+        MESSAGING["Firebase Cloud Messaging"]
+        APPCHECK["Firebase App Check"]
+        REMOTE_CONFIG["Remote Config"]
+    end
+
+    subgraph TrustedOperations["Trusted Learning Operations in Cloud Functions"]
+        PROFILE["Consent and Child Profile Service"]
+        ACTIVITY["Activity Assignment"]
+        ANSWER["Answer Validation"]
+        SQUEEZE["Daily Squeeze Engine"]
+        MASTERY["Mastery and Recommendation Engine"]
+        REWARD["XP, Streak and Reward Service"]
+        CONTENT["Content Validation and Publishing"]
+    end
+
+    subgraph Async["Asynchronous Services"]
+        SCHEDULER["Cloud Scheduler"]
+        TASKS["Cloud Tasks"]
+        REPORTS["Weekly Report Generator"]
+        EMAIL["Transactional Email Provider"]
+    end
+
+    subgraph Operations["Operations and Quality"]
+        ANALYTICS["Firebase Analytics"]
+        CRASHLYTICS["Firebase Crashlytics"]
+        PERFORMANCE["Firebase Performance Monitoring"]
+        LOGGING["Cloud Logging and Alerting"]
+        AUDIT["Admin and Security Audit Documents"]
+    end
+
+    FLUTTER --> APP --> FEATURES --> DOMAIN --> REPOSITORIES
+    REPOSITORIES --> FIREBASE_DS
+    REPOSITORIES <--> LOCAL
+    FIREBASE_DS <--> FIRESTORE_CACHE
+    LOCAL <--> SYNC
+    FLUTTER --> SECURE
+
+    FIREBASE_DS --> AUTH
+    FIREBASE_DS --> FIRESTORE
+    FIREBASE_DS --> FUNCTIONS
+    FIREBASE_DS --> STORAGE
+    FIREBASE_DS --> MESSAGING
+    FIREBASE_DS --> REMOTE_CONFIG
+    FIREBASE_DS --> APPCHECK
+
+    WEB --> AUTH
+    WEB --> FIRESTORE
+    WEB --> FUNCTIONS
+    ADMIN --> AUTH
+    ADMIN --> FUNCTIONS
+    ADMIN --> STORAGE
+
+    FUNCTIONS --> PROFILE
+    FUNCTIONS --> ACTIVITY
+    FUNCTIONS --> ANSWER
+    FUNCTIONS --> SQUEEZE
+    FUNCTIONS --> MASTERY
+    FUNCTIONS --> REWARD
+    FUNCTIONS --> CONTENT
+
+    PROFILE --> FIRESTORE
+    ACTIVITY --> FIRESTORE
+    ANSWER --> FIRESTORE
+    SQUEEZE --> FIRESTORE
+    MASTERY --> FIRESTORE
+    REWARD --> FIRESTORE
+    CONTENT --> FIRESTORE
+    CONTENT --> STORAGE
+
+    SCHEDULER --> FUNCTIONS
+    FUNCTIONS --> TASKS
+    TASKS --> REPORTS
+    REPORTS --> MESSAGING
+    REPORTS --> EMAIL
+
+    FLUTTER -. "privacy-safe events" .-> ANALYTICS
+    FLUTTER -. "crashes" .-> CRASHLYTICS
+    FLUTTER -. "performance traces" .-> PERFORMANCE
+    FUNCTIONS -. "logs and failures" .-> LOGGING
+    ADMIN -. "publishing actions" .-> AUDIT
+    AUDIT --> FIRESTORE
