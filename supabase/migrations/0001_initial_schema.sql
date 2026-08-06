@@ -56,6 +56,30 @@
 create extension if not exists pgcrypto;
 
 -- ----------------------------------------------------------------------------
+-- Baseline role privileges
+-- ----------------------------------------------------------------------------
+-- Every table below relies on RLS (and, for a few columns, the column-level
+-- grants in "Server-authoritative columns") as the real access gate - but
+-- RLS only filters ROWS a role is otherwise allowed to touch; a role with
+-- no GRANT at all on a table gets "permission denied" before RLS ever runs.
+-- Supabase's hosted platform sets up a baseline grant automatically when a
+-- project is created, but this migration must not assume that silently
+-- happened somewhere upstream - the local CLI stack (`supabase start` /
+-- `supabase test db`) does NOT configure it, which is exactly what the
+-- first real run of this migration's pgTAP tests caught: a SELECT the RLS
+-- policy below explicitly permits still failed with "permission denied for
+-- table profile" because anon/authenticated had no GRANT on it at all.
+-- `alter default privileges` here applies to every table this migration
+-- creates from this point on (it's scoped to whatever role runs this
+-- script, which creates every table below in the same session) - RLS
+-- policies (or, for forced-RPC tables, the absence of an insert/update
+-- policy) remain the actual gate; this just makes "attempt the operation
+-- at all" possible in the first place.
+grant usage on schema public to anon, authenticated, service_role;
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to anon, authenticated, service_role;
+
+-- ----------------------------------------------------------------------------
 -- profile
 -- Mirrors auth.users 1:1. Created only via create_parent_profile() below -
 -- see "Forced-RPC tables" note above. RLS policies for this table are added
