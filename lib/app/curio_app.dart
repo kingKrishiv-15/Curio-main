@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 
-import '../core/state/curio_state.dart';
 import '../core/theme/curio_theme.dart';
-import '../features/shell/presentation/main_shell.dart';
 
-class CurioApp extends StatefulWidget {
+/// Root widget for Phase 0. Deliberately just a blank shell right now - no
+/// routing, no auth gate, no feature screens. Those land as later Phase 0
+/// steps (auth) and later phases (everything else) build on this.
+class CurioApp extends StatelessWidget {
   const CurioApp({super.key});
 
   @override
-  State<CurioApp> createState() => _CurioAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Curio',
+      debugShowCheckedModeBanner: false,
+      theme: CurioTheme.light(),
+      home: const _BlankShellPage(),
+    );
+  }
 }
 
-class _CurioAppState extends State<CurioApp> {
-  final CurioState _state = CurioState();
-
-  @override
-  void dispose() {
-    _state.dispose();
-    super.dispose();
-  }
+class _BlankShellPage extends StatelessWidget {
+  const _BlankShellPage();
 
   @override
   Widget build(BuildContext context) {
-    return CurioScope(
-      notifier: _state,
-      child: MaterialApp(
-        title: 'Curio',
-        debugShowCheckedModeBanner: false,
-        theme: CurioTheme.light,
-        home: const MainShell(),
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Curio',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
       ),
     );
   }

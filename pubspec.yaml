@@ -35,8 +35,49 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # State management (presentation layer). Chosen over Bloc for Curio because
+  # our screens lean on a lot of small, independently-cacheable pieces of
+  # server state (child profile, skill levels, session status) rather than
+  # one big linear event stream per feature - Riverpod's provider graph and
+  # built-in caching/invalidation fit that shape with less boilerplate than
+  # Bloc's event/state classes per feature. See README "Architecture" section.
+  flutter_riverpod: ^2.6.1
+
+  # Navigation - declarative routing, integrates cleanly with Riverpod via
+  # ref.listen-based redirects (used for the auth-gated route guard).
+  go_router: ^15.1.2
+
+  # Supabase client: Auth, PostgREST reads, and RPC calls.
+  supabase_flutter: ^2.9.0
+
+  # Local/offline database (local/ layer) + sync queue. Chosen over sqflite
+  # for Curio because the sync queue and cached-content tables benefit from
+  # compile-time-checked queries and generated type-safe row classes - with
+  # sqflite those queries are raw SQL strings with no compile-time safety,
+  # which is exactly where an offline sync queue tends to grow subtle bugs.
+  drift: ^2.23.0
+  sqlite3_flutter_libs: ^0.5.28
+  path_provider: ^2.1.5
+  path: ^1.9.0
+
+  # Secure token storage (secure/ layer) - Keychain on iOS, Keystore-backed
+  # EncryptedSharedPreferences on Android. Auth tokens must never sit in
+  # plain SharedPreferences.
+  flutter_secure_storage: ^9.2.4
+
+  # Per-environment config (dev/staging/prod Supabase URL + anon key).
+  flutter_dotenv: ^5.2.1
+
+  # Crash/error reporting. Chosen over Firebase Crashlytics because the rest
+  # of the backend is Supabase, not Firebase, and Sentry's free tier plus
+  # first-class Flutter SDK (release health, breadcrumbs, performance traces)
+  # don't require pulling in the Firebase SDK/config just for crash reports.
+  sentry_flutter: ^8.14.2
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -45,6 +86,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+  # Codegen for Drift's generated tables/DAOs.
+  drift_dev: ^2.23.0
+  build_runner: ^2.4.13
+
+  # Mocking for domain/repository unit tests (no Flutter/Supabase dependency
+  # in those tests, per the domain layer's "pure Dart" rule).
+  mocktail: ^1.0.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -56,6 +105,11 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    # Per-environment config (.env.dev / .env.staging / .env.prod). Only
+    # .env.example is committed - see README "Environment configuration".
+    - assets/env/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

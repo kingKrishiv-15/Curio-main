@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Per-environment secrets (Supabase URL/keys, Sentry DSN). Only the
+# .env.example template is committed - see README "Environment configuration".
+assets/env/.env
+assets/env/.env.*
+!assets/env/.env.example
+
+# Local Supabase CLI state
+supabase/.branches/
+supabase/.temp/

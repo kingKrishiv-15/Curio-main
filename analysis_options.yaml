@@ -9,6 +9,14 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # Archived prototype - not part of the `curio` package (no package:curio/
+    # imports resolve from here), not built on, kept for UX reference only.
+    - "legacy_prototype/**"
+    # Generated Drift code (added once the local database layer lands).
+    - "**/*.g.dart"
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

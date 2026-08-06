@@ -1,0 +1,85 @@
+name: CI
+
+# Runs on every push to krishiv (and on PRs targeting main, once those start
+# happening) so nothing broken ever lands on main unreviewed. Every job must
+# pass - there is no "continue-on-error" anywhere in this file on purpose:
+# a red CI run should always mean something is actually broken.
+on:
+  push:
+    branches: [krishiv, vaibhav, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # flutter analyze + flutter test + an Android debug build, the three
+  # Phase 0 brief explicitly asks for.
+  flutter_checks:
+    name: Flutter analyze, test, Android build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Provide placeholder env config
+        # flutter_dotenv's asset file must exist for asset bundling to
+        # succeed, even for a build/analyze check that never actually talks
+        # to Supabase. Real keys are never in this repo - see README
+        # "Environment configuration".
+        run: cp assets/env/.env.example assets/env/.env.dev
+
+      - name: flutter analyze
+        run: flutter analyze
+
+      - name: flutter test
+        run: flutter test
+
+      - name: Android debug build check
+        run: flutter build apk --debug
+
+  # A genuine cross-check that the project is actually configured for iOS,
+  # not just "there's an ios/ folder in the repo" - this runs on a real
+  # macOS runner (the Windows dev machine used for day-to-day work can't
+  # build iOS at all, so this is the only place that verifies it).
+  ios_build_check:
+    name: iOS build check (macOS runner)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Provide placeholder env config
+        run: cp assets/env/.env.example assets/env/.env.dev
+
+      - name: iOS build check (no code signing)
+        run: flutter build ios --no-codesign
+
+  # Applies every migration to a fresh local Supabase stack and runs the
+  # pgTAP integration tests in supabase/tests/database/ - including the
+  # onboarding-RPC rollback test. This is real verification that the schema
+  # and RLS policies actually work, not just that the SQL has valid syntax.
+  database_checks:
+    name: Supabase migrations + pgTAP tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Run database tests (applies migrations, then pgTAP)
+        run: supabase test db
