@@ -65,14 +65,18 @@ dependencies:
   # plain SharedPreferences.
   flutter_secure_storage: ^9.2.4
 
-  # Per-environment config (dev/staging/prod Supabase URL + anon key).
+  # Per-environment config (dev/staging/prod Supabase URL + publishable key).
   flutter_dotenv: ^5.2.1
 
   # Crash/error reporting. Chosen over Firebase Crashlytics because the rest
   # of the backend is Supabase, not Firebase, and Sentry's free tier plus
   # first-class Flutter SDK (release health, breadcrumbs, performance traces)
   # don't require pulling in the Firebase SDK/config just for crash reports.
-  sentry_flutter: ^8.14.2
+  # Pinned to >=9.0.0: 8.x's Android native code targets an old Kotlin
+  # language version that this machine's Kotlin Gradle Plugin has dropped
+  # support for (compileDebugKotlin fails with "Language version 1.6 is no
+  # longer supported").
+  sentry_flutter: ^9.0.0
 
 dev_dependencies:
   flutter_test:

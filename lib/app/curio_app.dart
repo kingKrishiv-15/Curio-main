@@ -1,36 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/curio_theme.dart';
+import 'router.dart';
 
-/// Root widget for Phase 0. Deliberately just a blank shell right now - no
-/// routing, no auth gate, no feature screens. Those land as later Phase 0
-/// steps (auth) and later phases (everything else) build on this.
-class CurioApp extends StatelessWidget {
+class CurioApp extends ConsumerWidget {
   const CurioApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'Curio',
       debugShowCheckedModeBanner: false,
       theme: CurioTheme.light(),
-      home: const _BlankShellPage(),
-    );
-  }
-}
-
-class _BlankShellPage extends StatelessWidget {
-  const _BlankShellPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'Curio',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+      routerConfig: router,
     );
   }
 }

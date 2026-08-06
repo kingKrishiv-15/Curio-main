@@ -8,13 +8,17 @@ class EnvConfig {
   const EnvConfig._({
     required this.environment,
     required this.supabaseUrl,
-    required this.supabaseAnonKey,
+    required this.supabasePublishableKey,
     required this.sentryDsn,
   });
 
   final AppEnvironment environment;
   final String supabaseUrl;
-  final String supabaseAnonKey;
+
+  /// Supabase's client-side API key (formerly "anon key" - Supabase renamed
+  /// this to "publishable key" alongside "secret key" replacing "service
+  /// role key"; supabase_flutter's `anonKey` param is now deprecated).
+  final String supabasePublishableKey;
 
   /// Empty string means crash reporting is disabled for this environment
   /// (e.g. a developer left SENTRY_DSN blank in their local .env.dev).
@@ -36,7 +40,7 @@ class EnvConfig {
     return EnvConfig._(
       environment: environment,
       supabaseUrl: _require('SUPABASE_URL', environment),
-      supabaseAnonKey: _require('SUPABASE_ANON_KEY', environment),
+      supabasePublishableKey: _require('SUPABASE_PUBLISHABLE_KEY', environment),
       sentryDsn: dotenv.env['SENTRY_DSN'] ?? '',
     );
   }

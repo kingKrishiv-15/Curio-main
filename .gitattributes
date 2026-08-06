@@ -1,0 +1,8 @@
+# Normalize line endings to LF in the repo regardless of the checkout OS -
+# krishiv/vaibhav are likely on different platforms, and Windows checkouts
+# were producing CRLF warnings on every commit.
+* text=auto eol=lf
+
+# Windows-specific project files that expect CRLF.
+*.sln text eol=crlf
+*.bat text eol=crlf

@@ -20,14 +20,29 @@
 --    only server-side logic should ever set (scores, correctness, XP,
 --    mastery, an encrypted puzzle answer) two layers protect it:
 --      a) Row Level Security (RLS) controls which ROWS a role can touch.
---      b) Column-level GRANT/REVOKE controls which COLUMNS of a visible row
---         a role can read or write - Postgres supports privileges at column
+--      b) Column-level GRANT controls which COLUMNS of a visible row a role
+--         can read or write - Postgres supports privileges at column
 --         granularity, and RLS alone can't express "you may see this row but
 --         not this one column of it."
---    Supabase's `service_role` (used by Edge Functions) has BYPASSRLS and is
---    never included in these REVOKEs, so it always retains full access.
---    `anon`/`authenticated` (used by the Flutter app via PostgREST) are the
---    roles these REVOKEs target.
+--    Supabase's `service_role` (used by Edge Functions) has BYPASSRLS and
+--    keeps its own full table-level grants throughout, so it always retains
+--    full access. `anon`/`authenticated` (used by the Flutter app via
+--    PostgREST) are the roles this section restricts.
+--
+--    IMPORTANT: table-level and column-level grants in Postgres are
+--    independent and additive - a role can read/write a column if EITHER
+--    grant covers it. Supabase's platform bootstrap runs
+--    `alter default privileges in schema public grant all on tables to
+--    anon, authenticated, service_role`, so every table created below
+--    starts out with a table-level grant already covering every column for
+--    anon/authenticated. That means `revoke <priv> (<column>) ... from
+--    anon` on its own is a no-op: the table-level grant still covers that
+--    column regardless (see PostgreSQL docs on GRANT/REVOKE - "granting the
+--    privilege at the table level and then revoking it for one column will
+--    not do what one might wish"). The only way to actually lock a column
+--    down is to revoke the table-level privilege entirely and re-grant it
+--    column-by-column, explicitly excluding the protected column(s) - that
+--    is the pattern used everywhere below (search for "column privileges").
 --
 -- 3. Forced-RPC tables. A few tables (profile, consent_record, child,
 --    child_skill) have NO direct INSERT policy for anon/authenticated at
@@ -127,7 +142,10 @@ create policy "consent_record: read own" on public.consent_record
 create policy "consent_record: revoke own" on public.consent_record
   for update using (parent_id = auth.uid()) with check (parent_id = auth.uid());
 
-revoke update (consent_type, policy_version, granted_at) on public.consent_record from anon, authenticated;
+-- Column privileges: only revoked_at is updatable (see "Server-authoritative
+-- columns" note above for why a plain REVOKE alone wouldn't work here).
+revoke update on public.consent_record from anon, authenticated;
+grant update (revoked_at) on public.consent_record to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
 -- child
@@ -157,9 +175,13 @@ create policy "child: update own" on public.child
   for update using (parent_id = auth.uid()) with check (parent_id = auth.uid());
 
 -- total_xp/dragon_stage are server-computed from reward_ledger entries by
--- the (not-yet-built, Phase 2+) reward-awarding RPC - a parent can rename
--- or deactivate their child, but can't hand them XP directly.
-revoke update (total_xp, dragon_stage) on public.child from anon, authenticated;
+-- the (not-yet-built, Phase 2+) reward-awarding RPC - a parent can rename,
+-- reassign the age band, or deactivate their child, but can't hand them XP
+-- or a dragon stage directly (column privileges - see "Server-authoritative
+-- columns" note above for why a plain REVOKE alone wouldn't work here).
+revoke update on public.child from anon, authenticated;
+grant update (display_name, avatar_key, age_band, preferred_language, active, updated_at)
+  on public.child to anon, authenticated;
 
 -- No insert policy for anon/authenticated - see add_child_profile().
 
@@ -395,7 +417,21 @@ create policy "learning_session: insert own child" on public.learning_session
 create policy "learning_session: update own child" on public.learning_session
   for update using (public.is_own_child(child_id));
 
-revoke insert (score, xp_awarded), update (score, xp_awarded) on public.learning_session from anon, authenticated;
+-- Column privileges: score/xp_awarded are never client-writable at all -
+-- not on insert, not on update (see "Server-authoritative columns" note
+-- above for why a plain REVOKE alone wouldn't work here). Once started, the
+-- only thing a client can legitimately change is status (e.g. -> abandoned)
+-- and completed_at; child_id/activity_version_id/idempotency_key are
+-- write-once at creation. `id` is insertable (not just server-defaulted) so
+-- the offline sync queue (local/ layer) can pre-generate a UUID for a
+-- session started while offline and safely replay that exact insert once
+-- reconnected - idempotency_key is what makes the replay itself safe to
+-- retry, `id` being client-choosable is what lets local-first code
+-- reference the row before the server has ever seen it.
+revoke insert, update on public.learning_session from anon, authenticated;
+grant insert (id, child_id, activity_version_id, status, idempotency_key, started_at, client_version)
+  on public.learning_session to anon, authenticated;
+grant update (status, completed_at) on public.learning_session to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
 -- response
@@ -434,7 +470,13 @@ create policy "response: insert own child" on public.response
     )
   );
 
-revoke insert (is_correct), update (is_correct) on public.response from anon, authenticated;
+-- Column privileges: is_correct is never client-writable (see
+-- "Server-authoritative columns" note above for why a plain REVOKE alone
+-- wouldn't work here). There's no UPDATE policy on this table at all, so
+-- update access is already fully blocked at the RLS layer regardless.
+revoke insert on public.response from anon, authenticated;
+grant insert (session_id, question_version_id, response_value, attempt_number, duration_ms, idempotency_key, answered_at)
+  on public.response to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
 -- daily_puzzle
@@ -465,11 +507,19 @@ revoke insert (is_correct), update (is_correct) on public.response from anon, au
 -- public_config, e.g. the guessable number range). A `for select using
 -- (true)` policy would make the whole visible row's columns readable,
 -- including encrypted_answer, unless something else blocks that column
--- specifically. That "something else" is the column-level REVOKE below -
--- Postgres enforces it before RLS even runs, so no query shape (select *,
--- an explicit column list, a PostgREST embed, anything) can read the
--- ciphertext through anon/authenticated. service_role is never included in
--- the REVOKE, so the Edge Function's decrypt path is unaffected.
+-- specifically. That "something else" is a column-level grant, done
+-- carefully: `revoke select (encrypted_answer) ... from anon` on its own
+-- would NOT work, because Supabase's default privileges already grant
+-- anon/authenticated table-level SELECT on every new table, and Postgres
+-- table-level and column-level grants are independent/additive - a
+-- column-level revoke can't take away access a table-level grant already
+-- provides (see "Server-authoritative columns" note at the top of this
+-- file). So instead: revoke the table-level SELECT entirely, then grant
+-- SELECT back explicitly listing every column except encrypted_answer. That
+-- way there is no grant path - table-level or column-level - through which
+-- anon/authenticated can ever read that column. service_role is never
+-- touched by either statement, so the Edge Function's decrypt path (which
+-- runs as service_role) is unaffected.
 -- ============================================================================
 create table public.daily_puzzle (
   id uuid primary key default gen_random_uuid(),
@@ -485,7 +535,18 @@ alter table public.daily_puzzle enable row level security;
 create policy "daily_puzzle: public read" on public.daily_puzzle
   for select to anon, authenticated using (true);
 
-revoke select (encrypted_answer) on public.daily_puzzle from anon, authenticated;
+revoke select on public.daily_puzzle from anon, authenticated;
+grant select (id, puzzle_date, puzzle_type, public_config, published_at)
+  on public.daily_puzzle to anon, authenticated;
+
+-- Operational gotcha for whoever builds the Squeeze client query (Phase 2+):
+-- `select * from daily_puzzle` (or supabase-flutter's `.select()` with no
+-- explicit column list, which defaults to `*`) expands to every column at
+-- parse time - if any expanded column lacks privilege, Postgres rejects the
+-- WHOLE query with "permission denied for column encrypted_answer", it does
+-- not silently return just the visible columns. Any client-side read of
+-- this table must explicitly list columns, e.g.
+-- `.select('id, puzzle_date, puzzle_type, public_config, published_at')`.
 
 -- ----------------------------------------------------------------------------
 -- squeeze_attempt / squeeze_guess
@@ -513,7 +574,13 @@ create policy "squeeze_attempt: read own child" on public.squeeze_attempt
 create policy "squeeze_attempt: insert own child" on public.squeeze_attempt
   for insert with check (public.is_own_child(child_id));
 
-revoke insert (score), update (score) on public.squeeze_attempt from anon, authenticated;
+-- Column privileges: score (and guesses_used/status, which only the
+-- Squeeze Edge Function should progress) are never client-writable (see
+-- "Server-authoritative columns" note above for why a plain REVOKE alone
+-- wouldn't work here). There's no UPDATE policy on this table at all, so
+-- update access is already fully blocked at the RLS layer regardless.
+revoke insert on public.squeeze_attempt from anon, authenticated;
+grant insert (child_id, puzzle_id) on public.squeeze_attempt to anon, authenticated;
 
 create table public.squeeze_guess (
   id uuid primary key default gen_random_uuid(),
