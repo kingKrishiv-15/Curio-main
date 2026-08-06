@@ -14,7 +14,7 @@ class CurioApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Curio',
       debugShowCheckedModeBanner: false,
-      theme: CurioTheme.light(),
+      theme: CurioTheme.platform(),
       routerConfig: router,
     );
   }

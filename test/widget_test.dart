@@ -23,16 +23,24 @@ void main() {
     when(() => authClient.onAuthStateChange).thenAnswer((_) => const Stream.empty());
   });
 
-  testWidgets('CurioApp starts signed-out users on the sign-in screen', (tester) async {
+  testWidgets('CurioApp renders Home on launch', (tester) async {
+    // TODO(ui-sprint): router.dart currently starts at /home unconditionally
+    // (see its TODO) for this sprint's fake-data screens - once that's
+    // reverted to gate on real auth, this test should go back to asserting
+    // the signed-out redirect to /sign-in instead.
     await tester.pumpWidget(
       ProviderScope(
         overrides: [supabaseClientProvider.overrideWithValue(supabaseClient)],
         child: const CurioApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    // Not pumpAndSettle(): Home has a deliberately-continuous idle
+    // animation (see IdleFloat), which by design never "settles" -
+    // pumpAndSettle would just time out waiting for it to stop.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('Ways to learn'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

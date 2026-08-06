@@ -8,9 +8,13 @@ import '../presentation/auth/consent_page.dart';
 import '../presentation/auth/sign_in_page.dart';
 import '../presentation/auth/sign_up_page.dart';
 import '../presentation/auth/verify_email_page.dart';
-import '../presentation/home/home_placeholder_page.dart';
+import '../presentation/home/home_page.dart';
 import '../presentation/splash/splash_page.dart';
+import '../presentation/widgets/coming_soon_page.dart';
 import 'providers.dart';
+
+// UI sprint routes - fake data only, not wired to live Supabase.
+const _platformRoutes = {'/home', '/curio-special', '/maths', '/sharpen'};
 
 /// Each onboarding step navigates to the next one explicitly on success
 /// (see the auth screens) rather than this router inferring "which step is
@@ -21,14 +25,21 @@ import 'providers.dart';
 /// using back/forward.
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    // TODO(ui-sprint): temporarily starts at /home and exempts
+    // _platformRoutes from the auth gate below, so these screens can be
+    // built/demoed against fake data without a real Supabase backend to
+    // sign in against. Revert initialLocation to '/' and drop the
+    // _platformRoutes exemption once this sprint's screens get wired to
+    // real auth + data.
+    initialLocation: '/home',
     refreshListenable: _GoRouterRefreshStream(ref),
     redirect: (context, state) {
       final isSignedIn = ref.read(supabaseClientProvider).auth.currentSession != null;
       final isOnAuthScreen = state.matchedLocation == '/sign-in' || state.matchedLocation == '/sign-up';
       final isOnSplash = state.matchedLocation == '/';
+      final isOnPlatformRoute = _platformRoutes.contains(state.matchedLocation);
 
-      if (!isSignedIn && !isOnAuthScreen && !isOnSplash) {
+      if (!isSignedIn && !isOnAuthScreen && !isOnSplash && !isOnPlatformRoute) {
         return '/sign-in';
       }
       return null;
@@ -40,7 +51,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/verify-email', builder: (context, state) => const VerifyEmailPage()),
       GoRoute(path: '/onboarding/consent', builder: (context, state) => const ConsentPage()),
       GoRoute(path: '/onboarding/add-child', builder: (context, state) => const AddChildPage()),
-      GoRoute(path: '/home', builder: (context, state) => const HomePlaceholderPage()),
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      GoRoute(path: '/curio-special', builder: (context, state) => const ComingSoonPage(title: 'Curio Special')),
+      GoRoute(path: '/maths', builder: (context, state) => const ComingSoonPage(title: 'Maths')),
+      GoRoute(path: '/sharpen', builder: (context, state) => const ComingSoonPage(title: 'IPM & MAT')),
     ],
   );
 });
