@@ -81,5 +81,11 @@ jobs:
         with:
           version: latest
 
-      - name: Run database tests (applies migrations, then pgTAP)
+      - name: Start local Supabase stack
+        # `supabase test db` connects to an already-running local stack, it
+        # doesn't start one itself - this is what applies every migration
+        # under supabase/migrations/ before the pgTAP tests run against it.
+        run: supabase start
+
+      - name: Run database tests (pgTAP, against the stack started above)
         run: supabase test db
