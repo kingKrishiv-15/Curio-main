@@ -56,7 +56,70 @@
 create extension if not exists pgcrypto;
 
 -- ----------------------------------------------------------------------------
--- Helper functions (used throughout the RLS policies below)
+-- profile
+-- Mirrors auth.users 1:1. Created only via create_parent_profile() below -
+-- see "Forced-RPC tables" note above. RLS policies for this table are added
+-- further down, after the is_admin() helper function exists - a
+-- `language sql` function body (and a policy's USING clause) is resolved
+-- against the catalog immediately at CREATE time, unlike plpgsql where the
+-- body stays opaque until first executed. Every object a policy or SQL
+-- helper function references has to already exist at the point it's
+-- defined, which is why tables are created before the helpers below, and
+-- the helpers before the policies that use them.
+-- ----------------------------------------------------------------------------
+create table public.profile (
+  id uuid primary key references auth.users (id) on delete cascade,
+  role text not null check (role in ('parent', 'child', 'admin')),
+  display_name text not null,
+  preferred_language text not null default 'en',
+  status text not null default 'active' check (status in ('active', 'suspended', 'deleted')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.profile enable row level security;
+
+-- ----------------------------------------------------------------------------
+-- consent_record
+-- Created only via create_parent_profile() below, in the same transaction as
+-- the profile row it belongs to.
+-- ----------------------------------------------------------------------------
+create table public.consent_record (
+  id uuid primary key default gen_random_uuid(),
+  parent_id uuid not null references public.profile (id) on delete cascade,
+  consent_type text not null,
+  policy_version text not null,
+  granted_at timestamptz not null default now(),
+  revoked_at timestamptz
+);
+
+alter table public.consent_record enable row level security;
+
+-- ----------------------------------------------------------------------------
+-- child
+-- Created only via add_child_profile() below, together with its baseline
+-- child_skill rows - see "Forced-RPC tables" note above.
+-- ----------------------------------------------------------------------------
+create table public.child (
+  id uuid primary key default gen_random_uuid(),
+  parent_id uuid not null references public.profile (id) on delete cascade,
+  display_name text not null,
+  avatar_key text,
+  age_band text not null,
+  preferred_language text not null default 'en',
+  total_xp int not null default 0,
+  dragon_stage int not null default 1,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.child enable row level security;
+
+-- ----------------------------------------------------------------------------
+-- Helper functions (used throughout the RLS policies below). Defined here,
+-- after profile/consent_record/child exist - see the note on the profile
+-- table above for why the ordering matters.
 -- ----------------------------------------------------------------------------
 
 -- True if the given child belongs to the currently authenticated parent.
@@ -90,22 +153,8 @@ as $$
 $$;
 
 -- ----------------------------------------------------------------------------
--- profile
--- Mirrors auth.users 1:1. Created only via create_parent_profile() below -
--- see "Forced-RPC tables" note above.
+-- profile RLS policies (now that is_admin() exists)
 -- ----------------------------------------------------------------------------
-create table public.profile (
-  id uuid primary key references auth.users (id) on delete cascade,
-  role text not null check (role in ('parent', 'child', 'admin')),
-  display_name text not null,
-  preferred_language text not null default 'en',
-  status text not null default 'active' check (status in ('active', 'suspended', 'deleted')),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-alter table public.profile enable row level security;
-
 create policy "profile: read own" on public.profile
   for select using (id = auth.uid());
 
@@ -118,21 +167,8 @@ create policy "profile: update own" on public.profile
 -- No insert policy for anon/authenticated - see create_parent_profile().
 
 -- ----------------------------------------------------------------------------
--- consent_record
--- Created only via create_parent_profile() below, in the same transaction as
--- the profile row it belongs to.
+-- consent_record RLS policies
 -- ----------------------------------------------------------------------------
-create table public.consent_record (
-  id uuid primary key default gen_random_uuid(),
-  parent_id uuid not null references public.profile (id) on delete cascade,
-  consent_type text not null,
-  policy_version text not null,
-  granted_at timestamptz not null default now(),
-  revoked_at timestamptz
-);
-
-alter table public.consent_record enable row level security;
-
 create policy "consent_record: read own" on public.consent_record
   for select using (parent_id = auth.uid());
 
@@ -148,26 +184,8 @@ revoke update on public.consent_record from anon, authenticated;
 grant update (revoked_at) on public.consent_record to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
--- child
--- Created only via add_child_profile() below, together with its baseline
--- child_skill rows - see "Forced-RPC tables" note above.
+-- child RLS policies (now that is_own_child() exists)
 -- ----------------------------------------------------------------------------
-create table public.child (
-  id uuid primary key default gen_random_uuid(),
-  parent_id uuid not null references public.profile (id) on delete cascade,
-  display_name text not null,
-  avatar_key text,
-  age_band text not null,
-  preferred_language text not null default 'en',
-  total_xp int not null default 0,
-  dragon_stage int not null default 1,
-  active boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-alter table public.child enable row level security;
-
 create policy "child: read own" on public.child
   for select using (parent_id = auth.uid());
 
