@@ -1,12 +1,11 @@
 {
-    "name": "curio",
-    "short_name": "curio",
+    "name": "Curio — Learn through play",
+    "short_name": "Curio",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F6F7FB",
+    "theme_color": "#315EDB",
+    "description": "Daily puzzles, learning adventures and discoveries for curious young thinkers.",
     "prefer_related_applications": false,
     "icons": [
         {

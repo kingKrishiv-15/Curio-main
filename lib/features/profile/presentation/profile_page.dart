@@ -5,6 +5,7 @@ import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../parent/presentation/parent_dashboard_page.dart';
+import '../../skills/presentation/skill_quest_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -19,6 +20,9 @@ class ProfilePage extends StatelessWidget {
           controller: controller,
           autofocus: true,
           maxLength: 18,
+          decoration: const InputDecoration(
+            hintText: 'What should we call you?',
+          ),
         ),
         actions: [
           TextButton(
@@ -30,7 +34,7 @@ class ProfilePage extends StatelessWidget {
               state.renameChild(controller.text);
               Navigator.pop(dialogContext);
             },
-            child: const Text('Save'),
+            child: const Text('Save name'),
           ),
         ],
       ),
@@ -41,11 +45,32 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     return CurioPage(
+      maxWidth: 760,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 28, 20, 30),
+        padding: const EdgeInsets.fromLTRB(20, 28, 20, 112),
         children: [
-          const Center(child: MascotBadge(size: 100)),
-          const SizedBox(height: 13),
+          Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const MascotBadge(size: 104),
+                Positioned(
+                  right: -3,
+                  bottom: -3,
+                  child: IconButton.filled(
+                    tooltip: 'Change explorer name',
+                    onPressed: () => _rename(context, state),
+                    icon: const Icon(Icons.edit_rounded, size: 17),
+                    style: IconButton.styleFrom(
+                      backgroundColor: CurioColors.coral,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           Center(
             child: Text(
               state.childName,
@@ -54,82 +79,137 @@ class ProfilePage extends StatelessWidget {
           ),
           Center(
             child: Text(
-              'Curious Explorer · Stage ${state.companionStage}',
+              'Curious Explorer · Companion stage ${state.companionStage}',
               style: const TextStyle(color: CurioColors.navyMuted),
             ),
           ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              StatPill(
+                icon: Icons.bolt_rounded,
+                value: '${state.totalXp}',
+                label: 'total XP',
+                color: CurioColors.coral,
+                background: CurioColors.coralSoft,
+              ),
+              const SizedBox(width: 10),
+              StatPill(
+                icon: Icons.local_fire_department_rounded,
+                value: '${state.streak}',
+                label: 'day streak',
+                color: CurioColors.orange,
+                background: CurioColors.orangeSoft,
+              ),
+              const SizedBox(width: 10),
+              StatPill(
+                icon: Icons.auto_stories_rounded,
+                value: '${state.collectedFacts.length}',
+                label: 'discoveries',
+                color: CurioColors.tealDark,
+                background: CurioColors.tealSoft,
+              ),
+            ],
+          ),
           const SizedBox(height: 22),
           CurioCard(
-            color: CurioColors.tealSoft,
-            borderColor: CurioColors.teal,
+            color: CurioColors.coralSoft,
+            borderColor: CurioColors.coral.withValues(alpha: .2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Text(
-                      '${state.xpIntoStage} / 250 XP',
-                      style: const TextStyle(fontWeight: FontWeight.w900),
+                      'Companion growth',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const Spacer(),
                     Text(
-                      'Stage ${state.companionStage + 1}',
+                      '${state.xpIntoStage} / 250 XP',
                       style: const TextStyle(
-                        color: CurioColors.tealDark,
+                        color: CurioColors.coralDark,
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                ClipRRect(
+                const SizedBox(height: 11),
+                LinearProgressIndicator(
+                  value: state.xpIntoStage / 250,
+                  minHeight: 10,
                   borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: state.xpIntoStage / 250,
-                    minHeight: 11,
-                    backgroundColor: Colors.white,
-                    color: CurioColors.teal,
+                  backgroundColor: Colors.white,
+                  color: CurioColors.coral,
+                ),
+                const SizedBox(height: 7),
+                Text(
+                  '${250 - state.xpIntoStage} XP until stage ${state.companionStage + 1}',
+                  style: const TextStyle(
+                    color: CurioColors.navyMuted,
+                    fontSize: 11,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 22),
-          _ProfileTile(
-            icon: Icons.edit_rounded,
-            title: 'Change explorer name',
-            onTap: () => _rename(context, state),
+          const SizedBox(height: 26),
+          const SectionHeading('Your space'),
+          const SizedBox(height: 10),
+          CurioCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                _ProfileTile(
+                  icon: Icons.route_rounded,
+                  title: 'Skills and mastery',
+                  subtitle: 'See your learning map',
+                  onTap: () => openPage(context, const SkillQuestPage()),
+                ),
+                const Divider(height: 1, indent: 66),
+                _ProfileTile(
+                  icon: Icons.emoji_events_outlined,
+                  title: 'Badges and milestones',
+                  subtitle: 'View achievements',
+                  onTap: () {},
+                ),
+                const Divider(height: 1, indent: 66),
+                _ProfileTile(
+                  icon: Icons.family_restroom_rounded,
+                  title: 'Parent dashboard',
+                  subtitle: 'Insights and family controls',
+                  onTap: () => openPage(context, const ParentDashboardPage()),
+                ),
+              ],
+            ),
           ),
-          _ProfileTile(
-            icon: Icons.pets_rounded,
-            title: 'Companion collection',
-            onTap: () {},
-          ),
-          _ProfileTile(
-            icon: Icons.emoji_events_rounded,
-            title: 'Badges and milestones',
-            onTap: () {},
-          ),
-          _ProfileTile(
-            icon: Icons.family_restroom_rounded,
-            title: 'Open parent dashboard',
-            onTap: () => openPage(context, const ParentDashboardPage()),
-          ),
-          _ProfileTile(
-            icon: Icons.accessibility_new_rounded,
-            title: 'Accessibility',
-            onTap: () {},
-          ),
-          _ProfileTile(
-            icon: Icons.help_outline_rounded,
-            title: 'Help and feedback',
-            onTap: () {},
+          const SizedBox(height: 16),
+          CurioCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                _ProfileTile(
+                  icon: Icons.accessibility_new_rounded,
+                  title: 'Accessibility',
+                  subtitle: 'Motion, contrast and reading options',
+                  onTap: () {},
+                ),
+                const Divider(height: 1, indent: 66),
+                _ProfileTile(
+                  icon: Icons.help_outline_rounded,
+                  title: 'Help and feedback',
+                  subtitle: 'Get support or share an idea',
+                  onTap: () {},
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           const Center(
             child: Text(
-              'Curio prototype · Local progress mode',
-              style: TextStyle(color: CurioColors.navyMuted, fontSize: 11),
+              'Curio 1.0 · Learning should feel like discovery',
+              style: TextStyle(color: CurioColors.navyMuted, fontSize: 10),
             ),
           ),
         ],
@@ -142,24 +222,38 @@ class _ProfileTile extends StatelessWidget {
   const _ProfileTile({
     required this.icon,
     required this.title,
+    required this.subtitle,
     required this.onTap,
   });
+
   final IconData icon;
   final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-      leading: CircleAvatar(
-        backgroundColor: CurioColors.coralSoft,
-        foregroundColor: CurioColors.coral,
-        child: Icon(icon),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: CurioColors.surfaceMuted,
+          borderRadius: BorderRadius.circular(13),
+        ),
+        child: Icon(icon, color: CurioColors.coral, size: 21),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-      trailing: const Icon(Icons.chevron_right_rounded),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(color: CurioColors.navyMuted, fontSize: 11),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: CurioColors.navyMuted,
+      ),
     );
   }
 }

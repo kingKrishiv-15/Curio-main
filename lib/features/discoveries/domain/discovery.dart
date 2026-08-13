@@ -71,4 +71,20 @@ const discoveries = <Discovery>[
     category: 'World',
     icon: Icons.auto_awesome_rounded,
   ),
+  Discovery(
+    id: 'classification_science',
+    title: 'Order in the world',
+    fact:
+        'Classification helps scientists compare living things by grouping shared characteristics.',
+    category: 'Thinking',
+    icon: Icons.account_tree_rounded,
+  ),
+  Discovery(
+    id: 'binary_patterns',
+    title: 'Two can do plenty',
+    fact:
+        'Binary systems use only two states, yet they can encode numbers, images, music and instructions.',
+    category: 'Computing',
+    icon: Icons.memory_rounded,
+  ),
 ];

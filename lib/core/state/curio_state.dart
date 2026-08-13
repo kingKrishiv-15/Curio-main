@@ -20,6 +20,29 @@ class CurioState extends ChangeNotifier {
   int get companionStage => (totalXp ~/ 250) + 1;
   int get xpIntoStage => totalXp % 250;
   int get activitiesCompleted => completedActivities.length;
+  int get dailyGoalCompleted {
+    final suffix = _dateKey(DateTime.now());
+    return completedActivities
+        .where((id) => id.endsWith(suffix))
+        .length
+        .clamp(0, 3);
+  }
+
+  bool completedToday(String activity) {
+    return completedActivities.contains(
+      '${activity}_${_dateKey(DateTime.now())}',
+    );
+  }
+
+  static String dailyActivityId(String activity, [DateTime? date]) {
+    return '${activity}_${_dateKey(date ?? DateTime.now())}';
+  }
+
+  static String _dateKey(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}$month$day';
+  }
 
   void completeActivity({
     required String id,

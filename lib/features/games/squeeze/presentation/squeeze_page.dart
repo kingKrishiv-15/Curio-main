@@ -38,7 +38,7 @@ class _SqueezePageState extends State<SqueezePage> {
     if (_engine.solved && !_rewardGranted) {
       _rewardGranted = true;
       CurioScope.of(context).completeActivity(
-        id: 'squeeze_${DateTime.now().day}',
+        id: CurioState.dailyActivityId('squeeze'),
         xp: 80,
         skill: 'Number sense',
         factId: 'prime_numbers',

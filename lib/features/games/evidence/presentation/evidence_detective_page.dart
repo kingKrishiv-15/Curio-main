@@ -58,7 +58,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
     }
     setState(() => _submitted = true);
     CurioScope.of(context).completeActivity(
-      id: 'evidence_garden_1',
+      id: CurioState.dailyActivityId('evidence_garden'),
       xp: 70,
       skill: 'Evidence',
       factId: 'weather_evidence',

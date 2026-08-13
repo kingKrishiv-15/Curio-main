@@ -11,43 +11,86 @@ class DiscoveriesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
+    final progress = state.collectedFacts.length / discoveries.length;
     return CurioPage(
+      maxWidth: 820,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 30),
+        padding: const EdgeInsets.fromLTRB(20, 26, 20, 112),
         children: [
-          const Text(
-            'YOUR TREASURE SHELF',
-            style: TextStyle(
-              color: CurioColors.coral,
-              fontWeight: FontWeight.w900,
-              fontSize: 11,
-              letterSpacing: 1.6,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text('Discoveries', style: Theme.of(context).textTheme.headlineLarge),
-          const SizedBox(height: 6),
-          Text(
-            '${state.collectedFacts.length} of ${discoveries.length} curious facts collected',
-            style: const TextStyle(color: CurioColors.navyMuted),
-          ),
-          const SizedBox(height: 18),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: state.collectedFacts.length / discoveries.length,
-              minHeight: 10,
-              backgroundColor: CurioColors.creamDeep,
-              color: CurioColors.coral,
+          PageIntro(
+            eyebrow: 'Knowledge collection',
+            title: 'Discoveries',
+            subtitle:
+                '${state.collectedFacts.length} of ${discoveries.length} curious facts uncovered',
+            trailing: ProgressRing(
+              value: progress,
+              color: CurioColors.orange,
+              child: Text(
+                '${(progress * 100).round()}%',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 24),
+          CurioCard(
+            color: CurioColors.navy,
+            borderColor: CurioColors.navy,
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: CurioColors.auroraGradient,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(
+                    Icons.collections_bookmark_rounded,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Your curiosity archive',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Every completed challenge can reveal a new idea worth remembering.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: .65),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+          const SectionHeading(
+            'Collected cards',
+            subtitle: 'Tap into the facts you’ve earned through play',
+          ),
+          const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 280,
-              mainAxisExtent: 210,
+              maxCrossAxisExtent: 260,
+              mainAxisExtent: 218,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
             ),
@@ -56,42 +99,55 @@ class DiscoveriesPage extends StatelessWidget {
               final discovery = discoveries[index];
               final collected = state.collectedFacts.contains(discovery.id);
               return CurioCard(
-                color: collected ? Colors.white : CurioColors.creamDeep,
+                color: collected ? Colors.white : CurioColors.surfaceMuted,
                 borderColor: collected
-                    ? CurioColors.teal.withValues(alpha: .3)
+                    ? CurioColors.teal.withValues(alpha: .2)
                     : CurioColors.creamDeep,
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(16),
+                elevation: collected,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: collected
-                          ? CurioColors.tealSoft
-                          : Colors.white54,
-                      child: Icon(
-                        collected ? discovery.icon : Icons.lock_rounded,
-                        color: collected
-                            ? CurioColors.tealDark
-                            : CurioColors.navyMuted,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: collected
+                                ? CurioColors.tealSoft
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Icon(
+                            collected ? discovery.icon : Icons.lock_outline,
+                            color: collected
+                                ? CurioColors.tealDark
+                                : CurioColors.navyMuted,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (collected)
+                          const Icon(
+                            Icons.bookmark_added_rounded,
+                            color: CurioColors.coral,
+                            size: 19,
+                          ),
+                      ],
                     ),
                     const Spacer(),
-                    Text(
-                      collected ? discovery.category.toUpperCase() : 'LOCKED',
-                      style: const TextStyle(
-                        color: CurioColors.coral,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.1,
-                      ),
+                    CurioEyebrow(
+                      collected ? discovery.category : 'Locked',
+                      color: collected
+                          ? CurioColors.coral
+                          : CurioColors.navyMuted,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 5),
                     Text(
                       collected ? discovery.title : 'Keep exploring',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 5),
                     Text(
                       collected
                           ? discovery.fact

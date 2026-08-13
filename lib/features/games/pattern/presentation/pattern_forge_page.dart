@@ -59,7 +59,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
   void _next() {
     if (_index == _questions.length - 1) {
       CurioScope.of(context).completeActivity(
-        id: 'pattern_forge_1',
+        id: CurioState.dailyActivityId('pattern_forge'),
         xp: 60,
         skill: 'Patterns',
         factId: 'fibonacci_nature',

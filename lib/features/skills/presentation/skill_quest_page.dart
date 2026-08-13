@@ -20,7 +20,7 @@ class SkillQuestPage extends StatelessWidget {
     const colors = [
       CurioColors.teal,
       CurioColors.coral,
-      CurioColors.gold,
+      CurioColors.goldStrong,
       CurioColors.frost,
     ];
 
