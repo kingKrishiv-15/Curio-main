@@ -61,7 +61,7 @@ class _SqueezePageState extends State<SqueezePage> {
     return CurioPage(
       title: 'Daily Squeeze',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
           CurioCard(
             color: CurioColors.navy,
@@ -81,8 +81,8 @@ class _SqueezePageState extends State<SqueezePage> {
                 Text(
                   '${_engine.minimum}  —  ${_engine.maximum}',
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 39,
+                    color: CurioColors.onDark,
+                    fontSize: 34,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -92,7 +92,7 @@ class _SqueezePageState extends State<SqueezePage> {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 9,
-                    backgroundColor: Colors.white12,
+                    backgroundColor: CurioColors.onDark.withValues(alpha: .12),
                     color: CurioColors.coral,
                   ),
                 ),
@@ -100,7 +100,7 @@ class _SqueezePageState extends State<SqueezePage> {
                 Text(
                   '${_engine.guessesLeft} guesses left',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: .7),
+                    color: CurioColors.onDark.withValues(alpha: .7),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -188,7 +188,7 @@ class _SqueezePageState extends State<SqueezePage> {
                       ),
                       backgroundColor: guess == _engine.target
                           ? CurioColors.greenSoft
-                          : Colors.white,
+                          : CurioColors.surface,
                     ),
                   )
                   .toList(),

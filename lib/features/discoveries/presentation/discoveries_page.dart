@@ -15,16 +15,16 @@ class DiscoveriesPage extends StatelessWidget {
     return CurioPage(
       maxWidth: 820,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 26, 20, 112),
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 104),
         children: [
           PageIntro(
-            eyebrow: 'Knowledge collection',
-            title: 'Discoveries',
+            eyebrow: 'Curiosity archive',
+            title: 'Ideas worth keeping.',
             subtitle:
                 '${state.collectedFacts.length} of ${discoveries.length} curious facts uncovered',
             trailing: ProgressRing(
               value: progress,
-              color: CurioColors.orange,
+              color: CurioColors.coral,
               child: Text(
                 '${(progress * 100).round()}%',
                 style: const TextStyle(
@@ -36,20 +36,20 @@ class DiscoveriesPage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           CurioCard(
-            color: CurioColors.navy,
-            borderColor: CurioColors.navy,
+            color: CurioColors.forestStrong,
+            borderColor: CurioColors.forestStrong,
             child: Row(
               children: [
                 Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    gradient: CurioColors.auroraGradient,
-                    borderRadius: BorderRadius.circular(18),
+                    color: CurioColors.saffron,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                   child: const Icon(
                     Icons.collections_bookmark_rounded,
-                    color: Colors.white,
+                    color: CurioColors.forestStrong,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -58,18 +58,19 @@ class DiscoveriesPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Your curiosity archive',
+                        'A cabinet of curious things',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: CurioColors.onDark,
                           fontSize: 17,
-                          fontWeight: FontWeight.w800,
+                          fontFamily: 'Fraunces',
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Every completed challenge can reveal a new idea worth remembering.',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: .65),
+                          color: CurioColors.onDark.withValues(alpha: .65),
                           fontSize: 12,
                         ),
                       ),
@@ -85,83 +86,94 @@ class DiscoveriesPage extends StatelessWidget {
             subtitle: 'Tap into the facts you’ve earned through play',
           ),
           const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 260,
-              mainAxisExtent: 218,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: discoveries.length,
-            itemBuilder: (context, index) {
-              final discovery = discoveries[index];
-              final collected = state.collectedFacts.contains(discovery.id);
-              return CurioCard(
-                color: collected ? Colors.white : CurioColors.surfaceMuted,
-                borderColor: collected
-                    ? CurioColors.teal.withValues(alpha: .2)
-                    : CurioColors.creamDeep,
-                padding: const EdgeInsets.all(16),
-                elevation: collected,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 680
+                  ? 3
+                  : constraints.maxWidth >= 350
+                  ? 2
+                  : 1;
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisExtent: columns == 1 ? 172 : 210,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemCount: discoveries.length,
+                itemBuilder: (context, index) {
+                  final discovery = discoveries[index];
+                  final collected = state.collectedFacts.contains(discovery.id);
+                  return CurioCard(
+                    color: collected
+                        ? CurioColors.surface
+                        : CurioColors.surfaceMuted,
+                    borderColor: collected
+                        ? CurioColors.teal.withValues(alpha: .2)
+                        : CurioColors.creamDeep,
+                    padding: const EdgeInsets.all(13),
+                    elevation: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: collected
-                                ? CurioColors.tealSoft
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Icon(
-                            collected ? discovery.icon : Icons.lock_outline,
-                            color: collected
-                                ? CurioColors.tealDark
-                                : CurioColors.navyMuted,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 46,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                color: collected
+                                    ? CurioColors.tealSoft
+                                    : CurioColors.surface,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Icon(
+                                collected ? discovery.icon : Icons.lock_outline,
+                                color: collected
+                                    ? CurioColors.tealDark
+                                    : CurioColors.navyMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            if (collected)
+                              const Icon(
+                                Icons.bookmark_added_rounded,
+                                color: CurioColors.coral,
+                                size: 19,
+                              ),
+                          ],
                         ),
                         const Spacer(),
-                        if (collected)
-                          const Icon(
-                            Icons.bookmark_added_rounded,
-                            color: CurioColors.coral,
-                            size: 19,
+                        CurioEyebrow(
+                          collected ? discovery.category : 'Locked',
+                          color: collected
+                              ? CurioColors.coral
+                              : CurioColors.navyMuted,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          collected ? discovery.title : 'Keep exploring',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          collected
+                              ? discovery.fact
+                              : 'Complete another activity to reveal this discovery.',
+                          maxLines: columns == 1 ? 2 : 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: CurioColors.navyMuted,
+                            fontSize: 11,
+                            height: 1.35,
                           ),
+                        ),
                       ],
                     ),
-                    const Spacer(),
-                    CurioEyebrow(
-                      collected ? discovery.category : 'Locked',
-                      color: collected
-                          ? CurioColors.coral
-                          : CurioColors.navyMuted,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      collected ? discovery.title : 'Keep exploring',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      collected
-                          ? discovery.fact
-                          : 'Complete another activity to reveal this discovery.',
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: CurioColors.navyMuted,
-                        fontSize: 11,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
             },
           ),

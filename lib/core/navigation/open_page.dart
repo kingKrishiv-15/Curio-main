@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../state/curio_state.dart';
+
 Future<T?> openPage<T>(BuildContext context, Widget page) {
+  final state = CurioScope.of(context);
   return Navigator.of(context).push<T>(
     PageRouteBuilder<T>(
-      pageBuilder: (_, animation, secondaryAnimation) => page,
+      pageBuilder: (_, animation, secondaryAnimation) =>
+          CurioScope(notifier: state, child: page),
       transitionDuration: const Duration(milliseconds: 320),
       reverseTransitionDuration: const Duration(milliseconds: 240),
       transitionsBuilder: (_, animation, secondaryAnimation, child) {

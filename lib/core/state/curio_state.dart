@@ -1,6 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../services/progress_store.dart';
+
 class CurioState extends ChangeNotifier {
+  CurioState({this.store});
+
+  final ProgressStore? store;
+  bool isLoading = false;
+  bool isSyncing = false;
+  String? syncError;
+
   String childName = 'Explorer';
   int totalXp = 360;
   int streak = 4;
@@ -34,6 +45,39 @@ class CurioState extends ChangeNotifier {
     );
   }
 
+  Future<void> hydrate() async {
+    if (store == null) return;
+    isLoading = true;
+    syncError = null;
+    notifyListeners();
+    try {
+      final snapshot = await store!.load();
+      childName = snapshot.childName;
+      totalXp = snapshot.totalXp;
+      streak = snapshot.streak;
+      completedActivities
+        ..clear()
+        ..addAll(snapshot.completedActivities);
+      collectedFacts
+        ..clear()
+        ..addAll(snapshot.collectedFacts);
+      skills
+        ..clear()
+        ..addAll({
+          'Number sense': 0,
+          'Patterns': 0,
+          'Evidence': 0,
+          'Reasoning': 0,
+        })
+        ..addAll(snapshot.skills);
+    } catch (_) {
+      syncError = 'Could not load cloud progress. Local progress is available.';
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   static String dailyActivityId(String activity, [DateTime? date]) {
     return '${activity}_${_dateKey(date ?? DateTime.now())}';
   }
@@ -56,6 +100,7 @@ class CurioState extends ChangeNotifier {
     skills[skill] = ((skills[skill] ?? 0) + 0.12).clamp(0, 1);
     if (factId != null) collectedFacts.add(factId);
     notifyListeners();
+    _persist();
   }
 
   void renameChild(String value) {
@@ -63,6 +108,43 @@ class CurioState extends ChangeNotifier {
     if (cleaned.isEmpty) return;
     childName = cleaned;
     notifyListeners();
+    _persist();
+  }
+
+  Future<void> retrySync() async {
+    syncError = null;
+    notifyListeners();
+    await _save();
+  }
+
+  void _persist() {
+    if (store == null) return;
+    unawaited(_save());
+  }
+
+  Future<void> _save() async {
+    final progressStore = store;
+    if (progressStore == null) return;
+    isSyncing = true;
+    notifyListeners();
+    try {
+      await progressStore.save(
+        ProgressSnapshot(
+          childName: childName,
+          totalXp: totalXp,
+          streak: streak,
+          completedActivities: Set.of(completedActivities),
+          collectedFacts: Set.of(collectedFacts),
+          skills: Map.of(skills),
+        ),
+      );
+      syncError = null;
+    } catch (_) {
+      syncError = 'Progress is saved locally but has not reached Supabase yet.';
+    } finally {
+      isSyncing = false;
+      notifyListeners();
+    }
   }
 }
 

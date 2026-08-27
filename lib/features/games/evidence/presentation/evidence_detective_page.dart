@@ -70,7 +70,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
     return CurioPage(
       title: 'Evidence Detective',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
           CurioCard(
             color: CurioColors.frostDark,
@@ -91,8 +91,8 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
                 Text(
                   'The school garden was damaged overnight. What evidence should we trust?',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
+                    color: CurioColors.onDark,
+                    fontSize: 20,
                     height: 1.2,
                     fontWeight: FontWeight.w900,
                   ),

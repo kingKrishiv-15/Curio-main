@@ -1,8 +1,26 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
 import '../theme/curio_colors.dart';
+
+abstract final class CurioSpace {
+  static const xxs = 4.0;
+  static const xs = 8.0;
+  static const sm = 12.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
+  static const xxl = 48.0;
+}
+
+abstract final class CurioRadius {
+  static const small = 2.0;
+  static const medium = 4.0;
+  static const large = 7.0;
+  static const hero = 4.0;
+}
 
 class CurioPage extends StatelessWidget {
   const CurioPage({
@@ -22,7 +40,7 @@ class CurioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pageColor = backgroundColor ?? CurioColors.cream;
+    final pageColor = backgroundColor ?? CurioColors.canvas;
     return Scaffold(
       backgroundColor: pageColor,
       appBar: title == null
@@ -34,34 +52,27 @@ class CurioPage extends StatelessWidget {
             ),
       body: Stack(
         children: [
-          if (backgroundColor == null)
+          if (backgroundColor == null) ...[
             const Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(gradient: CurioColors.pageGradient),
               ),
             ),
-          const Positioned(
-            top: -120,
-            right: -105,
-            child: _AmbientOrb(size: 285, color: Color(0xFFBFD3FF)),
-          ),
-          const Positioned(
-            bottom: -135,
-            left: -120,
-            child: _AmbientOrb(size: 315, color: Color(0xFFBCEBDD)),
-          ),
-          const Positioned(
-            top: 280,
-            left: -125,
-            child: _AmbientOrb(size: 220, color: Color(0xFFFFDFB8)),
-          ),
+            const Positioned.fill(child: _CurioBackdrop()),
+          ],
           SafeArea(
             top: title == null,
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: maxWidth),
-                child: child,
+                child: DefaultTextStyle.merge(
+                  style: const TextStyle(color: CurioColors.ink),
+                  child: IconTheme.merge(
+                    data: const IconThemeData(color: CurioColors.inkSoft),
+                    child: child,
+                  ),
+                ),
               ),
             ),
           ),
@@ -71,47 +82,57 @@ class CurioPage extends StatelessWidget {
   }
 }
 
-class _AmbientOrb extends StatelessWidget {
-  const _AmbientOrb({required this.size, required this.color});
-
-  final double size;
-  final Color color;
+class _CurioBackdrop extends StatelessWidget {
+  const _CurioBackdrop();
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              colors: [
-                color.withValues(alpha: .44),
-                color.withValues(alpha: 0),
-              ],
-              stops: const [.08, 1],
-            ),
-            shape: BoxShape.circle,
-          ),
-        ),
+      child: Opacity(
+        opacity: .62,
+        child: CustomPaint(painter: _CurioBackdropPainter()),
       ),
     );
   }
 }
 
-/// A restrained frosted surface for floating controls and navigation.
-/// Content cards intentionally remain opaque so hierarchy and contrast stay
-/// predictable as colorful content moves behind the glass layer.
+class _CurioBackdropPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final forest = Paint()
+      ..color = CurioColors.forest.withValues(alpha: .08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final coral = Paint()
+      ..color = CurioColors.coral.withValues(alpha: .08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final ink = Paint()..color = CurioColors.ink.withValues(alpha: .018);
+
+    canvas.drawCircle(Offset(size.width + 22, 76), 108, forest);
+    canvas.drawCircle(Offset(-42, size.height * .58), 92, coral);
+
+    for (var y = 128.0; y < size.height; y += 42) {
+      for (var x = 24.0; x < size.width; x += 42) {
+        if ((x + y).round().isEven) continue;
+        canvas.drawCircle(Offset(x, y), .8, ink);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Frosted material is reserved for floating navigation and transient controls.
 class GlassSurface extends StatelessWidget {
   const GlassSurface({
     required this.child,
     this.padding = EdgeInsets.zero,
-    this.radius = 22,
+    this.radius = CurioRadius.large,
     this.blur = 18,
-    this.tint = Colors.white,
-    this.opacity = .72,
+    this.tint = CurioColors.surface,
+    this.opacity = .78,
     super.key,
   });
 
@@ -130,9 +151,9 @@ class GlassSurface extends StatelessWidget {
         borderRadius: borderRadius,
         boxShadow: const [
           BoxShadow(
-            color: Color(0x1714263D),
-            blurRadius: 30,
-            offset: Offset(0, 12),
+            color: Color(0x18291C12),
+            blurRadius: 24,
+            offset: Offset(0, 9),
           ),
         ],
       ),
@@ -142,21 +163,35 @@ class GlassSurface extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  tint.withValues(alpha: (opacity + .12).clamp(0, 1)),
-                  tint.withValues(alpha: opacity),
-                ],
-              ),
+              color: tint.withValues(alpha: opacity),
               borderRadius: borderRadius,
               border: Border.all(
-                color: Colors.white.withValues(alpha: .88),
+                color: Colors.white.withValues(alpha: .76),
                 width: 1.1,
               ),
             ),
-            child: Padding(padding: padding, child: child),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: borderRadius,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: .22),
+                            Colors.white.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(padding: padding, child: child),
+              ],
+            ),
           ),
         ),
       ),
@@ -168,11 +203,11 @@ class CurioCard extends StatelessWidget {
   const CurioCard({
     required this.child,
     this.color = CurioColors.surface,
-    this.borderColor = CurioColors.creamDeep,
-    this.padding = const EdgeInsets.all(18),
+    this.borderColor = CurioColors.outlineSoft,
+    this.padding = const EdgeInsets.all(14),
     this.onTap,
-    this.radius = 22,
-    this.elevation = true,
+    this.radius = CurioRadius.large,
+    this.elevation = false,
     super.key,
   });
 
@@ -195,8 +230,8 @@ class CurioCard extends StatelessWidget {
         boxShadow: elevation
             ? const [
                 BoxShadow(
-                  color: Color(0x0F101828),
-                  blurRadius: 22,
+                  color: Color(0x10291C12),
+                  blurRadius: 18,
                   offset: Offset(0, 8),
                 ),
               ]
@@ -208,6 +243,8 @@ class CurioCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
+          splashColor: CurioColors.forest.withValues(alpha: .08),
+          highlightColor: CurioColors.forest.withValues(alpha: .035),
           borderRadius: borderRadius,
           child: Padding(padding: padding, child: child),
         ),
@@ -217,21 +254,39 @@ class CurioCard extends StatelessWidget {
 }
 
 class CurioEyebrow extends StatelessWidget {
-  const CurioEyebrow(this.label, {this.color = CurioColors.coral, super.key});
+  const CurioEyebrow(this.label, {this.color = CurioColors.forest, super.key});
 
   final String label;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label.toUpperCase(),
-      style: TextStyle(
-        color: color,
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.5,
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 18,
+          height: 2,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: color,
+              fontSize: 9.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.35,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -260,17 +315,22 @@ class PageIntro extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CurioEyebrow(eyebrow),
-              const SizedBox(height: 7),
+              const SizedBox(height: 8),
               Text(title, style: Theme.of(context).textTheme.headlineLarge),
               const SizedBox(height: 7),
-              Text(
-                subtitle,
-                style: const TextStyle(color: CurioColors.navyMuted),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Text(
+                  subtitle,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: CurioColors.inkMuted),
+                ),
               ),
             ],
           ),
         ),
-        if (trailing != null) ...[const SizedBox(width: 14), trailing!],
+        if (trailing != null) ...[const SizedBox(width: 16), trailing!],
       ],
     );
   }
@@ -292,23 +352,14 @@ class SectionHeading extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: CurioColors.navy,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -.2,
-                ),
-              ),
+              Text(title, style: Theme.of(context).textTheme.titleLarge),
               if (subtitle != null) ...[
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   subtitle!,
-                  style: const TextStyle(
-                    color: CurioColors.navyMuted,
-                    fontSize: 12,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: CurioColors.inkMuted),
                 ),
               ],
             ],
@@ -327,40 +378,72 @@ class CurioBrand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: compact ? 34 : 40,
-          height: compact ? 34 : 40,
-          decoration: BoxDecoration(
-            gradient: CurioColors.auroraGradient,
-            borderRadius: BorderRadius.circular(compact ? 11 : 13),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x3013B8A6),
-                blurRadius: 14,
-                offset: Offset(0, 5),
-              ),
-            ],
+    return Semantics(
+      label: 'Curio',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _CurioLogoMark(size: compact ? 29 : 34),
+          const SizedBox(width: 10),
+          Text(
+            'curio',
+            style: TextStyle(
+              fontFamily: 'Fraunces',
+              color: CurioColors.ink,
+              fontSize: compact ? 24 : 29,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -1.35,
+            ),
           ),
-          child: Icon(
+        ],
+      ),
+    );
+  }
+}
+
+class _CurioLogoMark extends StatelessWidget {
+  const _CurioLogoMark({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: CurioColors.brandGradient,
+        borderRadius: BorderRadius.circular(size * .34),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x29183E35),
+            blurRadius: 12,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
             Icons.auto_awesome_rounded,
-            color: Colors.white,
-            size: compact ? 19 : 22,
+            color: CurioColors.onDark,
+            size: size * .48,
           ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          'curio',
-          style: TextStyle(
-            color: CurioColors.navy,
-            fontSize: compact ? 20 : 24,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1,
+          Positioned(
+            right: size * .17,
+            top: size * .16,
+            child: Container(
+              width: size * .13,
+              height: size * .13,
+              decoration: const BoxDecoration(
+                color: CurioColors.saffron,
+                shape: BoxShape.circle,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -378,43 +461,59 @@ class MascotBadge extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          gradient: CurioColors.auroraGradient,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 4),
+          color: CurioColors.forestSoft,
+          borderRadius: BorderRadius.circular(size * .36),
+          border: Border.all(color: CurioColors.surface, width: 4),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x3813B8A6),
-              blurRadius: 20,
-              offset: Offset(0, 8),
+              color: Color(0x18291C12),
+              blurRadius: 15,
+              offset: Offset(0, 7),
             ),
           ],
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Container(
-              width: size * .58,
-              height: size * .48,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(size * .22),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _MascotEye(size: size * .075),
-                  SizedBox(width: size * .13),
-                  _MascotEye(size: size * .075),
-                ],
+            Transform.rotate(
+              angle: -.08,
+              child: Container(
+                width: size * .7,
+                height: size * .62,
+                decoration: BoxDecoration(
+                  color: CurioColors.forest,
+                  borderRadius: BorderRadius.circular(size * .28),
+                ),
+                child: Center(
+                  child: Container(
+                    width: size * .48,
+                    height: size * .28,
+                    decoration: BoxDecoration(
+                      color: CurioColors.surface,
+                      borderRadius: BorderRadius.circular(size * .14),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _MascotEye(size: size * .065),
+                        SizedBox(width: size * .13),
+                        _MascotEye(size: size * .065),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
             Positioned(
-              right: size * .02,
+              right: size * .015,
               top: size * .01,
-              child: Icon(
-                Icons.auto_awesome,
-                color: CurioColors.gold,
-                size: size * .24,
+              child: Transform.rotate(
+                angle: .18,
+                child: Icon(
+                  Icons.auto_awesome,
+                  color: CurioColors.saffron,
+                  size: size * .27,
+                ),
               ),
             ),
           ],
@@ -434,7 +533,7 @@ class _MascotEye extends StatelessWidget {
       width: size,
       height: size,
       decoration: const BoxDecoration(
-        color: CurioColors.navy,
+        color: CurioColors.ink,
         shape: BoxShape.circle,
       ),
     );
@@ -461,22 +560,21 @@ class StatPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(CurioRadius.medium),
           border: Border.all(color: color.withValues(alpha: .16)),
         ),
         child: Row(
           children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: Icon(icon, color: color, size: 20),
+            CurioIconTile(
+              icon: icon,
+              color: color,
+              background: color.withValues(alpha: .1),
+              size: 30,
+              iconSize: 17,
+              radius: 10,
             ),
             const SizedBox(width: 9),
             Expanded(
@@ -486,10 +584,13 @@ class StatPill extends StatelessWidget {
                   Text(
                     value,
                     maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
                     style: TextStyle(
                       color: color,
                       fontWeight: FontWeight.w800,
-                      fontSize: 15,
+                      fontSize: 14.5,
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                   Text(
@@ -497,9 +598,9 @@ class StatPill extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: CurioColors.navyMuted,
+                      color: CurioColors.inkMuted,
                       fontWeight: FontWeight.w600,
-                      fontSize: 10,
+                      fontSize: 9.5,
                     ),
                   ),
                 ],
@@ -508,6 +609,38 @@ class StatPill extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class CurioIconTile extends StatelessWidget {
+  const CurioIconTile({
+    required this.icon,
+    required this.color,
+    this.background,
+    this.size = 44,
+    this.iconSize = 22,
+    this.radius = 15,
+    super.key,
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color? background;
+  final double size;
+  final double iconSize;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: background ?? color.withValues(alpha: .11),
+        borderRadius: BorderRadius.circular(radius),
+      ),
+      child: Icon(icon, color: color, size: iconSize),
     );
   }
 }
@@ -523,13 +656,13 @@ class GameMetaChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: CurioColors.navyMuted),
+        Icon(icon, size: 14, color: CurioColors.inkMuted),
         const SizedBox(width: 5),
         Text(
           label,
           style: const TextStyle(
-            color: CurioColors.navyMuted,
-            fontSize: 11,
+            color: CurioColors.inkMuted,
+            fontSize: 10.5,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -564,104 +697,98 @@ class ModeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return CurioCard(
       onTap: onTap,
-      color: Colors.white,
-      borderColor: CurioColors.creamDeep,
-      padding: const EdgeInsets.all(15),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: .12),
-              borderRadius: BorderRadius.circular(17),
+      color: CurioColors.surface,
+      borderColor: CurioColors.outlineSoft,
+      padding: EdgeInsets.zero,
+      elevation: false,
+      radius: 4,
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Container(width: 5, color: color),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 9, 12),
+              child: CurioIconTile(icon: icon, color: color),
             ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    if (badge != null) ...[
-                      const SizedBox(width: 7),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: .12),
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Text(
-                          badge!,
-                          style: TextStyle(
-                            color: color,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: .5,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
+                        if (badge != null) ...[
+                          const SizedBox(width: 7),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: .1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              badge!,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: .55,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: CurioColors.inkMuted,
+                        fontSize: 11.5,
+                        height: 1.35,
+                      ),
+                    ),
+                    if (duration != null || skill != null) ...[
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 5,
+                        children: [
+                          if (duration != null)
+                            GameMetaChip(
+                              icon: Icons.schedule_rounded,
+                              label: duration!,
+                            ),
+                          if (skill != null)
+                            GameMetaChip(
+                              icon: Icons.psychology_alt_rounded,
+                              label: skill!,
+                            ),
+                        ],
                       ),
                     ],
                   ],
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: CurioColors.navyMuted,
-                    fontSize: 12,
-                  ),
-                ),
-                if (duration != null || skill != null) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 5,
-                    children: [
-                      if (duration != null)
-                        GameMetaChip(
-                          icon: Icons.schedule_rounded,
-                          label: duration!,
-                        ),
-                      if (skill != null)
-                        GameMetaChip(
-                          icon: Icons.psychology_alt_rounded,
-                          label: skill!,
-                        ),
-                    ],
-                  ),
-                ],
-              ],
+              ),
             ),
-          ),
-          const SizedBox(width: 6),
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: CurioColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Icon(Icons.arrow_forward_rounded, size: 19, color: color),
             ),
-            child: const Icon(
-              Icons.arrow_forward_rounded,
-              size: 17,
-              color: CurioColors.navyMuted,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -687,7 +814,7 @@ class PrimaryButton extends StatelessWidget {
       width: double.infinity,
       child: FilledButton.icon(
         onPressed: onPressed,
-        icon: icon == null ? const SizedBox.shrink() : Icon(icon, size: 19),
+        icon: icon == null ? const SizedBox.shrink() : Icon(icon, size: 18),
         label: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15),
           child: Text(label),
@@ -702,7 +829,7 @@ class ProgressRing extends StatelessWidget {
   const ProgressRing({
     required this.value,
     required this.child,
-    this.color = CurioColors.teal,
+    this.color = CurioColors.coral,
     this.size = 54,
     super.key,
   });
@@ -722,7 +849,7 @@ class ProgressRing extends StatelessWidget {
         children: [
           SizedBox.expand(
             child: CircularProgressIndicator(
-              value: value,
+              value: value.clamp(0, 1),
               strokeWidth: 5,
               strokeCap: StrokeCap.round,
               color: color,
@@ -730,6 +857,103 @@ class ProgressRing extends StatelessWidget {
             ),
           ),
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class CurioProgressBar extends StatelessWidget {
+  const CurioProgressBar({
+    required this.value,
+    this.color = CurioColors.forest,
+    this.height = 8,
+    super.key,
+  });
+
+  final double value;
+  final Color color;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          height: height,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: .12),
+            borderRadius: BorderRadius.circular(height),
+          ),
+          alignment: Alignment.centerLeft,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeOutCubic,
+            width: math.max(height, constraints.maxWidth * value.clamp(0, 1)),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(height),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CurioStatusStrip extends StatelessWidget {
+  const CurioStatusStrip({
+    required this.icon,
+    required this.title,
+    required this.body,
+    this.color = CurioColors.forest,
+    super.key,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .075),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: .16)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CurioIconTile(
+            icon: icon,
+            color: color,
+            size: 38,
+            iconSize: 20,
+            radius: 11,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    color: CurioColors.inkMuted,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

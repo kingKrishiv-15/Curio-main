@@ -27,23 +27,23 @@ class _MainShellState extends State<MainShell> {
 
   static const _destinations = <NavigationDestination>[
     NavigationDestination(
-      icon: Icon(Icons.home_outlined),
-      selectedIcon: Icon(Icons.home_rounded),
+      icon: _NavGlyph(icon: Icons.home_outlined),
+      selectedIcon: _NavGlyph(icon: Icons.home_rounded, selected: true),
       label: 'Home',
     ),
     NavigationDestination(
-      icon: Icon(Icons.extension_outlined),
-      selectedIcon: Icon(Icons.extension_rounded),
+      icon: _NavGlyph(icon: Icons.grid_view_rounded),
+      selectedIcon: _NavGlyph(icon: Icons.extension_rounded, selected: true),
       label: 'Games',
     ),
     NavigationDestination(
-      icon: Icon(Icons.auto_stories_outlined),
-      selectedIcon: Icon(Icons.auto_stories_rounded),
+      icon: _NavGlyph(icon: Icons.explore_outlined),
+      selectedIcon: _NavGlyph(icon: Icons.explore_rounded, selected: true),
       label: 'Discoveries',
     ),
     NavigationDestination(
-      icon: Icon(Icons.face_outlined),
-      selectedIcon: Icon(Icons.face_rounded),
+      icon: _NavGlyph(icon: Icons.person_outline_rounded),
+      selectedIcon: _NavGlyph(icon: Icons.person_rounded, selected: true),
       label: 'Profile',
     ),
   ];
@@ -74,10 +74,7 @@ class _MainShellState extends State<MainShell> {
           body: IndexedStack(index: _index, children: _pages),
           bottomNavigationBar: SafeArea(
             minimum: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-            child: GlassSurface(
-              radius: 24,
-              blur: 22,
-              opacity: .7,
+            child: _BottomDock(
               child: NavigationBar(
                 selectedIndex: _index,
                 onDestinationSelected: _select,
@@ -92,6 +89,85 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
+class _NavGlyph extends StatelessWidget {
+  const _NavGlyph({required this.icon, this.selected = false});
+
+  final IconData icon;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      width: selected ? 35 : 31,
+      height: selected ? 35 : 31,
+      decoration: BoxDecoration(
+        gradient: selected
+            ? CurioColors.brandGradient
+            : const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [CurioColors.surface, CurioColors.forestMist],
+              ),
+        borderRadius: BorderRadius.circular(selected ? 13 : 11),
+        border: Border.all(
+          color: selected
+              ? CurioColors.forest
+              : CurioColors.forest.withValues(alpha: .11),
+        ),
+      ),
+      child: Icon(
+        icon,
+        size: selected ? 19 : 17,
+        color: selected ? CurioColors.onDark : CurioColors.forestStrong,
+      ),
+    );
+  }
+}
+
+class _BottomDock extends StatelessWidget {
+  const _BottomDock({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x24102C26),
+            blurRadius: 26,
+            offset: Offset(0, 11),
+          ),
+          BoxShadow(
+            color: Color(0x0F102C26),
+            blurRadius: 7,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFF0F6F2), Color(0xFFDDEBE3)],
+            ),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: const Color(0xE6FFFFFF), width: 1.2),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 class _CurioRail extends StatelessWidget {
   const _CurioRail({required this.index, required this.onSelected});
 
@@ -102,10 +178,10 @@ class _CurioRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     return Container(
-      width: 224,
+      width: 244,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .92),
-        border: const Border(right: BorderSide(color: CurioColors.creamDeep)),
+        color: CurioColors.surface.withValues(alpha: .94),
+        border: const Border(right: BorderSide(color: CurioColors.outlineSoft)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 20),
       child: Column(
@@ -127,13 +203,13 @@ class _CurioRail extends StatelessWidget {
                   onTap: () => onSelected(itemIndex),
                   leading: Icon(
                     selected
-                        ? (item.selectedIcon as Icon).icon
-                        : (item.icon as Icon).icon,
+                        ? (item.selectedIcon as _NavGlyph).icon
+                        : (item.icon as _NavGlyph).icon,
                   ),
                   title: Text(item.label),
-                  selectedColor: CurioColors.coralDark,
-                  iconColor: CurioColors.navyMuted,
-                  textColor: CurioColors.navyMuted,
+                  selectedColor: CurioColors.coral,
+                  iconColor: CurioColors.inkMuted,
+                  textColor: CurioColors.inkMuted,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -175,18 +251,15 @@ class _CurioRail extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                LinearProgressIndicator(
+                CurioProgressBar(
                   value: state.dailyGoalCompleted / 3,
-                  minHeight: 7,
-                  borderRadius: BorderRadius.circular(99),
-                  color: CurioColors.coral,
-                  backgroundColor: Colors.white,
+                  height: 7,
                 ),
                 const SizedBox(height: 7),
                 Text(
                   '${state.dailyGoalCompleted} of 3 challenges',
                   style: const TextStyle(
-                    color: CurioColors.navyMuted,
+                    color: CurioColors.inkMuted,
                     fontSize: 10,
                   ),
                 ),

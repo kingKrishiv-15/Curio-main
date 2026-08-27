@@ -158,7 +158,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
         ),
       ],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
           const CurioEyebrow('Daily knowledge puzzle'),
           const SizedBox(height: 6),
@@ -222,7 +222,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
                       group.title.toUpperCase(),
                       style: TextStyle(
                         color: group.color == CurioColors.gold
-                            ? const Color(0xFF8B6411)
+                            ? CurioColors.saffronStrong
                             : group.color,
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
@@ -286,7 +286,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
                                     word,
                                     style: TextStyle(
                                       color: selected
-                                          ? Colors.white
+                                          ? CurioColors.onDark
                                           : CurioColors.navy,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,

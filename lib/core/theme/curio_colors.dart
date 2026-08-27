@@ -1,62 +1,91 @@
 import 'package:flutter/material.dart';
 
+/// Curio's semantic colour system.
+///
+/// Palette adapted from the provided Hasta Kalā reference: warm paper,
+/// oxblood action, forest contrast, antique gold, and ink typography.
 abstract final class CurioColors {
-  // Product neutrals: cool enough to feel modern, warm enough for long
-  // learning sessions. These carry the majority of the interface.
-  static const cream = Color(0xFFF4F7FB);
-  static const creamDeep = Color(0xFFDDE5EF);
-  static const surface = Color(0xFFFFFFFF);
-  static const surfaceMuted = Color(0xFFEDF2F7);
-  static const navy = Color(0xFF14213D);
-  static const navyMuted = Color(0xFF607089);
-  static const navySoft = Color(0xFF33445F);
+  static const canvas = Color(0xFFE2ECE6);
+  static const canvasDeep = Color(0xFFD4E3DA);
+  static const surface = Color(0xFFF1F6F2);
+  static const surfaceMuted = Color(0xFFDCE8E0);
+  static const onDark = Color(0xFFF4FAF6);
+  static const ink = Color(0xFF17201D);
+  static const inkSoft = Color(0xFF46514C);
+  static const inkMuted = Color(0xFF68736E);
+  static const outline = Color(0x3D405049);
+  static const outlineSoft = Color(0x24405049);
 
-  // Semantic brand ramps. Cobalt is instructive/action, jade communicates
-  // exploration, and sunbeam is reserved for rewards. Legacy aliases keep
-  // feature code readable while the product migrates to semantic names.
-  static const primary = Color(0xFF315EDB);
-  static const primaryStrong = Color(0xFF1E3A8A);
-  static const primarySoft = Color(0xFFE6EEFF);
-  static const jade = Color(0xFF0F766E);
-  static const jadeStrong = Color(0xFF115E59);
-  static const jadeSoft = Color(0xFFDDF7F2);
-  static const mintBright = Color(0xFF2DD4BF);
-  static const skyBright = Color(0xFF38BDF8);
+  static const forest = Color(0xFF183E35);
+  static const forestStrong = Color(0xFF102C26);
+  static const forestSoft = Color(0xFFD4E4DD);
+  static const forestMist = Color(0xFFE2ECE7);
 
-  static const teal = jade;
-  static const tealDark = jadeStrong;
-  static const tealSoft = jadeSoft;
-  static const coral = primary;
-  static const coralDark = primaryStrong;
-  static const coralSoft = primarySoft;
-  static const gold = Color(0xFFF7C948);
-  static const goldStrong = Color(0xFF8A6100);
-  static const goldSoft = Color(0xFFFFF4CF);
-  static const frost = Color(0xFF7057E8);
-  static const frostDark = Color(0xFF243B64);
-  static const green = Color(0xFF178654);
-  static const greenSoft = Color(0xFFDFF6E9);
-  static const orange = Color(0xFFB5472F);
-  static const orangeSoft = Color(0xFFFFE8E1);
-  static const pink = Color(0xFFC93D78);
+  static const coral = Color(0xFF2D6A5B);
+  static const coralStrong = Color(0xFF19483D);
+  static const coralSoft = Color(0xFFCFE0D7);
+  static const saffron = Color(0xFFCBD957);
+  static const saffronStrong = Color(0xFF667119);
+  static const saffronSoft = Color(0xFFF0F3C9);
+  static const blue = Color(0xFF487568);
+  static const blueSoft = Color(0xFFD9E7E1);
+  static const plum = Color(0xFF315B50);
+  static const plumSoft = Color(0xFFDCE8E3);
+  static const success = Color(0xFF237A54);
+  static const successSoft = Color(0xFFDFEFE5);
+  static const danger = Color(0xFFB84335);
+  static const dangerSoft = Color(0xFFF8E1DD);
+
+  static const night = forestStrong;
+  static const ice = Color(0xFF5A8D7D);
+  static const iceSoft = Color(0xFFDCEAE4);
 
   static const heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF102D4F), Color(0xFF165C72), Color(0xFF0F8B80)],
-    stops: [0, .55, 1],
+    colors: [forestStrong, forest, Color(0xFF2D6A5B)],
   );
 
-  static const auroraGradient = LinearGradient(
+  static const brandGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [mintBright, skyBright],
+    colors: [forestStrong, forest],
   );
 
   static const pageGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFF9FBFF), cream, Color(0xFFF0FAF7)],
-    stops: [0, .55, 1],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFE8F1EB), Color(0xFFDDEAE2), Color(0xFFD5E5DC)],
+    stops: [0, .6, 1],
   );
+
+  // Compatibility aliases for established game presentation code.
+  static const cream = canvas;
+  static const creamDeep = outlineSoft;
+  static const navy = ink;
+  static const navySoft = inkSoft;
+  static const navyMuted = inkMuted;
+  static const primary = forest;
+  static const primaryStrong = forestStrong;
+  static const primarySoft = forestSoft;
+  static const jade = forest;
+  static const jadeStrong = forestStrong;
+  static const jadeSoft = forestSoft;
+  static const teal = forest;
+  static const tealDark = forestStrong;
+  static const tealSoft = forestSoft;
+  static const coralDark = coralStrong;
+  static const gold = saffron;
+  static const goldStrong = saffronStrong;
+  static const goldSoft = saffronSoft;
+  static const frost = blue;
+  static const frostDark = night;
+  static const green = success;
+  static const greenSoft = successSoft;
+  static const orange = coral;
+  static const orangeSoft = coralSoft;
+  static const pink = plum;
+  static const mintBright = Color(0xFF4AAD8C);
+  static const skyBright = Color(0xFF78A99A);
+  static const auroraGradient = brandGradient;
 }

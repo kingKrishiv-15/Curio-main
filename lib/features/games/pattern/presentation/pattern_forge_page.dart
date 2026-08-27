@@ -80,7 +80,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
       return CurioPage(
         title: 'Pattern Forge',
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: CurioCard(
             color: CurioColors.tealSoft,
             borderColor: CurioColors.teal,
@@ -118,7 +118,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
     return CurioPage(
       title: 'Pattern Forge',
       child: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         children: [
           Row(
             children: [
@@ -144,7 +144,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
             color: CurioColors.teal,
             backgroundColor: CurioColors.tealSoft,
           ),
-          const SizedBox(height: 26),
+          const SizedBox(height: 20),
           CurioCard(
             color: CurioColors.navy,
             borderColor: CurioColors.navy,
@@ -164,8 +164,8 @@ class _PatternForgePageState extends State<PatternForgePage> {
                   question.sequence,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
+                    color: CurioColors.onDark,
+                    fontSize: 27,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.5,
                   ),
@@ -190,7 +190,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
                     ? CurioColors.greenSoft
                     : isSelected
                     ? CurioColors.coralSoft
-                    : Colors.white,
+                    : CurioColors.surface,
                 borderColor: color.withValues(alpha: .6),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 18,
@@ -225,7 +225,10 @@ class _PatternForgePageState extends State<PatternForgePage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.lightbulb_rounded, color: Color(0xFFC78312)),
+                  const Icon(
+                    Icons.lightbulb_rounded,
+                    color: CurioColors.saffronStrong,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(child: Text(question.rule)),
                 ],

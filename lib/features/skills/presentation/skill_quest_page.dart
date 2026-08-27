@@ -18,23 +18,23 @@ class SkillQuestPage extends StatelessWidget {
       Icons.psychology_rounded,
     ];
     const colors = [
-      CurioColors.teal,
+      CurioColors.forest,
       CurioColors.coral,
       CurioColors.goldStrong,
-      CurioColors.frost,
+      CurioColors.blue,
     ];
 
     return CurioPage(
       title: 'Skill Quest',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
           const Text(
             'YOUR LEARNING MAP',
             style: TextStyle(
-              color: CurioColors.coral,
+              color: CurioColors.forest,
               fontSize: 11,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
               letterSpacing: 1.4,
             ),
           ),
@@ -50,14 +50,15 @@ class SkillQuestPage extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: CurioCard(
+                elevation: false,
                 borderColor: colors[index].withValues(alpha: .35),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 28,
+                      radius: 23,
                       backgroundColor: colors[index].withValues(alpha: .13),
                       foregroundColor: colors[index],
-                      child: Icon(icons[index], size: 28),
+                      child: Icon(icons[index], size: 23),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -84,20 +85,16 @@ class SkillQuestPage extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 9),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(99),
-                            child: LinearProgressIndicator(
-                              value: item.value,
-                              minHeight: 9,
-                              backgroundColor: CurioColors.creamDeep,
-                              color: colors[index],
-                            ),
+                          CurioProgressBar(
+                            value: item.value,
+                            color: colors[index],
+                            height: 8,
                           ),
                           const SizedBox(height: 5),
                           Text(
                             '${(item.value * 100).round()}% mastery',
                             style: const TextStyle(
-                              color: CurioColors.navyMuted,
+                              color: CurioColors.inkMuted,
                               fontSize: 11,
                             ),
                           ),
@@ -111,8 +108,8 @@ class SkillQuestPage extends StatelessWidget {
           }),
           const SizedBox(height: 8),
           CurioCard(
-            color: CurioColors.tealSoft,
-            borderColor: CurioColors.teal,
+            color: CurioColors.forestSoft,
+            borderColor: CurioColors.forest.withValues(alpha: .25),
             child: const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

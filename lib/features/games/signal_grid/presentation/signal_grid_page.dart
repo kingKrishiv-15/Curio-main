@@ -114,7 +114,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
       isScrollControlled: true,
       builder: (context) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +156,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
         ),
       ],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
           const CurioEyebrow('Daily logic puzzle', color: CurioColors.tealDark),
           const SizedBox(height: 6),
@@ -199,7 +199,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x30172033),
+                        color: Color(0x30102C26),
                         blurRadius: 30,
                         offset: Offset(0, 14),
                       ),
@@ -227,8 +227,8 @@ class _SignalGridPageState extends State<SignalGridPage> {
                           color: error
                               ? CurioColors.orangeSoft
                               : given
-                              ? const Color(0xFF293554)
-                              : Colors.white,
+                              ? CurioColors.forestStrong
+                              : CurioColors.surface,
                           borderRadius: BorderRadius.circular(15),
                           child: InkWell(
                             onTap: given ? null : () => _cycle(index),
@@ -239,7 +239,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                   ? Icon(
                                       Icons.add_rounded,
                                       key: ValueKey('empty_$index'),
-                                      color: const Color(0xFFB8C0D0),
+                                      color: CurioColors.forestSoft,
                                       size: 22,
                                     )
                                   : Icon(
@@ -250,7 +250,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                       color: signal == _Signal.spark
                                           ? CurioColors.gold
                                           : given
-                                          ? const Color(0xFF6FE1D5)
+                                          ? CurioColors.saffron
                                           : CurioColors.teal,
                                       size: 31,
                                     ),

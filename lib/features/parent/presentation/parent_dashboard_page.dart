@@ -12,28 +12,21 @@ class ParentDashboardPage extends StatelessWidget {
     final state = CurioScope.of(context);
     return CurioPage(
       title: 'Parent dashboard',
-      actions: [
-        IconButton(
-          onPressed: () {},
-          tooltip: 'Settings',
-          icon: const Icon(Icons.settings_outlined),
-        ),
-      ],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
           CurioCard(
-            color: CurioColors.navy,
-            borderColor: CurioColors.navy,
+            color: CurioColors.forestStrong,
+            borderColor: CurioColors.forestStrong,
             child: Row(
               children: [
                 const CircleAvatar(
                   radius: 30,
-                  backgroundColor: CurioColors.teal,
+                  backgroundColor: CurioColors.forest,
                   child: Icon(
-                    Icons.face_rounded,
-                    color: Colors.white,
-                    size: 32,
+                    Icons.auto_awesome_rounded,
+                    color: CurioColors.saffron,
+                    size: 30,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -44,7 +37,7 @@ class ParentDashboardPage extends StatelessWidget {
                       Text(
                         state.childName,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: CurioColors.onDark,
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
                         ),
@@ -52,7 +45,7 @@ class ParentDashboardPage extends StatelessWidget {
                       Text(
                         '${state.totalXp} total XP · Stage ${state.companionStage}',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: .66),
+                          color: CurioColors.onDark.withValues(alpha: .66),
                         ),
                       ),
                     ],
@@ -61,29 +54,38 @@ class ParentDashboardPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _ParentStat(
-                value: '${state.activitiesCompleted}',
-                label: 'activities',
-                color: CurioColors.teal,
-              ),
-              const SizedBox(width: 10),
-              _ParentStat(
-                value: '${state.streak}',
-                label: 'day streak',
-                color: CurioColors.coral,
-              ),
-              const SizedBox(width: 10),
-              _ParentStat(
-                value: '${state.collectedFacts.length}',
-                label: 'discoveries',
-                color: const Color(0xFFC78312),
-              ),
-            ],
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final stats = <Widget>[
+                _ParentStat(
+                  value: '${state.activitiesCompleted}',
+                  label: 'activities',
+                  color: CurioColors.teal,
+                ),
+                _ParentStat(
+                  value: '${state.streak}',
+                  label: 'day streak',
+                  color: CurioColors.coral,
+                ),
+                _ParentStat(
+                  value: '${state.collectedFacts.length}',
+                  label: 'discoveries',
+                  color: CurioColors.saffronStrong,
+                ),
+              ];
+              return Row(
+                children: [
+                  stats[0],
+                  const SizedBox(width: 8),
+                  stats[1],
+                  const SizedBox(width: 8),
+                  stats[2],
+                ],
+              );
+            },
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 20),
           const SectionHeading('Skill snapshot'),
           const SizedBox(height: 12),
           CurioCard(
@@ -105,14 +107,9 @@ class ParentDashboardPage extends StatelessWidget {
                             ),
                           ),
                           Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(99),
-                              child: LinearProgressIndicator(
-                                value: entry.value,
-                                minHeight: 9,
-                                backgroundColor: CurioColors.creamDeep,
-                                color: CurioColors.teal,
-                              ),
+                            child: CurioProgressBar(
+                              value: entry.value,
+                              height: 8,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -130,14 +127,20 @@ class ParentDashboardPage extends StatelessWidget {
                   .toList(),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           CurioCard(
-            color: CurioColors.goldSoft,
-            borderColor: CurioColors.gold,
+            color: CurioColors.saffronSoft,
+            borderColor: CurioColors.saffron.withValues(alpha: .3),
             child: const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.insights_rounded, color: Color(0xFFC78312)),
+                CurioIconTile(
+                  icon: Icons.insights_rounded,
+                  color: CurioColors.saffronStrong,
+                  size: 40,
+                  iconSize: 21,
+                  radius: 12,
+                ),
                 SizedBox(width: 11),
                 Expanded(
                   child: Column(
@@ -157,7 +160,7 @@ class ParentDashboardPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           const SectionHeading('Family controls'),
           const SizedBox(height: 10),
           const _ControlTile(
@@ -195,10 +198,10 @@ class _ParentStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: .10),
-          borderRadius: BorderRadius.circular(20),
+          color: color.withValues(alpha: .09),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: color.withValues(alpha: .25)),
         ),
         child: Column(
@@ -208,14 +211,14 @@ class _ParentStat extends StatelessWidget {
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.w900,
-                fontSize: 23,
+                fontSize: 21,
               ),
             ),
             Text(
               label,
               style: const TextStyle(
-                color: CurioColors.navyMuted,
-                fontSize: 10,
+                color: CurioColors.inkMuted,
+                fontSize: 9,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -246,12 +249,12 @@ class _ControlTile extends StatelessWidget {
         child: Icon(icon),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(value, style: const TextStyle(color: CurioColors.navyMuted)),
-          const Icon(Icons.chevron_right_rounded),
-        ],
+      trailing: Text(
+        value,
+        style: const TextStyle(
+          color: CurioColors.inkMuted,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

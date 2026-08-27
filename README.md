@@ -1,5 +1,8 @@
 # Curio
 
+For authentication and cloud-progress setup, follow
+[SUPABASE_SETUP.md](SUPABASE_SETUP.md).
+
 Curio is a polished Flutter learning-and-puzzle platform for curious young
 thinkers. It combines finite daily brain breaks, skill-building adventures,
 knowledge rewards and family insight in one responsive product experience.
