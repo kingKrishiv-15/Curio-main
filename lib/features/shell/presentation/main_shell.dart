@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
@@ -69,17 +72,46 @@ class _MainShellState extends State<MainShell> {
           );
         }
 
-        return Scaffold(
-          extendBody: true,
-          body: IndexedStack(index: _index, children: _pages),
-          bottomNavigationBar: SafeArea(
-            minimum: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-            child: _BottomDock(
-              child: NavigationBar(
-                selectedIndex: _index,
-                onDestinationSelected: _select,
-                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                destinations: _destinations,
+        // The old Material `NavigationBar` widget used to set the *OS*
+        // system navigation bar colour for us automatically. Our custom
+        // floating pill doesn't, so without this the Android system nav
+        // bar falls back to a default that reads as a stray green strip
+        // behind it. Set it explicitly, matched to whichever tab is up.
+        final onDarkHome = _index == 0;
+        final overlayStyle = onDarkHome
+            ? const SystemUiOverlayStyle(
+                systemNavigationBarColor: Color(0xFF05100D),
+                systemNavigationBarIconBrightness: Brightness.light,
+                systemNavigationBarDividerColor: Colors.transparent,
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.light,
+                statusBarBrightness: Brightness.dark,
+              )
+            : SystemUiOverlayStyle(
+                systemNavigationBarColor: CurioColors.canvas,
+                systemNavigationBarIconBrightness: Brightness.dark,
+                systemNavigationBarDividerColor: Colors.transparent,
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.dark,
+                statusBarBrightness: Brightness.light,
+              );
+
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: overlayStyle,
+          child: Scaffold(
+            extendBody: true,
+            // Matches the darkest tone of the redesigned Home tab so no
+            // lighter theme colour can ever peek through around the
+            // floating nav bar, whatever a page underneath is doing.
+            backgroundColor: const Color(0xFF05100D),
+            body: IndexedStack(index: _index, children: _pages),
+            bottomNavigationBar: SafeArea(
+              minimum: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+              child: SizedBox(
+                height: 64,
+                child: Center(
+                  child: _FloatingNav(index: _index, onSelected: _select),
+                ),
               ),
             ),
           ),
@@ -126,42 +158,139 @@ class _NavGlyph extends StatelessWidget {
   }
 }
 
-class _BottomDock extends StatelessWidget {
-  const _BottomDock({required this.child});
+/// Floating pill nav: frosted glass, fully rounded, with the active item
+/// expanding into an icon + label pill (mirrors the reference bottom bar).
+class _FloatingNav extends StatelessWidget {
+  const _FloatingNav({required this.index, required this.onSelected});
 
-  final Widget child;
+  final int index;
+  final ValueChanged<int> onSelected;
+
+  static const _items = <(IconData, IconData, String)>[
+    (Icons.home_outlined, Icons.home_rounded, 'Home'),
+    (Icons.grid_view_rounded, Icons.extension_rounded, 'Games'),
+    (Icons.explore_outlined, Icons.explore_rounded, 'Discover'),
+    (Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
+  ];
+
+  static const _borderRadius = BorderRadius.all(Radius.circular(999));
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: const [
+      decoration: const BoxDecoration(
+        borderRadius: _borderRadius,
+        boxShadow: [
           BoxShadow(
-            color: Color(0x24102C26),
+            color: Color(0x66020504),
             blurRadius: 26,
-            offset: Offset(0, 11),
-          ),
-          BoxShadow(
-            color: Color(0x0F102C26),
-            blurRadius: 7,
-            offset: Offset(0, 2),
+            offset: Offset(0, 12),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFF0F6F2), Color(0xFFDDEBE3)],
+        borderRadius: _borderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF13312A).withValues(alpha: .72),
+              borderRadius: _borderRadius,
+              border: Border.all(color: Colors.white.withValues(alpha: .12)),
             ),
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: const Color(0xE6FFFFFF), width: 1.2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < _items.length; i++)
+                  _FloatingNavItem(
+                    icon: _items[i].$1,
+                    selectedIcon: _items[i].$2,
+                    label: _items[i].$3,
+                    selected: i == index,
+                    onTap: () => onSelected(i),
+                  ),
+              ],
+            ),
           ),
-          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingNavItem extends StatelessWidget {
+  const _FloatingNavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  static const _accent = Color(0xFFDCE66A);
+  static const _accentInk = Color(0xFF0C221D);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      shape: const StadiumBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const StadiumBorder(),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          decoration: BoxDecoration(
+            color: selected ? _accent : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: _accent.withValues(alpha: .45),
+                      blurRadius: 14,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? selectedIcon : icon,
+                size: 22,
+                color: selected
+                    ? _accentInk
+                    : Colors.white.withValues(alpha: .68),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                child: selected
+                    ? Padding(
+                        padding: const EdgeInsets.only(left: 7),
+                        child: Text(
+                          label,
+                          style: const TextStyle(
+                            color: _accentInk,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      )
+                    : const SizedBox(height: 22),
+              ),
+            ],
+          ),
         ),
       ),
     );
