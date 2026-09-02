@@ -91,7 +91,56 @@ The Android manifest and iOS Info.plist already accept the finished login at
 If login returns to the browser, compare the redirect URL exactly. If progress
 does not save, confirm that the SQL ran fully and check the Profile sync status.
 
-## 7. Build for production
+## 7. Seed dummy data to verify the database
+
+This is the part you actually do *in Supabase*, step by step. Everything
+else in this file is one-time project setup; this step is the one that
+puts test data in front of you.
+
+1. Open your project at [supabase.com/dashboard](https://supabase.com/dashboard)
+   and click **SQL Editor** in the left sidebar.
+2. Click **New query**.
+3. Open the file `supabase/seed_five_students.sql` in this repo, select
+   all its text, and paste it into the SQL Editor.
+4. Click **Run** (or press Cmd/Ctrl+Enter).
+5. That's it — it creates 5 complete, ready-to-use accounts by itself:
+   nothing needs to exist beforehand, and nothing else needs configuring.
+
+What you get, across all 5 tables at once:
+
+| Email | Password | XP | Streak |
+|---|---|---|---|
+| `maya@curio.test` | `CurioDemo123!` | 980 | 9 |
+| `arjun@curio.test` | `CurioDemo123!` | 120 | 1 |
+| `zara@curio.test` | `CurioDemo123!` | 540 | 3 |
+| `leo@curio.test` | `CurioDemo123!` | 710 | 6 |
+| `priya@curio.test` | `CurioDemo123!` | 430 | 0 |
+
+Each also has different discoveries unlocked and different skill mastery —
+see the comments at the top of the file for the full breakdown.
+
+**To check it worked:**
+- In **Table Editor**, open `child_profiles` — you should see 5 rows named
+  Maya, Arjun, Zara, Leo, Priya. Open `activity_completions`,
+  `unlocked_discoveries`, and `skill_progress` — each has rows tied to
+  those same 5 children.
+- In the app itself, sign in on the Login screen with any email/password
+  pair above. Home, Profile, Skill Quest, and the Parent dashboard will
+  all show that student's exact seeded numbers, because they all read
+  live from these same tables (`lib/core/services/supabase_progress_store.dart`) —
+  there's no separate "demo data" path.
+
+Re-running the script is safe for the activity/discovery/skill rows (it
+skips duplicates), but the 5 accounts themselves can only be created once —
+running it twice will error on the second pass with a duplicate email. To
+reset and reseed from scratch, run the commented-out `delete` block at the
+bottom of the file first.
+
+If you'd rather seed just *your own* already-created account instead of
+5 fresh test ones, use `supabase/seed_dummy_data.sql` instead — see the
+comment at its top for the one line you need to edit.
+
+## 8. Build for production
 
 ```bash
 flutter build web --release --dart-define-from-file=config/supabase.json
