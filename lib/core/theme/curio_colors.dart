@@ -2,48 +2,51 @@ import 'package:flutter/material.dart';
 
 /// Curio's semantic colour system.
 ///
-/// Palette adapted from the provided Hasta Kalā reference: warm paper,
-/// oxblood action, forest contrast, antique gold, and ink typography.
+/// A deep, textured evergreen night palette: near-black canvas, glass
+/// surfaces a few steps lighter (not another shade of green, so cards
+/// separate from the page by hue as well as brightness), and accent hues
+/// brightened to actually pop against a dark background rather than the
+/// muted, light-page-oriented tones this used to hold.
 abstract final class CurioColors {
-  static const canvas = Color(0xFFE2ECE6);
-  static const canvasDeep = Color(0xFFD4E3DA);
-  static const surface = Color(0xFFF1F6F2);
-  static const surfaceMuted = Color(0xFFDCE8E0);
+  static const canvas = Color(0xFF05100D);
+  static const canvasDeep = Color(0xFF0A1A15);
+  static const surface = Color(0xFF232A2C);
+  static const surfaceMuted = Color(0xFF15191A);
   static const onDark = Color(0xFFF4FAF6);
-  static const ink = Color(0xFF17201D);
-  static const inkSoft = Color(0xFF46514C);
-  static const inkMuted = Color(0xFF68736E);
-  static const outline = Color(0x3D405049);
-  static const outlineSoft = Color(0x24405049);
+  static const ink = Color(0xFFF4FAF6);
+  static const inkSoft = Color(0xFFC7D0CC);
+  static const inkMuted = Color(0xFF8D948F);
+  static const outline = Color(0x3DFFFFFF);
+  static const outlineSoft = Color(0x24FFFFFF);
 
-  static const forest = Color(0xFF183E35);
-  static const forestStrong = Color(0xFF102C26);
-  static const forestSoft = Color(0xFFD4E4DD);
-  static const forestMist = Color(0xFFE2ECE7);
+  static const forest = Color(0xFF49BB8C);
+  static const forestStrong = Color(0xFF1F6B50);
+  static const forestSoft = Color(0x2949BB8C);
+  static const forestMist = Color(0x1449BB8C);
 
-  static const coral = Color(0xFF2D6A5B);
-  static const coralStrong = Color(0xFF19483D);
-  static const coralSoft = Color(0xFFCFE0D7);
-  static const saffron = Color(0xFFCBD957);
-  static const saffronStrong = Color(0xFF667119);
-  static const saffronSoft = Color(0xFFF0F3C9);
-  static const blue = Color(0xFF487568);
-  static const blueSoft = Color(0xFFD9E7E1);
-  static const plum = Color(0xFF315B50);
-  static const plumSoft = Color(0xFFDCE8E3);
-  static const success = Color(0xFF237A54);
-  static const successSoft = Color(0xFFDFEFE5);
-  static const danger = Color(0xFFB84335);
-  static const dangerSoft = Color(0xFFF8E1DD);
+  static const coral = Color(0xFFE49577);
+  static const coralStrong = Color(0xFFC97552);
+  static const coralSoft = Color(0x29E49577);
+  static const saffron = Color(0xFFE7BE6B);
+  static const saffronStrong = Color(0xFFB8934A);
+  static const saffronSoft = Color(0x29E7BE6B);
+  static const blue = Color(0xFF8FC3D9);
+  static const blueSoft = Color(0x298FC3D9);
+  static const plum = Color(0xFFBFA6E0);
+  static const plumSoft = Color(0x29BFA6E0);
+  static const success = Color(0xFF4FD69B);
+  static const successSoft = Color(0x294FD69B);
+  static const danger = Color(0xFFF0685A);
+  static const dangerSoft = Color(0x29F0685A);
 
-  static const night = forestStrong;
-  static const ice = Color(0xFF5A8D7D);
-  static const iceSoft = Color(0xFFDCEAE4);
+  static const night = Color(0xFF05100D);
+  static const ice = Color(0xFF7FB8A8);
+  static const iceSoft = Color(0x257FB8A8);
 
   static const heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [forestStrong, forest, Color(0xFF2D6A5B)],
+    colors: [Color(0xFF0A1A15), forestStrong, Color(0xFF15392E)],
   );
 
   static const brandGradient = LinearGradient(
@@ -55,14 +58,20 @@ abstract final class CurioColors {
   static const pageGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFE8F1EB), Color(0xFFDDEAE2), Color(0xFFD5E5DC)],
-    stops: [0, .6, 1],
+    colors: [Color(0xFF0E211B), Color(0xFF0A1A15), canvas],
+    stops: [0, .55, 1],
   );
 
   // Compatibility aliases for established game presentation code.
   static const cream = canvas;
   static const creamDeep = outlineSoft;
-  static const navy = ink;
+
+  /// A deep, jewel-toned card fill — deliberately independent of [ink] (the
+  /// two used to be the same colour, which broke the moment text needed to
+  /// go light-on-dark while these "hero" cards needed to stay a rich, dark
+  /// accent). Used for the bold stat/reward display cards in the game
+  /// pages (e.g. Squeeze's secret-range card).
+  static const navy = Color(0xFF123A30);
   static const navySoft = inkSoft;
   static const navyMuted = inkMuted;
   static const primary = forest;
@@ -85,7 +94,7 @@ abstract final class CurioColors {
   static const orange = coral;
   static const orangeSoft = coralSoft;
   static const pink = plum;
-  static const mintBright = Color(0xFF4AAD8C);
-  static const skyBright = Color(0xFF78A99A);
+  static const mintBright = Color(0xFF5FD9A8);
+  static const skyBright = Color(0xFF8FC3D9);
   static const auroraGradient = brandGradient;
 }

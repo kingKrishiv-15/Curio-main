@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: CurioColors.onDark,
+                              color: CurioColors.night,
                             ),
                           )
                         : Text(_creatingAccount ? 'Create account' : 'Sign in'),

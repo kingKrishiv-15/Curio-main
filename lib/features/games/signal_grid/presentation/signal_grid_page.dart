@@ -239,7 +239,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                   ? Icon(
                                       Icons.add_rounded,
                                       key: ValueKey('empty_$index'),
-                                      color: CurioColors.forestSoft,
+                                      color: CurioColors.inkMuted,
                                       size: 22,
                                     )
                                   : Icon(

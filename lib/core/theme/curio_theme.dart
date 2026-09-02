@@ -8,10 +8,10 @@ abstract final class CurioTheme {
   static const _display = 'Fraunces';
   static const _body = 'DM Sans';
 
-  static ThemeData get light {
+  static ThemeData get dark {
     final scheme = ColorScheme.fromSeed(
       seedColor: CurioColors.coral,
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
       primary: CurioColors.coral,
       onPrimary: CurioColors.onDark,
       primaryContainer: CurioColors.coralSoft,
@@ -127,7 +127,7 @@ abstract final class CurioTheme {
         elevation: 0,
         centerTitle: false,
         scrolledUnderElevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         titleTextStyle: TextStyle(
           fontFamily: _display,
           color: CurioColors.ink,
@@ -177,26 +177,35 @@ abstract final class CurioTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size(48, 49),
+          minimumSize: const Size(48, 54),
           elevation: 0,
           backgroundColor: CurioColors.coral,
-          foregroundColor: CurioColors.onDark,
+          // Coral is now a *bright* accent (not the dark tone it used to
+          // be), so its label needs to go dark-on-bright, matching the
+          // ink-on-lime treatment used for the home nav's active pill.
+          foregroundColor: CurioColors.night,
           disabledBackgroundColor: CurioColors.surfaceMuted,
           disabledForegroundColor: CurioColors.inkMuted,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+          shadowColor: CurioColors.coral.withValues(alpha: .4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           textStyle: const TextStyle(
             fontFamily: _body,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontSize: 14.5,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -.1,
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size(48, 47),
+          minimumSize: const Size(48, 52),
           foregroundColor: CurioColors.ink,
-          side: const BorderSide(color: CurioColors.outline, width: 1.2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+          side: const BorderSide(color: CurioColors.outline, width: 1.4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -212,7 +221,7 @@ abstract final class CurioTheme {
       chipTheme: base.chipTheme.copyWith(
         backgroundColor: CurioColors.surface,
         side: const BorderSide(color: CurioColors.outline),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         labelStyle: const TextStyle(
           color: CurioColors.inkSoft,
           fontWeight: FontWeight.w600,
@@ -241,7 +250,7 @@ abstract final class CurioTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: CurioColors.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         titleTextStyle: const TextStyle(
           fontFamily: _display,
           color: CurioColors.ink,
@@ -274,9 +283,12 @@ abstract final class CurioTheme {
         backgroundColor: CurioColors.surface,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: CurioColors.ink,
+        backgroundColor: CurioColors.navy,
         contentTextStyle: const TextStyle(
           color: CurioColors.onDark,
           fontFamily: _body,
@@ -292,7 +304,7 @@ abstract final class CurioTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: CurioColors.forestMist,
+        fillColor: CurioColors.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 14,
@@ -300,7 +312,7 @@ abstract final class CurioTheme {
         hintStyle: const TextStyle(color: CurioColors.inkMuted),
         labelStyle: const TextStyle(color: CurioColors.inkSoft),
         floatingLabelStyle: const TextStyle(
-          color: CurioColors.forestStrong,
+          color: CurioColors.forest,
           fontWeight: FontWeight.w700,
         ),
         prefixIconColor: CurioColors.inkMuted,

@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -16,10 +15,10 @@ abstract final class CurioSpace {
 }
 
 abstract final class CurioRadius {
-  static const small = 2.0;
-  static const medium = 4.0;
-  static const large = 7.0;
-  static const hero = 4.0;
+  static const small = 10.0;
+  static const medium = 14.0;
+  static const large = 20.0;
+  static const hero = 26.0;
 }
 
 class CurioPage extends StatelessWidget {
@@ -87,35 +86,35 @@ class _CurioBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Opacity(
-        opacity: .62,
-        child: CustomPaint(painter: _CurioBackdropPainter()),
-      ),
+    return const IgnorePointer(
+      child: CustomPaint(painter: _CurioBackdropPainter(), child: SizedBox.expand()),
     );
   }
 }
 
 class _CurioBackdropPainter extends CustomPainter {
+  const _CurioBackdropPainter();
+
   @override
   void paint(Canvas canvas, Size size) {
-    final forest = Paint()
-      ..color = CurioColors.forest.withValues(alpha: .08)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final coral = Paint()
-      ..color = CurioColors.coral.withValues(alpha: .08)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final ink = Paint()..color = CurioColors.ink.withValues(alpha: .018);
+    final warm = Paint()..color = CurioColors.saffron.withValues(alpha: .05);
+    final cool = Paint()..color = CurioColors.blue.withValues(alpha: .045);
+    canvas.drawCircle(
+      Offset(size.width * .86, size.height * .05),
+      size.width * .5,
+      warm,
+    );
+    canvas.drawCircle(
+      Offset(size.width * .04, size.height * .82),
+      size.width * .46,
+      cool,
+    );
 
-    canvas.drawCircle(Offset(size.width + 22, 76), 108, forest);
-    canvas.drawCircle(Offset(-42, size.height * .58), 92, coral);
-
-    for (var y = 128.0; y < size.height; y += 42) {
-      for (var x = 24.0; x < size.width; x += 42) {
+    final grain = Paint()..color = Colors.white.withValues(alpha: .022);
+    for (var y = 20.0; y < size.height; y += 30) {
+      for (var x = 10.0; x < size.width; x += 30) {
         if ((x + y).round().isEven) continue;
-        canvas.drawCircle(Offset(x, y), .8, ink);
+        canvas.drawCircle(Offset(x, y), .9, grain);
       }
     }
   }
@@ -124,73 +123,80 @@ class _CurioBackdropPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Frosted material is reserved for floating navigation and transient controls.
-class GlassSurface extends StatelessWidget {
-  const GlassSurface({
+/// Curio's standard "glass" card: a translucent tinted fill, a crisp bright
+/// border, a top sheen, and a lift shadow. Deliberately does **not** use a
+/// real `BackdropFilter` blur — stacking many independent blurs (one per
+/// card in a scrolling list, say) is what caused blur to render in the
+/// wrong place on real devices during the home-screen redesign. Reserve an
+/// actual blur for a single, well-contained floating element (like the
+/// bottom nav) rather than every card that wants a "glass" look.
+class GlassCard extends StatelessWidget {
+  const GlassCard({
     required this.child,
     this.padding = EdgeInsets.zero,
     this.radius = CurioRadius.large,
-    this.blur = 18,
     this.tint = CurioColors.surface,
-    this.opacity = .78,
+    this.opacity = .58,
+    this.onTap,
     super.key,
   });
 
   final Widget child;
   final EdgeInsets padding;
   final double radius;
-  final double blur;
   final Color tint;
   final double opacity;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(radius);
+    final fill = Color.lerp(tint, Colors.white, .1)!;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
         boxShadow: const [
           BoxShadow(
-            color: Color(0x18291C12),
-            blurRadius: 24,
-            offset: Offset(0, 9),
+            color: Color(0x66020504),
+            blurRadius: 28,
+            offset: Offset(0, 14),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: tint.withValues(alpha: opacity),
-              borderRadius: borderRadius,
-              border: Border.all(
-                color: Colors.white.withValues(alpha: .76),
-                width: 1.1,
+        child: Material(
+          color: fill.withValues(alpha: opacity),
+          child: InkWell(
+            onTap: onTap,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: borderRadius,
+                border: Border.all(color: Colors.white.withValues(alpha: .2)),
               ),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: borderRadius,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: .22),
-                            Colors.white.withValues(alpha: 0),
-                          ],
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: borderRadius,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(alpha: .14),
+                              Colors.white.withValues(alpha: 0),
+                            ],
+                            stops: const [0, .6],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Padding(padding: padding, child: child),
-              ],
+                  Padding(padding: padding, child: child),
+                ],
+              ),
             ),
           ),
         ),
@@ -700,8 +706,8 @@ class ModeTile extends StatelessWidget {
       color: CurioColors.surface,
       borderColor: CurioColors.outlineSoft,
       padding: EdgeInsets.zero,
-      elevation: false,
-      radius: 4,
+      elevation: true,
+      radius: CurioRadius.large,
       child: IntrinsicHeight(
         child: Row(
           children: [

@@ -286,8 +286,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
                                     word,
                                     style: TextStyle(
                                       color: selected
-                                          ? CurioColors.onDark
-                                          : CurioColors.navy,
+                                          ? CurioColors.night
+                                          : CurioColors.ink,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                     ),

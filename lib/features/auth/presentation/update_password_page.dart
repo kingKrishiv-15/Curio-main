@@ -146,7 +146,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: CurioColors.onDark,
+                                color: CurioColors.night,
                               ),
                             )
                           : const Text('Save new password'),

@@ -11,7 +11,7 @@ class CurioApp extends StatelessWidget {
     return MaterialApp(
       title: 'Curio',
       debugShowCheckedModeBanner: false,
-      theme: CurioTheme.light,
+      theme: CurioTheme.dark,
       home: const AuthGate(),
     );
   }
