@@ -54,36 +54,41 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CurioColors.canvas,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
+    return CurioPage(
+      maxWidth: 460,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Row(
+              children: [
+                MascotBadge(size: 56),
+                SizedBox(width: 14),
+                Expanded(child: CurioBrand()),
+              ],
+            ),
+            const SizedBox(height: 36),
+            const CurioEyebrow('Account recovery'),
+            const SizedBox(height: 12),
+            Text(
+              'Choose a new password.',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Use at least eight characters and avoid a password you use elsewhere.',
+              style: TextStyle(color: CurioColors.inkMuted, height: 1.5),
+            ),
+            const SizedBox(height: 26),
+            GlassCard(
+              radius: CurioRadius.hero,
+              padding: const EdgeInsets.all(22),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const CurioBrand(),
-                    const SizedBox(height: 42),
-                    const CurioEyebrow('Account recovery'),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Choose a new password.',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Use at least eight characters and avoid a password you use elsewhere.',
-                      style: TextStyle(
-                        color: CurioColors.inkMuted,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
                     TextFormField(
                       controller: _password,
                       style: const TextStyle(
@@ -155,7 +160,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

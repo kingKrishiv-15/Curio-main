@@ -102,36 +102,41 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CurioColors.canvas,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
+    return CurioPage(
+      maxWidth: 460,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const MascotBadge(size: 56),
+                const SizedBox(width: 14),
+                const Expanded(child: CurioBrand()),
+              ],
+            ),
+            const SizedBox(height: 36),
+            const CurioEyebrow('Family sign in'),
+            const SizedBox(height: 12),
+            Text(
+              _creatingAccount
+                  ? 'Create your family account.'
+                  : 'Welcome back, curious minds.',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'A parent account keeps every child’s progress private and available across devices.',
+              style: TextStyle(color: CurioColors.inkMuted, height: 1.5),
+            ),
+            const SizedBox(height: 26),
+            GlassCard(
+              radius: CurioRadius.hero,
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: CurioBrand(),
-                  ),
-                  const SizedBox(height: 42),
-                  const CurioEyebrow('Family sign in'),
-                  const SizedBox(height: 12),
-                  Text(
-                    _creatingAccount
-                        ? 'Create your family account.'
-                        : 'Welcome back, curious minds.',
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'A parent account keeps every child’s progress private and available across devices.',
-                    style: TextStyle(color: CurioColors.inkMuted, height: 1.5),
-                  ),
-                  const SizedBox(height: 28),
                   if (SupabaseConfig.enableGoogleAuth) ...[
                     OutlinedButton(
                       onPressed: _loading
@@ -283,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
