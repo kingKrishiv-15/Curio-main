@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
@@ -43,17 +41,20 @@ abstract final class _HomeColors {
   ];
 }
 
-/// A frosted-glass card: blurs whatever is behind it, tints with a neutral
-/// slate colour (not green, so it reads as its own material against the
-/// green backdrop), and adds a faint top sheen plus a lift shadow.
+/// A glass-*look* card: a translucent tinted fill, a crisp bright border,
+/// a top sheen, and a lift shadow. Deliberately does **not** use a real
+/// `BackdropFilter` blur — stacking many independent blurs (one per card
+/// in a scrolling shelf, plus the nav's own) is what caused blur to show up
+/// smeared across the wrong region on real devices. A single, well-behaved
+/// blur is reserved for the bottom nav shelf only; every card here fakes
+/// the rest of the "glass" look with plain translucency instead.
 class _GlassPanel extends StatelessWidget {
   const _GlassPanel({
     required this.child,
     this.padding = EdgeInsets.zero,
     this.radius = 22,
     this.tint = _HomeColors.surface,
-    this.opacity = .68,
-    this.blur = 20,
+    this.opacity = .58,
   });
 
   final Widget child;
@@ -61,11 +62,11 @@ class _GlassPanel extends StatelessWidget {
   final double radius;
   final Color tint;
   final double opacity;
-  final double blur;
 
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(radius);
+    final fill = Color.lerp(tint, Colors.white, .1)!;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
@@ -73,40 +74,124 @@ class _GlassPanel extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: tint.withValues(alpha: opacity),
-              borderRadius: borderRadius,
-              border: Border.all(color: _HomeColors.lineStrong),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: borderRadius,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: .08),
-                            Colors.white.withValues(alpha: 0),
-                          ],
-                          stops: const [0, .5],
-                        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: fill.withValues(alpha: opacity),
+            borderRadius: borderRadius,
+            border: Border.all(color: Colors.white.withValues(alpha: .2)),
+          ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: borderRadius,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withValues(alpha: .14),
+                          Colors.white.withValues(alpha: 0),
+                        ],
+                        stops: const [0, .6],
                       ),
                     ),
                   ),
                 ),
-                Padding(padding: padding, child: child),
-              ],
-            ),
+              ),
+              Padding(padding: padding, child: child),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A gentle looping scale pulse — used on "live" streak flames so they read
+/// as active rather than static icons, echoing the lively micro-animations
+/// common in kids' habit-streak apps.
+class _Pulse extends StatefulWidget {
+  const _Pulse({required this.child, super.key});
+  final Widget child;
+
+  @override
+  State<_Pulse> createState() => _PulseState();
+}
+
+class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1000),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: Tween(
+        begin: 0.92,
+        end: 1.1,
+      ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut)),
+      child: widget.child,
+    );
+  }
+}
+
+/// Fades and slides a section in once, staggered by [delay] — a cheap,
+/// dependency-free stand-in for the entrance choreography seen in the
+/// reference apps (cards/tiles animating in rather than just appearing).
+class _FadeSlideIn extends StatefulWidget {
+  const _FadeSlideIn({required this.child, this.delay = Duration.zero, super.key});
+  final Widget child;
+  final Duration delay;
+
+  @override
+  State<_FadeSlideIn> createState() => _FadeSlideInState();
+}
+
+class _FadeSlideInState extends State<_FadeSlideIn>
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 420),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(widget.delay, () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final curved = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    return AnimatedBuilder(
+      animation: curved,
+      child: widget.child,
+      builder: (context, child) {
+        return Opacity(
+          opacity: curved.value,
+          child: Transform.translate(
+            offset: Offset(0, (1 - curved.value) * 18),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
@@ -307,33 +392,48 @@ class HomePage extends StatelessWidget {
                             openPage(context, const ParentDashboardPage()),
                       ),
                       const SizedBox(height: 28),
-                      _Opening(
-                        greeting: greeting,
-                        name: state.childName,
-                        completed: state.dailyGoalCompleted,
+                      _FadeSlideIn(
+                        child: _Opening(
+                          greeting: greeting,
+                          name: state.childName,
+                          completed: state.dailyGoalCompleted,
+                        ),
                       ),
-                      const SizedBox(height: 22),
-                      _Momentum(state: state),
-                      const SizedBox(height: 24),
-                      _WeekPracticeCard(state: state),
+                      const SizedBox(height: 26),
+                      _FadeSlideIn(
+                        delay: const Duration(milliseconds: 100),
+                        child: _WeekPracticeCard(state: state),
+                      ),
                       const SizedBox(height: 28),
-                      _SectionTitle(
-                        title: 'Today’s picks',
-                        subtitle:
-                            '${_dateLabel(now)} · Small puzzles, designed for a satisfying finish.',
-                        action: 'See all',
-                        onAction: onExplore,
+                      _FadeSlideIn(
+                        delay: const Duration(milliseconds: 180),
+                        child: _SectionTitle(
+                          title: 'Today’s picks',
+                          subtitle:
+                              '${_dateLabel(now)} · Small puzzles, designed for a satisfying finish.',
+                          action: 'See all',
+                          onAction: onExplore,
+                        ),
                       ),
                       const SizedBox(height: 14),
-                      _TodayPicksShelf(games: games, state: state),
+                      _FadeSlideIn(
+                        delay: const Duration(milliseconds: 200),
+                        child: _TodayPicksShelf(games: games, state: state),
+                      ),
                       const SizedBox(height: 30),
-                      const _SectionTitle(
-                        title: 'Pick your next adventure',
-                        subtitle:
-                            'Choose a skill, then dive into a focused challenge.',
+                      _FadeSlideIn(
+                        delay: const Duration(milliseconds: 260),
+                        child: const _SectionTitle(
+                          title: 'Pick your next adventure',
+                          subtitle:
+                              'Choose a skill, then dive into a focused challenge.',
+                        ),
                       ),
                       const SizedBox(height: 14),
-                      _AdventurePicker(state: state, games: games),
+                      _FadeSlideIn(
+                        delay: const Duration(milliseconds: 300),
+                        child: _AdventurePicker(state: state, games: games),
+                      ),
                     ],
                   ),
                 ),
@@ -463,10 +563,12 @@ class _StreakChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.local_fire_department_rounded,
-            color: _HomeColors.gold,
-            size: 16,
+          const _Pulse(
+            child: Icon(
+              Icons.local_fire_department_rounded,
+              color: _HomeColors.gold,
+              size: 16,
+            ),
           ),
           const SizedBox(width: 5),
           Text(
@@ -639,70 +741,6 @@ class _GoalMark extends StatelessWidget {
   }
 }
 
-class _Momentum extends StatelessWidget {
-  const _Momentum({required this.state});
-  final CurioState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: _HomeColors.line),
-          bottom: BorderSide(color: _HomeColors.line),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Text(
-              'Today’s rhythm',
-              style: TextStyle(
-                color: CurioColors.onDark,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          _Metric(value: '${state.streak}', label: 'day streak'),
-          const SizedBox(width: 22),
-          _Metric(value: '${state.totalXp}', label: 'XP'),
-          const SizedBox(width: 22),
-          _Metric(value: '${state.collectedFacts.length}', label: 'finds'),
-        ],
-      ),
-    );
-  }
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({required this.value, required this.label});
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: CurioColors.onDark,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(color: _HomeColors.inkMuted, fontSize: 8.5),
-        ),
-      ],
-    );
-  }
-}
 
 class _WeekPracticeCard extends StatelessWidget {
   const _WeekPracticeCard({required this.state});
@@ -806,17 +844,21 @@ class _WeekPracticeCard extends StatelessWidget {
                           width: 1.3,
                         ),
                       ),
-                      child: Icon(
-                        practiced
-                            ? Icons.check_rounded
-                            : (isToday
-                                  ? Icons.local_fire_department_rounded
-                                  : null),
-                        color: practiced
-                            ? _HomeColors.surfaceSunken
-                            : _HomeColors.gold,
-                        size: 16,
-                      ),
+                      child: practiced
+                          ? const Icon(
+                              Icons.check_rounded,
+                              color: _HomeColors.surfaceSunken,
+                              size: 16,
+                            )
+                          : isToday
+                          ? const _Pulse(
+                              child: Icon(
+                                Icons.local_fire_department_rounded,
+                                color: _HomeColors.gold,
+                                size: 16,
+                              ),
+                            )
+                          : null,
                     ),
                     const SizedBox(height: 6),
                     Text(

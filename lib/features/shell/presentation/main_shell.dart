@@ -96,23 +96,34 @@ class _MainShellState extends State<MainShell> {
                 statusBarBrightness: Brightness.light,
               );
 
+        // No `bottomNavigationBar` slot at all: Scaffold gives that slot its
+        // own background no matter what widget lives in it, which is what
+        // kept reading as a bar behind the pill. Instead the nav is just a
+        // `Positioned` overlay inside the same Stack as the page content,
+        // so the page's own background is *literally* the layer behind it
+        // — nothing else can ever paint there.
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlayStyle,
           child: Scaffold(
-            extendBody: true,
-            // Matches the darkest tone of the redesigned Home tab so no
-            // lighter theme colour can ever peek through around the
-            // floating nav bar, whatever a page underneath is doing.
             backgroundColor: const Color(0xFF05100D),
-            body: IndexedStack(index: _index, children: _pages),
-            bottomNavigationBar: SafeArea(
-              minimum: const EdgeInsets.fromLTRB(12, 0, 12, 14),
-              child: SizedBox(
-                height: 64,
-                child: Center(
-                  child: _FloatingNav(index: _index, onSelected: _select),
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: IndexedStack(index: _index, children: _pages),
                 ),
-              ),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 0,
+                  child: SafeArea(
+                    top: false,
+                    minimum: const EdgeInsets.only(bottom: 12),
+                    child: Center(
+                      child: _FloatingNav(index: _index, onSelected: _select),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -188,16 +199,20 @@ class _FloatingNav extends StatelessWidget {
           ),
         ],
       ),
+      // The only blur in the app: clipped tightly to the capsule's own
+      // stadium shape, so only what's directly behind the pill itself
+      // blurs — nothing wider, no separate "shelf" rectangle floating
+      // above it.
       child: ClipRRect(
         borderRadius: _borderRadius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF13312A).withValues(alpha: .72),
+              color: const Color(0xFF1B4A3F).withValues(alpha: .48),
               borderRadius: _borderRadius,
-              border: Border.all(color: Colors.white.withValues(alpha: .12)),
+              border: Border.all(color: Colors.white.withValues(alpha: .22)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -248,7 +263,7 @@ class _FloatingNavItem extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 260),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 14),
           decoration: BoxDecoration(
             color: selected ? _accent : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
@@ -267,7 +282,7 @@ class _FloatingNavItem extends StatelessWidget {
             children: [
               Icon(
                 selected ? selectedIcon : icon,
-                size: 22,
+                size: 25,
                 color: selected
                     ? _accentInk
                     : Colors.white.withValues(alpha: .68),
@@ -277,17 +292,17 @@ class _FloatingNavItem extends StatelessWidget {
                 curve: Curves.easeOutCubic,
                 child: selected
                     ? Padding(
-                        padding: const EdgeInsets.only(left: 7),
+                        padding: const EdgeInsets.only(left: 8),
                         child: Text(
                           label,
                           style: const TextStyle(
                             color: _accentInk,
                             fontWeight: FontWeight.w800,
-                            fontSize: 12.5,
+                            fontSize: 13.5,
                           ),
                         ),
                       )
-                    : const SizedBox(height: 22),
+                    : const SizedBox(height: 25),
               ),
             ],
           ),
