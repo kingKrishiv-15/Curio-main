@@ -6,7 +6,7 @@
 -- instead of duplicating, moves are graded server-side, idempotency keys
 -- don't cost a player a guess, and streaks move on the right day boundaries.
 begin;
-select plan(16);
+select plan(17);
 
 create extension if not exists pgtap;
 

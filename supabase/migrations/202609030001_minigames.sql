@@ -58,10 +58,15 @@ create table public.daily_puzzles (
 
 alter table public.daily_puzzles enable row level security;
 
--- Deliberately no policy granting direct table SELECT: clients read puzzles
--- only through get_daily_puzzle(), which returns the safe columns and
--- nothing else. Leaving the table itself unreadable means a future column
--- added here is private by default rather than public by accident.
+-- Clients read puzzles only through get_daily_puzzle(), which returns the
+-- safe columns and nothing else.
+--
+-- RLS with no policy would already return zero rows, but that protects the
+-- data only as long as nobody adds a policy - and someone eventually will,
+-- for a good reason, and take encrypted_answer public with it. Revoking the
+-- grant outright makes "a column added to this table is private by default"
+-- an actual property rather than a comment. A pgTAP test asserts it.
+revoke all on public.daily_puzzles from anon, authenticated;
 
 create table public.puzzle_attempts (
   id uuid primary key default gen_random_uuid(),
