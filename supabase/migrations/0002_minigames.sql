@@ -154,6 +154,14 @@ create index minigame_move_attempt_idx on public.minigame_move (attempt_id, move
 -- Internal helpers (never granted to a client role)
 -- ============================================================================
 
+-- NOTE on the revokes below: `revoke ... from public` is NOT sufficient on
+-- Supabase. Its bootstrap grants EXECUTE on new functions in this schema to
+-- anon/authenticated *explicitly*, and an explicit grant to a role survives a
+-- revoke aimed at PUBLIC - so these helpers stayed callable by any signed-in
+-- user until the roles were named directly. That was a real hole: calling
+-- minigame_answer() would have handed a client the decrypted answer to every
+-- puzzle. Named revokes, and a pgTAP test asserting the denial, are what
+-- close it. Same reasoning as the table-level grants in 0001.
 create or replace function public.minigame_encryption_key()
 returns text
 language sql
@@ -164,7 +172,7 @@ as $$
   select value from public.app_secret where name = 'minigame_encryption_key';
 $$;
 
-revoke execute on function public.minigame_encryption_key() from public;
+revoke execute on function public.minigame_encryption_key() from public, anon, authenticated;
 
 -- search_path includes `extensions` because that is where a hosted Supabase
 -- project keeps pgcrypto (the local CLI stack may instead have it in
@@ -198,7 +206,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.minigame_answer(uuid) from public;
+revoke execute on function public.minigame_answer(uuid) from public, anon, authenticated;
 
 -- ============================================================================
 -- RPCs the client calls
@@ -306,7 +314,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.start_or_resume_minigame_attempt(uuid, uuid) from public;
+revoke execute on function public.start_or_resume_minigame_attempt(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.start_or_resume_minigame_attempt(uuid, uuid) to authenticated;
 
 -- Submit one move. The only path that can see the answer, and it returns only
@@ -389,7 +397,7 @@ begin
 end;
 $$;
 
-revoke execute on function public.submit_minigame_move(uuid, jsonb, text) from public;
+revoke execute on function public.submit_minigame_move(uuid, jsonb, text) from public, anon, authenticated;
 grant execute on function public.submit_minigame_move(uuid, jsonb, text) to authenticated;
 
 -- Record a completed day against this game's streak. streak_type is the
@@ -444,5 +452,5 @@ begin
 end;
 $$;
 
-revoke execute on function public.record_minigame_streak(uuid, text, date) from public;
+revoke execute on function public.record_minigame_streak(uuid, text, date) from public, anon, authenticated;
 grant execute on function public.record_minigame_streak(uuid, text, date) to authenticated;

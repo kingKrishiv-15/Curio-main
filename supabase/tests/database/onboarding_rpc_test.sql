@@ -162,7 +162,9 @@ select throws_like(
       100
     )
   $$,
-  '%permission denied for column score%',
+  -- Reported at table granularity: with only column-level grants held, the
+  -- table-level check fails first. Access is denied either way.
+  '%permission denied for table learning_session%',
   'authenticated cannot insert learning_session.score directly'
 );
 

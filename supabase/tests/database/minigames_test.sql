@@ -6,7 +6,7 @@
 -- submission dispatches per puzzle_type and is idempotent, and streaks
 -- extend/reset on the right day boundaries.
 begin;
-select plan(16);
+select plan(17);
 
 create extension if not exists pgtap;
 
@@ -98,9 +98,14 @@ select is(
 -- The answer column is unreadable to this role no matter how it's asked for
 -- (this is 0001's column grant doing the work, re-checked here because the
 -- whole minigame design leans on it).
+-- Postgres reports this at table granularity, not column: when a role holds
+-- only column-level grants (0001 revokes the table-level SELECT and re-grants
+-- the safe columns), asking for an ungranted column fails the table check
+-- first. The protection is the same either way - and tests 1-2 above prove
+-- the safe columns are still readable, so this is a carve-out, not a lockout.
 select throws_like(
   $$ select encrypted_answer from public.daily_puzzle limit 1 $$,
-  '%permission denied for column encrypted_answer%',
+  '%permission denied for table daily_puzzle%',
   'authenticated cannot read encrypted_answer directly'
 );
 
@@ -218,6 +223,22 @@ select is(
   (select current_count from public.record_minigame_streak((select id from public.child limit 1), 'testgame', current_date)),
   2,
   'a consecutive day extends the streak'
+);
+
+-- ----------------------------------------------------------------------------
+-- The signed-out role gets nothing
+-- ----------------------------------------------------------------------------
+-- Supabase grants EXECUTE on new functions to anon explicitly, so this only
+-- holds because 0002 revokes from anon by name rather than just from PUBLIC.
+reset role;
+set local role anon;
+
+select throws_like(
+  $$ select public.submit_minigame_move(
+       '00000000-0000-0000-0000-000000000000'::uuid, '{}'::jsonb, 'anon-key'
+     ) $$,
+  '%permission denied for function submit_minigame_move%',
+  'anon cannot submit moves at all'
 );
 
 reset role;
