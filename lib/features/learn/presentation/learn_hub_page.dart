@@ -6,6 +6,7 @@ import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/evidence/presentation/evidence_detective_page.dart';
 import '../../games/link_lab/presentation/link_lab_page.dart';
+import '../../games/loophole/presentation/loophole_page.dart';
 import '../../games/pattern/presentation/pattern_forge_page.dart';
 import '../../games/signal_grid/presentation/signal_grid_page.dart';
 import '../../games/squeeze/presentation/squeeze_page.dart';
@@ -43,6 +44,17 @@ class LearnHubPage extends StatelessWidget {
             subtitle: 'Fresh challenges that reward careful thinking',
           ),
           const SizedBox(height: 12),
+          ModeTile(
+            title: 'Loophole',
+            subtitle: 'Spot the one word making a true statement mislead you',
+            icon: Icons.format_quote_rounded,
+            color: CurioColors.saffron,
+            badge: 'NEW',
+            duration: '2 min',
+            skill: 'Scepticism',
+            onTap: () => openPage(context, const LoopholePage()),
+          ),
+          const SizedBox(height: 10),
           ModeTile(
             title: 'Link Lab',
             subtitle: 'Sort sixteen clues into four precise knowledge groups',
