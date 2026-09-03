@@ -1,0 +1,30 @@
+name: Database
+
+# Applies every migration to a throwaway local Supabase stack and runs the
+# pgTAP suite against it. This is the only place the SQL actually executes
+# before it reaches a real project - so a migration that would fail, or an
+# RLS/grant rule that doesn't hold, is caught here rather than in production.
+on:
+  push:
+    branches: [krishiv-2, vaibhav, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  database:
+    name: Migrations + pgTAP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # `supabase test db` connects to an already-running stack rather than
+      # starting one; this step is also what applies every migration.
+      - name: Start local Supabase stack
+        run: supabase start
+
+      - name: Run pgTAP tests
+        run: supabase test db
