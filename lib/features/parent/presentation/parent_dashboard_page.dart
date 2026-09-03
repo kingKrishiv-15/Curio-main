@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 
 class ParentDashboardPage extends StatelessWidget {
@@ -10,22 +11,42 @@ class ParentDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
+    final forestStrong = curioColor(
+      context,
+      CurioColors.forestStrong,
+      CurioColorsLight.forestStrong,
+    );
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final saffron = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
+    final saffronStrong = curioColor(
+      context,
+      CurioColors.saffronStrong,
+      CurioColorsLight.saffronStrong,
+    );
+    final saffronSoft = curioColor(
+      context,
+      CurioColors.saffronSoft,
+      CurioColorsLight.saffronSoft,
+    );
+    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
+    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
     return CurioPage(
       title: 'Parent dashboard',
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
           CurioCard(
-            color: CurioColors.forestStrong,
-            borderColor: CurioColors.forestStrong,
+            color: forestStrong,
+            borderColor: forestStrong,
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 30,
-                  backgroundColor: CurioColors.forest,
+                  backgroundColor: forest,
                   child: Icon(
                     Icons.auto_awesome_rounded,
-                    color: CurioColors.saffron,
+                    color: saffron,
                     size: 30,
                   ),
                 ),
@@ -36,8 +57,8 @@ class ParentDashboardPage extends StatelessWidget {
                     children: [
                       Text(
                         state.childName,
-                        style: const TextStyle(
-                          color: CurioColors.onDark,
+                        style: TextStyle(
+                          color: onDark,
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
                         ),
@@ -45,7 +66,7 @@ class ParentDashboardPage extends StatelessWidget {
                       Text(
                         '${state.totalXp} total XP · Stage ${state.companionStage}',
                         style: TextStyle(
-                          color: CurioColors.onDark.withValues(alpha: .66),
+                          color: onDark.withValues(alpha: .66),
                         ),
                       ),
                     ],
@@ -61,17 +82,17 @@ class ParentDashboardPage extends StatelessWidget {
                 _ParentStat(
                   value: '${state.activitiesCompleted}',
                   label: 'activities',
-                  color: CurioColors.teal,
+                  color: teal,
                 ),
                 _ParentStat(
                   value: '${state.streak}',
                   label: 'day streak',
-                  color: CurioColors.coral,
+                  color: coral,
                 ),
                 _ParentStat(
                   value: '${state.collectedFacts.length}',
                   label: 'discoveries',
-                  color: CurioColors.saffronStrong,
+                  color: saffronStrong,
                 ),
               ];
               return Row(
@@ -129,19 +150,19 @@ class ParentDashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CurioCard(
-            color: CurioColors.saffronSoft,
-            borderColor: CurioColors.saffron.withValues(alpha: .3),
-            child: const Row(
+            color: saffronSoft,
+            borderColor: saffron.withValues(alpha: .3),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CurioIconTile(
                   icon: Icons.insights_rounded,
-                  color: CurioColors.saffronStrong,
+                  color: saffronStrong,
                   size: 40,
                   iconSize: 21,
                   radius: 12,
                 ),
-                SizedBox(width: 11),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,6 +217,7 @@ class _ParentStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
@@ -216,8 +238,8 @@ class _ParentStat extends StatelessWidget {
             ),
             Text(
               label,
-              style: const TextStyle(
-                color: CurioColors.inkMuted,
+              style: TextStyle(
+                color: inkMuted,
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
               ),
@@ -241,18 +263,19 @@ class _ControlTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
       leading: CircleAvatar(
-        backgroundColor: CurioColors.tealSoft,
-        foregroundColor: CurioColors.tealDark,
+        backgroundColor: curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft),
+        foregroundColor: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
         child: Icon(icon),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
       trailing: Text(
         value,
-        style: const TextStyle(
-          color: CurioColors.inkMuted,
+        style: TextStyle(
+          color: inkMuted,
           fontWeight: FontWeight.w700,
         ),
       ),

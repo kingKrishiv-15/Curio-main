@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 
 enum EvidenceRank { strong, weak, misleading }
@@ -67,31 +68,41 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
 
   @override
   Widget build(BuildContext context) {
+    final frostDark = curioColor(context, CurioColors.frostDark, CurioColorsLight.frostDark);
+    final gold = curioColor(context, CurioColors.gold, CurioColorsLight.gold);
+    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
+    final green = curioColor(context, CurioColors.green, CurioColorsLight.green);
+    final creamDeep = curioColor(context, CurioColors.creamDeep, CurioColorsLight.creamDeep);
+    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
+    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
+    final navyMuted = curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted);
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final goldSoft = curioColor(context, CurioColors.goldSoft, CurioColorsLight.goldSoft);
     return CurioPage(
       title: 'Evidence Detective',
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
           CurioCard(
-            color: CurioColors.frostDark,
-            borderColor: CurioColors.frostDark,
-            child: const Column(
+            color: frostDark,
+            borderColor: frostDark,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'CASE 001 · THE GARDEN',
                   style: TextStyle(
-                    color: CurioColors.gold,
+                    color: gold,
                     fontWeight: FontWeight.w900,
                     fontSize: 11,
                     letterSpacing: 1.3,
                   ),
                 ),
-                SizedBox(height: 11),
+                const SizedBox(height: 11),
                 Text(
                   'The school garden was damaged overnight. What evidence should we trust?',
                   style: TextStyle(
-                    color: CurioColors.onDark,
+                    color: onDark,
                     fontSize: 20,
                     height: 1.2,
                     fontWeight: FontWeight.w900,
@@ -107,16 +118,16 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
               padding: const EdgeInsets.only(bottom: 13),
               child: CurioCard(
                 borderColor: _submitted && _answers[index] == clue.correct
-                    ? CurioColors.green
-                    : CurioColors.creamDeep,
+                    ? green
+                    : creamDeep,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: CurioColors.tealSoft,
-                          foregroundColor: CurioColors.tealDark,
+                          backgroundColor: tealSoft,
+                          foregroundColor: tealDark,
                           child: Text(
                             '${index + 1}',
                             style: const TextStyle(fontWeight: FontWeight.w900),
@@ -134,7 +145,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
                     const SizedBox(height: 10),
                     Text(
                       clue.detail,
-                      style: const TextStyle(color: CurioColors.navyMuted),
+                      style: TextStyle(color: navyMuted),
                     ),
                     const SizedBox(height: 13),
                     SegmentedButton<EvidenceRank>(
@@ -171,8 +182,8 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
                             : 'Look again: this clue is ${clue.correct.name}.',
                         style: TextStyle(
                           color: _answers[index] == clue.correct
-                              ? CurioColors.green
-                              : CurioColors.coral,
+                              ? green
+                              : coral,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -190,8 +201,8 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
             )
           else
             CurioCard(
-              color: CurioColors.goldSoft,
-              borderColor: CurioColors.gold,
+              color: goldSoft,
+              borderColor: gold,
               child: Column(
                 children: [
                   Text(
@@ -204,10 +215,10 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     '+70 XP · New discovery unlocked',
                     style: TextStyle(
-                      color: CurioColors.tealDark,
+                      color: tealDark,
                       fontWeight: FontWeight.w900,
                     ),
                   ),

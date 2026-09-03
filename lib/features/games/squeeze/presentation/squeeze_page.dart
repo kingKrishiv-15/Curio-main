@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../domain/squeeze_engine.dart';
 
@@ -58,20 +59,31 @@ class _SqueezePageState extends State<SqueezePage> {
   @override
   Widget build(BuildContext context) {
     final progress = _engine.guesses.length / SqueezeEngine.maxGuesses;
+    final navy = curioColor(context, CurioColors.navy, CurioColorsLight.navy);
+    final gold = curioColor(context, CurioColors.gold, CurioColorsLight.gold);
+    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final greenSoft = curioColor(context, CurioColors.greenSoft, CurioColorsLight.greenSoft);
+    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
+    final green = curioColor(context, CurioColors.green, CurioColorsLight.green);
+    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
+    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
+    final goldSoft = curioColor(context, CurioColors.goldSoft, CurioColorsLight.goldSoft);
+    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
     return CurioPage(
       title: 'Daily Squeeze',
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
           CurioCard(
-            color: CurioColors.navy,
-            borderColor: CurioColors.navy,
+            color: navy,
+            borderColor: navy,
             child: Column(
               children: [
-                const Text(
+                Text(
                   'SECRET RANGE',
                   style: TextStyle(
-                    color: CurioColors.gold,
+                    color: gold,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.4,
                     fontSize: 11,
@@ -80,8 +92,8 @@ class _SqueezePageState extends State<SqueezePage> {
                 const SizedBox(height: 8),
                 Text(
                   '${_engine.minimum}  —  ${_engine.maximum}',
-                  style: const TextStyle(
-                    color: CurioColors.onDark,
+                  style: TextStyle(
+                    color: onDark,
                     fontSize: 34,
                     fontWeight: FontWeight.w900,
                   ),
@@ -92,15 +104,15 @@ class _SqueezePageState extends State<SqueezePage> {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 9,
-                    backgroundColor: CurioColors.onDark.withValues(alpha: .12),
-                    color: CurioColors.coral,
+                    backgroundColor: onDark.withValues(alpha: .12),
+                    color: coral,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   '${_engine.guessesLeft} guesses left',
                   style: TextStyle(
-                    color: CurioColors.onDark.withValues(alpha: .7),
+                    color: onDark.withValues(alpha: .7),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -109,10 +121,8 @@ class _SqueezePageState extends State<SqueezePage> {
           ),
           const SizedBox(height: 16),
           CurioCard(
-            color: _engine.solved
-                ? CurioColors.greenSoft
-                : CurioColors.tealSoft,
-            borderColor: _engine.solved ? CurioColors.green : CurioColors.teal,
+            color: _engine.solved ? greenSoft : tealSoft,
+            borderColor: _engine.solved ? green : teal,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -120,9 +130,7 @@ class _SqueezePageState extends State<SqueezePage> {
                   _engine.solved
                       ? Icons.celebration_rounded
                       : Icons.tips_and_updates_rounded,
-                  color: _engine.solved
-                      ? CurioColors.green
-                      : CurioColors.tealDark,
+                  color: _engine.solved ? green : tealDark,
                 ),
                 const SizedBox(width: 11),
                 Expanded(child: Text(_message)),
@@ -150,8 +158,8 @@ class _SqueezePageState extends State<SqueezePage> {
             ),
           ] else ...[
             CurioCard(
-              color: CurioColors.goldSoft,
-              borderColor: CurioColors.gold,
+              color: goldSoft,
+              borderColor: gold,
               child: Column(
                 children: [
                   Text(
@@ -187,8 +195,8 @@ class _SqueezePageState extends State<SqueezePage> {
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                       backgroundColor: guess == _engine.target
-                          ? CurioColors.greenSoft
-                          : CurioColors.surface,
+                          ? greenSoft
+                          : surface,
                     ),
                   )
                   .toList(),

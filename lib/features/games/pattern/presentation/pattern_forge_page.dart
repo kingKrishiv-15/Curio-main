@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 
 class _PatternQuestion {
@@ -76,21 +77,35 @@ class _PatternForgePageState extends State<PatternForgePage> {
 
   @override
   Widget build(BuildContext context) {
+    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
+    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
+    final gold = curioColor(context, CurioColors.gold, CurioColorsLight.gold);
+    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
+    final navyMuted = curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted);
+    final navy = curioColor(context, CurioColors.navy, CurioColorsLight.navy);
+    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
+    final green = curioColor(context, CurioColors.green, CurioColorsLight.green);
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final greenSoft = curioColor(context, CurioColors.greenSoft, CurioColorsLight.greenSoft);
+    final coralSoft = curioColor(context, CurioColors.coralSoft, CurioColorsLight.coralSoft);
+    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final goldSoft = curioColor(context, CurioColors.goldSoft, CurioColorsLight.goldSoft);
+    final saffronStrong = curioColor(context, CurioColors.saffronStrong, CurioColorsLight.saffronStrong);
     if (_index >= _questions.length) {
       return CurioPage(
         title: 'Pattern Forge',
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: CurioCard(
-            color: CurioColors.tealSoft,
-            borderColor: CurioColors.teal,
+            color: tealSoft,
+            borderColor: teal,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.auto_awesome_rounded,
                   size: 60,
-                  color: CurioColors.gold,
+                  color: gold,
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -124,15 +139,15 @@ class _PatternForgePageState extends State<PatternForgePage> {
             children: [
               Text(
                 'Puzzle ${_index + 1} of ${_questions.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w900,
-                  color: CurioColors.tealDark,
+                  color: tealDark,
                 ),
               ),
               const Spacer(),
               Text(
                 '$_score correct',
-                style: const TextStyle(color: CurioColors.navyMuted),
+                style: TextStyle(color: navyMuted),
               ),
             ],
           ),
@@ -141,19 +156,19 @@ class _PatternForgePageState extends State<PatternForgePage> {
             value: (_index + 1) / _questions.length,
             minHeight: 8,
             borderRadius: BorderRadius.circular(99),
-            color: CurioColors.teal,
-            backgroundColor: CurioColors.tealSoft,
+            color: teal,
+            backgroundColor: tealSoft,
           ),
           const SizedBox(height: 20),
           CurioCard(
-            color: CurioColors.navy,
-            borderColor: CurioColors.navy,
+            color: navy,
+            borderColor: navy,
             child: Column(
               children: [
-                const Text(
+                Text(
                   'WHAT COMES NEXT?',
                   style: TextStyle(
-                    color: CurioColors.gold,
+                    color: gold,
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.4,
@@ -163,8 +178,8 @@ class _PatternForgePageState extends State<PatternForgePage> {
                 Text(
                   question.sequence,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: CurioColors.onDark,
+                  style: TextStyle(
+                    color: onDark,
                     fontSize: 27,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.5,
@@ -178,19 +193,19 @@ class _PatternForgePageState extends State<PatternForgePage> {
             final isSelected = _selected == option;
             final isCorrect = _answered && option == question.answer;
             final color = isCorrect
-                ? CurioColors.green
+                ? green
                 : isSelected
-                ? CurioColors.coral
-                : CurioColors.teal;
+                ? coral
+                : teal;
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: CurioCard(
                 onTap: () => _choose(option),
                 color: isCorrect
-                    ? CurioColors.greenSoft
+                    ? greenSoft
                     : isSelected
-                    ? CurioColors.coralSoft
-                    : CurioColors.surface,
+                    ? coralSoft
+                    : surface,
                 borderColor: color.withValues(alpha: .6),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 18,
@@ -208,9 +223,9 @@ class _PatternForgePageState extends State<PatternForgePage> {
                       ),
                     ),
                     if (isCorrect)
-                      const Icon(
+                      Icon(
                         Icons.check_circle_rounded,
-                        color: CurioColors.green,
+                        color: green,
                       ),
                   ],
                 ),
@@ -220,14 +235,14 @@ class _PatternForgePageState extends State<PatternForgePage> {
           if (_answered) ...[
             const SizedBox(height: 5),
             CurioCard(
-              color: CurioColors.goldSoft,
-              borderColor: CurioColors.gold,
+              color: goldSoft,
+              borderColor: gold,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.lightbulb_rounded,
-                    color: CurioColors.saffronStrong,
+                    color: saffronStrong,
                   ),
                   const SizedBox(width: 10),
                   Expanded(child: Text(question.rule)),

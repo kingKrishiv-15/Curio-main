@@ -3,38 +3,66 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'curio_colors.dart';
+import 'curio_colors_light.dart';
 
 abstract final class CurioTheme {
   static const _display = 'Fraunces';
   static const _body = 'DM Sans';
 
-  static ThemeData get dark {
+  static ThemeData get dark => _build(dark: true);
+  static ThemeData get light => _build(dark: false);
+
+  /// One builder for both modes: every colour reference goes through [c],
+  /// which just picks the matching named constant from [CurioColors]
+  /// (dark) or [CurioColorsLight] (light) — the two classes share field
+  /// names by design specifically so this stays a 1:1 swap, never a
+  /// judgement call about which `ColorScheme` slot something maps to.
+  static ThemeData _build({required bool dark}) {
+    Color c(Color darkColor, Color lightColor) => dark ? darkColor : lightColor;
+
     final scheme = ColorScheme.fromSeed(
-      seedColor: CurioColors.coral,
-      brightness: Brightness.dark,
-      primary: CurioColors.coral,
-      onPrimary: CurioColors.onDark,
-      primaryContainer: CurioColors.coralSoft,
-      onPrimaryContainer: CurioColors.coralStrong,
-      secondary: CurioColors.forest,
-      onSecondary: CurioColors.onDark,
-      secondaryContainer: CurioColors.forestSoft,
-      onSecondaryContainer: CurioColors.forestStrong,
-      surface: CurioColors.surface,
-      onSurface: CurioColors.ink,
-      surfaceContainerLowest: CurioColors.surface,
-      surfaceContainerLow: CurioColors.surface,
-      surfaceContainer: CurioColors.surfaceMuted,
-      surfaceContainerHigh: CurioColors.canvasDeep,
-      onSurfaceVariant: CurioColors.inkSoft,
-      error: CurioColors.danger,
+      seedColor: c(CurioColors.coral, CurioColorsLight.coral),
+      brightness: dark ? Brightness.dark : Brightness.light,
+      primary: c(CurioColors.coral, CurioColorsLight.coral),
+      // Coral is a *bright* accent in both modes, so its "on" colour is
+      // always the dark ink, never the light text colour.
+      onPrimary: c(CurioColors.night, CurioColorsLight.ink),
+      primaryContainer: c(CurioColors.coralSoft, CurioColorsLight.coralSoft),
+      onPrimaryContainer: c(
+        CurioColors.coralStrong,
+        CurioColorsLight.coralStrong,
+      ),
+      secondary: c(CurioColors.forest, CurioColorsLight.forest),
+      onSecondary: c(CurioColors.night, CurioColorsLight.ink),
+      secondaryContainer: c(
+        CurioColors.forestSoft,
+        CurioColorsLight.forestSoft,
+      ),
+      onSecondaryContainer: c(
+        CurioColors.forestStrong,
+        CurioColorsLight.forestStrong,
+      ),
+      surface: c(CurioColors.surface, CurioColorsLight.surface),
+      onSurface: c(CurioColors.ink, CurioColorsLight.ink),
+      surfaceContainerLowest: c(CurioColors.surface, CurioColorsLight.surface),
+      surfaceContainerLow: c(CurioColors.surface, CurioColorsLight.surface),
+      surfaceContainer: c(
+        CurioColors.surfaceMuted,
+        CurioColorsLight.surfaceMuted,
+      ),
+      surfaceContainerHigh: c(
+        CurioColors.canvasDeep,
+        CurioColorsLight.canvasDeep,
+      ),
+      onSurfaceVariant: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
+      error: c(CurioColors.danger, CurioColorsLight.danger),
     );
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor: CurioColors.canvas,
-      canvasColor: CurioColors.canvas,
-      cardColor: CurioColors.surface,
+      scaffoldBackgroundColor: c(CurioColors.canvas, CurioColorsLight.canvas),
+      canvasColor: c(CurioColors.canvas, CurioColorsLight.canvas),
+      cardColor: c(CurioColors.surface, CurioColorsLight.surface),
       fontFamily: _body,
       splashFactory: InkSparkle.splashFactory,
       visualDensity: VisualDensity.standard,
@@ -44,100 +72,102 @@ abstract final class CurioTheme {
       textTheme: base.textTheme
           .apply(
             fontFamily: _body,
-            bodyColor: CurioColors.ink,
-            displayColor: CurioColors.ink,
+            bodyColor: c(CurioColors.ink, CurioColorsLight.ink),
+            displayColor: c(CurioColors.ink, CurioColorsLight.ink),
           )
           .copyWith(
-            displayLarge: const TextStyle(
+            displayLarge: TextStyle(
               fontFamily: _display,
-              color: CurioColors.ink,
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 52,
               height: .91,
               fontWeight: FontWeight.w500,
               letterSpacing: -2.6,
             ),
-            headlineLarge: const TextStyle(
+            headlineLarge: TextStyle(
               fontFamily: _display,
-              color: CurioColors.ink,
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 38,
               height: .96,
               fontWeight: FontWeight.w500,
               letterSpacing: -2,
             ),
-            headlineMedium: const TextStyle(
+            headlineMedium: TextStyle(
               fontFamily: _display,
-              color: CurioColors.ink,
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 29,
               height: 1.02,
               fontWeight: FontWeight.w500,
               letterSpacing: -1.2,
             ),
-            headlineSmall: const TextStyle(
+            headlineSmall: TextStyle(
               fontFamily: _display,
-              color: CurioColors.ink,
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 24,
               height: 1.08,
               fontWeight: FontWeight.w500,
               letterSpacing: -.8,
             ),
-            titleLarge: const TextStyle(
+            titleLarge: TextStyle(
               fontFamily: _display,
-              color: CurioColors.ink,
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 21,
               height: 1.18,
               fontWeight: FontWeight.w500,
               letterSpacing: -.55,
             ),
-            titleMedium: const TextStyle(
-              color: CurioColors.ink,
+            titleMedium: TextStyle(
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 16,
               height: 1.28,
               fontWeight: FontWeight.w700,
               letterSpacing: -.15,
             ),
-            bodyLarge: const TextStyle(
-              color: CurioColors.ink,
+            bodyLarge: TextStyle(
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 16,
               height: 1.52,
               fontWeight: FontWeight.w500,
             ),
-            bodyMedium: const TextStyle(
-              color: CurioColors.ink,
+            bodyMedium: TextStyle(
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 14,
               height: 1.48,
               fontWeight: FontWeight.w500,
             ),
-            bodySmall: const TextStyle(
-              color: CurioColors.inkSoft,
+            bodySmall: TextStyle(
+              color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
               fontSize: 12,
               height: 1.42,
               fontWeight: FontWeight.w500,
             ),
-            labelLarge: const TextStyle(
-              color: CurioColors.ink,
+            labelLarge: TextStyle(
+              color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 14,
               fontWeight: FontWeight.w700,
               letterSpacing: -.05,
             ),
           ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
-        foregroundColor: CurioColors.ink,
+        foregroundColor: c(CurioColors.ink, CurioColorsLight.ink),
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         scrolledUnderElevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle: dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         titleTextStyle: TextStyle(
           fontFamily: _display,
-          color: CurioColors.ink,
+          color: c(CurioColors.ink, CurioColorsLight.ink),
           fontSize: 22,
           fontWeight: FontWeight.w500,
           letterSpacing: -.35,
         ),
       ),
-      dividerTheme: const DividerThemeData(
-        color: CurioColors.outlineSoft,
+      dividerTheme: DividerThemeData(
+        color: c(CurioColors.outlineSoft, CurioColorsLight.outlineSoft),
         thickness: 1,
         space: 1,
       ),
@@ -153,16 +183,16 @@ abstract final class CurioTheme {
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(WidgetState.selected)
-                ? CurioColors.coral
-                : CurioColors.inkMuted,
+                ? c(CurioColors.coral, CurioColorsLight.coral)
+                : c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
             size: 23,
           ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => TextStyle(
             color: states.contains(WidgetState.selected)
-                ? CurioColors.coral
-                : CurioColors.inkMuted,
+                ? c(CurioColors.coral, CurioColorsLight.coral)
+                : c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
             fontSize: 10.5,
             fontWeight: states.contains(WidgetState.selected)
                 ? FontWeight.w800
@@ -171,7 +201,8 @@ abstract final class CurioTheme {
         ),
         overlayColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.pressed)
-              ? CurioColors.forest.withValues(alpha: .055)
+              ? c(CurioColors.forest, CurioColorsLight.forest)
+                    .withValues(alpha: .055)
               : Colors.transparent,
         ),
       ),
@@ -179,14 +210,23 @@ abstract final class CurioTheme {
         style: FilledButton.styleFrom(
           minimumSize: const Size(48, 54),
           elevation: 0,
-          backgroundColor: CurioColors.coral,
-          // Coral is now a *bright* accent (not the dark tone it used to
-          // be), so its label needs to go dark-on-bright, matching the
-          // ink-on-lime treatment used for the home nav's active pill.
-          foregroundColor: CurioColors.night,
-          disabledBackgroundColor: CurioColors.surfaceMuted,
-          disabledForegroundColor: CurioColors.inkMuted,
-          shadowColor: CurioColors.coral.withValues(alpha: .4),
+          backgroundColor: c(CurioColors.coral, CurioColorsLight.coral),
+          // Coral is a bright accent in both modes, so its label needs to
+          // go dark-on-bright, matching the ink-on-lime treatment used for
+          // the home nav's active pill.
+          foregroundColor: c(CurioColors.night, CurioColorsLight.ink),
+          disabledBackgroundColor: c(
+            CurioColors.surfaceMuted,
+            CurioColorsLight.surfaceMuted,
+          ),
+          disabledForegroundColor: c(
+            CurioColors.inkMuted,
+            CurioColorsLight.inkMuted,
+          ),
+          shadowColor: c(
+            CurioColors.coral,
+            CurioColorsLight.coral,
+          ).withValues(alpha: .4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -201,8 +241,11 @@ abstract final class CurioTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(48, 52),
-          foregroundColor: CurioColors.ink,
-          side: const BorderSide(color: CurioColors.outline, width: 1.4),
+          foregroundColor: c(CurioColors.ink, CurioColorsLight.ink),
+          side: BorderSide(
+            color: c(CurioColors.outline, CurioColorsLight.outline),
+            width: 1.4,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -211,7 +254,7 @@ abstract final class CurioTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: CurioColors.coral,
+          foregroundColor: c(CurioColors.coral, CurioColorsLight.coral),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -219,11 +262,11 @@ abstract final class CurioTheme {
         ),
       ),
       chipTheme: base.chipTheme.copyWith(
-        backgroundColor: CurioColors.surface,
-        side: const BorderSide(color: CurioColors.outline),
+        backgroundColor: c(CurioColors.surface, CurioColorsLight.surface),
+        side: BorderSide(color: c(CurioColors.outline, CurioColorsLight.outline)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        labelStyle: const TextStyle(
-          color: CurioColors.inkSoft,
+        labelStyle: TextStyle(
+          color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -231,16 +274,16 @@ abstract final class CurioTheme {
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith(
             (states) => states.contains(WidgetState.selected)
-                ? CurioColors.coralSoft
-                : CurioColors.surface,
+                ? c(CurioColors.coralSoft, CurioColorsLight.coralSoft)
+                : c(CurioColors.surface, CurioColorsLight.surface),
           ),
           foregroundColor: WidgetStateProperty.resolveWith(
             (states) => states.contains(WidgetState.selected)
-                ? CurioColors.coralStrong
-                : CurioColors.inkMuted,
+                ? c(CurioColors.coralStrong, CurioColorsLight.coralStrong)
+                : c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
           ),
-          side: const WidgetStatePropertyAll(
-            BorderSide(color: CurioColors.outline),
+          side: WidgetStatePropertyAll(
+            BorderSide(color: c(CurioColors.outline, CurioColorsLight.outline)),
           ),
           textStyle: const WidgetStatePropertyAll(
             TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
@@ -248,96 +291,113 @@ abstract final class CurioTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: CurioColors.surface,
+        backgroundColor: c(CurioColors.surface, CurioColorsLight.surface),
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontFamily: _display,
-          color: CurioColors.ink,
+          color: c(CurioColors.ink, CurioColorsLight.ink),
           fontSize: 23,
           fontWeight: FontWeight.w600,
         ),
-        contentTextStyle: const TextStyle(
+        contentTextStyle: TextStyle(
           fontFamily: _body,
-          color: CurioColors.inkSoft,
+          color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
           fontSize: 14,
           height: 1.48,
         ),
       ),
-      listTileTheme: const ListTileThemeData(
-        textColor: CurioColors.ink,
-        iconColor: CurioColors.inkSoft,
+      listTileTheme: ListTileThemeData(
+        textColor: c(CurioColors.ink, CurioColorsLight.ink),
+        iconColor: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
         titleTextStyle: TextStyle(
           fontFamily: _body,
-          color: CurioColors.ink,
+          color: c(CurioColors.ink, CurioColorsLight.ink),
           fontSize: 14,
           fontWeight: FontWeight.w700,
         ),
         subtitleTextStyle: TextStyle(
           fontFamily: _body,
-          color: CurioColors.inkMuted,
+          color: c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
           fontSize: 12,
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: CurioColors.surface,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: c(CurioColors.surface, CurioColorsLight.surface),
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: CurioColors.navy,
+        backgroundColor: c(CurioColors.navy, CurioColorsLight.navy),
         contentTextStyle: const TextStyle(
-          color: CurioColors.onDark,
+          color: Colors.white,
           fontFamily: _body,
           fontWeight: FontWeight.w600,
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: CurioColors.coral,
-        linearTrackColor: CurioColors.outlineSoft,
-        circularTrackColor: CurioColors.outlineSoft,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: c(CurioColors.coral, CurioColorsLight.coral),
+        linearTrackColor: c(
+          CurioColors.outlineSoft,
+          CurioColorsLight.outlineSoft,
+        ),
+        circularTrackColor: c(
+          CurioColors.outlineSoft,
+          CurioColorsLight.outlineSoft,
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: CurioColors.surface,
+        fillColor: c(CurioColors.surface, CurioColorsLight.surface),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 14,
         ),
-        hintStyle: const TextStyle(color: CurioColors.inkMuted),
-        labelStyle: const TextStyle(color: CurioColors.inkSoft),
-        floatingLabelStyle: const TextStyle(
-          color: CurioColors.forest,
+        hintStyle: TextStyle(
+          color: c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
+        ),
+        labelStyle: TextStyle(
+          color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
+        ),
+        floatingLabelStyle: TextStyle(
+          color: c(CurioColors.forest, CurioColorsLight.forest),
           fontWeight: FontWeight.w700,
         ),
-        prefixIconColor: CurioColors.inkMuted,
-        suffixIconColor: CurioColors.inkMuted,
-        border: OutlineInputBorder(
+        prefixIconColor: c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
+        suffixIconColor: c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
+        border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(14)),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(14)),
-          borderSide: const BorderSide(color: CurioColors.outline),
+          borderRadius: const BorderRadius.all(Radius.circular(14)),
+          borderSide: BorderSide(
+            color: c(CurioColors.outline, CurioColorsLight.outline),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(14)),
-          borderSide: const BorderSide(color: CurioColors.coral, width: 1.8),
+          borderRadius: const BorderRadius.all(Radius.circular(14)),
+          borderSide: BorderSide(
+            color: c(CurioColors.coral, CurioColorsLight.coral),
+            width: 1.8,
+          ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(14)),
-          borderSide: const BorderSide(color: CurioColors.danger),
+          borderRadius: const BorderRadius.all(Radius.circular(14)),
+          borderSide: BorderSide(
+            color: c(CurioColors.danger, CurioColorsLight.danger),
+          ),
         ),
       ),
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: CurioColors.forestStrong,
-        selectionColor: CurioColors.forestSoft,
-        selectionHandleColor: CurioColors.forest,
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: c(CurioColors.forestStrong, CurioColorsLight.forestStrong),
+        selectionColor: c(CurioColors.forestSoft, CurioColorsLight.forestSoft),
+        selectionHandleColor: c(CurioColors.forest, CurioColorsLight.forest),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {

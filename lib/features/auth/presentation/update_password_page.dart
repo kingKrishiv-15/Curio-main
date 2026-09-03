@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
@@ -54,6 +55,12 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final inkColor = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final forestStrongColor = curioColor(
+      context,
+      CurioColors.forestStrong,
+      CurioColorsLight.forestStrong,
+    );
     return CurioPage(
       maxWidth: 460,
       child: SingleChildScrollView(
@@ -76,9 +83,16 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'Use at least eight characters and avoid a password you use elsewhere.',
-              style: TextStyle(color: CurioColors.inkMuted, height: 1.5),
+              style: TextStyle(
+                color: curioColor(
+                  context,
+                  CurioColors.inkMuted,
+                  CurioColorsLight.inkMuted,
+                ),
+                height: 1.5,
+              ),
             ),
             const SizedBox(height: 26),
             GlassCard(
@@ -91,11 +105,11 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                   children: [
                     TextFormField(
                       controller: _password,
-                      style: const TextStyle(
-                        color: CurioColors.ink,
+                      style: TextStyle(
+                        color: inkColor,
                         fontWeight: FontWeight.w600,
                       ),
-                      cursorColor: CurioColors.forestStrong,
+                      cursorColor: forestStrongColor,
                       obscureText: _hidden,
                       autofillHints: const [AutofillHints.newPassword],
                       decoration: InputDecoration(
@@ -117,11 +131,11 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _confirmation,
-                      style: const TextStyle(
-                        color: CurioColors.ink,
+                      style: TextStyle(
+                        color: inkColor,
                         fontWeight: FontWeight.w600,
                       ),
-                      cursorColor: CurioColors.forestStrong,
+                      cursorColor: forestStrongColor,
                       obscureText: _hidden,
                       autofillHints: const [AutofillHints.newPassword],
                       decoration: const InputDecoration(
@@ -136,8 +150,12 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                       const SizedBox(height: 12),
                       Text(
                         _error!,
-                        style: const TextStyle(
-                          color: CurioColors.coralStrong,
+                        style: TextStyle(
+                          color: curioColor(
+                            context,
+                            CurioColors.coralStrong,
+                            CurioColorsLight.coralStrong,
+                          ),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -146,12 +164,16 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                     FilledButton(
                       onPressed: _loading ? null : _save,
                       child: _loading
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: CurioColors.night,
+                                color: curioColor(
+                                  context,
+                                  CurioColors.night,
+                                  CurioColorsLight.night,
+                                ),
                               ),
                             )
                           : const Text('Save new password'),

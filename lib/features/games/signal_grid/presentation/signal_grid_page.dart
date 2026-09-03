@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 
 enum _Signal { spark, wave }
@@ -158,16 +159,21 @@ class _SignalGridPageState extends State<SignalGridPage> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
-          const CurioEyebrow('Daily logic puzzle', color: CurioColors.tealDark),
+          CurioEyebrow(
+            'Daily logic puzzle',
+            color: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
+          ),
           const SizedBox(height: 6),
           Text(
             _complete ? 'Grid harmonised.' : 'Balance the signals',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 7),
-          const Text(
+          Text(
             'Place two sparks and two waves in every row and column. No two lines may match.',
-            style: TextStyle(color: CurioColors.navyMuted),
+            style: TextStyle(
+              color: curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted),
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -195,13 +201,20 @@ class _SignalGridPageState extends State<SignalGridPage> {
                 child: Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: CurioColors.navy,
+                    color: curioColor(context, CurioColors.navy, CurioColorsLight.navy),
                     borderRadius: BorderRadius.circular(25),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
-                        color: Color(0x30102C26),
+                        // Dark mode: translucent near-black-green overlay.
+                        // Light mode counterpart: translucent dark ink tone
+                        // at the same alpha (0x30).
+                        color: curioColor(
+                          context,
+                          const Color(0x30102C26),
+                          const Color(0x302E2417),
+                        ),
                         blurRadius: 30,
-                        offset: Offset(0, 14),
+                        offset: const Offset(0, 14),
                       ),
                     ],
                   ),
@@ -225,10 +238,10 @@ class _SignalGridPageState extends State<SignalGridPage> {
                         child: Material(
                           key: Key('signal_$index'),
                           color: error
-                              ? CurioColors.orangeSoft
+                              ? curioColor(context, CurioColors.orangeSoft, CurioColorsLight.orangeSoft)
                               : given
-                              ? CurioColors.forestStrong
-                              : CurioColors.surface,
+                              ? curioColor(context, CurioColors.forestStrong, CurioColorsLight.forestStrong)
+                              : curioColor(context, CurioColors.surface, CurioColorsLight.surface),
                           borderRadius: BorderRadius.circular(15),
                           child: InkWell(
                             onTap: given ? null : () => _cycle(index),
@@ -239,7 +252,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                   ? Icon(
                                       Icons.add_rounded,
                                       key: ValueKey('empty_$index'),
-                                      color: CurioColors.inkMuted,
+                                      color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
                                       size: 22,
                                     )
                                   : Icon(
@@ -248,10 +261,10 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                           : Icons.waves_rounded,
                                       key: ValueKey('${signal.name}_$index'),
                                       color: signal == _Signal.spark
-                                          ? CurioColors.gold
+                                          ? curioColor(context, CurioColors.gold, CurioColorsLight.gold)
                                           : given
-                                          ? CurioColors.saffron
-                                          : CurioColors.teal,
+                                          ? curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)
+                                          : curioColor(context, CurioColors.teal, CurioColorsLight.teal),
                                       size: 31,
                                     ),
                             ),
@@ -269,12 +282,14 @@ class _SignalGridPageState extends State<SignalGridPage> {
             duration: const Duration(milliseconds: 240),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: _complete ? CurioColors.greenSoft : CurioColors.surface,
+              color: _complete
+                  ? curioColor(context, CurioColors.greenSoft, CurioColorsLight.greenSoft)
+                  : curioColor(context, CurioColors.surface, CurioColorsLight.surface),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: _complete
-                    ? CurioColors.green.withValues(alpha: .3)
-                    : CurioColors.creamDeep,
+                    ? curioColor(context, CurioColors.green, CurioColorsLight.green).withValues(alpha: .3)
+                    : curioColor(context, CurioColors.creamDeep, CurioColorsLight.creamDeep),
               ),
             ),
             child: Row(
@@ -283,14 +298,16 @@ class _SignalGridPageState extends State<SignalGridPage> {
                   _complete
                       ? Icons.check_circle_rounded
                       : Icons.tips_and_updates_outlined,
-                  color: _complete ? CurioColors.green : CurioColors.coral,
+                  color: _complete
+                      ? curioColor(context, CurioColors.green, CurioColorsLight.green)
+                      : curioColor(context, CurioColors.coral, CurioColorsLight.coral),
                 ),
                 const SizedBox(width: 10),
                 Expanded(child: Text(_message)),
                 Text(
                   '$filled/16',
-                  style: const TextStyle(
-                    color: CurioColors.navyMuted,
+                  style: TextStyle(
+                    color: curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted),
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -304,7 +321,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                 ? Icons.emoji_events_rounded
                 : Icons.task_alt_rounded,
             onPressed: _complete ? null : _check,
-            color: CurioColors.teal,
+            color: curioColor(context, CurioColors.teal, CurioColorsLight.teal),
           ),
         ],
       ),
@@ -325,8 +342,8 @@ class _Rule extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundColor: CurioColors.tealSoft,
-            foregroundColor: CurioColors.tealDark,
+            backgroundColor: curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft),
+            foregroundColor: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
             child: Icon(icon, size: 20),
           ),
           const SizedBox(width: 12),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 
 class SkillQuestPage extends StatelessWidget {
@@ -17,22 +18,26 @@ class SkillQuestPage extends StatelessWidget {
       Icons.manage_search_rounded,
       Icons.psychology_rounded,
     ];
-    const colors = [
-      CurioColors.forest,
-      CurioColors.coral,
-      CurioColors.goldStrong,
-      CurioColors.blue,
+    final colors = [
+      curioColor(context, CurioColors.forest, CurioColorsLight.forest),
+      curioColor(context, CurioColors.coral, CurioColorsLight.coral),
+      curioColor(context, CurioColors.goldStrong, CurioColorsLight.goldStrong),
+      curioColor(context, CurioColors.blue, CurioColorsLight.blue),
     ];
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
+    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
 
     return CurioPage(
       title: 'Skill Quest',
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
-          const Text(
+          Text(
             'YOUR LEARNING MAP',
             style: TextStyle(
-              color: CurioColors.forest,
+              color: forest,
               fontSize: 11,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.4,
@@ -93,8 +98,8 @@ class SkillQuestPage extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             '${(item.value * 100).round()}% mastery',
-                            style: const TextStyle(
-                              color: CurioColors.inkMuted,
+                            style: TextStyle(
+                              color: inkMuted,
                               fontSize: 11,
                             ),
                           ),
@@ -108,14 +113,14 @@ class SkillQuestPage extends StatelessWidget {
           }),
           const SizedBox(height: 8),
           CurioCard(
-            color: CurioColors.forestSoft,
-            borderColor: CurioColors.forest.withValues(alpha: .25),
-            child: const Row(
+            color: forestSoft,
+            borderColor: forest.withValues(alpha: .25),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.explore_rounded, color: CurioColors.tealDark),
-                SizedBox(width: 11),
-                Expanded(
+                Icon(Icons.explore_rounded, color: tealDark),
+                const SizedBox(width: 11),
+                const Expanded(
                   child: Text(
                     'Recommended next: play Pattern Forge to strengthen pattern recognition and explanation skills.',
                   ),
