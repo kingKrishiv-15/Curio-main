@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/services/minigame_service.dart';
 import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 
 /// Loophole: a statement that is technically true but misleading. Tap the one
@@ -212,7 +213,7 @@ class _LoopholePageState extends State<LoopholePage> {
   void _showHowToPlay() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: CurioColors.surface,
+      backgroundColor: curioColor(context, CurioColors.surface, CurioColorsLight.surface),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -239,8 +240,8 @@ class _LoopholePageState extends State<LoopholePage> {
                       margin: const EdgeInsets.only(top: 7, right: 10),
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
-                        color: CurioColors.coral,
+                      decoration: BoxDecoration(
+                        color: curioColor(context, CurioColors.coral, CurioColorsLight.coral),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -269,9 +270,9 @@ class _LoopholePageState extends State<LoopholePage> {
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         const SizedBox(height: 7),
-        const Text(
+        Text(
           'Each statement is true. One word is doing something sneaky.',
-          style: TextStyle(color: CurioColors.inkSoft),
+          style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft)),
         ),
         const SizedBox(height: 16),
         Row(
@@ -353,14 +354,14 @@ class _StatementCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.format_quote_rounded, size: 18, color: CurioColors.saffron),
+              Icon(Icons.format_quote_rounded, size: 18, color: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
               const SizedBox(width: 6),
               Text(
                 guessesUsed == 0
                     ? 'Two guesses'
                     : (guessesUsed == 1 ? 'One guess left' : 'Round over'),
-                style: const TextStyle(
-                  color: CurioColors.inkMuted,
+                style: TextStyle(
+                  color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
@@ -419,10 +420,10 @@ class _TokenChipState extends State<_TokenChip> {
     final scale = _pressed && !reduceMotion ? 0.94 : 1.0;
 
     final (bg, fg, border) = switch (widget.state) {
-      _TokenState.correct => (CurioColors.successSoft, CurioColors.success, CurioColors.success),
-      _TokenState.wrong => (CurioColors.dangerSoft, CurioColors.danger, CurioColors.danger),
-      _TokenState.missed => (CurioColors.saffronSoft, CurioColors.saffron, CurioColors.saffron),
-      _TokenState.idle => (CurioColors.surfaceMuted, CurioColors.ink, CurioColors.outlineSoft),
+      _TokenState.correct => (curioColor(context, CurioColors.successSoft, CurioColorsLight.successSoft), curioColor(context, CurioColors.success, CurioColorsLight.success), curioColor(context, CurioColors.success, CurioColorsLight.success)),
+      _TokenState.wrong => (curioColor(context, CurioColors.dangerSoft, CurioColorsLight.dangerSoft), curioColor(context, CurioColors.danger, CurioColorsLight.danger), curioColor(context, CurioColors.danger, CurioColorsLight.danger)),
+      _TokenState.missed => (curioColor(context, CurioColors.saffronSoft, CurioColorsLight.saffronSoft), curioColor(context, CurioColors.saffron, CurioColorsLight.saffron), curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
+      _TokenState.idle => (curioColor(context, CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted), curioColor(context, CurioColors.ink, CurioColorsLight.ink), curioColor(context, CurioColors.outlineSoft, CurioColorsLight.outlineSoft)),
     };
 
     return GestureDetector(
@@ -464,13 +465,13 @@ class _ExplanationCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.lightbulb_outline_rounded, size: 18, color: CurioColors.saffron),
+              Icon(Icons.lightbulb_outline_rounded, size: 18, color: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
               const SizedBox(width: 7),
               Text('Why', style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: 9),
-          Text(text, style: const TextStyle(color: CurioColors.inkSoft, height: 1.5)),
+          Text(text, style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft), height: 1.5)),
         ],
       ),
     );
@@ -492,16 +493,16 @@ class _ResultCard extends StatelessWidget {
         children: [
           Text('$score / $outOf', style: Theme.of(context).textTheme.displayLarge),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Come back tomorrow for three more.',
-            style: TextStyle(color: CurioColors.inkSoft),
+            style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft)),
           ),
           const SizedBox(height: 16),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: CurioColors.surfaceMuted,
+              color: curioColor(context, CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(shareText, style: const TextStyle(height: 1.6, fontSize: 15)),
@@ -537,12 +538,12 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 34, color: CurioColors.inkMuted),
+            Icon(Icons.cloud_off_rounded, size: 34, color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted)),
             const SizedBox(height: 14),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: CurioColors.inkSoft, height: 1.5),
+              style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft), height: 1.5),
             ),
             const SizedBox(height: 18),
             PrimaryButton(label: 'Try again', onPressed: onRetry),
@@ -571,12 +572,12 @@ class _RoundPips extends StatelessWidget {
           final Color color;
           if (index < marks.length) {
             color = switch (marks[index]) {
-              2 => CurioColors.success,
-              1 => CurioColors.saffron,
-              _ => CurioColors.danger,
+              2 => curioColor(context, CurioColors.success, CurioColorsLight.success),
+              1 => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
+              _ => curioColor(context, CurioColors.danger, CurioColorsLight.danger),
             };
           } else {
-            color = index == current ? CurioColors.coral : CurioColors.outlineSoft;
+            color = index == current ? curioColor(context, CurioColors.coral, CurioColorsLight.coral) : curioColor(context, CurioColors.outlineSoft, CurioColorsLight.outlineSoft);
           }
           return Container(
             width: 9,
