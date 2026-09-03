@@ -49,3 +49,6 @@ app.*.map.json
 
 .claude/
 .agents/
+# Stray dotenv config from an earlier branch - this project configures
+# Supabase via config/supabase.json + --dart-define-from-file instead.
+assets/env/
