@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../discoveries/presentation/discoveries_page.dart';
 import '../../home/presentation/home_page.dart';
@@ -76,24 +77,25 @@ class _MainShellState extends State<MainShell> {
         // system navigation bar colour for us automatically. Our custom
         // floating pill doesn't, so without this the Android system nav
         // bar falls back to a default that reads as a stray green strip
-        // behind it. Set it explicitly, matched to whichever tab is up.
-        final onDarkHome = _index == 0;
-        final overlayStyle = onDarkHome
+        // behind it. Set it explicitly, driven by the app-wide light/dark
+        // toggle (not a per-tab guess — every tab shares the same mode now).
+        final light = Theme.of(context).brightness == Brightness.light;
+        final overlayStyle = light
             ? const SystemUiOverlayStyle(
+                systemNavigationBarColor: Color(0xFFFDF1E2),
+                systemNavigationBarIconBrightness: Brightness.dark,
+                systemNavigationBarDividerColor: Colors.transparent,
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.dark,
+                statusBarBrightness: Brightness.light,
+              )
+            : const SystemUiOverlayStyle(
                 systemNavigationBarColor: Color(0xFF05100D),
                 systemNavigationBarIconBrightness: Brightness.light,
                 systemNavigationBarDividerColor: Colors.transparent,
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness: Brightness.light,
                 statusBarBrightness: Brightness.dark,
-              )
-            : SystemUiOverlayStyle(
-                systemNavigationBarColor: CurioColors.canvas,
-                systemNavigationBarIconBrightness: Brightness.dark,
-                systemNavigationBarDividerColor: Colors.transparent,
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: Brightness.dark,
-                statusBarBrightness: Brightness.light,
               );
 
         // No `bottomNavigationBar` slot at all: Scaffold gives that slot its
@@ -105,7 +107,9 @@ class _MainShellState extends State<MainShell> {
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlayStyle,
           child: Scaffold(
-            backgroundColor: const Color(0xFF05100D),
+            backgroundColor: light
+                ? const Color(0xFFFDF1E2)
+                : const Color(0xFF05100D),
             body: Stack(
               children: [
                 Positioned.fill(
@@ -119,7 +123,11 @@ class _MainShellState extends State<MainShell> {
                     top: false,
                     minimum: const EdgeInsets.only(bottom: 12),
                     child: Center(
-                      child: _FloatingNav(index: _index, onSelected: _select),
+                      child: _FloatingNav(
+                        index: _index,
+                        light: light,
+                        onSelected: _select,
+                      ),
                     ),
                   ),
                 ),
@@ -140,6 +148,8 @@ class _NavGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final forest = dark ? CurioColors.forest : CurioColorsLight.forest;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,
@@ -147,23 +157,26 @@ class _NavGlyph extends StatelessWidget {
       height: selected ? 35 : 31,
       decoration: BoxDecoration(
         gradient: selected
-            ? CurioColors.brandGradient
-            : const LinearGradient(
+            ? (dark ? CurioColors.brandGradient : CurioColorsLight.brandGradient)
+            : LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [CurioColors.surface, CurioColors.forestMist],
+                colors: [
+                  dark ? CurioColors.surface : CurioColorsLight.surface,
+                  dark ? CurioColors.forestMist : CurioColorsLight.forestMist,
+                ],
               ),
         borderRadius: BorderRadius.circular(selected ? 13 : 11),
         border: Border.all(
-          color: selected
-              ? CurioColors.forest
-              : CurioColors.forest.withValues(alpha: .11),
+          color: selected ? forest : forest.withValues(alpha: .11),
         ),
       ),
       child: Icon(
         icon,
         size: selected ? 19 : 17,
-        color: selected ? CurioColors.onDark : CurioColors.forestStrong,
+        color: selected
+            ? (dark ? CurioColors.onDark : CurioColorsLight.onDark)
+            : (dark ? CurioColors.forestStrong : CurioColorsLight.forestStrong),
       ),
     );
   }
@@ -171,11 +184,19 @@ class _NavGlyph extends StatelessWidget {
 
 /// Floating pill nav: frosted glass, fully rounded, with the active item
 /// expanding into an icon + label pill (mirrors the reference bottom bar).
+/// [light] switches the whole pill between the dark-glass treatment (for
+/// the still-dark Learn/Discoveries/Profile tabs) and a warm cream/coral
+/// treatment that reads correctly floating over the now-bright Home tab.
 class _FloatingNav extends StatelessWidget {
-  const _FloatingNav({required this.index, required this.onSelected});
+  const _FloatingNav({
+    required this.index,
+    required this.onSelected,
+    required this.light,
+  });
 
   final int index;
   final ValueChanged<int> onSelected;
+  final bool light;
 
   static const _items = <(IconData, IconData, String)>[
     (Icons.home_outlined, Icons.home_rounded, 'Home'),
@@ -189,13 +210,15 @@ class _FloatingNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         borderRadius: _borderRadius,
         boxShadow: [
           BoxShadow(
-            color: Color(0x66020504),
+            color: light
+                ? const Color(0x332E2417)
+                : const Color(0x66020504),
             blurRadius: 26,
-            offset: Offset(0, 12),
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -210,9 +233,15 @@ class _FloatingNav extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF1B4A3F).withValues(alpha: .48),
+              color: light
+                  ? Colors.white.withValues(alpha: .62)
+                  : const Color(0xFF1B4A3F).withValues(alpha: .48),
               borderRadius: _borderRadius,
-              border: Border.all(color: Colors.white.withValues(alpha: .22)),
+              border: Border.all(
+                color: light
+                    ? const Color(0xFF2E2417).withValues(alpha: .08)
+                    : Colors.white.withValues(alpha: .22),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -223,6 +252,7 @@ class _FloatingNav extends StatelessWidget {
                     selectedIcon: _items[i].$2,
                     label: _items[i].$3,
                     selected: i == index,
+                    light: light,
                     onTap: () => onSelected(i),
                   ),
               ],
@@ -240,6 +270,7 @@ class _FloatingNavItem extends StatelessWidget {
     required this.selectedIcon,
     required this.label,
     required this.selected,
+    required this.light,
     required this.onTap,
   });
 
@@ -247,13 +278,20 @@ class _FloatingNavItem extends StatelessWidget {
   final IconData selectedIcon;
   final String label;
   final bool selected;
+  final bool light;
   final VoidCallback onTap;
 
-  static const _accent = Color(0xFFDCE66A);
-  static const _accentInk = Color(0xFF0C221D);
+  static const _darkAccent = Color(0xFFDCE66A);
+  static const _darkAccentInk = Color(0xFF0C221D);
+  static const _lightAccent = Color(0xFFF2564A);
 
   @override
   Widget build(BuildContext context) {
+    final accent = light ? _lightAccent : _darkAccent;
+    final accentInk = light ? Colors.white : _darkAccentInk;
+    final idleColor = light
+        ? const Color(0xFF2E2417).withValues(alpha: .55)
+        : Colors.white.withValues(alpha: .68);
     return Material(
       color: Colors.transparent,
       shape: const StadiumBorder(),
@@ -265,12 +303,12 @@ class _FloatingNavItem extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 14),
           decoration: BoxDecoration(
-            color: selected ? _accent : Colors.transparent,
+            color: selected ? accent : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
             boxShadow: selected
                 ? [
                     BoxShadow(
-                      color: _accent.withValues(alpha: .45),
+                      color: accent.withValues(alpha: .45),
                       blurRadius: 14,
                       offset: const Offset(0, 3),
                     ),
@@ -283,9 +321,7 @@ class _FloatingNavItem extends StatelessWidget {
               Icon(
                 selected ? selectedIcon : icon,
                 size: 25,
-                color: selected
-                    ? _accentInk
-                    : Colors.white.withValues(alpha: .68),
+                color: selected ? accentInk : idleColor,
               ),
               AnimatedSize(
                 duration: const Duration(milliseconds: 220),
@@ -295,8 +331,8 @@ class _FloatingNavItem extends StatelessWidget {
                         padding: const EdgeInsets.only(left: 8),
                         child: Text(
                           label,
-                          style: const TextStyle(
-                            color: _accentInk,
+                          style: TextStyle(
+                            color: accentInk,
                             fontWeight: FontWeight.w800,
                             fontSize: 13.5,
                           ),
@@ -321,11 +357,19 @@ class _CurioRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final surface = dark ? CurioColors.surface : CurioColorsLight.surface;
+    final outlineSoft = dark ? CurioColors.outlineSoft : CurioColorsLight.outlineSoft;
+    final coral = dark ? CurioColors.coral : CurioColorsLight.coral;
+    final coralSoft = dark ? CurioColors.coralSoft : CurioColorsLight.coralSoft;
+    final inkMuted = dark ? CurioColors.inkMuted : CurioColorsLight.inkMuted;
+    final surfaceMuted = dark ? CurioColors.surfaceMuted : CurioColorsLight.surfaceMuted;
+    final orange = dark ? CurioColors.orange : CurioColorsLight.orange;
     return Container(
       width: 244,
       decoration: BoxDecoration(
-        color: CurioColors.surface.withValues(alpha: .94),
-        border: const Border(right: BorderSide(color: CurioColors.outlineSoft)),
+        color: surface.withValues(alpha: .94),
+        border: Border(right: BorderSide(color: outlineSoft)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 20),
       child: Column(
@@ -351,13 +395,13 @@ class _CurioRail extends StatelessWidget {
                         : (item.icon as _NavGlyph).icon,
                   ),
                   title: Text(item.label),
-                  selectedColor: CurioColors.coral,
-                  iconColor: CurioColors.inkMuted,
-                  textColor: CurioColors.inkMuted,
+                  selectedColor: coral,
+                  iconColor: inkMuted,
+                  textColor: inkMuted,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  selectedTileColor: CurioColors.coralSoft,
+                  selectedTileColor: coralSoft,
                   titleTextStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -369,20 +413,20 @@ class _CurioRail extends StatelessWidget {
           const Spacer(),
           CurioCard(
             elevation: false,
-            color: CurioColors.surfaceMuted,
+            color: surfaceMuted,
             padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(
                       Icons.local_fire_department_rounded,
-                      color: CurioColors.orange,
+                      color: orange,
                       size: 20,
                     ),
-                    SizedBox(width: 7),
-                    Expanded(
+                    const SizedBox(width: 7),
+                    const Expanded(
                       child: Text(
                         'Daily momentum',
                         maxLines: 2,
@@ -402,10 +446,7 @@ class _CurioRail extends StatelessWidget {
                 const SizedBox(height: 7),
                 Text(
                   '${state.dailyGoalCompleted} of 3 challenges',
-                  style: const TextStyle(
-                    color: CurioColors.inkMuted,
-                    fontSize: 10,
-                  ),
+                  style: TextStyle(color: inkMuted, fontSize: 10),
                 ),
               ],
             ),

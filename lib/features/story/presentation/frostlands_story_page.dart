@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 
 class _Scene {
@@ -70,11 +71,23 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
   @override
   Widget build(BuildContext context) {
     final complete = _scene >= _scenes.length;
+    final frostDark = curioColor(context, CurioColors.frostDark, CurioColorsLight.frostDark);
+    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final forestStrong = curioColor(
+      context,
+      CurioColors.forestStrong,
+      CurioColorsLight.forestStrong,
+    );
+    final ice = curioColor(context, CurioColors.ice, CurioColorsLight.ice);
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final gold = curioColor(context, CurioColors.gold, CurioColorsLight.gold);
+    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
     return Scaffold(
-      backgroundColor: CurioColors.frostDark,
+      backgroundColor: frostDark,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: CurioColors.onDark,
+        foregroundColor: onDark,
         title: const Text(
           'Frostlands · Night 1',
           style: TextStyle(fontWeight: FontWeight.w900),
@@ -90,11 +103,11 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
               children: [
                 Positioned.fill(
                   child: DecoratedBox(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [CurioColors.forest, CurioColors.forestStrong],
+                        colors: [forest, forestStrong],
                       ),
                     ),
                   ),
@@ -104,7 +117,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                   left: 20,
                   child: Icon(
                     Icons.ac_unit_rounded,
-                    color: CurioColors.onDark.withValues(alpha: .22),
+                    color: onDark.withValues(alpha: .22),
                     size: 80,
                   ),
                 ),
@@ -113,7 +126,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                   right: 20,
                   child: Icon(
                     Icons.ac_unit_rounded,
-                    color: CurioColors.onDark.withValues(alpha: .13),
+                    color: onDark.withValues(alpha: .13),
                     size: 54,
                   ),
                 ),
@@ -123,26 +136,26 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                     Container(
                       height: 210,
                       decoration: BoxDecoration(
-                        color: CurioColors.onDark.withValues(alpha: .06),
+                        color: onDark.withValues(alpha: .06),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(
-                          color: CurioColors.onDark.withValues(alpha: .12),
+                          color: onDark.withValues(alpha: .12),
                         ),
                       ),
-                      child: const Stack(
+                      child: Stack(
                         alignment: Alignment.center,
                         children: [
                           Positioned(
                             bottom: 25,
                             child: Icon(
                               Icons.landscape_rounded,
-                              color: CurioColors.ice,
+                              color: ice,
                               size: 180,
                             ),
                           ),
                           Icon(
                             Icons.pets_rounded,
-                            color: CurioColors.coral,
+                            color: coral,
                             size: 82,
                           ),
                           Positioned(
@@ -150,7 +163,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                             right: 60,
                             child: Icon(
                               Icons.auto_awesome,
-                              color: CurioColors.gold,
+                              color: gold,
                               size: 32,
                             ),
                           ),
@@ -161,8 +174,8 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                     if (!complete) ...[
                       Text(
                         _scenes[_scene].title.toUpperCase(),
-                        style: const TextStyle(
-                          color: CurioColors.gold,
+                        style: TextStyle(
+                          color: gold,
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.3,
@@ -171,8 +184,8 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                       const SizedBox(height: 8),
                       Text(
                         _scenes[_scene].body,
-                        style: const TextStyle(
-                          color: CurioColors.onDark,
+                        style: TextStyle(
+                          color: onDark,
                           fontSize: 20,
                           height: 1.35,
                           fontWeight: FontWeight.w700,
@@ -183,7 +196,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                         (choice) => Padding(
                           padding: const EdgeInsets.only(bottom: 11),
                           child: Material(
-                            color: CurioColors.onDark.withValues(alpha: .10),
+                            color: onDark.withValues(alpha: .10),
                             borderRadius: BorderRadius.circular(20),
                             child: InkWell(
                               onTap: () => _choose(choice),
@@ -195,15 +208,15 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                                     Expanded(
                                       child: Text(
                                         choice,
-                                        style: const TextStyle(
-                                          color: CurioColors.onDark,
+                                        style: TextStyle(
+                                          color: onDark,
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
                                     ),
-                                    const Icon(
+                                    Icon(
                                       Icons.arrow_forward_rounded,
-                                      color: CurioColors.teal,
+                                      color: teal,
                                     ),
                                   ],
                                 ),
@@ -213,20 +226,20 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                         ),
                       ),
                     ] else ...[
-                      const Text(
+                      Text(
                         'SAFE PASSAGE',
                         style: TextStyle(
-                          color: CurioColors.gold,
+                          color: gold,
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.3,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Ash trusted your decisions and you found a thoughtful way home.',
                         style: TextStyle(
-                          color: CurioColors.onDark,
+                          color: onDark,
                           fontSize: 25,
                           height: 1.22,
                           fontWeight: FontWeight.w900,
@@ -236,15 +249,15 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                       Text(
                         'Your path: ${_path.join(' → ')}',
                         style: TextStyle(
-                          color: CurioColors.onDark.withValues(alpha: .7),
+                          color: onDark.withValues(alpha: .7),
                           height: 1.5,
                         ),
                       ),
                       const SizedBox(height: 18),
-                      const Text(
+                      Text(
                         '+50 XP · Aurora discovery unlocked',
                         style: TextStyle(
-                          color: CurioColors.teal,
+                          color: teal,
                           fontWeight: FontWeight.w900,
                         ),
                       ),

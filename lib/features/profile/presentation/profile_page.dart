@@ -5,6 +5,8 @@ import '../../../core/navigation/open_page.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../parent/presentation/parent_dashboard_page.dart';
 import '../../skills/presentation/skill_quest_page.dart';
@@ -13,6 +15,8 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   void _showMilestones(BuildContext context, CurioState state) {
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -34,14 +38,14 @@ class ProfilePage extends StatelessWidget {
                 icon: Icons.bolt_rounded,
                 title: '${state.totalXp} XP collected',
                 body: 'Every completed quest adds to your explorer story.',
-                color: CurioColors.coral,
+                color: coral,
               ),
               const SizedBox(height: 10),
               CurioStatusStrip(
                 icon: Icons.auto_stories_rounded,
                 title: '${state.collectedFacts.length} discoveries saved',
                 body: 'Curious facts are archived as you learn.',
-                color: CurioColors.forest,
+                color: forest,
               ),
             ],
           ),
@@ -110,6 +114,18 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final orange = curioColor(context, CurioColors.orange, CurioColorsLight.orange);
+    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
+    final coralSoft = curioColor(context, CurioColors.coralSoft, CurioColorsLight.coralSoft);
+    final orangeSoft = curioColor(context, CurioColors.orangeSoft, CurioColorsLight.orangeSoft);
+    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
+    final forestStrong = curioColor(context, CurioColors.forestStrong, CurioColorsLight.forestStrong);
+    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+
     return CurioPage(
       maxWidth: 760,
       child: ListView(
@@ -126,7 +142,7 @@ class ProfilePage extends StatelessWidget {
           Center(
             child: Text(
               'Curious Explorer · Stage ${state.companionStage}',
-              style: const TextStyle(color: CurioColors.inkMuted),
+              style: TextStyle(color: inkMuted),
             ),
           ),
           Center(
@@ -145,22 +161,22 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.bolt_rounded,
                   value: '${state.totalXp}',
                   label: 'total XP',
-                  color: CurioColors.coral,
-                  background: CurioColors.coralSoft,
+                  color: coral,
+                  background: coralSoft,
                 ),
                 StatPill(
                   icon: Icons.local_fire_department_rounded,
                   value: '${state.streak}',
                   label: 'day streak',
-                  color: CurioColors.orange,
-                  background: CurioColors.orangeSoft,
+                  color: orange,
+                  background: orangeSoft,
                 ),
                 StatPill(
                   icon: Icons.auto_stories_rounded,
                   value: '${state.collectedFacts.length}',
                   label: 'discoveries',
-                  color: CurioColors.tealDark,
-                  background: CurioColors.tealSoft,
+                  color: tealDark,
+                  background: tealSoft,
                 ),
               ];
               if (!compact) {
@@ -187,8 +203,8 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CurioCard(
-            color: CurioColors.forestSoft,
-            borderColor: CurioColors.forest.withValues(alpha: .18),
+            color: forestSoft,
+            borderColor: forest.withValues(alpha: .18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -199,8 +215,8 @@ class ProfilePage extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   '${state.xpIntoStage} / 250 XP',
-                  style: const TextStyle(
-                    color: CurioColors.forestStrong,
+                  style: TextStyle(
+                    color: forestStrong,
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                   ),
@@ -210,16 +226,13 @@ class ProfilePage extends StatelessWidget {
                   value: state.xpIntoStage / 250,
                   minHeight: 10,
                   borderRadius: BorderRadius.circular(99),
-                  backgroundColor: CurioColors.surface,
-                  color: CurioColors.forest,
+                  backgroundColor: surface,
+                  color: forest,
                 ),
                 const SizedBox(height: 7),
                 Text(
                   '${250 - state.xpIntoStage} XP until stage ${state.companionStage + 1}',
-                  style: const TextStyle(
-                    color: CurioColors.inkMuted,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: inkMuted, fontSize: 11),
                 ),
               ],
             ),
@@ -259,6 +272,8 @@ class ProfilePage extends StatelessWidget {
             padding: EdgeInsets.zero,
             child: Column(
               children: [
+                const _ThemeToggleTile(),
+                const Divider(height: 1, indent: 66),
                 _ProfileTile(
                   icon: Icons.accessibility_new_rounded,
                   title: 'Accessibility',
@@ -312,14 +327,66 @@ class ProfilePage extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 18),
-          const Center(
+          Center(
             child: Text(
               'Curio · Learning should feel like discovery',
-              style: TextStyle(color: CurioColors.inkMuted, fontSize: 10),
+              style: TextStyle(color: inkMuted, fontSize: 10),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A "Dark mode" row with a switch, bound to the app-wide [ThemeController]
+/// via [CurioThemeScope]. The one place the light/dark toggle lives.
+class _ThemeToggleTile extends StatelessWidget {
+  const _ThemeToggleTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = CurioThemeScope.of(context);
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final isDark = controller.isDark;
+        return ListTile(
+          onTap: controller.toggle,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 5,
+          ),
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: forestSoft,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: Icon(
+              isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+              color: forest,
+              size: 21,
+            ),
+          ),
+          title: const Text(
+            'Dark mode',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          subtitle: Text(
+            isDark ? 'On — easier on the eyes at night' : 'Off — bright and light',
+            style: TextStyle(color: inkMuted, fontSize: 11),
+          ),
+          trailing: Switch(
+            value: isDark,
+            onChanged: (_) => controller.toggle(),
+          ),
+        );
+      },
     );
   }
 }
@@ -339,6 +406,9 @@ class _ProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
@@ -346,20 +416,14 @@ class _ProfileTile extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: CurioColors.forestSoft,
+          color: forestSoft,
           borderRadius: BorderRadius.circular(13),
         ),
-        child: Icon(icon, color: CurioColors.forest, size: 21),
+        child: Icon(icon, color: forest, size: 21),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(color: CurioColors.inkMuted, fontSize: 11),
-      ),
-      trailing: const Icon(
-        Icons.chevron_right_rounded,
-        color: CurioColors.inkMuted,
-      ),
+      subtitle: Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 11)),
+      trailing: Icon(Icons.chevron_right_rounded, color: inkMuted),
     );
   }
 }

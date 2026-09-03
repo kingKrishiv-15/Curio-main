@@ -3,6 +3,19 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/curio_colors.dart';
+import '../theme/curio_colors_light.dart';
+
+/// Resolves a colour to its dark/light counterpart based on the current
+/// `Theme.of(context).brightness`. Used throughout this file so every
+/// shared widget adapts to both modes automatically — callers that just
+/// use the defaults never need to think about which mode is active.
+/// [CurioColors] and [CurioColorsLight] share field names by design
+/// specifically so this is always a direct 1:1 swap.
+Color curioColor(BuildContext context, Color darkColor, Color lightColor) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? darkColor
+      : lightColor;
+}
 
 abstract final class CurioSpace {
   static const xxs = 4.0;
@@ -39,7 +52,9 @@ class CurioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pageColor = backgroundColor ?? CurioColors.canvas;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final pageColor =
+        backgroundColor ?? curioColor(context, CurioColors.canvas, CurioColorsLight.canvas);
     return Scaffold(
       backgroundColor: pageColor,
       appBar: title == null
@@ -52,12 +67,16 @@ class CurioPage extends StatelessWidget {
       body: Stack(
         children: [
           if (backgroundColor == null) ...[
-            const Positioned.fill(
+            Positioned.fill(
               child: DecoratedBox(
-                decoration: BoxDecoration(gradient: CurioColors.pageGradient),
+                decoration: BoxDecoration(
+                  gradient: dark
+                      ? CurioColors.pageGradient
+                      : CurioColorsLight.pageGradient,
+                ),
               ),
             ),
-            const Positioned.fill(child: _CurioBackdrop()),
+            Positioned.fill(child: _CurioBackdrop(dark: dark)),
           ],
           SafeArea(
             top: title == null,
@@ -66,9 +85,17 @@ class CurioPage extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: maxWidth),
                 child: DefaultTextStyle.merge(
-                  style: const TextStyle(color: CurioColors.ink),
+                  style: TextStyle(
+                    color: curioColor(context, CurioColors.ink, CurioColorsLight.ink),
+                  ),
                   child: IconTheme.merge(
-                    data: const IconThemeData(color: CurioColors.inkSoft),
+                    data: IconThemeData(
+                      color: curioColor(
+                        context,
+                        CurioColors.inkSoft,
+                        CurioColorsLight.inkSoft,
+                      ),
+                    ),
                     child: child,
                   ),
                 ),
@@ -82,23 +109,30 @@ class CurioPage extends StatelessWidget {
 }
 
 class _CurioBackdrop extends StatelessWidget {
-  const _CurioBackdrop();
+  const _CurioBackdrop({required this.dark});
+  final bool dark;
 
   @override
   Widget build(BuildContext context) {
-    return const IgnorePointer(
-      child: CustomPaint(painter: _CurioBackdropPainter(), child: SizedBox.expand()),
+    return IgnorePointer(
+      child: CustomPaint(
+        painter: _CurioBackdropPainter(dark: dark),
+        child: const SizedBox.expand(),
+      ),
     );
   }
 }
 
 class _CurioBackdropPainter extends CustomPainter {
-  const _CurioBackdropPainter();
+  const _CurioBackdropPainter({required this.dark});
+  final bool dark;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final warm = Paint()..color = CurioColors.saffron.withValues(alpha: .05);
-    final cool = Paint()..color = CurioColors.blue.withValues(alpha: .045);
+    final warmColor = dark ? CurioColors.saffron : CurioColorsLight.saffron;
+    final coolColor = dark ? CurioColors.blue : CurioColorsLight.blue;
+    final warm = Paint()..color = warmColor.withValues(alpha: dark ? .05 : .07);
+    final cool = Paint()..color = coolColor.withValues(alpha: dark ? .045 : .06);
     canvas.drawCircle(
       Offset(size.width * .86, size.height * .05),
       size.width * .5,
@@ -110,7 +144,8 @@ class _CurioBackdropPainter extends CustomPainter {
       cool,
     );
 
-    final grain = Paint()..color = Colors.white.withValues(alpha: .022);
+    final grainColor = dark ? Colors.white : const Color(0xFF2E2417);
+    final grain = Paint()..color = grainColor.withValues(alpha: dark ? .022 : .014);
     for (var y = 20.0; y < size.height; y += 30) {
       for (var x = 10.0; x < size.width; x += 30) {
         if ((x + y).round().isEven) continue;
@@ -120,7 +155,8 @@ class _CurioBackdropPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CurioBackdropPainter oldDelegate) =>
+      oldDelegate.dark != dark;
 }
 
 /// Curio's standard "glass" card: a translucent tinted fill, a crisp bright
@@ -135,8 +171,8 @@ class GlassCard extends StatelessWidget {
     required this.child,
     this.padding = EdgeInsets.zero,
     this.radius = CurioRadius.large,
-    this.tint = CurioColors.surface,
-    this.opacity = .58,
+    this.tint,
+    this.opacity,
     this.onTap,
     super.key,
   });
@@ -144,35 +180,41 @@ class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
   final double radius;
-  final Color tint;
-  final double opacity;
+  final Color? tint;
+  final double? opacity;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final borderRadius = BorderRadius.circular(radius);
-    final fill = Color.lerp(tint, Colors.white, .1)!;
+    final baseTint = tint ?? curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final fill = Color.lerp(baseTint, dark ? Colors.white : Colors.black, .1)!;
+    final sheenColor = dark ? Colors.white : const Color(0xFF2E2417);
+    final borderColor = dark
+        ? Colors.white.withValues(alpha: .2)
+        : const Color(0xFF2E2417).withValues(alpha: .08);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x66020504),
-            blurRadius: 28,
-            offset: Offset(0, 14),
+            color: dark ? const Color(0x66020504) : const Color(0x1A2E2417),
+            blurRadius: dark ? 28 : 20,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
         child: Material(
-          color: fill.withValues(alpha: opacity),
+          color: fill.withValues(alpha: opacity ?? (dark ? .58 : 1)),
           child: InkWell(
             onTap: onTap,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: borderRadius,
-                border: Border.all(color: Colors.white.withValues(alpha: .2)),
+                border: Border.all(color: borderColor),
               ),
               child: Stack(
                 children: [
@@ -185,8 +227,8 @@ class GlassCard extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Colors.white.withValues(alpha: .14),
-                              Colors.white.withValues(alpha: 0),
+                              sheenColor.withValues(alpha: dark ? .14 : .05),
+                              sheenColor.withValues(alpha: 0),
                             ],
                             stops: const [0, .6],
                           ),
@@ -208,8 +250,8 @@ class GlassCard extends StatelessWidget {
 class CurioCard extends StatelessWidget {
   const CurioCard({
     required this.child,
-    this.color = CurioColors.surface,
-    this.borderColor = CurioColors.outlineSoft,
+    this.color,
+    this.borderColor,
     this.padding = const EdgeInsets.all(14),
     this.onTap,
     this.radius = CurioRadius.large,
@@ -218,8 +260,8 @@ class CurioCard extends StatelessWidget {
   });
 
   final Widget child;
-  final Color color;
-  final Color borderColor;
+  final Color? color;
+  final Color? borderColor;
   final EdgeInsets padding;
   final VoidCallback? onTap;
   final double radius;
@@ -228,11 +270,15 @@ class CurioCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(radius);
+    final resolvedColor = color ?? curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final resolvedBorder = borderColor ??
+        curioColor(context, CurioColors.outlineSoft, CurioColorsLight.outlineSoft);
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: color,
+        color: resolvedColor,
         borderRadius: borderRadius,
-        border: Border.all(color: borderColor),
+        border: Border.all(color: resolvedBorder),
         boxShadow: elevation
             ? const [
                 BoxShadow(
@@ -249,8 +295,8 @@ class CurioCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
-          splashColor: CurioColors.forest.withValues(alpha: .08),
-          highlightColor: CurioColors.forest.withValues(alpha: .035),
+          splashColor: forest.withValues(alpha: .08),
+          highlightColor: forest.withValues(alpha: .035),
           borderRadius: borderRadius,
           child: Padding(padding: padding, child: child),
         ),
@@ -260,13 +306,14 @@ class CurioCard extends StatelessWidget {
 }
 
 class CurioEyebrow extends StatelessWidget {
-  const CurioEyebrow(this.label, {this.color = CurioColors.forest, super.key});
+  const CurioEyebrow(this.label, {this.color, super.key});
 
   final String label;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final resolved = color ?? curioColor(context, CurioColors.forest, CurioColorsLight.forest);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -274,7 +321,7 @@ class CurioEyebrow extends StatelessWidget {
           width: 18,
           height: 2,
           decoration: BoxDecoration(
-            color: color,
+            color: resolved,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -285,7 +332,7 @@ class CurioEyebrow extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: color,
+              color: resolved,
               fontSize: 9.5,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.35,
@@ -313,6 +360,7 @@ class PageIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -330,7 +378,7 @@ class PageIntro extends StatelessWidget {
                   subtitle,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.copyWith(color: CurioColors.inkMuted),
+                  ).textTheme.bodyMedium?.copyWith(color: inkMuted),
                 ),
               ),
             ],
@@ -351,6 +399,7 @@ class SectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -365,7 +414,7 @@ class SectionHeading extends StatelessWidget {
                   subtitle!,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodySmall?.copyWith(color: CurioColors.inkMuted),
+                  ).textTheme.bodySmall?.copyWith(color: inkMuted),
                 ),
               ],
             ],
@@ -384,6 +433,7 @@ class CurioBrand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
     return Semantics(
       label: 'Curio',
       child: Row(
@@ -395,7 +445,7 @@ class CurioBrand extends StatelessWidget {
             'curio',
             style: TextStyle(
               fontFamily: 'Fraunces',
-              color: CurioColors.ink,
+              color: ink,
               fontSize: compact ? 24 : 29,
               fontWeight: FontWeight.w500,
               letterSpacing: -1.35,
@@ -414,11 +464,12 @@ class _CurioLogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        gradient: CurioColors.brandGradient,
+        gradient: dark ? CurioColors.brandGradient : CurioColorsLight.brandGradient,
         borderRadius: BorderRadius.circular(size * .34),
         boxShadow: const [
           BoxShadow(
@@ -433,7 +484,7 @@ class _CurioLogoMark extends StatelessWidget {
         children: [
           Icon(
             Icons.auto_awesome_rounded,
-            color: CurioColors.onDark,
+            color: dark ? CurioColors.onDark : CurioColorsLight.onDark,
             size: size * .48,
           ),
           Positioned(
@@ -442,8 +493,8 @@ class _CurioLogoMark extends StatelessWidget {
             child: Container(
               width: size * .13,
               height: size * .13,
-              decoration: const BoxDecoration(
-                color: CurioColors.saffron,
+              decoration: BoxDecoration(
+                color: dark ? CurioColors.saffron : CurioColorsLight.saffron,
                 shape: BoxShape.circle,
               ),
             ),
@@ -461,15 +512,21 @@ class MascotBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final forestSoft = dark ? CurioColors.forestSoft : CurioColorsLight.forestSoft;
+    final surface = dark ? CurioColors.surface : CurioColorsLight.surface;
+    final forest = dark ? CurioColors.forest : CurioColorsLight.forest;
+    final saffron = dark ? CurioColors.saffron : CurioColorsLight.saffron;
+    final ink = dark ? CurioColors.ink : CurioColorsLight.ink;
     return Semantics(
       label: 'Nova, your Curio companion',
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: CurioColors.forestSoft,
+          color: forestSoft,
           borderRadius: BorderRadius.circular(size * .36),
-          border: Border.all(color: CurioColors.surface, width: 4),
+          border: Border.all(color: surface, width: 4),
           boxShadow: const [
             BoxShadow(
               color: Color(0x18291C12),
@@ -487,7 +544,7 @@ class MascotBadge extends StatelessWidget {
                 width: size * .7,
                 height: size * .62,
                 decoration: BoxDecoration(
-                  color: CurioColors.forest,
+                  color: forest,
                   borderRadius: BorderRadius.circular(size * .28),
                 ),
                 child: Center(
@@ -495,15 +552,15 @@ class MascotBadge extends StatelessWidget {
                     width: size * .48,
                     height: size * .28,
                     decoration: BoxDecoration(
-                      color: CurioColors.surface,
+                      color: surface,
                       borderRadius: BorderRadius.circular(size * .14),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _MascotEye(size: size * .065),
+                        _MascotEye(size: size * .065, color: ink),
                         SizedBox(width: size * .13),
-                        _MascotEye(size: size * .065),
+                        _MascotEye(size: size * .065, color: ink),
                       ],
                     ),
                   ),
@@ -515,11 +572,7 @@ class MascotBadge extends StatelessWidget {
               top: size * .01,
               child: Transform.rotate(
                 angle: .18,
-                child: Icon(
-                  Icons.auto_awesome,
-                  color: CurioColors.saffron,
-                  size: size * .27,
-                ),
+                child: Icon(Icons.auto_awesome, color: saffron, size: size * .27),
               ),
             ),
           ],
@@ -530,18 +583,16 @@ class MascotBadge extends StatelessWidget {
 }
 
 class _MascotEye extends StatelessWidget {
-  const _MascotEye({required this.size});
+  const _MascotEye({required this.size, required this.color});
   final double size;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: CurioColors.ink,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
@@ -564,6 +615,7 @@ class StatPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
@@ -603,8 +655,8 @@ class StatPill extends StatelessWidget {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: CurioColors.inkMuted,
+                    style: TextStyle(
+                      color: inkMuted,
                       fontWeight: FontWeight.w600,
                       fontSize: 9.5,
                     ),
@@ -659,15 +711,16 @@ class GameMetaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: CurioColors.inkMuted),
+        Icon(icon, size: 14, color: inkMuted),
         const SizedBox(width: 5),
         Text(
           label,
-          style: const TextStyle(
-            color: CurioColors.inkMuted,
+          style: TextStyle(
+            color: inkMuted,
             fontSize: 10.5,
             fontWeight: FontWeight.w600,
           ),
@@ -701,10 +754,9 @@ class ModeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return CurioCard(
       onTap: onTap,
-      color: CurioColors.surface,
-      borderColor: CurioColors.outlineSoft,
       padding: EdgeInsets.zero,
       elevation: true,
       radius: CurioRadius.large,
@@ -760,11 +812,7 @@ class ModeTile extends StatelessWidget {
                       subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: CurioColors.inkMuted,
-                        fontSize: 11.5,
-                        height: 1.35,
-                      ),
+                      style: TextStyle(color: inkMuted, fontSize: 11.5, height: 1.35),
                     ),
                     if (duration != null || skill != null) ...[
                       const SizedBox(height: 6),
@@ -805,14 +853,14 @@ class PrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
-    this.color = CurioColors.coral,
+    this.color,
     super.key,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -825,7 +873,9 @@ class PrimaryButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 15),
           child: Text(label),
         ),
-        style: FilledButton.styleFrom(backgroundColor: color),
+        style: color == null
+            ? null
+            : FilledButton.styleFrom(backgroundColor: color),
       ),
     );
   }
@@ -835,18 +885,19 @@ class ProgressRing extends StatelessWidget {
   const ProgressRing({
     required this.value,
     required this.child,
-    this.color = CurioColors.coral,
+    this.color,
     this.size = 54,
     super.key,
   });
 
   final double value;
   final Widget child;
-  final Color color;
+  final Color? color;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final resolved = color ?? Theme.of(context).colorScheme.primary;
     return SizedBox(
       width: size,
       height: size,
@@ -858,8 +909,8 @@ class ProgressRing extends StatelessWidget {
               value: value.clamp(0, 1),
               strokeWidth: 5,
               strokeCap: StrokeCap.round,
-              color: color,
-              backgroundColor: color.withValues(alpha: .12),
+              color: resolved,
+              backgroundColor: resolved.withValues(alpha: .12),
             ),
           ),
           child,
@@ -872,23 +923,24 @@ class ProgressRing extends StatelessWidget {
 class CurioProgressBar extends StatelessWidget {
   const CurioProgressBar({
     required this.value,
-    this.color = CurioColors.forest,
+    this.color,
     this.height = 8,
     super.key,
   });
 
   final double value;
-  final Color color;
+  final Color? color;
   final double height;
 
   @override
   Widget build(BuildContext context) {
+    final resolved = color ?? curioColor(context, CurioColors.forest, CurioColorsLight.forest);
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
           height: height,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: .12),
+            color: resolved.withValues(alpha: .12),
             borderRadius: BorderRadius.circular(height),
           ),
           alignment: Alignment.centerLeft,
@@ -897,7 +949,7 @@ class CurioProgressBar extends StatelessWidget {
             curve: Curves.easeOutCubic,
             width: math.max(height, constraints.maxWidth * value.clamp(0, 1)),
             decoration: BoxDecoration(
-              color: color,
+              color: resolved,
               borderRadius: BorderRadius.circular(height),
             ),
           ),
@@ -912,30 +964,32 @@ class CurioStatusStrip extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.body,
-    this.color = CurioColors.forest,
+    this.color,
     super.key,
   });
 
   final IconData icon;
   final String title;
   final String body;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final resolved = color ?? curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: .075),
+        color: resolved.withValues(alpha: .075),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withValues(alpha: .16)),
+        border: Border.all(color: resolved.withValues(alpha: .16)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CurioIconTile(
             icon: icon,
-            color: color,
+            color: resolved,
             size: 38,
             iconSize: 20,
             radius: 11,
@@ -950,13 +1004,7 @@ class CurioStatusStrip extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 3),
-                Text(
-                  body,
-                  style: const TextStyle(
-                    color: CurioColors.inkMuted,
-                    fontSize: 12,
-                  ),
-                ),
+                Text(body, style: TextStyle(color: inkMuted, fontSize: 12)),
               ],
             ),
           ),

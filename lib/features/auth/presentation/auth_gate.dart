@@ -7,6 +7,7 @@ import '../../../core/services/progress_store.dart';
 import '../../../core/services/supabase_progress_store.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../shell/presentation/main_shell.dart';
 import 'login_page.dart';
@@ -70,23 +71,33 @@ class _CurioExperienceState extends State<_CurioExperience> {
         listenable: _state,
         builder: (context, _) {
           if (_state.isLoading) {
-            return const Scaffold(
-              backgroundColor: CurioColors.canvas,
+            return Scaffold(
+              backgroundColor: curioColor(
+                context,
+                CurioColors.canvas,
+                CurioColorsLight.canvas,
+              ),
               body: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CurioBrand(),
-                    SizedBox(height: 22),
-                    SizedBox(
+                    const CurioBrand(),
+                    const SizedBox(height: 22),
+                    const SizedBox(
                       width: 26,
                       height: 26,
                       child: CircularProgressIndicator(strokeWidth: 2.5),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
                       'Loading your learning trail…',
-                      style: TextStyle(color: CurioColors.inkMuted),
+                      style: TextStyle(
+                        color: curioColor(
+                          context,
+                          CurioColors.inkMuted,
+                          CurioColorsLight.inkMuted,
+                        ),
+                      ),
                     ),
                   ],
                 ),

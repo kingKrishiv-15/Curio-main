@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/evidence/presentation/evidence_detective_page.dart';
 import '../../games/link_lab/presentation/link_lab_page.dart';
@@ -12,106 +11,157 @@ import '../../games/squeeze/presentation/squeeze_page.dart';
 import '../../parent/presentation/parent_dashboard_page.dart';
 import '../../skills/presentation/skill_quest_page.dart';
 
-/// Deep, textured evergreen backdrop — a gradient wash rather than a single
-/// flat green. Cards are a neutral warm slate, deliberately *not* green, so
-/// they separate from the backdrop by hue as well as brightness instead of
-/// reading as "another shade of the same colour".
-abstract final class _HomeColors {
+/// Home's dark mode: a deep, textured evergreen backdrop with neutral-slate
+/// cards (deliberately not another shade of green) and a lime "this is
+/// live right now" accent.
+abstract final class _HomeDark {
   static const bgTop = Color(0xFF0E211B);
-  static const bgMid = Color(0xFF091712);
   static const bgBottom = Color(0xFF05100D);
 
   static const surface = Color(0xFF2B3032);
-  static const surfaceHigh = Color(0xFF343A3D);
   static const surfaceRaised = Color(0xFF3C4346);
   static const surfaceSunken = Color(0xFF15191A);
 
   static const line = Color(0x26FFFFFF);
   static const lineStrong = Color(0x3DFFFFFF);
+  static const ink = Color(0xFFF4FAF6);
   static const inkMuted = Color(0xFFC4CDC9);
   static const inkFaint = Color(0xFF8D948F);
-  static const lime = Color(0xFFDCE66A);
+
+  static const accent = Color(0xFFDCE66A);
+  static const accentInk = Color(0xFF0C221D);
   static const gold = Color(0xFFE7BE6B);
-  static const coral = Color(0xFFE49577);
+  static const rose = Color(0xFFE49577);
   static const sky = Color(0xFF8FC3D9);
   static const violet = Color(0xFFBFA6E0);
+  static const success = Color(0xFFDCE66A);
 
   static const cardShadow = [
     BoxShadow(color: Color(0x66020504), blurRadius: 28, offset: Offset(0, 14)),
   ];
 }
 
-/// A glass-*look* card: a translucent tinted fill, a crisp bright border,
-/// a top sheen, and a lift shadow. Deliberately does **not** use a real
-/// `BackdropFilter` blur — stacking many independent blurs (one per card
-/// in a scrolling shelf, plus the nav's own) is what caused blur to show up
-/// smeared across the wrong region on real devices. A single, well-behaved
-/// blur is reserved for the bottom nav shelf only; every card here fakes
-/// the rest of the "glass" look with plain translucency instead.
+/// Home's light mode: a bright, warm cream backdrop with white cards and a
+/// saturated coral "this is live right now" accent — kid-friendly and
+/// vibrant rather than moody.
+abstract final class _HomeLight {
+  static const bgTop = Color(0xFFFFF8EE);
+  static const bgBottom = Color(0xFFFDF1E2);
+
+  static const surface = Color(0xFFFFFFFF);
+  static const surfaceSunken = Color(0xFFF3E9D8);
+
+  static const line = Color(0xFFF0E4D0);
+  static const lineStrong = Color(0xFFE7D7BC);
+  static const ink = Color(0xFF2E2417);
+  static const inkMuted = Color(0xFF8C7C63);
+  static const inkFaint = Color(0xFFB8AB92);
+
+  static const accent = Color(0xFFF2564A);
+  static const accentInk = Colors.white;
+  static const gold = Color(0xFFDB9A2C);
+  static const rose = Color(0xFFDD5D82);
+  static const sky = Color(0xFF2E9FD6);
+  static const violet = Color(0xFF8467E0);
+  static const success = Color(0xFF25A369);
+
+  static const yellowTile = Color(0xFFFFEEBE);
+  static const yellowInk = Color(0xFFAD7A0C);
+
+  static const cardShadow = [
+    BoxShadow(color: Color(0x1A2E2417), blurRadius: 20, offset: Offset(0, 8)),
+  ];
+}
+
+/// Picks between [_HomeDark] and [_HomeLight] for the current theme
+/// brightness — every colour decision in this file goes through this so
+/// the whole page adapts to the global light/dark toggle automatically.
+Color _hc(BuildContext context, Color darkColor, Color lightColor) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? darkColor
+      : lightColor;
+}
+
+/// A card surface: translucent dark glass in dark mode, a plain white card
+/// with a soft shadow in light mode. See design.md §5 for why dark mode
+/// avoids a real `BackdropFilter` blur here.
 class _GlassPanel extends StatelessWidget {
   const _GlassPanel({
     required this.child,
     this.padding = EdgeInsets.zero,
     this.radius = 22,
-    this.tint = _HomeColors.surface,
-    this.opacity = .58,
+    this.darkTint,
+    this.lightTint,
   });
 
   final Widget child;
   final EdgeInsets padding;
   final double radius;
-  final Color tint;
-  final double opacity;
+  final Color? darkTint;
+  final Color? lightTint;
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final borderRadius = BorderRadius.circular(radius);
-    final fill = Color.lerp(tint, Colors.white, .1)!;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        boxShadow: _HomeColors.cardShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: fill.withValues(alpha: opacity),
-            borderRadius: borderRadius,
-            border: Border.all(color: Colors.white.withValues(alpha: .2)),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: borderRadius,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withValues(alpha: .14),
-                          Colors.white.withValues(alpha: 0),
-                        ],
-                        stops: const [0, .6],
+    if (dark) {
+      final tint = darkTint ?? _HomeDark.surface;
+      final fill = Color.lerp(tint, Colors.white, .1)!;
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          boxShadow: _HomeDark.cardShadow,
+        ),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: fill.withValues(alpha: .58),
+              borderRadius: borderRadius,
+              border: Border.all(color: Colors.white.withValues(alpha: .2)),
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: borderRadius,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: .14),
+                            Colors.white.withValues(alpha: 0),
+                          ],
+                          stops: const [0, .6],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Padding(padding: padding, child: child),
-            ],
+                Padding(padding: padding, child: child),
+              ],
+            ),
           ),
         ),
+      );
+    }
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: lightTint ?? _HomeLight.surface,
+        borderRadius: borderRadius,
+        border: Border.all(color: _HomeLight.line),
+        boxShadow: _HomeLight.cardShadow,
       ),
+      child: child,
     );
   }
 }
 
 /// A gentle looping scale pulse — used on "live" streak flames so they read
-/// as active rather than static icons, echoing the lively micro-animations
-/// common in kids' habit-streak apps.
+/// as active rather than static icons.
 class _Pulse extends StatefulWidget {
   const _Pulse({required this.child, super.key});
   final Widget child;
@@ -144,9 +194,7 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
   }
 }
 
-/// Fades and slides a section in once, staggered by [delay] — a cheap,
-/// dependency-free stand-in for the entrance choreography seen in the
-/// reference apps (cards/tiles animating in rather than just appearing).
+/// Fades and slides a section in once, staggered by [delay].
 class _FadeSlideIn extends StatefulWidget {
   const _FadeSlideIn({required this.child, this.delay = Duration.zero, super.key});
   final Widget child;
@@ -196,18 +244,18 @@ class _FadeSlideInState extends State<_FadeSlideIn>
   }
 }
 
-Color _skillColor(String skill) {
+Color _skillColor(BuildContext context, String skill) {
   switch (skill) {
     case 'Number sense':
-      return _HomeColors.gold;
+      return _hc(context, _HomeDark.gold, _HomeLight.gold);
     case 'Patterns':
-      return _HomeColors.coral;
+      return _hc(context, _HomeDark.rose, _HomeLight.rose);
     case 'Evidence':
-      return _HomeColors.sky;
+      return _hc(context, _HomeDark.sky, _HomeLight.sky);
     case 'Reasoning':
-      return _HomeColors.violet;
+      return _hc(context, _HomeDark.violet, _HomeLight.violet);
     default:
-      return _HomeColors.lime;
+      return _hc(context, _HomeDark.accent, _HomeLight.accent);
   }
 }
 
@@ -237,13 +285,14 @@ class _GameInfo {
 
   /// Path to an illustrated banner (e.g. `assets/games/squeeze.png`).
   /// Left null until real artwork is dropped in — falls back to a
-  /// gradient + icon placeholder so the layout works either way.
+  /// vivid gradient + icon placeholder so the layout works either way.
   final String? imageAsset;
 }
 
-/// Illustrated banner area for a game card. Renders [imageAsset] when one
-/// is supplied; otherwise a gradient-and-icon placeholder that already
-/// reads as an image slot, ready to swap in real artwork later.
+/// Illustrated banner area for a game card: a fully-opaque, vivid two-tone
+/// gradient (never a low-alpha tint) so it reads as bright, playful banner
+/// art rather than a muted wash, plus a white icon on top. Vivid in both
+/// modes — this is "content that represents play," not chrome.
 class _CardArt extends StatelessWidget {
   const _CardArt({
     required this.icon,
@@ -259,6 +308,23 @@ class _CardArt extends StatelessWidget {
   final double height;
   final double radius;
 
+  static LinearGradient _vividGradient(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    final start = hsl
+        .withLightness((hsl.lightness + .1).clamp(0.0, 1.0))
+        .withSaturation((hsl.saturation + .08).clamp(0.0, 1.0))
+        .toColor();
+    final end = hsl
+        .withHue((hsl.hue + 26) % 360)
+        .withLightness((hsl.lightness - .1).clamp(0.0, 1.0))
+        .toColor();
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [start, end],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -269,30 +335,28 @@ class _CardArt extends StatelessWidget {
         child: imageAsset != null
             ? Image.asset(imageAsset!, fit: BoxFit.cover)
             : DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      color.withValues(alpha: .38),
-                      color.withValues(alpha: .14),
-                    ],
-                  ),
-                ),
+                decoration: BoxDecoration(gradient: _vividGradient(color)),
                 child: Stack(
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
                     Positioned(
-                      right: -height * .18,
-                      bottom: -height * .22,
+                      right: -height * .2,
+                      bottom: -height * .24,
                       child: Icon(
                         icon,
                         size: height * .95,
-                        color: color.withValues(alpha: .18),
+                        color: Colors.white.withValues(alpha: .18),
                       ),
                     ),
-                    Icon(icon, size: height * .38, color: color),
+                    Icon(
+                      icon,
+                      size: height * .38,
+                      color: Colors.white,
+                      shadows: const [
+                        Shadow(color: Color(0x40000000), blurRadius: 6),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -371,7 +435,7 @@ class HomePage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: _HomeColors.bgBottom,
+      backgroundColor: _hc(context, _HomeDark.bgBottom, _HomeLight.bgBottom),
       body: Stack(
         children: [
           const Positioned.fill(child: _HomeBackdrop()),
@@ -381,7 +445,7 @@ class HomePage extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 940),
                 child: DefaultTextStyle.merge(
-                  style: const TextStyle(color: CurioColors.onDark),
+                  style: TextStyle(color: _hc(context, _HomeDark.ink, _HomeLight.ink)),
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 112),
                     children: [
@@ -391,7 +455,7 @@ class HomePage extends StatelessWidget {
                         onParentTap: () =>
                             openPage(context, const ParentDashboardPage()),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 26),
                       _FadeSlideIn(
                         child: _Opening(
                           greeting: greeting,
@@ -399,7 +463,7 @@ class HomePage extends StatelessWidget {
                           completed: state.dailyGoalCompleted,
                         ),
                       ),
-                      const SizedBox(height: 26),
+                      const SizedBox(height: 22),
                       _FadeSlideIn(
                         delay: const Duration(milliseconds: 100),
                         child: _WeekPracticeCard(state: state),
@@ -465,34 +529,43 @@ class HomePage extends StatelessWidget {
   }
 }
 
-/// Soft gradient + faint blobs + a hint of grain — texture instead of a flat
-/// wash of green.
+/// The page backdrop: a textured evergreen gradient in dark mode, a clean
+/// warm cream wash in light mode — both with just a hint of grain/glow,
+/// never a flat single-colour fill.
 class _HomeBackdrop extends StatelessWidget {
   const _HomeBackdrop();
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [_HomeColors.bgTop, _HomeColors.bgMid, _HomeColors.bgBottom],
-          stops: [0, .55, 1],
+          colors: dark
+              ? const [_HomeDark.bgTop, _HomeDark.bgBottom]
+              : const [_HomeLight.bgTop, _HomeLight.bgBottom],
         ),
       ),
-      child: const CustomPaint(painter: _HomeTexturePainter(), child: SizedBox.expand()),
+      child: CustomPaint(
+        painter: _HomeTexturePainter(dark: dark),
+        child: const SizedBox.expand(),
+      ),
     );
   }
 }
 
 class _HomeTexturePainter extends CustomPainter {
-  const _HomeTexturePainter();
+  const _HomeTexturePainter({required this.dark});
+  final bool dark;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final warm = Paint()..color = _HomeColors.gold.withValues(alpha: .05);
-    final cool = Paint()..color = _HomeColors.sky.withValues(alpha: .045);
+    final goldColor = dark ? _HomeDark.gold : _HomeLight.gold;
+    final skyColor = dark ? _HomeDark.sky : _HomeLight.sky;
+    final warm = Paint()..color = goldColor.withValues(alpha: dark ? .05 : .07);
+    final cool = Paint()..color = skyColor.withValues(alpha: dark ? .045 : .06);
     canvas.drawCircle(
       Offset(size.width * .86, size.height * .05),
       size.width * .5,
@@ -504,7 +577,8 @@ class _HomeTexturePainter extends CustomPainter {
       cool,
     );
 
-    final grain = Paint()..color = Colors.white.withValues(alpha: .022);
+    final grainColor = dark ? Colors.white : const Color(0xFF2E2417);
+    final grain = Paint()..color = grainColor.withValues(alpha: dark ? .022 : .014);
     for (var y = 20.0; y < size.height; y += 30) {
       for (var x = 10.0; x < size.width; x += 30) {
         if ((x + y).round().isEven) continue;
@@ -514,7 +588,8 @@ class _HomeTexturePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _HomeTexturePainter oldDelegate) =>
+      oldDelegate.dark != dark;
 }
 
 class _Avatar extends StatelessWidget {
@@ -523,22 +598,32 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final trimmed = name.trim();
     final letter = trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
     return Container(
       width: 46,
       height: 46,
       decoration: BoxDecoration(
-        gradient: CurioColors.brandGradient,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: dark
+              ? const [Color(0xFF1F6B50), Color(0xFF49BB8C)]
+              : const [_HomeLight.accent, Color(0xFFD8362B)],
+        ),
         shape: BoxShape.circle,
-        border: Border.all(color: _HomeColors.line, width: 1.4),
+        border: Border.all(
+          color: _hc(context, _HomeDark.line, _HomeLight.line),
+          width: 1.4,
+        ),
       ),
       alignment: Alignment.center,
       child: Text(
         letter,
         style: const TextStyle(
           fontFamily: 'Fraunces',
-          color: CurioColors.onDark,
+          color: Colors.white,
           fontSize: 19,
           fontWeight: FontWeight.w600,
         ),
@@ -553,28 +638,32 @@ class _StreakChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final chipColor = dark ? _HomeDark.surfaceRaised : _HomeLight.yellowTile;
+    final flameColor = dark ? _HomeDark.gold : _HomeLight.yellowInk;
+    final textColor = dark ? _HomeDark.ink : _HomeLight.yellowInk;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: _HomeColors.surfaceRaised,
+        color: chipColor,
         borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: _HomeColors.line),
+        border: Border.all(color: _hc(context, _HomeDark.line, _HomeLight.lineStrong)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const _Pulse(
+          _Pulse(
             child: Icon(
               Icons.local_fire_department_rounded,
-              color: _HomeColors.gold,
+              color: flameColor,
               size: 16,
             ),
           ),
           const SizedBox(width: 5),
           Text(
             '$streak',
-            style: const TextStyle(
-              color: CurioColors.onDark,
+            style: TextStyle(
+              color: textColor,
               fontWeight: FontWeight.w800,
               fontSize: 13,
             ),
@@ -598,6 +687,10 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final surface = _hc(context, _HomeDark.surfaceRaised, _HomeLight.surface);
+    final line = _hc(context, _HomeDark.line, _HomeLight.line);
     return Row(
       children: [
         _Avatar(name: name),
@@ -606,10 +699,10 @@ class _Header extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'HELLO THERE',
                 style: TextStyle(
-                  color: _HomeColors.inkMuted,
+                  color: inkMuted,
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.1,
@@ -619,9 +712,9 @@ class _Header extends StatelessWidget {
                 name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Fraunces',
-                  color: CurioColors.onDark,
+                  color: ink,
                   fontSize: 19,
                   fontWeight: FontWeight.w500,
                 ),
@@ -636,9 +729,9 @@ class _Header extends StatelessWidget {
           onPressed: onParentTap,
           style: IconButton.styleFrom(
             minimumSize: const Size(42, 42),
-            backgroundColor: _HomeColors.surfaceRaised,
-            foregroundColor: CurioColors.onDark,
-            side: const BorderSide(color: _HomeColors.line),
+            backgroundColor: surface,
+            foregroundColor: ink,
+            side: BorderSide(color: line),
             shape: const CircleBorder(),
           ),
           icon: const Icon(Icons.family_restroom_outlined, size: 19),
@@ -661,6 +754,8 @@ class _Opening extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 560;
@@ -672,20 +767,16 @@ class _Opening extends StatelessWidget {
             Text(
               'What will you\nsolve today?',
               style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                color: CurioColors.onDark,
+                color: ink,
                 fontSize: compact ? 40 : 56,
                 height: .88,
                 letterSpacing: compact ? -2.3 : -3,
               ),
             ),
             const SizedBox(height: 15),
-            const Text(
+            Text(
               'A small challenge can change the way you see a big idea.',
-              style: TextStyle(
-                color: _HomeColors.inkMuted,
-                fontSize: 13.5,
-                height: 1.45,
-              ),
+              style: TextStyle(color: inkMuted, fontSize: 13.5, height: 1.45),
             ),
           ],
         );
@@ -708,6 +799,9 @@ class _GoalMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
     return SizedBox(
       width: 104,
       child: Column(
@@ -715,32 +809,25 @@ class _GoalMark extends StatelessWidget {
         children: [
           Text(
             '$completed / 3',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: CurioColors.onDark),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: ink),
           ),
           const SizedBox(height: 5),
-          const Text(
+          Text(
             'DAILY GOAL',
             style: TextStyle(
-              color: _HomeColors.inkMuted,
+              color: inkMuted,
               fontSize: 9,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 9),
-          CurioProgressBar(
-            value: completed / 3,
-            color: _HomeColors.lime,
-            height: 5,
-          ),
+          CurioProgressBar(value: completed / 3, color: accent, height: 5),
         ],
       ),
     );
   }
 }
-
 
 class _WeekPracticeCard extends StatelessWidget {
   const _WeekPracticeCard({required this.state});
@@ -767,6 +854,17 @@ class _WeekPracticeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final ink = dark ? _HomeDark.ink : _HomeLight.ink;
+    final inkMuted = dark ? _HomeDark.inkMuted : _HomeLight.inkMuted;
+    final inkFaint = dark ? _HomeDark.inkFaint : _HomeLight.inkFaint;
+    final lineStrong = dark ? _HomeDark.lineStrong : _HomeLight.lineStrong;
+    final surfaceRaised = dark ? _HomeDark.surfaceRaised : _HomeLight.surfaceSunken;
+    final surfaceSunken = dark ? _HomeDark.surfaceSunken : _HomeLight.surfaceSunken;
+    final flameColor = dark ? _HomeDark.gold : _HomeLight.yellowInk;
+    final practicedFill = dark ? _HomeDark.gold : _HomeLight.accent;
+    final practicedCheck = dark ? _HomeDark.surfaceSunken : Colors.white;
+
     final days = _practicedDays();
     final count = days.where((d) => d).length;
     final remaining = (_goal - count).clamp(0, _goal);
@@ -788,17 +886,14 @@ class _WeekPracticeCard extends StatelessWidget {
                     Text(
                       'Practiced $count day${count == 1 ? '' : 's'}',
                       style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(color: CurioColors.onDark, fontSize: 21),
+                          ?.copyWith(color: ink, fontSize: 21),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       remaining == 0
                           ? 'Weekly goal reached — amazing focus!'
                           : 'Just $remaining more day${remaining == 1 ? '' : 's'} to hit your goal',
-                      style: const TextStyle(
-                        color: _HomeColors.inkMuted,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: inkMuted, fontSize: 12),
                     ),
                   ],
                 ),
@@ -807,15 +902,11 @@ class _WeekPracticeCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: _HomeColors.surfaceRaised,
+                  color: surfaceSunken,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _HomeColors.lineStrong),
+                  border: Border.all(color: lineStrong),
                 ),
-                child: const Icon(
-                  Icons.calendar_today_rounded,
-                  color: CurioColors.onDark,
-                  size: 16,
-                ),
+                child: Icon(Icons.calendar_today_rounded, color: ink, size: 16),
               ),
             ],
           ),
@@ -833,28 +924,20 @@ class _WeekPracticeCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: practiced
-                            ? _HomeColors.gold
-                            : (isToday
-                                  ? _HomeColors.surfaceRaised
-                                  : _HomeColors.surfaceSunken),
+                            ? practicedFill
+                            : (isToday ? surfaceRaised : surfaceSunken),
                         border: Border.all(
-                          color: practiced
-                              ? Colors.transparent
-                              : _HomeColors.lineStrong,
+                          color: practiced ? Colors.transparent : lineStrong,
                           width: 1.3,
                         ),
                       ),
                       child: practiced
-                          ? const Icon(
-                              Icons.check_rounded,
-                              color: _HomeColors.surfaceSunken,
-                              size: 16,
-                            )
+                          ? Icon(Icons.check_rounded, color: practicedCheck, size: 16)
                           : isToday
-                          ? const _Pulse(
+                          ? _Pulse(
                               child: Icon(
                                 Icons.local_fire_department_rounded,
-                                color: _HomeColors.gold,
+                                color: flameColor,
                                 size: 16,
                               ),
                             )
@@ -864,13 +947,9 @@ class _WeekPracticeCard extends StatelessWidget {
                     Text(
                       _labels[i],
                       style: TextStyle(
-                        color: isToday
-                            ? CurioColors.onDark
-                            : _HomeColors.inkFaint,
+                        color: isToday ? ink : inkFaint,
                         fontSize: 9.5,
-                        fontWeight: isToday
-                            ? FontWeight.w800
-                            : FontWeight.w600,
+                        fontWeight: isToday ? FontWeight.w800 : FontWeight.w600,
                       ),
                     ),
                   ],
@@ -898,6 +977,9 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -907,26 +989,19 @@ class _SectionTitle extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: CurioColors.onDark,
-                  fontSize: 24,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 24),
               ),
               const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: _HomeColors.inkMuted,
-                  fontSize: 11.5,
-                ),
-              ),
+              Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 11.5)),
             ],
           ),
         ),
         if (action != null)
           TextButton(
             onPressed: onAction,
-            style: TextButton.styleFrom(foregroundColor: _HomeColors.lime),
+            style: TextButton.styleFrom(foregroundColor: accent),
             child: Text(action!.toUpperCase()),
           ),
       ],
@@ -970,7 +1045,13 @@ class _PickCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = _skillColor(game.skill);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final accent = _skillColor(context, game.skill);
+    final ink = dark ? _HomeDark.ink : _HomeLight.ink;
+    final inkMuted = dark ? _HomeDark.inkMuted : _HomeLight.inkMuted;
+    final questAccent = dark ? _HomeDark.accent : _HomeLight.accent;
+    final questInk = dark ? _HomeDark.accentInk : _HomeLight.accentInk;
+    final successColor = dark ? _HomeDark.success : _HomeLight.success;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(24),
@@ -979,7 +1060,7 @@ class _PickCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: _GlassPanel(
           radius: 24,
-          tint: _HomeColors.surfaceHigh,
+          darkTint: _HomeDark.surface,
           padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -994,13 +1075,14 @@ class _PickCard extends StatelessWidget {
                     radius: 16,
                   ),
                   if (completed)
-                    Positioned(
+                    const Positioned(
                       left: 8,
                       top: 8,
                       child: Icon(
                         Icons.check_circle_rounded,
-                        color: _HomeColors.lime,
+                        color: Colors.white,
                         size: 22,
+                        shadows: [Shadow(color: Color(0x40000000), blurRadius: 4)],
                       ),
                     ),
                   if (game.featured)
@@ -1013,13 +1095,13 @@ class _PickCard extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: _HomeColors.lime,
+                          color: questAccent,
                           borderRadius: BorderRadius.circular(99),
                         ),
-                        child: const Text(
+                        child: Text(
                           'QUEST',
                           style: TextStyle(
-                            color: _HomeColors.surfaceSunken,
+                            color: questInk,
                             fontSize: 7.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: .5,
@@ -1040,18 +1122,14 @@ class _PickCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium
-                          ?.copyWith(color: CurioColors.onDark, fontSize: 15),
+                          ?.copyWith(color: ink, fontSize: 15),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       game.subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: _HomeColors.inkMuted,
-                        fontSize: 10.5,
-                        height: 1.3,
-                      ),
+                      style: TextStyle(color: inkMuted, fontSize: 10.5, height: 1.3),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -1061,7 +1139,7 @@ class _PickCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: completed ? _HomeColors.lime : accent,
+                        color: completed ? successColor : accent,
                         fontSize: 8,
                         fontWeight: FontWeight.w800,
                         letterSpacing: .5,
@@ -1111,7 +1189,7 @@ class _AdventurePickerState extends State<_AdventurePicker> {
                   child: _SkillTab(
                     label: skill,
                     selected: skill == _selected,
-                    color: _skillColor(skill),
+                    color: _skillColor(context, skill),
                     onTap: () => setState(() => _selected = skill),
                   ),
                 ),
@@ -1122,7 +1200,7 @@ class _AdventurePickerState extends State<_AdventurePicker> {
         _SkillProgressCard(
           skill: _selected,
           progress: widget.state.skills[_selected] ?? 0,
-          color: _skillColor(_selected),
+          color: _skillColor(context, _selected),
         ),
         for (final game in matches) ...[
           const SizedBox(height: 12),
@@ -1150,6 +1228,10 @@ class _SkillTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final surface = _hc(context, _HomeDark.surface, _HomeLight.surface);
+    final line = _hc(context, _HomeDark.line, _HomeLight.line);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(99),
@@ -1159,14 +1241,14 @@ class _SkillTab extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? color.withValues(alpha: .22) : _HomeColors.surface,
+            color: selected ? color.withValues(alpha: .16) : surface,
             borderRadius: BorderRadius.circular(99),
-            border: Border.all(color: selected ? color : _HomeColors.line),
+            border: Border.all(color: selected ? color : line),
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? CurioColors.onDark : _HomeColors.inkMuted,
+              color: selected ? (color.computeLuminance() > .5 ? ink : color) : inkMuted,
               fontSize: 12,
               fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
             ),
@@ -1189,6 +1271,7 @@ class _SkillProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(22),
@@ -1197,7 +1280,7 @@ class _SkillProgressCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         child: _GlassPanel(
           radius: 22,
-          tint: _HomeColors.surfaceRaised,
+          darkTint: _HomeDark.surfaceRaised,
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
@@ -1205,7 +1288,7 @@ class _SkillProgressCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: .2),
+                  color: color.withValues(alpha: .16),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.trending_up_rounded, color: color, size: 22),
@@ -1220,8 +1303,9 @@ class _SkillProgressCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '$skill path',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: CurioColors.onDark),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleMedium?.copyWith(color: ink),
                           ),
                         ),
                         Text(
@@ -1240,10 +1324,7 @@ class _SkillProgressCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: CurioColors.onDark.withValues(alpha: .7),
-              ),
+              Icon(Icons.arrow_forward_rounded, color: ink.withValues(alpha: .5)),
             ],
           ),
         ),
@@ -1259,7 +1340,10 @@ class _AdventureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = _skillColor(game.skill);
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final accent = _skillColor(context, game.skill);
+    final successColor = _hc(context, _HomeDark.success, _HomeLight.success);
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(24),
@@ -1268,7 +1352,7 @@ class _AdventureCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: _GlassPanel(
           radius: 24,
-          tint: _HomeColors.surfaceHigh,
+          darkTint: _HomeDark.surface,
           child: Row(
             children: [
               Container(
@@ -1294,19 +1378,16 @@ class _AdventureCard extends StatelessWidget {
                     children: [
                       Text(
                         game.title,
-                        style: Theme.of(context).textTheme.titleLarge
-                            ?.copyWith(color: CurioColors.onDark, fontSize: 19),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 19),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         game.subtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: _HomeColors.inkMuted,
-                          fontSize: 11.5,
-                          height: 1.35,
-                        ),
+                        style: TextStyle(color: inkMuted, fontSize: 11.5, height: 1.35),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -1314,7 +1395,7 @@ class _AdventureCard extends StatelessWidget {
                             ? 'COMPLETED TODAY'
                             : '${game.duration} · +${game.xp} XP',
                         style: TextStyle(
-                          color: completed ? _HomeColors.lime : accent,
+                          color: completed ? successColor : accent,
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
                           letterSpacing: .5,
@@ -1328,7 +1409,7 @@ class _AdventureCard extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 14),
                 child: Icon(
                   Icons.arrow_forward_rounded,
-                  color: CurioColors.onDark.withValues(alpha: .7),
+                  color: ink.withValues(alpha: .5),
                 ),
               ),
             ],
@@ -1345,18 +1426,19 @@ class _Eyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 24, height: 1, color: _HomeColors.lime),
+        Container(width: 24, height: 1, color: accent),
         const SizedBox(width: 9),
         Flexible(
           child: Text(
             text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: _HomeColors.lime,
+            style: TextStyle(
+              color: accent,
               fontSize: 9.5,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,

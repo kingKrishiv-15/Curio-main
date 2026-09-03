@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 
 class _LinkGroup {
@@ -167,9 +168,11 @@ class _LinkLabPageState extends State<LinkLabPage> {
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 7),
-          const Text(
+          Text(
             'Create four groups of four. Each group shares one precise connection.',
-            style: TextStyle(color: CurioColors.navyMuted),
+            style: TextStyle(
+              color: curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted),
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -196,8 +199,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: index < _mistakesLeft
-                            ? CurioColors.coral
-                            : CurioColors.creamDeep,
+                            ? curioColor(context, CurioColors.coral, CurioColorsLight.coral)
+                            : curioColor(context, CurioColors.creamDeep, CurioColorsLight.creamDeep),
                       ),
                     ),
                   ),
@@ -221,8 +224,12 @@ class _LinkLabPageState extends State<LinkLabPage> {
                     Text(
                       group.title.toUpperCase(),
                       style: TextStyle(
+                        // NOTE: group.color comes from the top-level `_groups`
+                        // data list, which stores fixed CurioColors.* (dark
+                        // mode) constants with no BuildContext available —
+                        // left unconverted per the data-model exception.
                         color: group.color == CurioColors.gold
-                            ? CurioColors.saffronStrong
+                            ? curioColor(context, CurioColors.saffronStrong, CurioColorsLight.saffronStrong)
                             : group.color,
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
@@ -233,8 +240,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
                     Text(
                       group.words.join(' · '),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: CurioColors.navySoft,
+                      style: TextStyle(
+                        color: curioColor(context, CurioColors.navySoft, CurioColorsLight.navySoft),
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),
@@ -260,8 +267,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
                           height: 70,
                           child: Material(
                             color: selected
-                                ? CurioColors.coral
-                                : CurioColors.surface,
+                                ? curioColor(context, CurioColors.coral, CurioColorsLight.coral)
+                                : curioColor(context, CurioColors.surface, CurioColorsLight.surface),
                             borderRadius: BorderRadius.circular(15),
                             child: InkWell(
                               key: Key('link_$word'),
@@ -276,8 +283,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
                                   borderRadius: BorderRadius.circular(15),
                                   border: Border.all(
                                     color: selected
-                                        ? CurioColors.coral
-                                        : CurioColors.creamDeep,
+                                        ? curioColor(context, CurioColors.coral, CurioColorsLight.coral)
+                                        : curioColor(context, CurioColors.creamDeep, CurioColorsLight.creamDeep),
                                   ),
                                 ),
                                 child: FittedBox(
@@ -286,8 +293,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
                                     word,
                                     style: TextStyle(
                                       color: selected
-                                          ? CurioColors.night
-                                          : CurioColors.ink,
+                                          ? curioColor(context, CurioColors.night, CurioColorsLight.night)
+                                          : curioColor(context, CurioColors.ink, CurioColorsLight.ink),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -310,14 +317,14 @@ class _LinkLabPageState extends State<LinkLabPage> {
                 key: ValueKey(_message),
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  color: CurioColors.surfaceMuted,
+                  color: curioColor(context, CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.auto_awesome_rounded,
-                      color: CurioColors.coral,
+                      color: curioColor(context, CurioColors.coral, CurioColorsLight.coral),
                       size: 19,
                     ),
                     const SizedBox(width: 9),
@@ -330,29 +337,32 @@ class _LinkLabPageState extends State<LinkLabPage> {
           const SizedBox(height: 14),
           if (_complete) ...[
             CurioCard(
-              color: CurioColors.greenSoft,
-              borderColor: CurioColors.green.withValues(alpha: .3),
-              child: const Row(
+              color: curioColor(context, CurioColors.greenSoft, CurioColorsLight.greenSoft),
+              borderColor: curioColor(context, CurioColors.green, CurioColorsLight.green).withValues(alpha: .3),
+              child: Row(
                 children: [
                   ProgressRing(
                     value: 1,
-                    color: CurioColors.green,
-                    child: Icon(Icons.check_rounded, color: CurioColors.green),
+                    color: curioColor(context, CurioColors.green, CurioColorsLight.green),
+                    child: Icon(
+                      Icons.check_rounded,
+                      color: curioColor(context, CurioColors.green, CurioColorsLight.green),
+                    ),
                   ),
-                  SizedBox(width: 14),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           '+90 XP earned',
                           style: TextStyle(fontWeight: FontWeight.w800),
                         ),
-                        SizedBox(height: 3),
+                        const SizedBox(height: 3),
                         Text(
                           'Classification discovery unlocked',
                           style: TextStyle(
-                            color: CurioColors.navyMuted,
+                            color: curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted),
                             fontSize: 12,
                           ),
                         ),
@@ -367,7 +377,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
               label: 'Copy my result',
               icon: Icons.ios_share_rounded,
               onPressed: _share,
-              color: CurioColors.green,
+              color: curioColor(context, CurioColors.green, CurioColorsLight.green),
             ),
           ] else
             PrimaryButton(

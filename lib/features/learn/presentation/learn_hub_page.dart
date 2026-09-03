@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/evidence/presentation/evidence_detective_page.dart';
 import '../../games/link_lab/presentation/link_lab_page.dart';
@@ -16,6 +17,15 @@ class LearnHubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
+    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
+    final saffronStrong = curioColor(
+      context,
+      CurioColors.saffronStrong,
+      CurioColorsLight.saffronStrong,
+    );
     return CurioPage(
       maxWidth: 880,
       child: ListView(
@@ -37,7 +47,7 @@ class LearnHubPage extends StatelessWidget {
             title: 'Link Lab',
             subtitle: 'Sort sixteen clues into four precise knowledge groups',
             icon: Icons.hub_rounded,
-            color: CurioColors.coral,
+            color: coral,
             badge: 'NEW',
             duration: '3–5 min',
             skill: 'Reasoning',
@@ -48,7 +58,7 @@ class LearnHubPage extends StatelessWidget {
             title: 'Signal Grid',
             subtitle: 'Balance a binary grid using deduction, never guessing',
             icon: Icons.grid_4x4_rounded,
-            color: CurioColors.blue,
+            color: blue,
             badge: 'NEW',
             duration: '4–6 min',
             skill: 'Logic',
@@ -66,7 +76,7 @@ class LearnHubPage extends StatelessWidget {
             title: 'Pattern Forge',
             subtitle: 'Predict, explain, and repair number patterns',
             icon: Icons.blur_on_rounded,
-            color: CurioColors.forest,
+            color: forest,
             duration: '5 min',
             skill: 'Patterns',
             onTap: () => openPage(context, const PatternForgePage()),
@@ -76,7 +86,7 @@ class LearnHubPage extends StatelessWidget {
             title: 'Evidence Detective',
             subtitle: 'Separate reliable clues from tempting distractions',
             icon: Icons.manage_search_rounded,
-            color: CurioColors.plum,
+            color: plum,
             duration: '6 min',
             skill: 'Evidence',
             onTap: () => openPage(context, const EvidenceDetectivePage()),
@@ -86,7 +96,7 @@ class LearnHubPage extends StatelessWidget {
             title: 'Frostlands Story',
             subtitle: 'Your choices decide how Ash crosses the ice',
             icon: Icons.ac_unit_rounded,
-            color: CurioColors.blue,
+            color: blue,
             duration: '8 min',
             skill: 'Decisions',
             onTap: () => openPage(context, const FrostlandsStoryPage()),
@@ -96,7 +106,7 @@ class LearnHubPage extends StatelessWidget {
             title: 'Skill Quest',
             subtitle: 'See how your four thinking domains are growing',
             icon: Icons.route_rounded,
-            color: CurioColors.saffronStrong,
+            color: saffronStrong,
             duration: 'Progress map',
             skill: 'All skills',
             onTap: () => openPage(context, const SkillQuestPage()),
@@ -113,6 +123,9 @@ class _FeaturedQuest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final saffron = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
+    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
     return Semantics(
       button: true,
       label: 'Play today’s featured game, Squeeze',
@@ -124,7 +137,7 @@ class _FeaturedQuest extends StatelessWidget {
           child: Ink(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: CurioColors.heroGradient,
+              gradient: dark ? CurioColors.heroGradient : CurioColorsLight.heroGradient,
               borderRadius: BorderRadius.circular(CurioRadius.hero),
             ),
             child: Row(
@@ -133,37 +146,37 @@ class _FeaturedQuest extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CurioEyebrow(
+                      CurioEyebrow(
                         'Featured quest',
-                        color: CurioColors.saffron,
+                        color: saffron,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'Squeeze the\nsecret number',
                         style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(color: CurioColors.onDark),
+                            ?.copyWith(color: onDark),
                       ),
                       const SizedBox(height: 9),
                       Text(
                         'Seven guesses. One shrinking range. How quickly can you find it?',
                         style: TextStyle(
-                          color: CurioColors.onDark.withValues(alpha: .72),
+                          color: onDark.withValues(alpha: .72),
                           fontSize: 12,
                         ),
                       ),
                       const SizedBox(height: 13),
-                      const Row(
+                      Row(
                         children: [
                           Icon(
                             Icons.play_circle_fill_rounded,
-                            color: CurioColors.saffron,
+                            color: saffron,
                             size: 22,
                           ),
-                          SizedBox(width: 7),
+                          const SizedBox(width: 7),
                           Text(
                             'PLAY NOW',
                             style: TextStyle(
-                              color: CurioColors.onDark,
+                              color: onDark,
                               fontSize: 10.5,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1,
@@ -180,19 +193,19 @@ class _FeaturedQuest extends StatelessWidget {
                   height: 102,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: CurioColors.onDark.withValues(alpha: .08),
+                    color: onDark.withValues(alpha: .08),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(54),
                     ),
                     border: Border.all(
-                      color: CurioColors.onDark.withValues(alpha: .1),
+                      color: onDark.withValues(alpha: .1),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     '?',
                     style: TextStyle(
                       fontFamily: 'Fraunces',
-                      color: CurioColors.saffron,
+                      color: saffron,
                       fontSize: 72,
                       fontWeight: FontWeight.w500,
                       height: 1,
