@@ -1,73 +1,63 @@
 import 'package:flutter/material.dart';
-
+import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../../core/widgets/curio_gloss.dart';
+import '../../family/presentation/family_inbox_page.dart';
+import '../../family/presentation/family_settings_page.dart';
+import '../../family/presentation/privacy_page.dart';
 
 class ParentDashboardPage extends StatelessWidget {
   const ParentDashboardPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final forestStrong = curioColor(
-      context,
-      CurioColors.forestStrong,
-      CurioColorsLight.forestStrong,
-    );
-    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
-    final saffron = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
-    final saffronStrong = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
-    final saffronSoft = curioColor(
-      context,
-      CurioColors.saffronSoft,
-      CurioColorsLight.saffronSoft,
-    );
-    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
-    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final now = DateTime.now();
+    final start = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
+    final recent = state.completedActivities.where((id) {
+      if (!RegExp(r'_[0-9]{8}$').hasMatch(id)) return false;
+      final d = id.substring(id.length - 8);
+      final date = DateTime(
+        int.parse(d.substring(0, 4)),
+        int.parse(d.substring(4, 6)),
+        int.parse(d.substring(6, 8)),
+      );
+      return !date.isBefore(start) && !date.isAfter(now);
+    }).toList();
+    final practiceDays = recent
+        .map((id) => id.substring(id.length - 8))
+        .toSet()
+        .length;
+    final skills = state.skills.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final hasProgress = state.completedActivities.isNotEmpty;
     return CurioPage(
       title: 'Parent dashboard',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+        padding: const EdgeInsets.all(24),
         children: [
-          CurioCard(
-            color: forestStrong,
-            borderColor: forestStrong,
+          CurioGloss(
+            tint: Theme.of(context).colorScheme.secondaryContainer,
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: forest,
-                  child: Icon(
-                    Icons.auto_awesome_rounded,
-                    color: saffron,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(width: 14),
+                const MascotBadge(size: 68),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const CurioEyebrow('Growing, one discovery at a time'),
+                      const SizedBox(height: 10),
                       Text(
                         state.childName,
-                        style: TextStyle(
-                          color: onDark,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       Text(
-                        '${state.totalXp} total XP · Stage ${state.companionStage}',
-                        style: TextStyle(
-                          color: onDark.withValues(alpha: .66),
-                        ),
+                        '${state.totalXp} XP · Stage ${state.companionStage}',
                       ),
                     ],
                   ),
@@ -75,129 +65,110 @@ class ParentDashboardPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final stats = <Widget>[
-                _ParentStat(
-                  value: '${state.activitiesCompleted}',
-                  label: 'activities',
-                  color: teal,
-                ),
-                _ParentStat(
-                  value: '${state.streak}',
-                  label: 'day streak',
-                  color: coral,
-                ),
-                _ParentStat(
-                  value: '${state.collectedFacts.length}',
-                  label: 'discoveries',
-                  color: saffronStrong,
-                ),
-              ];
-              return Row(
-                children: [
-                  stats[0],
-                  const SizedBox(width: 8),
-                  stats[1],
-                  const SizedBox(width: 8),
-                  stats[2],
-                ],
-              );
-            },
+          const SizedBox(height: 24),
+          Text(
+            'The last 7 days',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 14),
+          CurioGloss(
+            child: Wrap(
+              spacing: 32,
+              runSpacing: 20,
+              children: [
+                _Stat('${recent.length}', 'activities'),
+                _Stat('$practiceDays', 'practice days'),
+                _Stat('${state.streak}', 'day streak'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Skill snapshot',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 14),
+          CurioGloss(
+            child: Column(
+              children: [
+                for (final skill in skills)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${skill.key} · ${(skill.value * 100).round()}%'),
+                        const SizedBox(height: 8),
+                        CurioProgressBar(value: skill.value),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: 20),
-          const SectionHeading('Skill snapshot'),
-          const SizedBox(height: 12),
-          CurioCard(
+          CurioGloss(
             child: Column(
-              children: state.skills.entries
-                  .map(
-                    (entry) => Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 105,
-                            child: Text(
-                              entry.key,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: CurioProgressBar(
-                              value: entry.value,
-                              height: 8,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${(entry.value * 100).round()}%',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          CurioCard(
-            color: saffronSoft,
-            borderColor: saffron.withValues(alpha: .3),
-            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CurioIconTile(
-                  icon: Icons.insights_rounded,
-                  color: saffronStrong,
-                  size: 40,
-                  iconSize: 21,
-                  radius: 12,
+                Text(
+                  'A little encouragement',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(width: 11),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'This week\'s insight',
-                        style: TextStyle(fontWeight: FontWeight.w900),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Number sense is the strongest area. Encourage explanations—not just answers—during the next pattern activity.',
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: 10),
+                Text(
+                  hasProgress
+                      ? '${skills.first.key} is currently ${state.childName}’s strongest area. Try a ${skills.last.key.toLowerCase()} activity next, and ask them to explain their thinking.'
+                      : 'Your first completed activity will start the learning snapshot. Let your explorer choose what looks interesting.',
+                  style: const TextStyle(height: 1.6),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          const SectionHeading('Family controls'),
-          const SizedBox(height: 10),
-          const _ControlTile(
-            icon: Icons.schedule_rounded,
-            title: 'Daily learning goal',
-            value: '15 minutes',
+          const SizedBox(height: 24),
+          Text(
+            'Your family space',
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const _ControlTile(
-            icon: Icons.notifications_outlined,
-            title: 'Learning reminders',
-            value: '6:00 PM',
+          const SizedBox(height: 14),
+          CurioGloss(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                _Link(
+                  Icons.insights_outlined,
+                  'Weekly reports',
+                  'Your learning story, week by week',
+                  () => openPage(
+                    context,
+                    const FamilyInboxPage(reportsOnly: true),
+                  ),
+                ),
+                _Link(
+                  Icons.notifications_outlined,
+                  'Notifications',
+                  'Reminders and report updates',
+                  () => openPage(context, const FamilyInboxPage()),
+                ),
+                _Link(
+                  Icons.tune_rounded,
+                  'Family preferences',
+                  '${state.dailyGoal} activities a day · reminders · email',
+                  () => openPage(context, const FamilySettingsPage()),
+                ),
+                _Link(
+                  Icons.privacy_tip_outlined,
+                  'Privacy and account',
+                  'Review, export, or delete your data',
+                  () => openPage(context, const PrivacyPage()),
+                ),
+              ],
+            ),
           ),
-          const _ControlTile(
-            icon: Icons.privacy_tip_outlined,
-            title: 'Privacy and consent',
-            value: 'Review',
+          const SizedBox(height: 18),
+          const Text(
+            'Mastery reflects completed practice, not a formal assessment.',
+            style: TextStyle(fontSize: 12),
           ),
         ],
       ),
@@ -205,80 +176,31 @@ class ParentDashboardPage extends StatelessWidget {
   }
 }
 
-class _ParentStat extends StatelessWidget {
-  const _ParentStat({
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-  final String value;
-  final String label;
-  final Color color;
-
+class _Stat extends StatelessWidget {
+  const _Stat(this.value, this.label);
+  final String value, label;
   @override
-  Widget build(BuildContext context) {
-    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: .09),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: .25)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w900,
-                fontSize: 21,
-              ),
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: inkMuted,
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(value, style: Theme.of(context).textTheme.headlineMedium),
+      Text(label),
+    ],
+  );
 }
 
-class _ControlTile extends StatelessWidget {
-  const _ControlTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+class _Link extends StatelessWidget {
+  const _Link(this.icon, this.title, this.subtitle, this.onTap);
   final IconData icon;
-  final String title;
-  final String value;
-
+  final String title, subtitle;
+  final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) {
-    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-      leading: CircleAvatar(
-        backgroundColor: curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft),
-        foregroundColor: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
-        child: Icon(icon),
-      ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-      trailing: Text(
-        value,
-        style: TextStyle(
-          color: inkMuted,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    leading: Icon(icon),
+    title: Text(title),
+    subtitle: Text(subtitle),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: onTap,
+  );
 }

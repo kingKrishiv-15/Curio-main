@@ -4,6 +4,7 @@ import '../../../core/navigation/open_page.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../../core/widgets/curio_gloss.dart';
 import '../../games/evidence/presentation/evidence_detective_page.dart';
 import '../../games/link_lab/presentation/link_lab_page.dart';
 import '../../games/loophole/presentation/loophole_page.dart';
@@ -18,9 +19,17 @@ class LearnHubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final coral = curioColor(
+      context,
+      CurioColors.coral,
+      CurioColorsLight.coral,
+    );
     final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
-    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
     final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
     final saffronStrong = curioColor(
       context,
@@ -28,6 +37,7 @@ class LearnHubPage extends StatelessWidget {
       CurioColorsLight.saffronStrong,
     );
     return CurioPage(
+      extendBehindBottom: true,
       maxWidth: 880,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 104),
@@ -136,8 +146,16 @@ class _FeaturedQuest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final saffron = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
-    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
+    final saffron = curioColor(
+      context,
+      CurioColors.saffron,
+      CurioColorsLight.saffron,
+    );
+    final onDark = curioColor(
+      context,
+      CurioColors.onDark,
+      CurioColorsLight.ink,
+    );
     return Semantics(
       button: true,
       label: 'Play today’s featured game, Squeeze',
@@ -146,27 +164,25 @@ class _FeaturedQuest extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(CurioRadius.hero),
-          child: Ink(
+          child: CurioGloss(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: dark ? CurioColors.heroGradient : CurioColorsLight.heroGradient,
-              borderRadius: BorderRadius.circular(CurioRadius.hero),
-            ),
+            radius: CurioRadius.hero,
+            tint: dark
+                ? CurioColors.forestStrong
+                : CurioColorsLight.saffronSoft,
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CurioEyebrow(
-                        'Featured quest',
-                        color: saffron,
-                      ),
+                      CurioEyebrow('Featured quest', color: saffron),
                       const SizedBox(height: 12),
                       Text(
                         'Squeeze the\nsecret number',
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(color: onDark),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.headlineMedium?.copyWith(color: onDark),
                       ),
                       const SizedBox(height: 9),
                       Text(
@@ -209,9 +225,7 @@ class _FeaturedQuest extends StatelessWidget {
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(54),
                     ),
-                    border: Border.all(
-                      color: onDark.withValues(alpha: .1),
-                    ),
+                    border: Border.all(color: onDark.withValues(alpha: .1)),
                   ),
                   child: Text(
                     '?',

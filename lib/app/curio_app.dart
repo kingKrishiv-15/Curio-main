@@ -33,6 +33,19 @@ class _CurioAppState extends State<CurioApp> {
             theme: CurioTheme.light,
             darkTheme: CurioTheme.dark,
             themeMode: _themeController.mode,
+            builder: (context, child) {
+              final media = MediaQuery.of(context);
+              return MediaQuery(
+                data: media.copyWith(
+                  disableAnimations:
+                      media.disableAnimations || _themeController.reduceMotion,
+                  textScaler: TextScaler.linear(
+                    media.textScaler.scale(1) * _themeController.readingScale,
+                  ),
+                ),
+                child: child!,
+              );
+            },
             home: const AuthGate(),
           );
         },
