@@ -1,0 +1,61 @@
+# Loophole
+
+A short statement appears on screen, split into tappable chunks. The statement is technically true but designed to mislead, for example "This toothpaste is recommended by 90% of dentists surveyed."
+
+The player taps the word or phrase doing the deceptive work. Here it is "surveyed," because the claim sounds like 90% of all dentists when it actually means 90% of whichever dentists the company chose to ask.
+
+Two guesses. After the answer, a short explanation appears covering why that word matters. That explanation is the actual teaching, the tapping is just what makes them read it.
+
+About twenty seconds per round, so the daily version serves three statements.
+
+**Content logic:** each entry in the database is a statement, the target token, and the explanation. Drawn from real ads, headlines, statistics and political claims.
+
+---
+
+# Odd Cluster
+
+Sixteen tiles in a four by four grid. Four hidden groups of four. The player selects four tiles and submits. Correct groups lock in and the grid shrinks. Four wrong guesses ends the game.
+
+When three of the four selected tiles are correct, the game says "one away." That turns a wrong guess into a near miss, which is far more compelling than a flat failure.
+
+Groups are conceptual and knowledge-based, not wordplay. For example: things there are exactly 1000 of, words that are also chemical symbols, numbers that are palindromes in binary, capitals that are not the largest city in their country.
+
+**Difficulty logic:** each puzzle has one easy group, two medium, one deliberately sneaky. The sneaky group contains tiles that look like they belong to an easier group, so the player commits wrongly first. The trap is the point.
+
+---
+
+# Sequence
+
+Numbers are revealed one at a time, connected by a hidden rule. After each reveal the player either guesses the next number or pays to have it revealed.
+
+Scoring rewards cracking it early. A correct guess after two numbers is worth far more than after four. So every turn is a real decision: commit now, or buy more evidence at a cost.
+
+Rules range from arithmetic (add seven, double and subtract one) to structural (each term is the digit sum of the previous term, cubed).
+
+**Generator logic:** the sequence must uniquely determine its rule. If 2, 4, 8, 16 could be "double" or "powers of two," the next term is ambiguous and a player can be right but marked wrong. The validator has to reject ambiguous sequences before they ship.
+
+---
+
+# Cascade
+
+A claim appears at the top, for example "A city bans all cars from its centre." Below it, twelve consequence tiles.
+
+The player drags five into a vertical chain where each follows causally from the one above. Not just things that happen, but this therefore this therefore this. A correct chain might run: fewer cars, so air quality improves, so fewer respiratory admissions, so lower public health costs, so budget freed for transport expansion.
+
+**Decoy logic:** some tiles are genuine consequences, some are plausible but false. The false ones cannot be obviously wrong. They have to be things a reasonable person accepts without checking, like "shop revenue in the centre falls," which sounds obvious but is contradicted by evidence from cities that have done it. A player picking it is reasoning from intuition rather than evidence.
+
+On completion, the correct chain appears with an explanation of each causal link, so the player sees which link in their reasoning broke.
+
+---
+
+# Bridge
+
+Two numbers at opposite ends of the screen, say 7 and 500. Between them, five draggable operation tiles: ×3, +14, ÷2, −6, x².
+
+Arrange them so the start number transforms into the target. Every tile used exactly once. The running value updates live between tiles as they drag, so the player watches the number move as they rearrange.
+
+Order is everything. Squaring before multiplying is not the same as multiplying before squaring, so the player is searching a space of arrangements rather than calculating.
+
+**Generator logic:** you cannot pick a random target and random tiles and hope a solution exists, it usually won't. Instead, pick a start number, apply five random operations in sequence, and whatever you land on becomes the target. Then shuffle the tiles. Solvability is guaranteed because you built it from a solution.
+
+Two constraints: division tiles only appear where they divide evenly, so intermediate values stay clean. And a solver runs afterwards to check whether multiple orderings work, so single-solution days can be flagged as harder.
