@@ -8,8 +8,12 @@ Future<T?> openPage<T>(BuildContext context, Widget page) {
     PageRouteBuilder<T>(
       pageBuilder: (_, animation, secondaryAnimation) =>
           CurioScope(notifier: state, child: page),
-      transitionDuration: const Duration(milliseconds: 320),
-      reverseTransitionDuration: const Duration(milliseconds: 240),
+      transitionDuration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 320),
+      reverseTransitionDuration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 240),
       transitionsBuilder: (_, animation, secondaryAnimation, child) {
         final curve = CurvedAnimation(
           parent: animation,

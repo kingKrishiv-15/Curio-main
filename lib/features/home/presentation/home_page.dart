@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../../core/widgets/curio_gloss.dart';
 import '../../games/evidence/presentation/evidence_detective_page.dart';
 import '../../games/link_lab/presentation/link_lab_page.dart';
 import '../../games/pattern/presentation/pattern_forge_page.dart';
 import '../../games/signal_grid/presentation/signal_grid_page.dart';
 import '../../games/squeeze/presentation/squeeze_page.dart';
 import '../../parent/presentation/parent_dashboard_page.dart';
+import '../../family/presentation/family_inbox_page.dart';
 import '../../skills/presentation/skill_quest_page.dart';
 
 /// Home's dark mode: a deep, textured evergreen backdrop with neutral-slate
@@ -91,79 +93,24 @@ class _GlassPanel extends StatelessWidget {
     this.padding = EdgeInsets.zero,
     this.radius = 22,
     this.darkTint,
-    this.lightTint,
   });
-
   final Widget child;
   final EdgeInsets padding;
   final double radius;
   final Color? darkTint;
-  final Color? lightTint;
-
   @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final borderRadius = BorderRadius.circular(radius);
-    if (dark) {
-      final tint = darkTint ?? _HomeDark.surface;
-      final fill = Color.lerp(tint, Colors.white, .1)!;
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: borderRadius,
-          boxShadow: _HomeDark.cardShadow,
-        ),
-        child: ClipRRect(
-          borderRadius: borderRadius,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: fill.withValues(alpha: .58),
-              borderRadius: borderRadius,
-              border: Border.all(color: Colors.white.withValues(alpha: .2)),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: borderRadius,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: .14),
-                            Colors.white.withValues(alpha: 0),
-                          ],
-                          stops: const [0, .6],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(padding: padding, child: child),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: lightTint ?? _HomeLight.surface,
-        borderRadius: borderRadius,
-        border: Border.all(color: _HomeLight.line),
-        boxShadow: _HomeLight.cardShadow,
-      ),
-      child: child,
-    );
-  }
+  Widget build(BuildContext context) => CurioGloss(
+    padding: padding,
+    radius: radius,
+    tint: Theme.of(context).brightness == Brightness.dark ? darkTint : null,
+    child: child,
+  );
 }
 
 /// A gentle looping scale pulse — used on "live" streak flames so they read
 /// as active rather than static icons.
 class _Pulse extends StatefulWidget {
-  const _Pulse({required this.child, super.key});
+  const _Pulse({required this.child});
   final Widget child;
 
   @override
@@ -184,6 +131,7 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
     return ScaleTransition(
       scale: Tween(
         begin: 0.92,
@@ -196,7 +144,7 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
 
 /// Fades and slides a section in once, staggered by [delay].
 class _FadeSlideIn extends StatefulWidget {
-  const _FadeSlideIn({required this.child, this.delay = Duration.zero, super.key});
+  const _FadeSlideIn({required this.child, this.delay = Duration.zero});
   final Widget child;
   final Duration delay;
 
@@ -227,7 +175,11 @@ class _FadeSlideInState extends State<_FadeSlideIn>
 
   @override
   Widget build(BuildContext context) {
-    final curved = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    final curved = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
     return AnimatedBuilder(
       animation: curved,
       child: widget.child,
@@ -374,11 +326,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final now = DateTime.now();
-    final greeting = now.hour < 12
-        ? 'Good morning'
-        : now.hour < 17
-        ? 'Good afternoon'
-        : 'Good evening';
 
     final games = <_GameInfo>[
       _GameInfo(
@@ -440,14 +387,22 @@ class HomePage extends StatelessWidget {
         children: [
           const Positioned.fill(child: _HomeBackdrop()),
           SafeArea(
+            bottom: false,
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 940),
                 child: DefaultTextStyle.merge(
-                  style: TextStyle(color: _hc(context, _HomeDark.ink, _HomeLight.ink)),
+                  style: TextStyle(
+                    color: _hc(context, _HomeDark.ink, _HomeLight.ink),
+                  ),
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 112),
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      18,
+                      20,
+                      96 + MediaQuery.viewPaddingOf(context).bottom,
+                    ),
                     children: [
                       _Header(
                         name: state.childName,
@@ -458,8 +413,7 @@ class HomePage extends StatelessWidget {
                       const SizedBox(height: 26),
                       _FadeSlideIn(
                         child: _Opening(
-                          greeting: greeting,
-                          name: state.childName,
+                          onExplore: onExplore,
                           completed: state.dailyGoalCompleted,
                         ),
                       ),
@@ -578,7 +532,8 @@ class _HomeTexturePainter extends CustomPainter {
     );
 
     final grainColor = dark ? Colors.white : const Color(0xFF2E2417);
-    final grain = Paint()..color = grainColor.withValues(alpha: dark ? .022 : .014);
+    final grain = Paint()
+      ..color = grainColor.withValues(alpha: dark ? .022 : .014);
     for (var y = 20.0; y < size.height; y += 30) {
       for (var x = 10.0; x < size.width; x += 30) {
         if ((x + y).round().isEven) continue;
@@ -647,7 +602,9 @@ class _StreakChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: chipColor,
         borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: _hc(context, _HomeDark.line, _HomeLight.lineStrong)),
+        border: Border.all(
+          color: _hc(context, _HomeDark.line, _HomeLight.lineStrong),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -722,6 +679,11 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
+        IconButton(
+          tooltip: 'Notifications',
+          onPressed: () => openPage(context, const FamilyInboxPage()),
+          icon: const Icon(Icons.notifications_outlined),
+        ),
         _StreakChip(streak: streak),
         const SizedBox(width: 10),
         IconButton(
@@ -742,87 +704,57 @@ class _Header extends StatelessWidget {
 }
 
 class _Opening extends StatelessWidget {
-  const _Opening({
-    required this.greeting,
-    required this.name,
-    required this.completed,
-  });
-
-  final String greeting;
-  final String name;
+  const _Opening({required this.completed, required this.onExplore});
   final int completed;
+  final VoidCallback onExplore;
 
   @override
   Widget build(BuildContext context) {
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compact = constraints.maxWidth < 560;
-        final copy = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _Eyebrow('$greeting · $name!'),
-            const SizedBox(height: 13),
-            Text(
-              'What will you\nsolve today?',
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                color: ink,
-                fontSize: compact ? 40 : 56,
-                height: .88,
-                letterSpacing: compact ? -2.3 : -3,
-              ),
-            ),
-            const SizedBox(height: 15),
-            Text(
-              'A small challenge can change the way you see a big idea.',
-              style: TextStyle(color: inkMuted, fontSize: 13.5, height: 1.45),
-            ),
-          ],
-        );
-        if (compact) return copy;
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(child: copy),
-            _GoalMark(completed: completed),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _GoalMark extends StatelessWidget {
-  const _GoalMark({required this.completed});
-  final int completed;
-
-  @override
-  Widget build(BuildContext context) {
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final goal = CurioScope.of(context).dailyGoal;
     final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
-    return SizedBox(
-      width: 104,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+    return CurioGloss(
+      key: const Key('daily_goal_banner'),
+      radius: 24,
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            '$completed / 3',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: ink),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            'DAILY GOAL',
-            style: TextStyle(
-              color: inkMuted,
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
+          const MascotBadge(size: 52),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'A little discovery today?',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontSize: 22, height: 1.15),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$completed of $goal daily activities complete',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 10),
+                CurioProgressBar(
+                  value: completed / goal,
+                  color: accent,
+                  height: 4,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 9),
-          CurioProgressBar(value: completed / 3, color: accent, height: 5),
+          const SizedBox(width: 8),
+          IconButton.filledTonal(
+            tooltip: 'Choose an activity',
+            onPressed: onExplore,
+            style: IconButton.styleFrom(
+              backgroundColor: accent.withValues(alpha: .14),
+              foregroundColor: accent,
+            ),
+            icon: const Icon(Icons.arrow_forward_rounded, size: 20),
+          ),
         ],
       ),
     );
@@ -859,8 +791,12 @@ class _WeekPracticeCard extends StatelessWidget {
     final inkMuted = dark ? _HomeDark.inkMuted : _HomeLight.inkMuted;
     final inkFaint = dark ? _HomeDark.inkFaint : _HomeLight.inkFaint;
     final lineStrong = dark ? _HomeDark.lineStrong : _HomeLight.lineStrong;
-    final surfaceRaised = dark ? _HomeDark.surfaceRaised : _HomeLight.surfaceSunken;
-    final surfaceSunken = dark ? _HomeDark.surfaceSunken : _HomeLight.surfaceSunken;
+    final surfaceRaised = dark
+        ? _HomeDark.surfaceRaised
+        : _HomeLight.surfaceSunken;
+    final surfaceSunken = dark
+        ? _HomeDark.surfaceSunken
+        : _HomeLight.surfaceSunken;
     final flameColor = dark ? _HomeDark.gold : _HomeLight.yellowInk;
     final practicedFill = dark ? _HomeDark.gold : _HomeLight.accent;
     final practicedCheck = dark ? _HomeDark.surfaceSunken : Colors.white;
@@ -932,7 +868,11 @@ class _WeekPracticeCard extends StatelessWidget {
                         ),
                       ),
                       child: practiced
-                          ? Icon(Icons.check_rounded, color: practicedCheck, size: 16)
+                          ? Icon(
+                              Icons.check_rounded,
+                              color: practicedCheck,
+                              size: 16,
+                            )
                           : isToday
                           ? _Pulse(
                               child: Icon(
@@ -1082,7 +1022,9 @@ class _PickCard extends StatelessWidget {
                         Icons.check_circle_rounded,
                         color: Colors.white,
                         size: 22,
-                        shadows: [Shadow(color: Color(0x40000000), blurRadius: 4)],
+                        shadows: [
+                          Shadow(color: Color(0x40000000), blurRadius: 4),
+                        ],
                       ),
                     ),
                   if (game.featured)
@@ -1121,15 +1063,21 @@ class _PickCard extends StatelessWidget {
                       game.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium
-                          ?.copyWith(color: ink, fontSize: 15),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: ink,
+                        fontSize: 15,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       game.subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: inkMuted, fontSize: 10.5, height: 1.3),
+                      style: TextStyle(
+                        color: inkMuted,
+                        fontSize: 10.5,
+                        height: 1.3,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -1248,7 +1196,9 @@ class _SkillTab extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? (color.computeLuminance() > .5 ? ink : color) : inkMuted,
+              color: selected
+                  ? (color.computeLuminance() > .5 ? ink : color)
+                  : inkMuted,
               fontSize: 12,
               fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
             ),
@@ -1324,7 +1274,10 @@ class _SkillProgressCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.arrow_forward_rounded, color: ink.withValues(alpha: .5)),
+              Icon(
+                Icons.arrow_forward_rounded,
+                color: ink.withValues(alpha: .5),
+              ),
             ],
           ),
         ),
@@ -1378,16 +1331,21 @@ class _AdventureCard extends StatelessWidget {
                     children: [
                       Text(
                         game.title,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 19),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: ink,
+                          fontSize: 19,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         game.subtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: inkMuted, fontSize: 11.5, height: 1.35),
+                        style: TextStyle(
+                          color: inkMuted,
+                          fontSize: 11.5,
+                          height: 1.35,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(

@@ -1,5 +1,6 @@
 {
   "SUPABASE_URL": "https://YOUR_PROJECT_REF.supabase.co",
   "SUPABASE_PUBLISHABLE_KEY": "YOUR_PUBLISHABLE_KEY",
-  "ENABLE_GOOGLE_AUTH": "false"
+  "ENABLE_GOOGLE_AUTH": "false",
+  "OTP_LENGTH": "6"
 }

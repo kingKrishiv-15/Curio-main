@@ -2,17 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Curio (with Supabase)",
+      "name": "Curio",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-      "args": ["--dart-define-from-file", "config/supabase.json"]
+      "program": "lib/main.dart"
     },
     {
       "name": "Curio (demo mode, no login)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart"
+      "program": "lib/main.dart",
+      "args": ["--dart-define=CURIO_DEMO=true"]
     }
   ]
 }

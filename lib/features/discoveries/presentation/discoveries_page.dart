@@ -33,6 +33,7 @@ class DiscoveriesPage extends StatelessWidget {
     final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
     final navyMuted = curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted);
     return CurioPage(
+      extendBehindBottom: true,
       maxWidth: 820,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 104),

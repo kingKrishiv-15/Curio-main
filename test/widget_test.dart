@@ -35,11 +35,12 @@ void main() {
   ) async {
     await tester.pumpWidget(const CurioApp());
 
-    expect(find.textContaining('Explorer!'), findsOneWidget);
-    expect(find.text("TODAY'S QUEST"), findsOneWidget);
+    expect(find.text('Explorer'), findsOneWidget);
+    expect(find.text('A little discovery today?'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Games'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nav_Games')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Ways to learn'), findsOneWidget);
     expect(find.text('Link Lab'), findsOneWidget);
@@ -77,8 +78,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const CurioApp());
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Games'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nav_Games')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
     await tester.scrollUntilVisible(
       find.text('Evidence Detective'),
       320,
@@ -90,7 +92,8 @@ void main() {
           .first,
     );
     await tester.tap(find.text('Evidence Detective'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('CASE 001 · THE GARDEN'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -103,10 +106,12 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const CurioApp());
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Games'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nav_Games')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
     await tester.tap(find.text('Link Lab').first);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     for (final word in ['MERCURY', 'VENUS', 'EARTH', 'MARS']) {
       await tester.ensureVisible(find.byKey(Key('link_$word')));
@@ -123,7 +128,8 @@ void main() {
           .first,
     );
     await tester.tap(find.text('Check connection'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('ROCKY PLANETS'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -136,10 +142,11 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const CurioApp());
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('Daily momentum'), findsOneWidget);
-    expect(find.text('Today’s brain breaks'), findsOneWidget);
+    expect(find.textContaining('Practiced'), findsOneWidget);
+    expect(find.text('Today’s picks'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -150,10 +157,12 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const CurioApp());
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Games'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nav_Games')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
     await tester.tap(find.text('Signal Grid').first);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     const tapsByCell = <int, int>{
       1: 2,
@@ -175,7 +184,8 @@ void main() {
     }
     await tester.ensureVisible(find.text('Check my grid'));
     await tester.tap(find.text('Check my grid'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Grid harmonised.'), findsOneWidget);
     expect(find.text('+100 XP earned'), findsOneWidget);

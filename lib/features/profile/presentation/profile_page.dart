@@ -10,79 +10,89 @@ import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../parent/presentation/parent_dashboard_page.dart';
 import '../../skills/presentation/skill_quest_page.dart';
+import '../../family/presentation/accessibility_page.dart';
+import '../../family/presentation/help_page.dart';
+import '../../family/presentation/privacy_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   void _showMilestones(BuildContext context, CurioState state) {
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
-    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    final coral = curioColor(
+      context,
+      CurioColors.coral,
+      CurioColorsLight.coral,
+    );
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       builder: (context) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const CurioEyebrow('Milestones'),
-              const SizedBox(height: 10),
-              Text(
-                'A trail of brave thinking',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 18),
-              CurioStatusStrip(
-                icon: Icons.bolt_rounded,
-                title: '${state.totalXp} XP collected',
-                body: 'Every completed quest adds to your explorer story.',
-                color: coral,
-              ),
-              const SizedBox(height: 10),
-              CurioStatusStrip(
-                icon: Icons.auto_stories_rounded,
-                title: '${state.collectedFacts.length} discoveries saved',
-                body: 'Curious facts are archived as you learn.',
-                color: forest,
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CurioEyebrow('Milestones'),
+                const SizedBox(height: 10),
+                Text(
+                  'A trail of brave thinking',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 18),
+                for (final milestone in <(String, bool)>[
+                  (
+                    'First discovery · complete an activity',
+                    state.activitiesCompleted > 0,
+                  ),
+                  (
+                    'Curious collector · collect 5 discoveries',
+                    state.collectedFacts.length >= 5,
+                  ),
+                  ('Finding a rhythm · a 3-day streak', state.streak >= 3),
+                  ('Growing explorer · earn 500 XP', state.totalXp >= 500),
+                ])
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      milestone.$2
+                          ? Icons.verified_rounded
+                          : Icons.lock_outline,
+                    ),
+                    title: Text(milestone.$1),
+                    subtitle: Text(milestone.$2 ? 'Earned' : 'Keep exploring'),
+                  ),
+                const SizedBox(height: 18),
+                CurioStatusStrip(
+                  icon: Icons.bolt_rounded,
+                  title: '${state.totalXp} XP collected',
+                  body: 'Every completed quest adds to your explorer story.',
+                  color: coral,
+                ),
+                const SizedBox(height: 10),
+                CurioStatusStrip(
+                  icon: Icons.auto_stories_rounded,
+                  title: '${state.collectedFacts.length} discoveries saved',
+                  body: 'Curious facts are archived as you learn.',
+                  color: forest,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _showAccessibility(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Accessibility',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Curio respects your device text scale and screen-reader settings. Controls use clear labels, strong contrast, and generous touch targets.',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _rename(BuildContext context, CurioState state) {
+  Future<void> _rename(BuildContext context, CurioState state) async {
     final controller = TextEditingController(text: state.childName);
-    showDialog<void>(
+    await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Explorer name'),
@@ -109,24 +119,70 @@ class ProfilePage extends StatelessWidget {
         ],
       ),
     );
+    controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
-    final orange = curioColor(context, CurioColors.orange, CurioColorsLight.orange);
-    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
-    final coralSoft = curioColor(context, CurioColors.coralSoft, CurioColorsLight.coralSoft);
-    final orangeSoft = curioColor(context, CurioColors.orangeSoft, CurioColorsLight.orangeSoft);
-    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
-    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
-    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
-    final forestStrong = curioColor(context, CurioColors.forestStrong, CurioColorsLight.forestStrong);
-    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final inkMuted = curioColor(
+      context,
+      CurioColors.inkMuted,
+      CurioColorsLight.inkMuted,
+    );
+    final coral = curioColor(
+      context,
+      CurioColors.coral,
+      CurioColorsLight.coral,
+    );
+    final orange = curioColor(
+      context,
+      CurioColors.orange,
+      CurioColorsLight.orange,
+    );
+    final tealDark = curioColor(
+      context,
+      CurioColors.tealDark,
+      CurioColorsLight.tealDark,
+    );
+    final coralSoft = curioColor(
+      context,
+      CurioColors.coralSoft,
+      CurioColorsLight.coralSoft,
+    );
+    final orangeSoft = curioColor(
+      context,
+      CurioColors.orangeSoft,
+      CurioColorsLight.orangeSoft,
+    );
+    final tealSoft = curioColor(
+      context,
+      CurioColors.tealSoft,
+      CurioColorsLight.tealSoft,
+    );
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
+    final forestSoft = curioColor(
+      context,
+      CurioColors.forestSoft,
+      CurioColorsLight.forestSoft,
+    );
+    final forestStrong = curioColor(
+      context,
+      CurioColors.forestStrong,
+      CurioColorsLight.forestStrong,
+    );
+    final surface = curioColor(
+      context,
+      CurioColors.surface,
+      CurioColorsLight.surface,
+    );
 
     return CurioPage(
+      extendBehindBottom: true,
       maxWidth: 760,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 25, 16, 104),
@@ -278,23 +334,24 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.accessibility_new_rounded,
                   title: 'Accessibility',
                   subtitle: 'Motion, contrast and reading options',
-                  onTap: () => _showAccessibility(context),
+                  onTap: () => openPage(context, const AccessibilityPage()),
                 ),
                 const Divider(height: 1, indent: 66),
                 _ProfileTile(
                   icon: Icons.help_outline_rounded,
                   title: 'Help and feedback',
                   subtitle: 'Get support or share an idea',
-                  onTap: () => showAboutDialog(
-                    context: context,
-                    applicationName: 'Curio',
-                    applicationVersion: '1.0',
-                    applicationLegalese:
-                        'Thoughtful daily games for curious young minds.',
-                  ),
+                  onTap: () => openPage(context, const HelpPage()),
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 16),
+          _ProfileTile(
+            icon: Icons.privacy_tip_outlined,
+            title: 'Privacy and account',
+            subtitle: 'Your data and your choices',
+            onTap: () => openPage(context, const PrivacyPage()),
           ),
           if (SupabaseConfig.isConfigured) ...[
             const SizedBox(height: 16),
@@ -320,7 +377,32 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.logout_rounded,
                     title: 'Sign out',
                     subtitle: 'Your cloud progress stays safely stored',
-                    onTap: AuthService().signOut,
+                    onTap: () async {
+                      await state.retrySync();
+                      if (!context.mounted) return;
+                      if (state.syncError != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please reconnect and sync before signing out so your progress is safe.',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+                      try {
+                        await AuthService().signOut();
+                      } catch (_) {
+                        if (context.mounted)
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Could not sign out. Please try again.',
+                              ),
+                            ),
+                          );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -347,9 +429,21 @@ class _ThemeToggleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = CurioThemeScope.of(context);
-    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
-    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
-    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
+    final forestSoft = curioColor(
+      context,
+      CurioColors.forestSoft,
+      CurioColorsLight.forestSoft,
+    );
+    final inkMuted = curioColor(
+      context,
+      CurioColors.inkMuted,
+      CurioColorsLight.inkMuted,
+    );
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -378,7 +472,9 @@ class _ThemeToggleTile extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.w700),
           ),
           subtitle: Text(
-            isDark ? 'On — easier on the eyes at night' : 'Off — bright and light',
+            isDark
+                ? 'On — easier on the eyes at night'
+                : 'Off — bright and light',
             style: TextStyle(color: inkMuted, fontSize: 11),
           ),
           trailing: Switch(
@@ -406,9 +502,21 @@ class _ProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final forest = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
-    final forestSoft = curioColor(context, CurioColors.forestSoft, CurioColorsLight.forestSoft);
-    final inkMuted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
+    final forestSoft = curioColor(
+      context,
+      CurioColors.forestSoft,
+      CurioColorsLight.forestSoft,
+    );
+    final inkMuted = curioColor(
+      context,
+      CurioColors.inkMuted,
+      CurioColorsLight.inkMuted,
+    );
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),

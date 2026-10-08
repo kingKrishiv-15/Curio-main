@@ -3,6 +3,16 @@
 For authentication and cloud-progress setup, follow
 [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 
+## Run it
+
+```bash
+cp config/supabase.example.json config/supabase.json   # then add your URL + publishable key
+flutter run                                            # landing → sign-up with an emailed code → Home
+flutter run --dart-define=CURIO_DEMO=true              # demo mode: no login, on-device profile
+flutter test                                           # includes the auth-flow suite
+flutter test tool/generate_brand_assets.dart           # regenerate app icons from the logo code
+```
+
 Curio is a polished Flutter learning-and-puzzle platform for curious young
 thinkers. It combines finite daily brain breaks, skill-building adventures,
 knowledge rewards and family insight in one responsive product experience.

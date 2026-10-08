@@ -8,6 +8,28 @@ class ProgressSnapshot {
     required this.skills,
   });
 
+  factory ProgressSnapshot.fromJson(Map<String, dynamic> json) =>
+      ProgressSnapshot(
+        childName: json['childName'] as String,
+        totalXp: json['totalXp'] as int,
+        streak: json['streak'] as int,
+        completedActivities: Set<String>.from(
+          json['completedActivities'] as List,
+        ),
+        collectedFacts: Set<String>.from(json['collectedFacts'] as List),
+        skills: (json['skills'] as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, (value as num).toDouble()),
+        ),
+      );
+  Map<String, dynamic> toJson() => {
+    'childName': childName,
+    'totalXp': totalXp,
+    'streak': streak,
+    'completedActivities': completedActivities.toList(),
+    'collectedFacts': collectedFacts.toList(),
+    'skills': skills,
+  };
+
   final String childName;
   final int totalXp;
   final int streak;

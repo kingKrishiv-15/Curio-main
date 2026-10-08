@@ -3,9 +3,40 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../services/progress_store.dart';
+import '../services/cached_progress_store.dart';
+import '../services/family_service.dart';
 
-class CurioState extends ChangeNotifier {
-  CurioState({this.store});
+class CurioState extends ChangeNotifier with WidgetsBindingObserver {
+  CurioState({this.store}) {
+    WidgetsBinding.instance.addObserver(this);
+  }
+  bool _disposed = false;
+  Future<void> _saveQueue = Future.value();
+  bool loadFailed = false;
+  int dailyGoal = 3;
+  @override
+  void dispose() {
+    _disposed = true;
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && store != null && !isLoading) {
+      unawaited(retrySync());
+    }
+  }
+
+  void setDailyGoal(int value) {
+    dailyGoal = value;
+    notifyListeners();
+  }
 
   final ProgressStore? store;
   bool isLoading = false;
@@ -36,7 +67,7 @@ class CurioState extends ChangeNotifier {
     return completedActivities
         .where((id) => id.endsWith(suffix))
         .length
-        .clamp(0, 3);
+        .clamp(0, dailyGoal);
   }
 
   bool completedToday(String activity) {
@@ -47,11 +78,21 @@ class CurioState extends ChangeNotifier {
 
   Future<void> hydrate() async {
     if (store == null) return;
+    loadFailed = false;
     isLoading = true;
     syncError = null;
     notifyListeners();
     try {
       final snapshot = await store!.load();
+      try {
+        dailyGoal = (await FamilyService().loadSettings()).dailyGoal;
+      } catch (_) {
+        /* Settings can be retried separately. */
+      }
+      if (store is CachedProgressStore &&
+          (store as CachedProgressStore).offline) {
+        syncError = 'Offline — showing progress saved on this device.';
+      }
       childName = snapshot.childName;
       totalXp = snapshot.totalXp;
       streak = snapshot.streak;
@@ -71,7 +112,8 @@ class CurioState extends ChangeNotifier {
         })
         ..addAll(snapshot.skills);
     } catch (_) {
-      syncError = 'Could not load cloud progress. Local progress is available.';
+      loadFailed = true;
+      syncError = 'Could not load your learning trail.';
     } finally {
       isLoading = false;
       notifyListeners();
@@ -99,13 +141,14 @@ class CurioState extends ChangeNotifier {
     totalXp += xp;
     skills[skill] = ((skills[skill] ?? 0) + 0.12).clamp(0, 1);
     if (factId != null) collectedFacts.add(factId);
+    streak = calculateStreak(completedActivities, DateTime.now());
     notifyListeners();
     _persist();
   }
 
   void renameChild(String value) {
     final cleaned = value.trim();
-    if (cleaned.isEmpty) return;
+    if (cleaned.isEmpty || cleaned.length > 18) return;
     childName = cleaned;
     notifyListeners();
     _persist();
@@ -122,29 +165,47 @@ class CurioState extends ChangeNotifier {
     unawaited(_save());
   }
 
-  Future<void> _save() async {
-    final progressStore = store;
-    if (progressStore == null) return;
-    isSyncing = true;
-    notifyListeners();
-    try {
-      await progressStore.save(
-        ProgressSnapshot(
-          childName: childName,
-          totalXp: totalXp,
-          streak: streak,
-          completedActivities: Set.of(completedActivities),
-          collectedFacts: Set.of(collectedFacts),
-          skills: Map.of(skills),
-        ),
-      );
-      syncError = null;
-    } catch (_) {
-      syncError = 'Progress is saved locally but has not reached Supabase yet.';
-    } finally {
-      isSyncing = false;
-      notifyListeners();
+  static int calculateStreak(Set<String> activities, DateTime now) {
+    final days = activities
+        .where((id) => RegExp(r'_[0-9]{8}$').hasMatch(id))
+        .map((id) => id.substring(id.length - 8))
+        .toSet();
+    var day = DateTime(now.year, now.month, now.day);
+    if (!days.contains(_dateKey(day)))
+      day = DateTime(day.year, day.month, day.day - 1);
+    var count = 0;
+    while (days.contains(_dateKey(day))) {
+      count++;
+      day = DateTime(day.year, day.month, day.day - 1);
     }
+    return count;
+  }
+
+  Future<void> _save() {
+    final progressStore = store;
+    if (progressStore == null || loadFailed) return Future.value();
+    final snapshot = ProgressSnapshot(
+      childName: childName,
+      totalXp: totalXp,
+      streak: streak,
+      completedActivities: Set.of(completedActivities),
+      collectedFacts: Set.of(collectedFacts),
+      skills: Map.of(skills),
+    );
+    _saveQueue = _saveQueue.then((_) async {
+      isSyncing = true;
+      notifyListeners();
+      try {
+        await progressStore.save(snapshot);
+        syncError = null;
+      } catch (_) {
+        syncError = 'Sync is pending. Reconnect and tap to retry.';
+      } finally {
+        isSyncing = false;
+        notifyListeners();
+      }
+    });
+    return _saveQueue;
   }
 }
 

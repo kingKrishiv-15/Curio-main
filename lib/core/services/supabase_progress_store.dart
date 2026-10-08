@@ -89,52 +89,13 @@ class SupabaseProgressStore implements ProgressStore {
     final child = await _child();
     final childId = child['id'] as String;
 
-    await _client
-        .from('child_profiles')
-        .update({
-          'name': snapshot.childName,
-          'total_xp': snapshot.totalXp,
-          'streak': snapshot.streak,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', childId);
-
-    if (snapshot.completedActivities.isNotEmpty) {
-      await _client
-          .from('activity_completions')
-          .upsert(
-            snapshot.completedActivities
-                .map((id) => {'child_id': childId, 'activity_id': id})
-                .toList(),
-            onConflict: 'child_id,activity_id',
-          );
-    }
-    if (snapshot.collectedFacts.isNotEmpty) {
-      await _client
-          .from('unlocked_discoveries')
-          .upsert(
-            snapshot.collectedFacts
-                .map((id) => {'child_id': childId, 'discovery_id': id})
-                .toList(),
-            onConflict: 'child_id,discovery_id',
-          );
-    }
-    if (snapshot.skills.isNotEmpty) {
-      await _client
-          .from('skill_progress')
-          .upsert(
-            snapshot.skills.entries
-                .map(
-                  (entry) => {
-                    'child_id': childId,
-                    'skill_key': entry.key,
-                    'mastery': entry.value,
-                    'updated_at': DateTime.now().toUtc().toIso8601String(),
-                  },
-                )
-                .toList(),
-            onConflict: 'child_id,skill_key',
-          );
-    }
+    await _client.rpc(
+      'sync_learning_progress',
+      params: {
+        'child_id': childId,
+        'learner_name': snapshot.childName,
+        'activities': snapshot.completedActivities.toList(),
+      },
+    );
   }
 }

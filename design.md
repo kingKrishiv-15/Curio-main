@@ -173,6 +173,10 @@ progress bars, and badges wherever that skill appears, in both modes:
   a three-stop teal → near-black wash. Light: a two-stop warm cream wash.
 - `heroGradient` — a richer full-bleed hero panel (e.g. the Frostlands
   story scene).
+- `markGradient`, `markGlyph`, `spark` — the logo's own colours (§13).
+  `markGradient`/`markGlyph` hold **identical values on both classes**: the
+  mark stays evergreen in both modes. `spark` differs slightly (a deeper
+  amber on light) so the wordmark's i-dot stays visible on cream.
 
 ## 4. Backdrop, texture, and the "cards must not blend into the page" rule
 
@@ -301,7 +305,12 @@ purpose — round everything. Same scale in both modes.
 | `PrimaryButton` | `curio_ui.dart` | Full-width `FilledButton` wrapper; inherits theme colours by default — pass `color:` explicitly only when you also know the right foreground pairing (see §7) |
 | `StatPill` / `CurioIconTile` | `curio_ui.dart` | Small stat readouts with an icon medallion |
 | `CurioProgressBar` / `ProgressRing` | `curio_ui.dart` | Animated linear/circular progress, colour passed in per skill or defaults to the theme accent |
-| `MascotBadge` / `CurioBrand` | `curio_ui.dart` | Brand mark and mascot avatar |
+| `MascotBadge` / `CurioBrand` | `curio_ui.dart` | Mascot avatar; `CurioBrand` is the logo lockup used in page headers |
+| `CurioLogo` / `CurioLogoMark` / `CurioWordmark` | `curio_logo.dart` | The logo (§13): lockup, square mark, wordmark alone |
+| `CurioFadeSlideIn` / `CurioFloat` | `curio_motion.dart` | Public entrance and gentle-bob motion (§10) |
+| `AuthFrame` / `WelcomePanel` | `auth_layout.dart` | Frame for every signed-out step: back + logo, one column on phones, art beside the form when wide |
+| `OrbitHero`, `GameFanArt`, `DiscoveryArt`, `GrowthArt`, `InboxArt` | `features/auth/presentation/widgets/welcome_art.dart` | Illustrations for the landing page and intro slides — decorative, excluded from semantics |
+| `OtpCodeField` | `features/auth/presentation/widgets/otp_code_field.dart` | Digit boxes over one real text field (paste, iOS code autofill, screen readers) |
 | `_ThemeToggleTile` | `profile_page.dart` | The one light/dark switch (§2) |
 | `_FloatingNav` | `main_shell.dart` | Bottom pill nav (§6) — private to the shell, not reused elsewhere |
 
@@ -319,6 +328,12 @@ identical in both modes:
 - Both are plain `AnimationController` + implicit-animation patterns.
   Don't reach for a new dependency for a UI animation until these two
   patterns genuinely can't do the job.
+- Outside Home, use the public versions in `curio_motion.dart`:
+  `CurioFadeSlideIn` (entrance) and `CurioFloat` (a slow bob for
+  illustration pieces). Any looping controller should start through
+  `syncLoop(controller, context)` from `didChangeDependencies`, so it
+  doesn't tick at all when reduce motion is on — returning a static child
+  while the ticker keeps running still costs battery.
 
 ## 11. Kid-facing vs parent-facing tone
 
@@ -350,3 +365,42 @@ identical in both modes:
 6. If it needs to feel alive, prefer the existing `_Pulse`/`_FadeSlideIn`
    patterns over inventing a new animation approach.
 7. Test both modes before calling a screen done — toggle it from Profile.
+
+## 13. The logo
+
+**Idea.** A lowercase "c" drawn as one brush stroke — the shape of a
+question still being asked — with a spark leaping from its tip: the moment
+the answer lands. The stroke starts fine and swells, the way a thought
+gathers weight. The spark is the same four-point sparkle Nova wears, so the
+mark and the mascot read as one family. On the landing page the same "c"
+becomes Nova's orbit, with the four skills travelling around it
+(`OrbitHero`).
+
+**Construction.** All geometry lives in `CurioMarkGeometry`
+(`lib/core/widgets/curio_logo.dart`) in a 1×1 unit square: the "c" is an
+arc (centre .465/.535, radius .235, weight .158) opening towards the upper
+right, sweeping 268°, tapered over its first 45%; the spark sits at
+.735/.265 with a small twinkle below it. Change the numbers there and
+everything follows.
+
+**Parts.**
+- `CurioLogoMark` — the evergreen tile. Minimum size 16px; it still reads.
+- `CurioWordmark` — "curio" in Fraunces with the i's dot replaced by the
+  spark (the text uses a dotless ı, U+0131, which Fraunces includes).
+- `CurioLogo` — mark + wordmark, horizontal or `vertical`.
+
+**Rules.**
+- The tile is always `markGradient` with a `markGlyph` "c" and a `spark`
+  sparkle — in **both** modes. Don't recolour it to match a screen.
+- Don't place the mark on another green; it sits on `canvas`, cards, or
+  photos with enough contrast.
+- Give it clear space of at least a quarter of its own width.
+- Launcher icons, the favicon and `assets/brand/curio-mark.svg` are
+  generated from the same painter — never edit those files by hand:
+
+  ```bash
+  flutter test tool/generate_brand_assets.dart
+  ```
+
+  It writes Android (legacy + adaptive + themed), iOS (opaque, as the App
+  Store requires), macOS, and web (incl. maskable) icons.

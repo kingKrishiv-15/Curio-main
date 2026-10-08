@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,6 +5,7 @@ import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../../core/widgets/curio_gloss.dart';
 import '../../discoveries/presentation/discoveries_page.dart';
 import '../../home/presentation/home_page.dart';
 import '../../learn/presentation/learn_hub_page.dart';
@@ -19,11 +18,45 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell>
+    with SingleTickerProviderStateMixin {
   int _index = 0;
+  double _direction = 1;
+  late final AnimationController _tabTransition = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 260),
+    value: 1,
+  );
+
+  @override
+  void dispose() {
+    _tabTransition.dispose();
+    super.dispose();
+  }
+
+  Widget _content() {
+    final curve = _tabTransition.drive(CurveTween(curve: Curves.easeOutCubic));
+    return FadeTransition(
+      key: const Key('tab_transition'),
+      opacity: Tween<double>(begin: .65, end: 1).animate(curve),
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: Offset(.018 * _direction, 0),
+          end: Offset.zero,
+        ).animate(curve),
+        child: IndexedStack(
+          index: _index,
+          children: [
+            for (var i = 0; i < _pages.length; i++)
+              TickerMode(enabled: i == _index, child: _pages[i]),
+          ],
+        ),
+      ),
+    );
+  }
 
   late final List<Widget> _pages = <Widget>[
-    HomePage(onExplore: () => setState(() => _index = 1)),
+    HomePage(onExplore: () => _select(1)),
     const LearnHubPage(),
     const DiscoveriesPage(),
     const ProfilePage(),
@@ -52,7 +85,18 @@ class _MainShellState extends State<MainShell> {
     ),
   ];
 
-  void _select(int value) => setState(() => _index = value);
+  void _select(int value) {
+    if (_index == value) return;
+    setState(() {
+      _direction = value > _index ? 1 : -1;
+      _index = value;
+    });
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _tabTransition.value = 1;
+    } else {
+      _tabTransition.forward(from: 0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,34 +109,32 @@ class _MainShellState extends State<MainShell> {
               children: [
                 _CurioRail(index: _index, onSelected: _select),
                 const VerticalDivider(width: 1),
-                Expanded(
-                  child: IndexedStack(index: _index, children: _pages),
-                ),
+                Expanded(child: _content()),
               ],
             ),
           );
         }
 
-        // The old Material `NavigationBar` widget used to set the *OS*
-        // system navigation bar colour for us automatically. Our custom
-        // floating pill doesn't, so without this the Android system nav
-        // bar falls back to a default that reads as a stray green strip
-        // behind it. Set it explicitly, driven by the app-wide light/dark
-        // toggle (not a per-tab guess — every tab shares the same mode now).
+        // Paint content behind the system gesture area; no opaque navigation
+        // bar or contrast scrim should create a seam below the floating dock.
         final light = Theme.of(context).brightness == Brightness.light;
         final overlayStyle = light
             ? const SystemUiOverlayStyle(
-                systemNavigationBarColor: Color(0xFFFDF1E2),
+                systemNavigationBarColor: Colors.transparent,
                 systemNavigationBarIconBrightness: Brightness.dark,
                 systemNavigationBarDividerColor: Colors.transparent,
+                systemNavigationBarContrastEnforced: false,
+                systemStatusBarContrastEnforced: false,
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness: Brightness.dark,
                 statusBarBrightness: Brightness.light,
               )
             : const SystemUiOverlayStyle(
-                systemNavigationBarColor: Color(0xFF05100D),
+                systemNavigationBarColor: Colors.transparent,
                 systemNavigationBarIconBrightness: Brightness.light,
                 systemNavigationBarDividerColor: Colors.transparent,
+                systemNavigationBarContrastEnforced: false,
+                systemStatusBarContrastEnforced: false,
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness: Brightness.light,
                 statusBarBrightness: Brightness.dark,
@@ -112,16 +154,14 @@ class _MainShellState extends State<MainShell> {
                 : const Color(0xFF05100D),
             body: Stack(
               children: [
-                Positioned.fill(
-                  child: IndexedStack(index: _index, children: _pages),
-                ),
+                Positioned.fill(child: _content()),
                 Positioned(
                   left: 16,
                   right: 16,
                   bottom: 0,
                   child: SafeArea(
                     top: false,
-                    minimum: const EdgeInsets.only(bottom: 12),
+                    minimum: const EdgeInsets.only(bottom: 10),
                     child: Center(
                       child: _FloatingNav(
                         index: _index,
@@ -157,7 +197,9 @@ class _NavGlyph extends StatelessWidget {
       height: selected ? 35 : 31,
       decoration: BoxDecoration(
         gradient: selected
-            ? (dark ? CurioColors.brandGradient : CurioColorsLight.brandGradient)
+            ? (dark
+                  ? CurioColors.brandGradient
+                  : CurioColorsLight.brandGradient)
             : LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -182,163 +224,156 @@ class _NavGlyph extends StatelessWidget {
   }
 }
 
-/// Floating pill nav: frosted glass, fully rounded, with the active item
-/// expanding into an icon + label pill (mirrors the reference bottom bar).
-/// [light] switches the whole pill between the dark-glass treatment (for
-/// the still-dark Learn/Discoveries/Profile tabs) and a warm cream/coral
-/// treatment that reads correctly floating over the now-bright Home tab.
+/// A compact glass capsule with one sliding selection lens. Its dimensions
+/// stay fixed as destinations change, so the dock never jumps or stretches.
 class _FloatingNav extends StatelessWidget {
   const _FloatingNav({
     required this.index,
     required this.onSelected,
     required this.light,
   });
-
   final int index;
   final ValueChanged<int> onSelected;
   final bool light;
-
   static const _items = <(IconData, IconData, String)>[
     (Icons.home_outlined, Icons.home_rounded, 'Home'),
-    (Icons.grid_view_rounded, Icons.extension_rounded, 'Games'),
+    (Icons.grid_view_outlined, Icons.extension_rounded, 'Games'),
     (Icons.explore_outlined, Icons.explore_rounded, 'Discover'),
     (Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
   ];
 
-  static const _borderRadius = BorderRadius.all(Radius.circular(999));
-
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: _borderRadius,
-        boxShadow: [
-          BoxShadow(
-            color: light
-                ? const Color(0x332E2417)
-                : const Color(0x66020504),
-            blurRadius: 26,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      // The only blur in the app: clipped tightly to the capsule's own
-      // stadium shape, so only what's directly behind the pill itself
-      // blurs — nothing wider, no separate "shelf" rectangle floating
-      // above it.
-      child: ClipRRect(
-        borderRadius: _borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: light
-                  ? Colors.white.withValues(alpha: .62)
-                  : const Color(0xFF1B4A3F).withValues(alpha: .48),
-              borderRadius: _borderRadius,
-              border: Border.all(
-                color: light
-                    ? const Color(0xFF2E2417).withValues(alpha: .08)
-                    : Colors.white.withValues(alpha: .22),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var i = 0; i < _items.length; i++)
-                  _FloatingNavItem(
-                    icon: _items[i].$1,
-                    selectedIcon: _items[i].$2,
-                    label: _items[i].$3,
-                    selected: i == index,
-                    light: light,
-                    onTap: () => onSelected(i),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FloatingNavItem extends StatelessWidget {
-  const _FloatingNavItem({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.selected,
-    required this.light,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final bool selected;
-  final bool light;
-  final VoidCallback onTap;
-
-  static const _darkAccent = Color(0xFFDCE66A);
-  static const _darkAccentInk = Color(0xFF0C221D);
-  static const _lightAccent = Color(0xFFF2564A);
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = light ? _lightAccent : _darkAccent;
-    final accentInk = light ? Colors.white : _darkAccentInk;
-    final idleColor = light
-        ? const Color(0xFF2E2417).withValues(alpha: .55)
-        : Colors.white.withValues(alpha: .68);
-    return Material(
-      color: Colors.transparent,
-      shape: const StadiumBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const StadiumBorder(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 14),
-          decoration: BoxDecoration(
-            color: selected ? accent : Colors.transparent,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: accent.withValues(alpha: .45),
-                      blurRadius: 14,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+    final accent = light ? CurioColorsLight.coralStrong : CurioColors.forest;
+    final ink = light ? CurioColorsLight.inkSoft : CurioColors.inkSoft;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 280);
+    final textScale = MediaQuery.textScalerOf(context).scale(10) / 10;
+    final itemHeight = 52.0 + (textScale > 1.3 ? (textScale - 1.3) * 12 : 0);
+    return ConstrainedBox(
+      key: const Key('bottom_capsule'),
+      constraints: const BoxConstraints(maxWidth: 304),
+      child: CurioGloss(
+        radius: 32,
+        blur: true,
+        padding: const EdgeInsets.all(5),
+        child: SizedBox(
+          height: itemHeight,
+          child: Stack(
             children: [
-              Icon(
-                selected ? selectedIcon : icon,
-                size: 25,
-                color: selected ? accentInk : idleColor,
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: AnimatedAlign(
+                    key: const Key('capsule_selection'),
+                    duration: duration,
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment(-1 + index * 2 / 3, 0),
+                    child: FractionallySizedBox(
+                      widthFactor: .25,
+                      heightFactor: 1,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(26),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color.lerp(
+                                accent,
+                                Colors.white,
+                                light ? .6 : .2,
+                              )!.withValues(alpha: light ? .35 : .3),
+                              accent.withValues(alpha: light ? .14 : .13),
+                            ],
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: light ? .65 : .16,
+                            ),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withValues(alpha: .09),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                child: selected
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            color: accentInk,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 13.5,
+              Row(
+                children: [
+                  for (var i = 0; i < _items.length; i++)
+                    Expanded(
+                      child: Semantics(
+                        label: _items[i].$3,
+                        selected: i == index,
+                        button: true,
+                        child: Tooltip(
+                          message: _items[i].$3,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              key: Key('nav_${_items[i].$3}'),
+                              borderRadius: BorderRadius.circular(26),
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                onSelected(i);
+                              },
+                              child: SizedBox(
+                                height: itemHeight,
+                                child: ExcludeSemantics(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      AnimatedScale(
+                                        scale: i == index ? 1.06 : 1,
+                                        duration: duration,
+                                        curve: Curves.easeOutCubic,
+                                        child: AnimatedSwitcher(
+                                          duration: duration,
+                                          child: Icon(
+                                            i == index
+                                                ? _items[i].$2
+                                                : _items[i].$1,
+                                            key: ValueKey('${i == index}'),
+                                            size: 21,
+                                            color: i == index ? accent : ink,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      AnimatedDefaultTextStyle(
+                                        duration: duration,
+                                        style: TextStyle(
+                                          fontFamily: 'DM Sans',
+                                          fontSize: 9.5,
+                                          fontWeight: i == index
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
+                                          color: i == index ? accent : ink,
+                                        ),
+                                        child: Text(
+                                          _items[i].$3,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      )
-                    : const SizedBox(height: 25),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -359,11 +394,15 @@ class _CurioRail extends StatelessWidget {
     final state = CurioScope.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
     final surface = dark ? CurioColors.surface : CurioColorsLight.surface;
-    final outlineSoft = dark ? CurioColors.outlineSoft : CurioColorsLight.outlineSoft;
+    final outlineSoft = dark
+        ? CurioColors.outlineSoft
+        : CurioColorsLight.outlineSoft;
     final coral = dark ? CurioColors.coral : CurioColorsLight.coral;
     final coralSoft = dark ? CurioColors.coralSoft : CurioColorsLight.coralSoft;
     final inkMuted = dark ? CurioColors.inkMuted : CurioColorsLight.inkMuted;
-    final surfaceMuted = dark ? CurioColors.surfaceMuted : CurioColorsLight.surfaceMuted;
+    final surfaceMuted = dark
+        ? CurioColors.surfaceMuted
+        : CurioColorsLight.surfaceMuted;
     final orange = dark ? CurioColors.orange : CurioColorsLight.orange;
     return Container(
       width: 244,

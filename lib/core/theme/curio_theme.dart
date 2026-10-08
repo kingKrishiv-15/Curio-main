@@ -117,6 +117,7 @@ abstract final class CurioTheme {
               letterSpacing: -.55,
             ),
             titleMedium: TextStyle(
+              fontFamily: _body,
               color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 16,
               height: 1.28,
@@ -124,24 +125,28 @@ abstract final class CurioTheme {
               letterSpacing: -.15,
             ),
             bodyLarge: TextStyle(
+              fontFamily: _body,
               color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 16,
               height: 1.52,
               fontWeight: FontWeight.w500,
             ),
             bodyMedium: TextStyle(
+              fontFamily: _body,
               color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 14,
               height: 1.48,
               fontWeight: FontWeight.w500,
             ),
             bodySmall: TextStyle(
+              fontFamily: _body,
               color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
               fontSize: 12,
               height: 1.42,
               fontWeight: FontWeight.w500,
             ),
             labelLarge: TextStyle(
+              fontFamily: _body,
               color: c(CurioColors.ink, CurioColorsLight.ink),
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -190,6 +195,7 @@ abstract final class CurioTheme {
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => TextStyle(
+            fontFamily: _body,
             color: states.contains(WidgetState.selected)
                 ? c(CurioColors.coral, CurioColorsLight.coral)
                 : c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
@@ -201,8 +207,10 @@ abstract final class CurioTheme {
         ),
         overlayColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.pressed)
-              ? c(CurioColors.forest, CurioColorsLight.forest)
-                    .withValues(alpha: .055)
+              ? c(
+                  CurioColors.forest,
+                  CurioColorsLight.forest,
+                ).withValues(alpha: .055)
               : Colors.transparent,
         ),
       ),
@@ -249,13 +257,19 @@ abstract final class CurioTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          textStyle: const TextStyle(
+            fontFamily: _body,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: c(CurioColors.coral, CurioColorsLight.coral),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          textStyle: const TextStyle(
+            fontFamily: _body,
+            fontWeight: FontWeight.w700,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -263,9 +277,12 @@ abstract final class CurioTheme {
       ),
       chipTheme: base.chipTheme.copyWith(
         backgroundColor: c(CurioColors.surface, CurioColorsLight.surface),
-        side: BorderSide(color: c(CurioColors.outline, CurioColorsLight.outline)),
+        side: BorderSide(
+          color: c(CurioColors.outline, CurioColorsLight.outline),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         labelStyle: TextStyle(
+          fontFamily: _body,
           color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
           fontWeight: FontWeight.w600,
         ),
@@ -359,12 +376,15 @@ abstract final class CurioTheme {
           vertical: 14,
         ),
         hintStyle: TextStyle(
+          fontFamily: _body,
           color: c(CurioColors.inkMuted, CurioColorsLight.inkMuted),
         ),
         labelStyle: TextStyle(
+          fontFamily: _body,
           color: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
         ),
         floatingLabelStyle: TextStyle(
+          fontFamily: _body,
           color: c(CurioColors.forest, CurioColorsLight.forest),
           fontWeight: FontWeight.w700,
         ),

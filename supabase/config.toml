@@ -32,10 +32,39 @@ file_size_limit = "50MiB"
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = []
+additional_redirect_urls = ["io.curio.app://login-callback/**"]
 jwt_expiry = 3600
 enable_signup = true
+# Mirrors the app's rules (lib/features/auth/presentation/widgets/auth_fields.dart).
+minimum_password_length = 8
+password_requirements = "letters_digits"
 
+# Email sign-up with a 6-digit code. Locally, read the emails in Inbucket at
+# http://localhost:54324. The hosted project needs the same settings made in
+# the dashboard — see SUPABASE_SETUP.md, steps 4–6.
 [auth.email]
 enable_signup = true
-enable_confirmations = false
+enable_confirmations = true
+double_confirm_changes = true
+secure_password_change = true
+max_frequency = "60s"
+otp_length = 6
+otp_expiry = 3600
+
+[auth.email.template.confirmation]
+subject = "Your Curio confirmation code"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.magic_link]
+subject = "Your Curio sign-in code"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.recovery]
+subject = "Reset your Curio password"
+content_path = "./supabase/templates/recovery.html"
+
+[functions.parent-digest]
+verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = false

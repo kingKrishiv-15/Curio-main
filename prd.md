@@ -35,13 +35,27 @@ treadmill.
 ## 3. Current scope (what's built)
 
 ### 3.1 Account & access
-- Email/password sign-up, sign-in, password reset, resend-confirmation,
-  sign-out (`lib/features/auth`). Google sign-in is wired but
-  off by default (`ENABLE_GOOGLE_AUTH`).
-- **Demo mode**: if no Supabase project is configured
-  (`config/supabase.json` absent/placeholder), the app skips login
-  entirely and runs on an in-memory local profile — used for
-  development/design work without needing a backend.
+- **Landing page** for signed-out visitors (`landing_page.dart`): the
+  promise, both ways in above the fold on a phone, then how it works, the
+  games, and what parents get.
+- **Intro**: three swipeable slides (Play / Discover / Grow), shown once per
+  device (`intro_page.dart`).
+- **Sign-up**: email + password (8+ characters, letters and numbers) and a
+  parent/guardian agreement, confirmed with a **6-digit code emailed by
+  Supabase** (`verify_code_page.dart`). Already-registered addresses are
+  steered to sign-in; unconfirmed accounts get a fresh code on sign-in.
+- **Sign-in**: password, or password-free with an emailed code. **Password
+  reset** also uses a code, then asks for a new password. Google sign-in is
+  wired but off by default (`ENABLE_GOOGLE_AUTH`).
+- **Learner setup** after confirming (`onboarding_page.dart`): nickname,
+  daily goal (1/3/5 games), reminders + weekly email + time zone, then a
+  welcome summary. Saved to `child_profiles` and `family_settings`
+  (including `consent_version`).
+- **Demo mode**: when no Supabase project is configured
+  (`config/supabase.json` absent/placeholder) or `CURIO_DEMO=true`, the app
+  skips login and runs on an on-device profile — for development/design
+  work without a backend. A plain `flutter run` uses Supabase whenever the
+  config file exists.
 - One child per parent account today — there is no multi-child switcher
   in the UI yet (see §9).
 
