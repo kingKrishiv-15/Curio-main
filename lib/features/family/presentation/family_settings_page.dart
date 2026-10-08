@@ -18,21 +18,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
   int _goal = 3, _hour = 18;
   String _timezone = 'UTC';
   String? _consent, _error, _saved;
-  static const zones = [
-    'UTC',
-    'Asia/Kolkata',
-    'Asia/Dubai',
-    'Asia/Singapore',
-    'Asia/Tokyo',
-    'Europe/London',
-    'Europe/Paris',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Australia/Sydney',
-    'Pacific/Auckland',
-  ];
+  static const zones = FamilySettings.commonTimezones;
   @override
   void initState() {
     super.initState();

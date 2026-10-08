@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,32 +13,83 @@ import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../shell/presentation/main_shell.dart';
-import 'login_page.dart';
-import 'onboarding_page.dart';
 import 'auth_layout.dart';
+import 'landing_page.dart';
+import 'onboarding_page.dart';
 import 'update_password_page.dart';
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+/// Decides what the app shows, from Supabase's auth state:
+///
+/// * no Supabase project → demo mode, straight to Home
+/// * signed out → [LandingPage] (and whatever it pushes: intro, sign-in,
+///   code entry)
+/// * a password-reset code or link just verified → [UpdatePasswordPage]
+/// * signed in → learner setup the first time, then Home
+///
+/// Signed-out screens are pushed on the root navigator, so whenever the
+/// signed-in state flips the gate pops back to itself — a correct code
+/// lands the parent in learner setup without each page navigating itself.
+class AuthGate extends StatefulWidget {
+  const AuthGate({this.authService, super.key});
+
+  /// For tests; defaults to one backed by the initialised Supabase client.
+  final AuthService? authService;
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  AuthService? _auth;
+  StreamSubscription<AuthState>? _subscription;
+  Session? _session;
+  bool _recovering = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.authService == null && !SupabaseConfig.isConfigured) return;
+    final auth = _auth = widget.authService ?? AuthService();
+    _session = auth.currentSession;
+    _subscription = auth.authChanges.listen(_onAuthChange);
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  void _onAuthChange(AuthState state) {
+    if (!mounted) return;
+    final wasSignedIn = _session != null;
+    setState(() {
+      _session = state.session;
+      if (state.event == AuthChangeEvent.passwordRecovery) _recovering = true;
+      if (state.session == null) _recovering = false;
+    });
+    if (wasSignedIn != (state.session != null) ||
+        state.event == AuthChangeEvent.passwordRecovery) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (!SupabaseConfig.isConfigured) {
-      return const _CurioExperience();
+    final auth = _auth;
+    if (auth == null) return const _CurioExperience();
+    final session = _session;
+    if (session == null) return LandingPage(authService: auth);
+    if (_recovering) {
+      return UpdatePasswordPage(
+        authService: auth,
+        onDone: () => setState(() => _recovering = false),
+      );
     }
-
-    final auth = AuthService();
-    return StreamBuilder<AuthState>(
-      stream: auth.authChanges,
-      builder: (context, snapshot) {
-        final session = snapshot.data?.session ?? auth.currentSession;
-        if (session == null) return LoginPage(authService: auth);
-        if (snapshot.data?.event == AuthChangeEvent.passwordRecovery) {
-          return UpdatePasswordPage(authService: auth);
-        }
-        return _LearnerGate(key: ValueKey(session.user.id), auth: auth);
-      },
-    );
+    return _LearnerGate(key: ValueKey(session.user.id), auth: auth);
   }
 }
 
@@ -52,13 +105,14 @@ class _LearnerGateState extends State<_LearnerGate> {
   bool _complete = false;
   @override
   Widget build(BuildContext context) {
-    if (_complete)
+    if (_complete) {
       return _CurioExperience(
         store: CachedProgressStore(
           remote: SupabaseProgressStore(),
           userId: widget.auth.currentSession!.user.id,
         ),
       );
+    }
     return FutureBuilder<bool>(
       future: _needsOnboarding,
       builder: (context, snapshot) {

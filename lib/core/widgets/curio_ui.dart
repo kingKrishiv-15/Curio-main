@@ -1,4 +1,5 @@
 import 'curio_gloss.dart';
+import 'curio_logo.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -401,79 +402,7 @@ class CurioBrand extends StatelessWidget {
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    return Semantics(
-      label: 'Curio',
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _CurioLogoMark(size: compact ? 29 : 34),
-          const SizedBox(width: 10),
-          Text(
-            'curio',
-            style: TextStyle(
-              fontFamily: 'Fraunces',
-              color: ink,
-              fontSize: compact ? 24 : 29,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -1.35,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CurioLogoMark extends StatelessWidget {
-  const _CurioLogoMark({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        gradient: dark
-            ? CurioColors.brandGradient
-            : CurioColorsLight.brandGradient,
-        borderRadius: BorderRadius.circular(size * .34),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x29183E35),
-            blurRadius: 12,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(
-            Icons.auto_awesome_rounded,
-            color: dark ? CurioColors.onDark : CurioColorsLight.onDark,
-            size: size * .48,
-          ),
-          Positioned(
-            right: size * .17,
-            top: size * .16,
-            child: Container(
-              width: size * .13,
-              height: size * .13,
-              decoration: BoxDecoration(
-                color: dark ? CurioColors.saffron : CurioColorsLight.saffron,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => CurioLogo(markSize: compact ? 29 : 34);
 }
 
 class MascotBadge extends StatelessWidget {

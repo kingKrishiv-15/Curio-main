@@ -1,9 +1,204 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/curio_gloss.dart';
+import 'widgets/welcome_art.dart';
+
+/// Pushes a signed-out step with the same fade-and-drift as `openPage`
+/// (which can't be used here: it needs a signed-in `CurioScope`).
+Route<T> authRoute<T>(Widget page) => PageRouteBuilder<T>(
+  pageBuilder: (context, animation, secondaryAnimation) => page,
+  transitionDuration: const Duration(milliseconds: 320),
+  reverseTransitionDuration: const Duration(milliseconds: 240),
+  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    final curve = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    return FadeTransition(
+      opacity: curve,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(.04, 0),
+          end: Offset.zero,
+        ).animate(curve),
+        child: child,
+      ),
+    );
+  },
+);
+
+/// The frame for every step after the landing page: back + logo on top and
+/// one calm column of content. On wide screens the orbit art sits alongside
+/// so the form never stretches into a long, thin line.
+class AuthFrame extends StatelessWidget {
+  const AuthFrame({
+    required this.child,
+    this.onBack,
+    this.trailing,
+    this.maxContentWidth = 440,
+    super.key,
+  });
+
+  final Widget child;
+
+  /// Overrides the back button. When null, a back button appears only if
+  /// there is a route to go back to.
+  final VoidCallback? onBack;
+  final Widget? trailing;
+  final double maxContentWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final canPop = onBack != null || (ModalRoute.of(context)?.canPop ?? false);
+    return CurioPage(
+      maxWidth: 1160,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide =
+              constraints.maxWidth >= 880 && constraints.maxHeight >= 560;
+          final top = Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 12, 0),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 56,
+                  child: canPop
+                      ? IconButton(
+                          tooltip: 'Back',
+                          onPressed:
+                              onBack ?? () => Navigator.of(context).maybePop(),
+                          icon: const Icon(Icons.arrow_back_rounded),
+                        )
+                      : null,
+                ),
+                const Expanded(child: Center(child: CurioLogo(markSize: 28))),
+                SizedBox(
+                  width: 56,
+                  child: trailing == null
+                      ? null
+                      : Align(
+                          alignment: Alignment.centerRight,
+                          child: trailing,
+                        ),
+                ),
+              ],
+            ),
+          );
+          final content = Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxContentWidth),
+              child: child,
+            ),
+          );
+          if (!wide) {
+            return Column(
+              children: [
+                top,
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                    child: content,
+                  ),
+                ),
+              ],
+            );
+          }
+          return Column(
+            children: [
+              top,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Expanded(child: WelcomePanel()),
+                      const SizedBox(width: 28),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: CurioGloss(
+                            radius: 28,
+                            padding: const EdgeInsets.all(36),
+                            child: content,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// The brand panel beside wide auth forms.
+class WelcomePanel extends StatelessWidget {
+  const WelcomePanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: dark
+            ? CurioColors.heroGradient
+            : CurioColorsLight.heroGradient,
+      ),
+      padding: const EdgeInsets.all(32),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final art = math
+              .min(constraints.maxWidth * .86, constraints.maxHeight - 150)
+              .clamp(180.0, 420.0);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'A LITTLE WONDER, EVERY DAY',
+                style: TextStyle(
+                  color: ink,
+                  fontSize: 11,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Expanded(
+                child: Center(child: OrbitHero(size: art)),
+              ),
+              Text(
+                'Big ideas. Curious minds.',
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(color: ink),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Five-minute games that turn “why?” into a little adventure.',
+                style: TextStyle(color: ink, height: 1.5),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
 
 /// A shared, responsive frame for every step into Curio.
 class AuthLayout extends StatelessWidget {

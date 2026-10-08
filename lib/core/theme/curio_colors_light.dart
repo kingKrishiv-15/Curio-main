@@ -50,6 +50,20 @@ abstract final class CurioColorsLight {
     colors: [Color(0xFFFFEEBE), Color(0xFFFCE1DE), Color(0xFFEAE3FC)],
   );
 
+  /// The logo mark's evergreen tile, glyph and spark. Identical in both
+  /// palettes on purpose: the mark doesn't change colour with the theme.
+  static const markGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF3FA67C), Color(0xFF1F6B50), Color(0xFF123F30)],
+    stops: [0, .55, 1],
+  );
+  static const markGlyph = Color(0xFFFFF8EE);
+
+  /// The brand spark — the mark's sparkle and the wordmark's i-dot. Also a
+  /// fine accent wherever a "moment of discovery" is being celebrated.
+  static const spark = Color(0xFFE3A21A);
+
   static const brandGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
