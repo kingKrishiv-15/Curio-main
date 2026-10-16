@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/services/minigame_service.dart';
+import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
+import '../../common/game_kit.dart';
+import '../domain/loophole_local.dart';
 
 /// Loophole: a statement that is technically true but misleading. Tap the one
 /// word or phrase doing the deceptive work. Three statements, two guesses
 /// each.
 ///
-/// Everything that decides right or wrong happens server-side - this screen
-/// sends a tapped token index and renders whatever verdict comes back. It
-/// never holds the answer, so there is nothing here to read out of the
-/// binary or the network log.
+/// Signed in, everything that decides right or wrong happens server-side -
+/// this screen sends a tapped token index and renders whatever verdict comes
+/// back, never holding the answer. Guests, and anyone the server can't
+/// reach, play the same statements on the device ([LoopholeLocalGame]),
+/// which answers in the same shape.
 class LoopholePage extends StatefulWidget {
   const LoopholePage({super.key, this.service});
 
@@ -46,6 +50,12 @@ class _LoopholePageState extends State<LoopholePage> {
   bool _finished = false;
   int? _finalScore;
 
+  /// Set when playing on the device rather than against the server.
+  LoopholeLocalGame? _local;
+  bool _practice = false;
+  int _practiceShift = 0;
+  bool _alreadyDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -69,17 +79,19 @@ class _LoopholePageState extends State<LoopholePage> {
       _error = null;
     });
 
-    try {
-      if (!_service.isSignedIn) {
-        throw const MinigameNotAvailable(
-          'Sign in to play the daily puzzle. Everyone gets the same one.',
-        );
-      }
+    if (!_service.isSignedIn) {
+      _startLocal();
+      return;
+    }
 
+    try {
       final today = DateTime.now();
       final puzzle = await _service.fetchPuzzle(_type, today);
       if (puzzle == null) {
-        throw const MinigameNotAvailable('No Loophole published for today yet.');
+        // Nothing published for today: play the offline set instead of
+        // showing an empty screen.
+        _startLocal();
+        return;
       }
 
       final attempt = await _service.startAttempt(puzzle.id);
@@ -87,6 +99,7 @@ class _LoopholePageState extends State<LoopholePage> {
 
       if (!mounted) return;
       setState(() {
+        _local = null;
         _puzzle = puzzle;
         _attempt = attempt;
         _streak = streak;
@@ -100,6 +113,9 @@ class _LoopholePageState extends State<LoopholePage> {
         _finalScore = attempt.score;
         _loading = false;
       });
+      // Finished earlier (maybe on another device): count it here too, and
+      // don't claim the XP again on the result card.
+      if (attempt.isFinished) _award();
     } on MinigameNotAvailable catch (error) {
       if (!mounted) return;
       setState(() {
@@ -109,10 +125,55 @@ class _LoopholePageState extends State<LoopholePage> {
     } catch (error) {
       if (!mounted) return;
       setState(() {
-        _error = 'Could not load today\'s puzzle. $error';
+        _error =
+            'We couldn’t load today’s puzzle. Check your connection and try again.';
         _loading = false;
       });
     }
+  }
+
+  void _startLocal({bool practice = false}) {
+    if (practice) _practiceShift++;
+    // Practice replays *past* days, so it never spoils tomorrow's puzzle.
+    final game = LoopholeLocalGame.forDay(shift: -_practiceShift);
+    setState(() {
+      _local = game;
+      _practice = practice;
+      _puzzle = DailyPuzzle(
+        id: 'local',
+        date: DateTime.now(),
+        type: _type,
+        config: game.publicConfig,
+      );
+      _attempt = const PuzzleAttempt(
+        id: 'local',
+        status: 'in_progress',
+        state: {},
+        score: null,
+      );
+      _round = 0;
+      _guessesUsed = 0;
+      _marks = const [];
+      _revealedTarget = null;
+      _explanation = null;
+      _lastTapped = null;
+      _finished = false;
+      _finalScore = null;
+      _error = null;
+      _loading = false;
+    });
+  }
+
+  /// The server tracks a per-game streak; offline, the app-wide one is the
+  /// honest number to show.
+  int _shownStreak(BuildContext context) => _local == null
+      ? _streak
+      : context.dependOnInheritedWidgetOfExactType<CurioScope>()?.notifier?.streak ??
+            0;
+
+  void _award() {
+    if (_practice) return;
+    _alreadyDone = awardDaily(context, _type);
   }
 
   Future<void> _tap(int tokenIndex) async {
@@ -127,12 +188,16 @@ class _LoopholePageState extends State<LoopholePage> {
     });
 
     try {
-      final verdict = await _service.submitMove(
-        attemptId: attempt.id,
-        moveData: {'round': _round, 'token_index': tokenIndex},
-        // Stable per (round, guess): a retry replays rather than re-spends.
-        idempotencyKey: '${attempt.id}:r$_round:g${_guessesUsed + 1}',
-      );
+      final local = _local;
+      final verdict = local != null
+          ? MoveVerdict(local.submit(round: _round, tokenIndex: tokenIndex))
+          : await _service.submitMove(
+              attemptId: attempt.id,
+              moveData: {'round': _round, 'token_index': tokenIndex},
+              // Stable per (round, guess): a retry replays rather than
+              // re-spends.
+              idempotencyKey: '${attempt.id}:r$_round:g${_guessesUsed + 1}',
+            );
 
       if (!mounted) return;
       setState(() {
@@ -152,7 +217,8 @@ class _LoopholePageState extends State<LoopholePage> {
       if (verdict.isCorrect) {
         HapticFeedback.mediumImpact();
       }
-      if (verdict.isFinished) {
+      if (verdict.isFinished) _award();
+      if (verdict.isFinished && local == null) {
         // Only a completed day counts toward the streak.
         await _service.recordStreak(_type, DateTime.now());
         final streak = await _service.currentStreak(_type);
@@ -162,7 +228,8 @@ class _LoopholePageState extends State<LoopholePage> {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _error = 'That guess did not save. $error';
+        _error =
+            'That guess didn’t reach Curio. Check your connection and try again.';
       });
     }
   }
@@ -277,22 +344,38 @@ class _LoopholePageState extends State<LoopholePage> {
         const SizedBox(height: 16),
         Row(
           children: [
-            const GameMetaChip(icon: Icons.schedule_rounded, label: '2 min'),
-            const SizedBox(width: 12),
-            GameMetaChip(
-              icon: Icons.local_fire_department_rounded,
-              label: '$_streak day streak',
+            Expanded(
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 6,
+                children: [
+                  const GameMetaChip(icon: Icons.schedule_rounded, label: '2 min'),
+                  GameMetaChip(
+                    icon: Icons.local_fire_department_rounded,
+                    label: '${_shownStreak(context)} day streak',
+                  ),
+                ],
+              ),
             ),
-            const Spacer(),
             _RoundPips(total: rounds.length, marks: _marks, current: _round),
           ],
         ),
         const SizedBox(height: 18),
+        if (_practice) ...[
+          const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
+          const SizedBox(height: 12),
+        ],
         if (_finished) ...[
-          _ResultCard(
-            score: _finalScore ?? 0,
-            outOf: rounds.length * 2,
+          GameResultCard(
+            gameId: 'loophole',
+            title: (_finalScore ?? 0) >= rounds.length * 2 - 1
+                ? 'Sharp eyes!'
+                : 'Every catch teaches something.',
+            score: '${_finalScore ?? 0} / ${rounds.length * 2}',
             shareText: _shareText,
+            xp: _practice ? null : 70,
+            alreadyDone: _alreadyDone,
+            onPractice: () => _startLocal(practice: true),
           ),
           if (_explanation != null) ...[
             const SizedBox(height: 14),
@@ -349,6 +432,7 @@ class _StatementCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -460,6 +544,7 @@ class _ExplanationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -472,52 +557,6 @@ class _ExplanationCard extends StatelessWidget {
           ),
           const SizedBox(height: 9),
           Text(text, style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft), height: 1.5)),
-        ],
-      ),
-    );
-  }
-}
-
-class _ResultCard extends StatelessWidget {
-  const _ResultCard({required this.score, required this.outOf, required this.shareText});
-
-  final int score;
-  final int outOf;
-  final String shareText;
-
-  @override
-  Widget build(BuildContext context) {
-    return GlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$score / $outOf', style: Theme.of(context).textTheme.displayLarge),
-          const SizedBox(height: 4),
-          Text(
-            'Come back tomorrow for three more.',
-            style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft)),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: curioColor(context, CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Text(shareText, style: const TextStyle(height: 1.6, fontSize: 15)),
-          ),
-          const SizedBox(height: 12),
-          PrimaryButton(
-            label: 'Copy result',
-            onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: shareText));
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Result copied - no spoilers in it')),
-              );
-            },
-          ),
         ],
       ),
     );

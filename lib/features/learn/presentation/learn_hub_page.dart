@@ -1,44 +1,49 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
+import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/curio_gloss.dart';
-import '../../games/evidence/presentation/evidence_detective_page.dart';
-import '../../games/link_lab/presentation/link_lab_page.dart';
-import '../../games/loophole/presentation/loophole_page.dart';
-import '../../games/pattern/presentation/pattern_forge_page.dart';
-import '../../games/signal_grid/presentation/signal_grid_page.dart';
-import '../../games/squeeze/presentation/squeeze_page.dart';
+import '../../games/common/game_rewards.dart';
+import '../../games/game_catalog.dart';
+import '../../games/presentation/game_card.dart';
 import '../../skills/presentation/skill_quest_page.dart';
-import '../../story/presentation/frostlands_story_page.dart';
 
-class LearnHubPage extends StatelessWidget {
+/// The Games tab: today's featured quest, then every game as a card,
+/// filterable by skill, with what's already been played today sorted last.
+class LearnHubPage extends StatefulWidget {
   const LearnHubPage({super.key});
 
   @override
+  State<LearnHubPage> createState() => _LearnHubPageState();
+}
+
+class _LearnHubPageState extends State<LearnHubPage> {
+  /// null shows every skill.
+  String? _skill;
+
+  @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
-    final saffronStrong = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
+    final state = CurioScope.of(context);
+    final featured = featuredGame();
+    bool done(GameEntry g) => g.isDaily
+        ? state.completedToday(g.id)
+        : state.completedActivities.contains(g.id);
+
+    final daily = dailyGames;
+    final playedToday = daily.where(done).length;
+    // The featured game already has the hero card; skip it in the grid.
+    final shown = [
+      for (final g in daily)
+        if (g.id != featured.id && (_skill == null || g.skill == _skill)) g,
+    ]..sort((a, b) => (done(a) ? 1 : 0).compareTo(done(b) ? 1 : 0));
+    final stories = gameCatalog.where((g) => !g.isDaily);
+    final muted = curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft);
+
     return CurioPage(
       extendBehindBottom: true,
-      maxWidth: 880,
+      maxWidth: 1040,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 104),
         children: [
@@ -46,91 +51,68 @@ class LearnHubPage extends StatelessWidget {
             eyebrow: 'The playroom',
             title: 'Ways to learn',
             subtitle:
-                'Short, thoughtful games built to stretch logic, language, number sense, and good judgement.',
+                'Short, thoughtful games that stretch logic, number sense, patterns and good judgement.',
           ),
           const SizedBox(height: 20),
-          const SectionHeading(
-            'Daily brain breaks',
-            subtitle: 'Fresh challenges that reward careful thinking',
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: GameCard(
+                game: featured,
+                style: GameCardStyle.hero,
+                featured: true,
+                done: done(featured),
+              ),
+            ),
+          ),
+          const SizedBox(height: 26),
+          SectionHeading(
+            'Daily games',
+            subtitle:
+                '$playedToday of ${daily.length} played today · a fresh puzzle in each, every day',
           ),
           const SizedBox(height: 12),
-          ModeTile(
-            title: 'Loophole',
-            subtitle: 'Spot the one word making a true statement mislead you',
-            icon: Icons.format_quote_rounded,
-            color: CurioColors.saffron,
-            badge: 'NEW',
-            duration: '2 min',
-            skill: 'Scepticism',
-            onTap: () => openPage(context, const LoopholePage()),
+          _SkillFilter(
+            selected: _skill,
+            counts: {
+              for (final skill in learningSkills)
+                skill: daily.where((g) => g.skill == skill).length,
+            },
+            onSelected: (skill) => setState(() => _skill = skill),
           ),
-          const SizedBox(height: 10),
-          ModeTile(
-            title: 'Link Lab',
-            subtitle: 'Sort sixteen clues into four precise knowledge groups',
-            icon: Icons.hub_rounded,
-            color: coral,
-            badge: 'NEW',
-            duration: '3–5 min',
-            skill: 'Reasoning',
-            onTap: () => openPage(context, const LinkLabPage()),
-          ),
-          const SizedBox(height: 10),
-          ModeTile(
-            title: 'Signal Grid',
-            subtitle: 'Balance a binary grid using deduction, never guessing',
-            icon: Icons.grid_4x4_rounded,
-            color: blue,
-            badge: 'NEW',
-            duration: '4–6 min',
-            skill: 'Logic',
-            onTap: () => openPage(context, const SignalGridPage()),
-          ),
-          const SizedBox(height: 22),
-          _FeaturedQuest(onTap: () => openPage(context, const SqueezePage())),
-          const SizedBox(height: 24),
+          const SizedBox(height: 14),
+          if (shown.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                'Today’s featured quest is the ${_skill?.toLowerCase()} game — it’s at the top.',
+                style: TextStyle(color: muted),
+              ),
+            )
+          else
+            GameGrid(
+              children: [
+                for (final g in shown) GameCard(game: g, done: done(g)),
+              ],
+            ),
+          const SizedBox(height: 28),
           const SectionHeading(
-            'Longer adventures',
-            subtitle: 'Build mastery through guided, story-rich play',
+            'Stories',
+            subtitle: 'Slow down with a choose-your-path adventure',
           ),
           const SizedBox(height: 12),
-          ModeTile(
-            title: 'Pattern Forge',
-            subtitle: 'Predict, explain, and repair number patterns',
-            icon: Icons.blur_on_rounded,
-            color: forest,
-            duration: '5 min',
-            skill: 'Patterns',
-            onTap: () => openPage(context, const PatternForgePage()),
-          ),
-          const SizedBox(height: 10),
-          ModeTile(
-            title: 'Evidence Detective',
-            subtitle: 'Separate reliable clues from tempting distractions',
-            icon: Icons.manage_search_rounded,
-            color: plum,
-            duration: '6 min',
-            skill: 'Evidence',
-            onTap: () => openPage(context, const EvidenceDetectivePage()),
-          ),
-          const SizedBox(height: 10),
-          ModeTile(
-            title: 'Frostlands Story',
-            subtitle: 'Your choices decide how Ash crosses the ice',
-            icon: Icons.ac_unit_rounded,
-            color: blue,
-            duration: '8 min',
-            skill: 'Decisions',
-            onTap: () => openPage(context, const FrostlandsStoryPage()),
-          ),
-          const SizedBox(height: 10),
+          for (final story in stories) ...[
+            GameCard(game: story, style: GameCardStyle.row, done: done(story)),
+            const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 18),
+          const SectionHeading('Your progress'),
+          const SizedBox(height: 12),
           ModeTile(
             title: 'Skill Quest',
-            subtitle: 'See how your four thinking domains are growing',
+            subtitle: 'See how your four thinking skills are growing',
             icon: Icons.route_rounded,
-            color: saffronStrong,
-            duration: 'Progress map',
-            skill: 'All skills',
+            color: curioColor(context, CurioColors.forest, CurioColorsLight.forest),
             onTap: () => openPage(context, const SkillQuestPage()),
           ),
         ],
@@ -139,103 +121,97 @@ class LearnHubPage extends StatelessWidget {
   }
 }
 
-class _FeaturedQuest extends StatelessWidget {
-  const _FeaturedQuest({required this.onTap});
-  final VoidCallback onTap;
+class _SkillFilter extends StatelessWidget {
+  const _SkillFilter({
+    required this.selected,
+    required this.counts,
+    required this.onSelected,
+  });
+
+  final String? selected;
+  final Map<String, int> counts;
+  final ValueChanged<String?> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final saffron = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffron,
+    final all = counts.values.fold(0, (a, b) => a + b);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        children: [
+          _FilterChip(
+            label: 'All · $all',
+            selected: selected == null,
+            color: curioColor(context, CurioColors.forest, CurioColorsLight.forest),
+            onTap: () => onSelected(null),
+          ),
+          for (final MapEntry(key: skill, value: count) in counts.entries) ...[
+            const SizedBox(width: 8),
+            _FilterChip(
+              label: '$skill · $count',
+              icon: skillIcon(skill),
+              selected: selected == skill,
+              color: skillColor(context, skill),
+              onTap: () => onSelected(skill),
+            ),
+          ],
+        ],
+      ),
     );
-    final onDark = curioColor(
-      context,
-      CurioColors.onDark,
-      CurioColorsLight.ink,
-    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.color,
+    required this.onTap,
+    this.icon,
+  });
+
+  final String label;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final outline = curioColor(context, CurioColors.outline, CurioColorsLight.outline);
+    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final muted = curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft);
     return Semantics(
       button: true,
-      label: 'Play today’s featured game, Squeeze',
+      selected: selected,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(CurioRadius.hero),
-          child: CurioGloss(
-            padding: const EdgeInsets.all(16),
-            radius: CurioRadius.hero,
-            tint: dark
-                ? CurioColors.forestStrong
-                : CurioColorsLight.saffronSoft,
+          borderRadius: BorderRadius.circular(99),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            decoration: BoxDecoration(
+              color: selected ? color.withValues(alpha: .18) : surface,
+              borderRadius: BorderRadius.circular(99),
+              border: Border.all(color: selected ? color : outline, width: selected ? 1.6 : 1),
+            ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CurioEyebrow('Featured quest', color: saffron),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Squeeze the\nsecret number',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.headlineMedium?.copyWith(color: onDark),
-                      ),
-                      const SizedBox(height: 9),
-                      Text(
-                        'Seven guesses. One shrinking range. How quickly can you find it?',
-                        style: TextStyle(
-                          color: onDark.withValues(alpha: .72),
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(height: 13),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.play_circle_fill_rounded,
-                            color: saffron,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 7),
-                          Text(
-                            'PLAY NOW',
-                            style: TextStyle(
-                              color: onDark,
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  width: 104,
-                  height: 102,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: onDark.withValues(alpha: .08),
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(54),
-                    ),
-                    border: Border.all(color: onDark.withValues(alpha: .1)),
-                  ),
-                  child: Text(
-                    '?',
-                    style: TextStyle(
-                      fontFamily: 'Fraunces',
-                      color: saffron,
-                      fontSize: 72,
-                      fontWeight: FontWeight.w500,
-                      height: 1,
-                    ),
+                if (icon != null) ...[
+                  Icon(icon, size: 15, color: selected ? ink : color),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: selected ? ink : muted,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                    fontSize: 12.5,
                   ),
                 ),
               ],

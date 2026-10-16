@@ -288,7 +288,7 @@ class _Tip extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Emails can take a minute to arrive. Check your spam or promotions folder, and use the code from the newest email.',
+              'Emails can take a minute to arrive. Check your spam or promotions folder, and use the code from the newest email. Got a link instead of a code? Open it on this phone and it signs you in too.',
               style: TextStyle(color: muted, fontSize: 12.5, height: 1.5),
             ),
           ),

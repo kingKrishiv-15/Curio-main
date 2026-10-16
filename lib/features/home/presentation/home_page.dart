@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
+import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../../core/widgets/parental_gate.dart';
+import '../../games/common/game_rewards.dart';
+import '../../games/game_catalog.dart';
+import '../../games/presentation/game_card.dart';
 import '../../../core/widgets/curio_gloss.dart';
-import '../../games/evidence/presentation/evidence_detective_page.dart';
-import '../../games/link_lab/presentation/link_lab_page.dart';
-import '../../games/pattern/presentation/pattern_forge_page.dart';
-import '../../games/signal_grid/presentation/signal_grid_page.dart';
-import '../../games/squeeze/presentation/squeeze_page.dart';
 import '../../parent/presentation/parent_dashboard_page.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../skills/presentation/skill_quest_page.dart';
@@ -31,16 +33,8 @@ abstract final class _HomeDark {
   static const inkFaint = Color(0xFF8D948F);
 
   static const accent = Color(0xFFDCE66A);
-  static const accentInk = Color(0xFF0C221D);
   static const gold = Color(0xFFE7BE6B);
-  static const rose = Color(0xFFE49577);
   static const sky = Color(0xFF8FC3D9);
-  static const violet = Color(0xFFBFA6E0);
-  static const success = Color(0xFFDCE66A);
-
-  static const cardShadow = [
-    BoxShadow(color: Color(0x66020504), blurRadius: 28, offset: Offset(0, 14)),
-  ];
 }
 
 /// Home's light mode: a bright, warm cream backdrop with white cards and a
@@ -60,19 +54,11 @@ abstract final class _HomeLight {
   static const inkFaint = Color(0xFFB8AB92);
 
   static const accent = Color(0xFFF2564A);
-  static const accentInk = Colors.white;
   static const gold = Color(0xFFDB9A2C);
-  static const rose = Color(0xFFDD5D82);
   static const sky = Color(0xFF2E9FD6);
-  static const violet = Color(0xFF8467E0);
-  static const success = Color(0xFF25A369);
 
   static const yellowTile = Color(0xFFFFEEBE);
   static const yellowInk = Color(0xFFAD7A0C);
-
-  static const cardShadow = [
-    BoxShadow(color: Color(0x1A2E2417), blurRadius: 20, offset: Offset(0, 8)),
-  ];
 }
 
 /// Picks between [_HomeDark] and [_HomeLight] for the current theme
@@ -118,10 +104,19 @@ class _Pulse extends StatefulWidget {
 }
 
 class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
+  // Created up front and only looped while motion is allowed: a lazily
+  // created controller would first be touched in dispose() when reduce
+  // motion is on, which isn't allowed once the element is deactivated.
   late final _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1000),
-  )..repeat(reverse: true);
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    syncLoop(_controller, context, reverse: true);
+  }
 
   @override
   void dispose() {
@@ -159,16 +154,17 @@ class _FadeSlideInState extends State<_FadeSlideIn>
     duration: const Duration(milliseconds: 420),
   );
 
+  Timer? _start;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(widget.delay, () {
-      if (mounted) _controller.forward();
-    });
+    _start = Timer(widget.delay, _controller.forward);
   }
 
   @override
   void dispose() {
+    _start?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -196,127 +192,6 @@ class _FadeSlideInState extends State<_FadeSlideIn>
   }
 }
 
-Color _skillColor(BuildContext context, String skill) {
-  switch (skill) {
-    case 'Number sense':
-      return _hc(context, _HomeDark.gold, _HomeLight.gold);
-    case 'Patterns':
-      return _hc(context, _HomeDark.rose, _HomeLight.rose);
-    case 'Evidence':
-      return _hc(context, _HomeDark.sky, _HomeLight.sky);
-    case 'Reasoning':
-      return _hc(context, _HomeDark.violet, _HomeLight.violet);
-    default:
-      return _hc(context, _HomeDark.accent, _HomeLight.accent);
-  }
-}
-
-class _GameInfo {
-  const _GameInfo({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.skill,
-    required this.duration,
-    required this.xp,
-    required this.onTap,
-    this.featured = false,
-    this.imageAsset,
-  });
-
-  final String id;
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final String skill;
-  final String duration;
-  final int xp;
-  final VoidCallback onTap;
-  final bool featured;
-
-  /// Path to an illustrated banner (e.g. `assets/games/squeeze.png`).
-  /// Left null until real artwork is dropped in — falls back to a
-  /// vivid gradient + icon placeholder so the layout works either way.
-  final String? imageAsset;
-}
-
-/// Illustrated banner area for a game card: a fully-opaque, vivid two-tone
-/// gradient (never a low-alpha tint) so it reads as bright, playful banner
-/// art rather than a muted wash, plus a white icon on top. Vivid in both
-/// modes — this is "content that represents play," not chrome.
-class _CardArt extends StatelessWidget {
-  const _CardArt({
-    required this.icon,
-    required this.color,
-    this.imageAsset,
-    this.height = 96,
-    this.radius = 18,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String? imageAsset;
-  final double height;
-  final double radius;
-
-  static LinearGradient _vividGradient(Color color) {
-    final hsl = HSLColor.fromColor(color);
-    final start = hsl
-        .withLightness((hsl.lightness + .1).clamp(0.0, 1.0))
-        .withSaturation((hsl.saturation + .08).clamp(0.0, 1.0))
-        .toColor();
-    final end = hsl
-        .withHue((hsl.hue + 26) % 360)
-        .withLightness((hsl.lightness - .1).clamp(0.0, 1.0))
-        .toColor();
-    return LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [start, end],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: SizedBox(
-        height: height,
-        width: double.infinity,
-        child: imageAsset != null
-            ? Image.asset(imageAsset!, fit: BoxFit.cover)
-            : DecoratedBox(
-                decoration: BoxDecoration(gradient: _vividGradient(color)),
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned(
-                      right: -height * .2,
-                      bottom: -height * .24,
-                      child: Icon(
-                        icon,
-                        size: height * .95,
-                        color: Colors.white.withValues(alpha: .18),
-                      ),
-                    ),
-                    Icon(
-                      icon,
-                      size: height * .38,
-                      color: Colors.white,
-                      shadows: const [
-                        Shadow(color: Color(0x40000000), blurRadius: 6),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-      ),
-    );
-  }
-}
-
 class HomePage extends StatelessWidget {
   const HomePage({required this.onExplore, super.key});
 
@@ -327,59 +202,10 @@ class HomePage extends StatelessWidget {
     final state = CurioScope.of(context);
     final now = DateTime.now();
 
-    final games = <_GameInfo>[
-      _GameInfo(
-        id: 'squeeze',
-        title: 'Squeeze',
-        subtitle: 'Find the secret number before the range closes in.',
-        icon: Icons.calculate_rounded,
-        skill: 'Number sense',
-        duration: '2–4 MIN',
-        xp: 80,
-        featured: true,
-        onTap: () => openPage(context, const SqueezePage()),
-      ),
-      _GameInfo(
-        id: 'link_lab',
-        title: 'Link Lab',
-        subtitle: 'Find four hidden connections.',
-        icon: Icons.hub_outlined,
-        skill: 'Reasoning',
-        duration: '3–5 MIN',
-        xp: 90,
-        onTap: () => openPage(context, const LinkLabPage()),
-      ),
-      _GameInfo(
-        id: 'signal_grid',
-        title: 'Signal Grid',
-        subtitle: 'Balance the grid without guessing.',
-        icon: Icons.grid_view_rounded,
-        skill: 'Reasoning',
-        duration: '4–6 MIN',
-        xp: 100,
-        onTap: () => openPage(context, const SignalGridPage()),
-      ),
-      _GameInfo(
-        id: 'pattern_forge',
-        title: 'Pattern Forge',
-        subtitle: 'Crack the rule behind the sequence.',
-        icon: Icons.blur_on_rounded,
-        skill: 'Patterns',
-        duration: '3–5 MIN',
-        xp: 60,
-        onTap: () => openPage(context, const PatternForgePage()),
-      ),
-      _GameInfo(
-        id: 'evidence_garden',
-        title: 'Evidence Garden',
-        subtitle: 'Rank the clues before you jump to conclusions.',
-        icon: Icons.manage_search_rounded,
-        skill: 'Evidence',
-        duration: '4–6 MIN',
-        xp: 70,
-        onTap: () => openPage(context, const EvidenceDetectivePage()),
-      ),
-    ];
+    // One catalog for every screen; Home shows a rotating handful as today's
+    // picks (the first is the featured quest) and every game by skill below.
+    final featured = featuredGame();
+    final picks = todaysPicks();
 
     return Scaffold(
       backgroundColor: _hc(context, _HomeDark.bgBottom, _HomeLight.bgBottom),
@@ -407,8 +233,10 @@ class HomePage extends StatelessWidget {
                       _Header(
                         name: state.childName,
                         streak: state.streak,
-                        onParentTap: () =>
-                            openPage(context, const ParentDashboardPage()),
+                        onParentTap: () => ParentalGate.open(
+                          context,
+                          const ParentDashboardPage(),
+                        ),
                       ),
                       const SizedBox(height: 26),
                       _FadeSlideIn(
@@ -436,7 +264,11 @@ class HomePage extends StatelessWidget {
                       const SizedBox(height: 14),
                       _FadeSlideIn(
                         delay: const Duration(milliseconds: 200),
-                        child: _TodayPicksShelf(games: games, state: state),
+                        child: _TodayPicksShelf(
+                          games: picks,
+                          featuredId: featured.id,
+                          state: state,
+                        ),
                       ),
                       const SizedBox(height: 30),
                       _FadeSlideIn(
@@ -450,7 +282,7 @@ class HomePage extends StatelessWidget {
                       const SizedBox(height: 14),
                       _FadeSlideIn(
                         delay: const Duration(milliseconds: 300),
-                        child: _AdventurePicker(state: state, games: games),
+                        child: _AdventurePicker(state: state),
                       ),
                     ],
                   ),
@@ -776,7 +608,8 @@ class _WeekPracticeCard extends StatelessWidget {
 
   List<bool> _practicedDays() {
     final now = DateTime.now();
-    final sunday = now.subtract(Duration(days: now.weekday % 7));
+    // Calendar days, not 24-hour durations, so DST changes can't skip a day.
+    final sunday = DateTime(now.year, now.month, now.day - now.weekday % 7);
     return List.generate(7, (i) {
       final day = DateTime(sunday.year, sunday.month, sunday.day + i);
       final suffix = _dateKey(day);
@@ -805,6 +638,18 @@ class _WeekPracticeCard extends StatelessWidget {
     final count = days.where((d) => d).length;
     final remaining = (_goal - count).clamp(0, _goal);
     final todayIndex = DateTime.now().weekday % 7;
+    // Days still playable this week (today counts if not yet practised), so
+    // we never ask for five more days on a Friday.
+    final available = [
+      for (var i = todayIndex; i < 7; i++) !days[i],
+    ].where((open) => open).length;
+    final message = remaining == 0
+        ? 'Weekly goal reached — amazing focus!'
+        : remaining <= available
+        ? 'Just $remaining more day${remaining == 1 ? '' : 's'} to hit your goal'
+        : available == 0
+        ? 'Great week. A fresh one starts on Sunday.'
+        : '$available day${available == 1 ? '' : 's'} left this week — every one counts.';
 
     return _GlassPanel(
       radius: 24,
@@ -826,9 +671,7 @@ class _WeekPracticeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      remaining == 0
-                          ? 'Weekly goal reached — amazing focus!'
-                          : 'Just $remaining more day${remaining == 1 ? '' : 's'} to hit your goal',
+                      message,
                       style: TextStyle(color: inkMuted, fontSize: 12),
                     ),
                   ],
@@ -949,155 +792,43 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+bool _isDone(CurioState state, GameEntry game) => game.isDaily
+    ? state.completedToday(game.id)
+    : state.completedActivities.contains(game.id);
+
 class _TodayPicksShelf extends StatelessWidget {
-  const _TodayPicksShelf({required this.games, required this.state});
-  final List<_GameInfo> games;
+  const _TodayPicksShelf({
+    required this.games,
+    required this.featuredId,
+    required this.state,
+  });
+  final List<GameEntry> games;
+  final String featuredId;
   final CurioState state;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 216,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        clipBehavior: Clip.none,
-        itemCount: games.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final game = games[index];
-          return SizedBox(
-            width: 156,
-            child: _PickCard(
-              game: game,
-              completed: state.completedToday(game.id),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _PickCard extends StatelessWidget {
-  const _PickCard({required this.game, required this.completed});
-  final _GameInfo game;
-  final bool completed;
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final accent = _skillColor(context, game.skill);
-    final ink = dark ? _HomeDark.ink : _HomeLight.ink;
-    final inkMuted = dark ? _HomeDark.inkMuted : _HomeLight.inkMuted;
-    final questAccent = dark ? _HomeDark.accent : _HomeLight.accent;
-    final questInk = dark ? _HomeDark.accentInk : _HomeLight.accentInk;
-    final successColor = dark ? _HomeDark.success : _HomeLight.success;
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(24),
-      child: InkWell(
-        onTap: game.onTap,
-        borderRadius: BorderRadius.circular(24),
-        child: _GlassPanel(
-          radius: 24,
-          darkTint: _HomeDark.surface,
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  _CardArt(
-                    icon: game.icon,
-                    color: accent,
-                    imageAsset: game.imageAsset,
-                    height: 84,
-                    radius: 16,
-                  ),
-                  if (completed)
-                    const Positioned(
-                      left: 8,
-                      top: 8,
-                      child: Icon(
-                        Icons.check_circle_rounded,
-                        color: Colors.white,
-                        size: 22,
-                        shadows: [
-                          Shadow(color: Color(0x40000000), blurRadius: 4),
-                        ],
-                      ),
-                    ),
-                  if (game.featured)
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: questAccent,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: Text(
-                          'QUEST',
-                          style: TextStyle(
-                            color: questInk,
-                            fontSize: 7.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: .5,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      game.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: ink,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      game.subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: inkMuted,
-                        fontSize: 10.5,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      completed
-                          ? 'DONE TODAY'
-                          : '${game.skill.toUpperCase()} · ${game.duration}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: completed ? successColor : accent,
-                        fontSize: 8,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: .5,
-                      ),
-                    ),
-                  ],
+    // A scrolling Row (not a fixed-height ListView) so cards grow with the
+    // reader's text size; IntrinsicHeight keeps them the same height.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < games.length; i++) ...[
+              if (i > 0) const SizedBox(width: 12),
+              SizedBox(
+                width: 196,
+                child: GameCard(
+                  game: games[i],
+                  featured: games[i].id == featuredId,
+                  done: _isDone(state, games[i]),
                 ),
               ),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -1105,21 +836,20 @@ class _PickCard extends StatelessWidget {
 }
 
 class _AdventurePicker extends StatefulWidget {
-  const _AdventurePicker({required this.state, required this.games});
+  const _AdventurePicker({required this.state});
   final CurioState state;
-  final List<_GameInfo> games;
 
   @override
   State<_AdventurePicker> createState() => _AdventurePickerState();
 }
 
 class _AdventurePickerState extends State<_AdventurePicker> {
-  late String _selected = widget.state.skills.keys.first;
+  String _selected = learningSkills.first;
 
   @override
   Widget build(BuildContext context) {
-    final skills = widget.state.skills.keys.toList();
-    final matches = widget.games
+    final skills = learningSkills;
+    final matches = gameCatalog
         .where((game) => game.skill == _selected)
         .toList();
 
@@ -1137,7 +867,7 @@ class _AdventurePickerState extends State<_AdventurePicker> {
                   child: _SkillTab(
                     label: skill,
                     selected: skill == _selected,
-                    color: _skillColor(context, skill),
+                    color: skillColor(context, skill),
                     onTap: () => setState(() => _selected = skill),
                   ),
                 ),
@@ -1148,13 +878,14 @@ class _AdventurePickerState extends State<_AdventurePicker> {
         _SkillProgressCard(
           skill: _selected,
           progress: widget.state.skills[_selected] ?? 0,
-          color: _skillColor(context, _selected),
+          color: skillColor(context, _selected),
         ),
         for (final game in matches) ...[
           const SizedBox(height: 12),
-          _AdventureCard(
+          GameCard(
             game: game,
-            completed: widget.state.completedToday(game.id),
+            style: GameCardStyle.row,
+            done: _isDone(widget.state, game),
           ),
         ],
       ],
@@ -1282,128 +1013,6 @@ class _SkillProgressCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AdventureCard extends StatelessWidget {
-  const _AdventureCard({required this.game, required this.completed});
-  final _GameInfo game;
-  final bool completed;
-
-  @override
-  Widget build(BuildContext context) {
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    final accent = _skillColor(context, game.skill);
-    final successColor = _hc(context, _HomeDark.success, _HomeLight.success);
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(24),
-      child: InkWell(
-        onTap: game.onTap,
-        borderRadius: BorderRadius.circular(24),
-        child: _GlassPanel(
-          radius: 24,
-          darkTint: _HomeDark.surface,
-          child: Row(
-            children: [
-              Container(
-                width: 92,
-                height: 100,
-                margin: const EdgeInsets.all(10),
-                child: _CardArt(
-                  icon: game.icon,
-                  color: accent,
-                  imageAsset: game.imageAsset,
-                  height: 100,
-                  radius: 16,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 4,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        game.title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: ink,
-                          fontSize: 19,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        game.subtitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: inkMuted,
-                          fontSize: 11.5,
-                          height: 1.35,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        completed
-                            ? 'COMPLETED TODAY'
-                            : '${game.duration} · +${game.xp} XP',
-                        style: TextStyle(
-                          color: completed ? successColor : accent,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: .5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 14),
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  color: ink.withValues(alpha: .5),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Eyebrow extends StatelessWidget {
-  const _Eyebrow(this.text);
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(width: 24, height: 1, color: accent),
-        const SizedBox(width: 9),
-        Flexible(
-          child: Text(
-            text,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: accent,
-              fontSize: 9.5,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

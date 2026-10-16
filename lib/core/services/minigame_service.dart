@@ -112,7 +112,12 @@ class MinigameService {
         existing ??
         await _db
             .from('child_profiles')
-            .insert({'parent_id': userId, 'name': 'Explorer'})
+            .insert({
+              'parent_id': userId,
+              'name': 'Explorer',
+              'total_xp': 0,
+              'streak': 0,
+            })
             .select('id')
             .single();
 
@@ -178,10 +183,16 @@ class MinigameService {
     final childId = await _childProfileId();
     final row = await _db
         .from('puzzle_streaks')
-        .select('current_count')
+        .select('current_count, last_qualified_date')
         .eq('child_id', childId)
         .eq('puzzle_type', type)
         .maybeSingle();
+    // The stored count only changes when a day is played, so a streak that
+    // has since lapsed must be read as 0 rather than its old number.
+    final last = DateTime.tryParse('${row?['last_qualified_date'] ?? ''}');
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    if (last == null || last.isBefore(yesterday)) return 0;
     return (row?['current_count'] as int?) ?? 0;
   }
 

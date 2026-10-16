@@ -56,6 +56,10 @@ treadmill.
   skips login and runs on an on-device profile — for development/design
   work without a backend. A plain `flutter run` uses Supabase whenever the
   config file exists.
+- **Guest mode**: "Continue as guest" on the landing and sign-in screens
+  skips the account entirely. Progress is saved on the device only
+  (`LocalProgressStore`), Profile says so plainly, and offers "Create a
+  family account" or "Erase guest progress".
 - One child per parent account today — there is no multi-child switcher
   in the UI yet (see §9).
 
@@ -63,24 +67,39 @@ treadmill.
 The daily landing screen: greeting, a "what will you solve today"
 prompt, a weekly practice tracker (days practised this week vs. a
 5-day goal, with day-by-day checkmarks), a horizontally-scrolling shelf of
-today's picks (all five games, with the daily-quest game badged), and a
-skill-filtered "pick your next adventure" section that surfaces one
-in-progress skill and its matching game(s).
+today's picks (five daily games that rotate by date, the first badged as
+today's featured quest), and a skill-filtered "pick your next adventure"
+section that surfaces one in-progress skill and its matching game(s).
+Every game everywhere is drawn by the same `GameCard`: a skill-coloured
+art panel with a tiny preview of the board, skill · time · XP chips, and
+DONE / QUEST / NEW badges.
 
-### 3.3 Games (five, all complete-and-scored in one sitting)
+### 3.3 Games (fourteen daily games, each finished and scored in one sitting)
 | Game | Skill | What it teaches |
 |---|---|---|
+| Odd Cluster | Reasoning | 16 tiles, 4 knowledge groups (one easy, two medium, one sneaky); "one away" on near misses, 4 mistakes ends it |
+| Sequence | Patterns | Guess the next number early for more points, or pay to reveal more; guessing opens only once the rule is unambiguous |
+| Bridge | Number sense | Order every operation tile to turn a start number into a target; built backwards from a solution so it's always solvable |
+| Cascade | Evidence | Chain five consequences of a claim; side effects and evidence-contradicted myths are the decoys |
+| Loophole | Evidence | Tap the word making a true statement misleading; server-validated when signed in, offline set for guests |
 | Squeeze | Number sense | Binary-search-style number guessing with range narrowing |
 | Link Lab | Reasoning | Sort 16 words into 4 hidden category groups |
 | Signal Grid | Reasoning | Binary-logic grid puzzle (balance rows/columns, no guessing) |
 | Pattern Forge | Patterns | Spot-the-rule numeric sequence questions, three per session |
 | Evidence Detective | Evidence | Rank clues as strong/weak/misleading in a short "case" |
+| Tip the Scale | Number sense | Eight comparisons a day across fractions, decimals, percentages and small sums; the working puts both sides in one form ("3/4 = 0.750 · 5/8 = 0.625") |
+| Mirror | Patterns | Paint the reflection of a pattern across a vertical, horizontal, then diagonal mirror; three checks per board |
+| Verdict | Evidence | Five claims a day, each with one piece of evidence: supports it, goes against it, or can't tell yet — with the thinking tool named (fair test, counter-example, together isn't because…) |
+| Who's Who | Reasoning | Generated logic-grid puzzles (3 then 4 children); every clue is needed, exactly one answer, and solvable without guessing |
 
 Each game: awards fixed XP on first completion per day, unlocks exactly
 one discovery fact tied to that game, and nudges the matching skill's
 mastery value up slightly. Completion is keyed by
 `"<game>_<YYYYMMDD>"` so a game can be replayed for fun but only counts
-once per calendar day.
+once per calendar day. The newer games pick today's puzzle from a
+bank by date (`DailyPick`) and offer practice rounds afterwards, which
+earn no XP. Their rules live in pure-Dart `domain/` files with tests that
+enforce fairness (unique answers, unambiguous sequences, solvable bridges).
 
 ### 3.4 Story
 `Frostlands` — a three-scene branching narrative (`lib/features/story`)
@@ -88,9 +107,10 @@ with binary choices, no scoring, ends with a discovery unlock. Currently
 one story exists; the pattern is built to add more.
 
 ### 3.5 Discoveries
-A collected-facts library (`lib/features/discoveries`) — nine facts total
-today, each tied to one game or story completion, shown as a locked/
-unlocked card grid with a completion ring.
+A collected-facts library (`lib/features/discoveries`) — eighteen facts:
+one for each game and the story, plus three for 3-, 7- and 14-day streaks.
+Shown as a locked/unlocked card grid with a completion ring; a locked
+card says which game unlocks it.
 
 ### 3.6 Skill Quest
 A learning-map view (`lib/features/skills`) showing mastery (0–100%) for
@@ -100,8 +120,12 @@ each with a level derived from mastery and a "play this next" nudge.
 ### 3.7 Profile
 The child-facing settings surface: rename, XP/streak/discoveries summary,
 "companion" stage progress (a lightweight meta-progression tied to total
-XP), links into Skills, Badges (placeholder), Parent dashboard, and
-Accessibility settings (placeholder), plus sign-out and live sync status.
+XP), a badge shelf, links into Skills, Parent dashboard, and
+Accessibility settings, plus sign-out and live sync status. The twelve
+badges (first steps, busy brain, 3/7/14-day streaks, all-rounder, try
+every daily game, story time, discovery and XP milestones) are computed
+from the activity history rather than stored, each shows its progress
+("3 / 7 days"), and the shelf names the one closest to being earned.
 
 ### 3.8 Parent dashboard
 Read-only view for the parent: XP/streak/discoveries at a glance, a full

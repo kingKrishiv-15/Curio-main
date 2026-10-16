@@ -20,6 +20,8 @@ slightly, look for the nearest match on the same page.
 | 6 | Paste the three email templates | 5 min |
 | 7 | Rate limits and URLs | 2 min |
 | 8 | Test the whole journey | 5 min |
+| 9 | Weekly emails, reminders & account deletion (edge functions) | 15 min |
+| 10 | Server-checked Loophole puzzles (optional) | 3 min |
 
 ---
 
@@ -31,7 +33,7 @@ Open **Project Settings → API Keys**. You'll see:
 |---|---|---|
 | Project URL | `https://abcd1234.supabase.co` | `config/supabase.json` ✅ |
 | **Publishable** key | `sb_publishable_…` | `config/supabase.json` ✅ — designed to be public; Row Level Security protects the data |
-| **Secret** key | `sb_secret_…` | **Never in the app.** Only server code (Edge Functions get it automatically as an environment variable) |
+| **Secret** key | `sb_secret_…` | **Never in the app.** Only server code. Curio's Edge Functions don't need you to paste it anywhere — Supabase injects the project's service key into them as `SUPABASE_SERVICE_ROLE_KEY` |
 | JWKS URL | `…/auth/v1/.well-known/jwks.json` | Not needed by the app. Only for a server that verifies Curio's sign-in tokens itself |
 | Database password | — | Password manager only. Never in the repo |
 
@@ -42,8 +44,7 @@ contains a secret key, and a test fails the build for the same reason.
 > **If a secret key was ever pasted somewhere public — a chat, an issue, a
 > commit — rotate it now:** Project Settings → API Keys → the secret key's
 > **⋯** menu → create a new secret key, then delete the old one. Nothing in
-> the Flutter app needs changing; Edge Functions pick up the new key
-> automatically.
+> the Flutter app needs changing.
 
 ## 2. Create Curio's database tables
 
@@ -54,15 +55,31 @@ contains a secret key, and a test fails the build for the same reason.
    2. `supabase/migrations/202609030001_minigames.sql`
    3. `supabase/migrations/202609030002_loophole.sql`
    4. `supabase/migrations/202609180001_family_launch.sql`
+   5. `supabase/migrations/202610080001_launch_hardening.sql`
+   6. `supabase/migrations/202610090001_more_games.sql`
 3. Open **Table Editor** and check you can see `profiles`, `child_profiles`,
    `activity_completions`, `unlocked_discoveries`, `skill_progress`,
-   `family_settings` and `notifications`.
+   `family_settings`, `notifications`, `parent_reports`, `support_requests`,
+   `activity_rewards` and the puzzle tables (`daily_puzzles`,
+   `puzzle_attempts`, `puzzle_moves`, `puzzle_streaks`).
 
-Every table has Row Level Security on, so a parent can only ever read and
-write their own family's rows.
+> **Already ran the earlier files?** Run whichever of 5 and 6 you haven't —
+> both are safe to re-run, and they matter: the server only rewards games
+> it has a row for, so without them progress from the newer games is
+> silently dropped and disappears for signed-in families after a restart.
+> File 5 also closes two functions that were callable with the publishable
+> key.
+
+Every table has Row Level Security on, so a parent can only ever read their
+own family's rows. (XP is still calculated on the device and sent to the
+server, so a determined parent could edit their own child's numbers — fine
+for a family app, not for leaderboards.)
 
 Using the Supabase CLI instead? `supabase link --project-ref <ref>` then
-`supabase db push` applies the same migrations.
+`supabase db push` applies the same migrations. Pick one route and stick to
+it: files pasted into the SQL Editor aren't recorded in the CLI's migration
+history, so a later `db push` would try to re-run them (fix with
+`supabase migration repair --status applied <version>` for each one).
 
 ## 3. Connect the app
 
@@ -257,6 +274,90 @@ Inbucket at <http://localhost:54324>. Point the app at it with
 `"SUPABASE_URL": "http://127.0.0.1:54321"` (or `http://10.0.2.2:54321` from
 the Android emulator) and the publishable key that `supabase start` prints.
 
+## 9. Weekly emails, reminders and account deletion
+
+Two small server functions live in `supabase/functions/`:
+
+- **`parent-digest`** — runs every hour: creates inbox reminders, builds
+  Monday's weekly reports and sends the weekly email.
+- **`delete-account`** — permanently deletes a parent's account when they
+  confirm with their password in Profile → Privacy and account. Google
+  Play requires in-app account deletion, so deploy this one before
+  publishing.
+
+Without this step the app still works, but reminders and weekly reports
+never appear, and "Delete family account" fails.
+
+1. Install the Supabase CLI ([docs](https://supabase.com/docs/guides/cli)),
+   then from the project folder:
+
+   ```bash
+   supabase login
+   supabase link --project-ref YOUR_PROJECT_REF
+   supabase functions deploy parent-digest delete-account
+   ```
+
+   Deploy with the CLI, not the dashboard editor: `supabase/config.toml`
+   turns off the default JWT check for these two functions (each verifies
+   its caller itself), and a dashboard deploy would leave it on — the
+   hourly job would then be rejected.
+
+2. Set the function secrets. Invent a long random string for
+   `CURIO_CRON_SECRET` (e.g. `openssl rand -hex 32`):
+
+   ```bash
+   supabase secrets set \
+     CURIO_CRON_SECRET=your-long-random-string \
+     RESEND_API_KEY=re_your_resend_key \
+     CURIO_EMAIL_FROM="Curio <hello@your-verified-domain.com>" \
+     CURIO_APP_URL=https://your-website.com
+   ```
+
+   `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_ANON_KEY` are
+   provided to functions automatically. `CURIO_APP_URL` must start with
+   `https://` — it's the link in the weekly email.
+
+3. Give the database the two values the hourly job needs. In **SQL Editor**:
+
+   ```sql
+   select vault.create_secret('https://YOUR_PROJECT_REF.supabase.co', 'curio_project_url');
+   select vault.create_secret('your-long-random-string', 'curio_cron_secret');
+   ```
+
+   No trailing slash on the URL, and the second value must be exactly the
+   same as `CURIO_CRON_SECRET` above.
+
+4. Run `supabase/enable_family_schedule.sql` in the SQL Editor. It turns on
+   `pg_cron` and `pg_net` and schedules the job at five past every hour
+   (which also suits half-hour time zones like India's).
+
+5. Check it: **Integrations → Cron** shows `curio-family-updates`; after the
+   next run, **Edge Functions → parent-digest → Logs** shows a 200.
+
+Feedback from Help → "Tell us what could be better" is stored in the
+`support_requests` table — check it in Table Editor; nothing emails you.
+
+Parents who signed up **only with Google** have no password, so they can't
+confirm in-app deletion yet; handle their requests by email (the
+[deletion page](docs/delete-account.html) covers this).
+
+## 10. Server-checked Loophole puzzles (optional)
+
+Loophole works without this: the app ships the same 30 statements and plays
+them on the device. Setting it up lets signed-in players' answers be checked
+on the server, with a per-game streak.
+
+1. Create the key that encrypts answers at rest. In **SQL Editor**:
+
+   ```sql
+   insert into public.app_secrets (name, value)
+   values ('minigame_encryption_key', encode(gen_random_bytes(32), 'hex'));
+   ```
+
+2. Run `supabase/seed_loophole.sql`. It publishes 10 days of puzzles, ending
+   today. On days with nothing published the app quietly falls back to its
+   on-device set, so nothing breaks when they run out.
+
 ## Troubleshooting
 
 | What you see | Cause and fix |
@@ -270,6 +371,9 @@ the Android emulator) and the publishable key that `supabase start` prints.
 | "Please wait 42 seconds before asking for another email" | Supabase allows one email per address per minute. Wait, then resend. |
 | "We've sent a lot of emails…" | The project's hourly email limit was hit. Raise it (step 7) once custom SMTP is on, or wait an hour. |
 | "We couldn't find a Curio account for that email" on code sign-in | Code sign-in only works for existing accounts, by design. Create an account instead. |
+| New games' XP or discoveries vanish after reopening the app | Migration 5 (`202610080001_launch_hardening.sql`) hasn't been run. Run it (step 2) — it's safe to re-run. |
+| "Delete family account" fails | The `delete-account` function isn't deployed (step 9). |
+| No reminders or weekly reports ever appear | Step 9 isn't finished: check the function is deployed, the secrets are set, and `enable_family_schedule.sql` ran. |
 | Learner setup says it couldn't save | The `family_settings` table is missing — run migration 4 (step 2). |
 | "Please choose a stronger password" | The dashboard's password rules (step 4) are stricter than 8 characters with letters and numbers. Match them to the app's checklist. |
 
@@ -295,6 +399,14 @@ The Android manifest and iOS Info.plist already accept the finished login at
 `io.curio.app://login-callback/`. Parents who join with Google confirm the
 parent/guardian agreement during learner setup instead of at sign-up.
 
+## A demo account (no email needed)
+
+Run `supabase/seed_demo_account.sql` in the SQL Editor. It creates
+**demo@curio.test / CurioDemo123!**: already confirmed, already through
+learner setup, starting from 0 XP. Sign in with it on the sign-in screen —
+no code or SMTP involved. It's also the login to give Google Play under
+**App access**. Re-running it just resets the password.
+
 ## Seed dummy data to verify the database
 
 1. Open **SQL Editor → New query**.
@@ -303,20 +415,24 @@ parent/guardian agreement during learner setup instead of at sign-up.
 
 | Email | Password | XP | Streak |
 |---|---|---|---|
-| `maya@curio.test` | `CurioDemo123!` | 980 | 9 |
-| `arjun@curio.test` | `CurioDemo123!` | 120 | 1 |
-| `zara@curio.test` | `CurioDemo123!` | 540 | 3 |
-| `leo@curio.test` | `CurioDemo123!` | 710 | 6 |
-| `priya@curio.test` | `CurioDemo123!` | 430 | 0 |
+| `maya@curio.test` | `CurioDemo123!` | 980 | 9* |
+| `arjun@curio.test` | `CurioDemo123!` | 120 | 1* |
+| `zara@curio.test` | `CurioDemo123!` | 540 | 3* |
+| `leo@curio.test` | `CurioDemo123!` | 710 | 6* |
+| `priya@curio.test` | `CurioDemo123!` | 430 | 0* |
+
+\* The streak shown in the app is recalculated from the seeded play dates
+(and from today's date), so it can differ from the stored number — and it
+goes down if the seed was run a few days ago.
 
 Each has different discoveries unlocked and different skill mastery — see
 the comments at the top of the file. Sign in on the sign-in screen with any
 pair above; Home, Profile, Skill Quest and the Parent dashboard all read live
 from these tables (`lib/core/services/supabase_progress_store.dart`).
 
-Re-running is safe for activity/discovery/skill rows, but the 5 accounts can
-only be created once — a second run errors on the duplicate emails. To reset,
-run the commented-out `delete` block at the bottom of the file first. To seed
+The script runs as one block, so a second run stops at the first duplicate
+account and changes nothing. To reseed, run the commented-out `delete` block
+at the bottom of the file first. To seed
 just your own account instead, use `supabase/seed_dummy_data.sql` (see the
 comment at its top for the one line to edit).
 

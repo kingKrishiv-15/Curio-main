@@ -95,7 +95,9 @@ abstract final class CurioColors {
   static const jadeStrong = forestStrong;
   static const jadeSoft = forestSoft;
   static const teal = forest;
-  static const tealDark = forestStrong;
+  // Only ever used for text and icons, where forestStrong (#1F6B50) is too
+  // dark to read on dark surfaces (~2.3:1); the brighter forest passes.
+  static const tealDark = forest;
   static const tealSoft = forestSoft;
   static const coralDark = coralStrong;
   static const gold = saffron;

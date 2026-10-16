@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../games/common/game_rewards.dart';
+import '../../games/game_catalog.dart';
 import '../domain/discovery.dart';
 
 class DiscoveriesPage extends StatelessWidget {
@@ -66,7 +69,7 @@ class DiscoveriesPage extends StatelessWidget {
                   height: 56,
                   decoration: BoxDecoration(
                     color: saffron,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
                     Icons.collections_bookmark_rounded,
@@ -104,7 +107,7 @@ class DiscoveriesPage extends StatelessWidget {
           const SizedBox(height: 25),
           const SectionHeading(
             'Collected cards',
-            subtitle: 'Tap into the facts you’ve earned through play',
+            subtitle: 'Tap a card to read the whole fact, or to see how to unlock it',
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
@@ -119,7 +122,10 @@ class DiscoveriesPage extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: columns,
-                  mainAxisExtent: columns == 1 ? 172 : 210,
+                  // Grows with the reader's text size instead of clipping.
+                  mainAxisExtent:
+                      (columns == 1 ? 172 : 210) *
+                      MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8),
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
@@ -128,6 +134,7 @@ class DiscoveriesPage extends StatelessWidget {
                   final discovery = discoveries[index];
                   final collected = state.collectedFacts.contains(discovery.id);
                   return CurioCard(
+                    onTap: () => _showDiscovery(context, discovery, collected),
                     color: collected ? surface : surfaceMuted,
                     borderColor: collected
                         ? teal.withValues(alpha: .2)
@@ -144,14 +151,14 @@ class DiscoveriesPage extends StatelessWidget {
                               height: 46,
                               decoration: BoxDecoration(
                                 color: collected ? tealSoft : surface,
-                                borderRadius: BorderRadius.circular(3),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
                                 collected ? discovery.icon : Icons.lock_outline,
                                 color: collected ? tealDark : navyMuted,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const Spacer(),
                             if (collected)
                               Icon(
                                 Icons.bookmark_added_rounded,
@@ -174,7 +181,7 @@ class DiscoveriesPage extends StatelessWidget {
                         Text(
                           collected
                               ? discovery.fact
-                              : 'Complete another activity to reveal this discovery.',
+                              : _unlockHint(discovery.id),
                           maxLines: columns == 1 ? 2 : 3,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -194,4 +201,83 @@ class DiscoveriesPage extends StatelessWidget {
       ),
     );
   }
+}
+
+/// How a locked discovery is earned: the game that awards it, or the streak.
+String _unlockHint(String discoveryId) {
+  for (final MapEntry(key: game, value: reward) in gameRewards.entries) {
+    final title = findGame(game)?.title;
+    if (reward.factId == discoveryId && title != null) {
+      return 'Finish $title to reveal this discovery.';
+    }
+  }
+  for (final MapEntry(key: days, value: fact)
+      in CurioState.streakDiscoveries.entries) {
+    if (fact == discoveryId) {
+      return 'Practise $days days in a row to reveal this discovery.';
+    }
+  }
+  return 'Keep exploring to reveal this discovery.';
+}
+
+GameEntry? _unlockingGame(String discoveryId) {
+  for (final game in gameCatalog) {
+    if (game.reward.factId == discoveryId) return game;
+  }
+  return null;
+}
+
+void _showDiscovery(BuildContext context, Discovery discovery, bool collected) {
+  final game = collected ? null : _unlockingGame(discovery.id);
+  final accent = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (sheetContext) => SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CurioIconTile(
+              icon: collected ? discovery.icon : Icons.lock_outline,
+              color: accent,
+              size: 56,
+              iconSize: 28,
+              radius: 18,
+            ),
+            const SizedBox(height: 16),
+            CurioEyebrow(collected ? discovery.category : 'Locked'),
+            const SizedBox(height: 8),
+            Text(
+              collected ? discovery.title : 'Still a mystery',
+              style: Theme.of(sheetContext).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              collected ? discovery.fact : _unlockHint(discovery.id),
+              style: const TextStyle(fontSize: 16, height: 1.55),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: game == null
+                  ? FilledButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(),
+                      child: const Text('Close'),
+                    )
+                  : FilledButton.icon(
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop();
+                        openPage(context, game.open());
+                      },
+                      icon: Icon(game.icon, size: 18),
+                      label: Text('Play ${game.title}'),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

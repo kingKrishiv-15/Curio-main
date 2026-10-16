@@ -73,9 +73,11 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        widget.reportsOnly
-                            ? 'Your first report arrives after a completed calendar week. In the meantime, your parent dashboard shows your progress.'
-                            : 'Reminders and new weekly reports will appear here. Set your preferences in the parent dashboard.',
+                        _service.isDemo
+                            ? 'Reports and reminders need a family account. Create one from Profile to get a weekly summary of your explorer’s practice.'
+                            : widget.reportsOnly
+                            ? 'Your first report arrives after a completed calendar week. Until then, the parent dashboard shows this week’s progress.'
+                            : 'Reminders and new weekly reports will appear here. Choose what you get in Family preferences.',
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -100,7 +102,7 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      item['title'] as String,
+                                      '${item['title'] ?? 'Update'}',
                                       style: Theme.of(
                                         context,
                                       ).textTheme.titleMedium,
@@ -111,10 +113,10 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              Text(item['body'] as String),
+                              Text('${item['body'] ?? ''}'),
                               const SizedBox(height: 8),
                               Text(
-                                (item['created_at'] as String).substring(0, 10),
+                                _day(item['created_at']),
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               if (item['read_at'] == null)
@@ -168,8 +170,8 @@ class WeeklyReportCard extends StatelessWidget {
   final Map<String, dynamic> report;
   @override
   Widget build(BuildContext context) {
-    final summary = report['summary'] as Map<String, dynamic>;
-    final learners = summary['learners'] as List;
+    final summary = (report['summary'] as Map?)?.cast<String, dynamic>() ?? {};
+    final learners = summary['learners'] as List? ?? const [];
     return CurioGloss(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,4 +211,10 @@ class WeeklyReportCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "2026-10-08" from a timestamp, tolerating anything unexpected.
+String _day(Object? timestamp) {
+  final text = '${timestamp ?? ''}';
+  return text.length >= 10 ? text.substring(0, 10) : text;
 }

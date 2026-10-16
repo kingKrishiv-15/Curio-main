@@ -35,10 +35,13 @@ class CachedProgressStore implements ProgressStore {
   @override
   Future<void> save(ProgressSnapshot snapshot) async {
     final prefs = await SharedPreferences.getInstance();
+    // Mark pending *before* caching: if the app dies between the two writes,
+    // a pending flag without fresh data just resends; fresh data without the
+    // flag would be overwritten by the server and lost.
+    await prefs.setBool(_pending, true);
     if (!await prefs.setString(_cache, jsonEncode(snapshot.toJson()))) {
       throw StateError('Device storage is unavailable.');
     }
-    await prefs.setBool(_pending, true);
     try {
       await remote.save(snapshot);
       await prefs.setBool(_pending, false);

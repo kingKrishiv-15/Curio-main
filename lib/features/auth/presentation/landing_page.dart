@@ -11,6 +11,7 @@ import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_page.dart';
+import 'guest_sheet.dart';
 import 'intro_page.dart';
 import 'widgets/welcome_art.dart';
 
@@ -313,6 +314,12 @@ class _Ctas extends StatelessWidget {
         key: Key('${keyPrefix}_sign_in'),
         onPressed: onSignIn,
         child: const Text('I already have an account'),
+      ),
+      const SizedBox(height: 4),
+      TextButton(
+        key: Key('${keyPrefix}_guest'),
+        onPressed: () => showGuestSheet(context),
+        child: const Text('Just looking? Continue as guest'),
       ),
     ],
   );

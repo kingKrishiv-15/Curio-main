@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../games/game_catalog.dart';
+import '../../skills/presentation/skill_quest_page.dart';
 import '../../../core/widgets/curio_gloss.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../family/presentation/family_settings_page.dart';
@@ -13,11 +15,7 @@ class ParentDashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final now = DateTime.now();
-    final start = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(const Duration(days: 6));
+    final start = DateTime(now.year, now.month, now.day - 6);
     final recent = state.completedActivities.where((id) {
       if (!RegExp(r'_[0-9]{8}$').hasMatch(id)) return false;
       final d = id.substring(id.length - 8);
@@ -34,7 +32,6 @@ class ParentDashboardPage extends StatelessWidget {
         .length;
     final skills = state.skills.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    final hasProgress = state.completedActivities.isNotEmpty;
     return CurioPage(
       title: 'Parent dashboard',
       child: ListView(
@@ -99,7 +96,10 @@ class ParentDashboardPage extends StatelessWidget {
                       children: [
                         Text('${skill.key} · ${(skill.value * 100).round()}%'),
                         const SizedBox(height: 8),
-                        CurioProgressBar(value: skill.value),
+                        CurioProgressBar(
+                          value: skill.value,
+                          color: skillColor(context, skill.key),
+                        ),
                       ],
                     ),
                   ),
@@ -117,9 +117,7 @@ class ParentDashboardPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  hasProgress
-                      ? '${skills.first.key} is currently ${state.childName}’s strongest area. Try a ${skills.last.key.toLowerCase()} activity next, and ask them to explain their thinking.'
-                      : 'Your first completed activity will start the learning snapshot. Let your explorer choose what looks interesting.',
+                  _encouragement(state, skills),
                   style: const TextStyle(height: 1.6),
                 ),
               ],
@@ -203,4 +201,16 @@ class _Link extends StatelessWidget {
     trailing: const Icon(Icons.chevron_right),
     onTap: onTap,
   );
+}
+
+String _encouragement(CurioState state, List<MapEntry<String, double>> skills) {
+  if (state.completedActivities.isEmpty) {
+    return 'Your first completed activity will start the learning snapshot. Let your explorer choose what looks interesting.';
+  }
+  final (weakest, next) = SkillQuestPage.recommendation(state);
+  final even = skills.first.value - skills.last.value < .01;
+  final lead = even
+      ? '${state.childName} has been practising evenly across all four skills.'
+      : '${skills.first.key} is currently ${state.childName}’s strongest area.';
+  return '$lead To grow ${weakest.toLowerCase()}, try ${next.title} together — and ask them to explain their thinking out loud.';
 }

@@ -6,7 +6,7 @@
 -- instead of duplicating, moves are graded server-side, idempotency keys
 -- don't cost a player a guess, and streaks move on the right day boundaries.
 begin;
-select plan(17);
+select plan(18);
 
 create extension if not exists pgtap;
 
@@ -209,12 +209,28 @@ select is(
   'a consecutive day extends the streak'
 );
 
+-- Streak days are limited to around today (202610080001), so the gap is
+-- made on a second game: yesterday, then tomorrow.
+do $$ begin
+  perform public.record_puzzle_streak(
+    '77777777-7777-7777-7777-777777777777', 'gapgame', current_date - 1
+  );
+end $$;
+
 select is(
   (select current_count from public.record_puzzle_streak(
-    '77777777-7777-7777-7777-777777777777', 'testgame', current_date + 3
+    '77777777-7777-7777-7777-777777777777', 'gapgame', current_date + 1
   )),
   1,
   'a gap resets the streak'
+);
+
+select throws_ok(
+  $$ select public.record_puzzle_streak(
+    '77777777-7777-7777-7777-777777777777', 'testgame', current_date + 30
+  ) $$,
+  'played_on must be today',
+  'a streak day far from today is refused'
 );
 
 -- ----------------------------------------------------------------------------

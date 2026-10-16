@@ -112,6 +112,23 @@ void main() {
       );
     }
 
+    // Launch screens: the mark on the evergreen canvas, so the app opens
+    // without a white flash.
+    for (final MapEntry(key: density, value: scale) in android.entries) {
+      await _png(
+        'android/app/src/main/res/drawable-$density/splash_logo.png',
+        (96 * scale).round(),
+        const CurioMarkPainter(cornerRadius: .26),
+      );
+    }
+    for (final (suffix, scale) in [('', 1), ('@2x', 2), ('@3x', 3)]) {
+      await _png(
+        'ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage$suffix.png',
+        96 * scale,
+        const CurioMarkPainter(cornerRadius: .26),
+      );
+    }
+
     _write('assets/brand/curio-mark.svg', _svg());
   });
 }

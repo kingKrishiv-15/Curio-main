@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Curio's evergreen canvas (CurioColors.canvas) and the logo tile. -->
+    <color name="splash_background">#05100D</color>
+    <color name="splash_icon_background">#1F6B50</color>
+</resources>

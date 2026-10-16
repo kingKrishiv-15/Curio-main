@@ -3,9 +3,32 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:curio/app/curio_app.dart';
 import 'package:curio/core/state/curio_state.dart';
+import 'package:curio/features/games/common/game_kit.dart';
+import 'package:curio/features/games/evidence/domain/evidence_cases.dart';
+import 'package:curio/features/games/link_lab/domain/link_lab.dart';
 import 'package:curio/features/games/link_lab/presentation/link_lab_page.dart';
+import 'package:curio/features/games/signal_grid/domain/signal_grid.dart';
 import 'package:curio/features/games/squeeze/domain/squeeze_engine.dart';
 import 'package:curio/features/learn/presentation/learn_hub_page.dart';
+
+/// The Learn hub is a long list; scroll a game into the middle of the screen
+/// (clear of the floating nav) before checking or tapping it.
+Future<void> showInLearnHub(WidgetTester tester, String title) async {
+  final finder = find.text(title);
+  await tester.scrollUntilVisible(
+    finder,
+    250,
+    scrollable: find
+        .descendant(
+          of: find.byType(LearnHubPage),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.ensureVisible(finder.first);
+  await tester.pump();
+  await tester.pump(const Duration(seconds: 1));
+}
 
 void main() {
   test('Squeeze narrows its candidate range', () {
@@ -43,7 +66,9 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Ways to learn'), findsOneWidget);
+    await showInLearnHub(tester, 'Link Lab');
     expect(find.text('Link Lab'), findsOneWidget);
+    await showInLearnHub(tester, 'Signal Grid');
     expect(find.text('Signal Grid'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('Pattern Forge'),
@@ -91,11 +116,13 @@ void main() {
           )
           .first,
     );
+    await showInLearnHub(tester, 'Evidence Detective');
     await tester.tap(find.text('Evidence Detective'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('CASE 001 · THE GARDEN'), findsOneWidget);
+    final today = evidenceCaseFor(DailyPick.dayNumber());
+    expect(find.text(today.heading), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -109,29 +136,52 @@ void main() {
     await tester.tap(find.byKey(const Key('nav_Games')));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
+    await showInLearnHub(tester, 'Link Lab');
     await tester.tap(find.text('Link Lab').first);
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    for (final word in ['MERCURY', 'VENUS', 'EARTH', 'MARS']) {
-      await tester.ensureVisible(find.byKey(Key('link_$word')));
-      await tester.tap(find.byKey(Key('link_$word')));
+    // Solve today's puzzle, group by group, checking each one is revealed.
+    final puzzle = LinkLabGame.forDay(linkLabDay(DailyPick.dayNumber())).puzzle;
+    final list = find
+        .descendant(
+          of: find.byType(LinkLabPage),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+    for (final group in puzzle.groups) {
+      for (final word in group.words) {
+        await tester.scrollUntilVisible(
+          find.byKey(Key('link_$word')),
+          -250,
+          scrollable: list,
+        );
+        await tester.ensureVisible(find.byKey(Key('link_$word')));
+        await tester.pump();
+        await tester.tap(find.byKey(Key('link_$word')));
+        await tester.pump();
+      }
+      await tester.scrollUntilVisible(
+        find.text('Check connection'),
+        250,
+        scrollable: list,
+      );
+      await tester.tap(find.text('Check connection'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.scrollUntilVisible(
+        find.text(group.title.toUpperCase()),
+        -250,
+        scrollable: list,
+      );
+      expect(find.text(group.title.toUpperCase()), findsOneWidget);
     }
     await tester.scrollUntilVisible(
-      find.text('Check connection'),
+      find.text('Flawless links!'),
       250,
-      scrollable: find
-          .descendant(
-            of: find.byType(LinkLabPage),
-            matching: find.byType(Scrollable),
-          )
-          .first,
+      scrollable: list,
     );
-    await tester.tap(find.text('Check connection'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-
-    expect(find.text('ROCKY PLANETS'), findsOneWidget);
+    expect(find.text('Flawless links!'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -160,21 +210,16 @@ void main() {
     await tester.tap(find.byKey(const Key('nav_Games')));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
+    await showInLearnHub(tester, 'Signal Grid');
     await tester.tap(find.text('Signal Grid').first);
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    const tapsByCell = <int, int>{
-      1: 2,
-      2: 1,
-      4: 1,
-      6: 2,
-      7: 1,
-      8: 2,
-      9: 1,
-      11: 2,
-      13: 1,
-      14: 2,
+    // One tap makes a spark, two make a wave; givens are already placed.
+    final puzzle = SignalPuzzle.forDay(DailyPick.dayNumber());
+    final tapsByCell = <int, int>{
+      for (var i = 0; i < 16; i++)
+        if (!puzzle.givens.contains(i)) i: puzzle.solution[i] ? 1 : 2,
     };
     for (final entry in tapsByCell.entries) {
       final cell = find.byKey(Key('signal_${entry.key}'));

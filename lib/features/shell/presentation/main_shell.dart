@@ -100,6 +100,17 @@ class _MainShellState extends State<MainShell>
 
   @override
   Widget build(BuildContext context) {
+    // Android back on another tab returns Home instead of closing the app.
+    return PopScope(
+      canPop: _index == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _select(0);
+      },
+      child: _shell(),
+    );
+  }
+
+  Widget _shell() {
     return LayoutBuilder(
       builder: (context, constraints) {
         final desktop = constraints.maxWidth >= 900;
@@ -479,12 +490,12 @@ class _CurioRail extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 CurioProgressBar(
-                  value: state.dailyGoalCompleted / 3,
+                  value: state.dailyGoalCompleted / state.dailyGoal,
                   height: 7,
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  '${state.dailyGoalCompleted} of 3 challenges',
+                  '${state.dailyGoalCompleted} of ${state.dailyGoal} challenges',
                   style: TextStyle(color: inkMuted, fontSize: 10),
                 ),
               ],

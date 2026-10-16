@@ -36,7 +36,12 @@ class SupabaseProgressStore implements ProgressStore {
         existing ??
         await _client
             .from('child_profiles')
-            .insert({'parent_id': _userId, 'name': 'Explorer'})
+            .insert({
+              'parent_id': _userId,
+              'name': 'Explorer',
+              'total_xp': 0,
+              'streak': 0,
+            })
             .select()
             .single();
     _childId = child['id'] as String;

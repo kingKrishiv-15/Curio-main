@@ -1,45 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/state/curio_state.dart';
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
+import '../../common/game_kit.dart';
+import '../../common/game_rewards.dart';
+import '../domain/signal_grid.dart';
 
 enum _Signal { spark, wave }
 
 class SignalGridPage extends StatefulWidget {
-  const SignalGridPage({super.key});
+  const SignalGridPage({super.key, this.date});
+
+  /// For tests; defaults to today.
+  final DateTime? date;
 
   @override
   State<SignalGridPage> createState() => _SignalGridPageState();
 }
 
 class _SignalGridPageState extends State<SignalGridPage> {
-  static const _solution = <_Signal>[
-    _Signal.spark,
-    _Signal.wave,
-    _Signal.spark,
-    _Signal.wave,
-    _Signal.spark,
-    _Signal.wave,
-    _Signal.wave,
-    _Signal.spark,
-    _Signal.wave,
-    _Signal.spark,
-    _Signal.spark,
-    _Signal.wave,
-    _Signal.wave,
-    _Signal.spark,
-    _Signal.wave,
-    _Signal.spark,
-  ];
-  static const _givens = <int>{0, 3, 5, 10, 12, 15};
+  late SignalPuzzle _puzzle = _newPuzzle();
+  late List<_Signal?> _cells = _startingCells();
+  int _practiceShift = 0;
+  bool _alreadyDone = false;
 
-  late final List<_Signal?> _cells = List<_Signal?>.generate(
-    16,
-    (index) => _givens.contains(index) ? _solution[index] : null,
+  bool get _practice => _practiceShift > 0;
+  Set<int> get _givens => _puzzle.givens;
+  _Signal _solutionAt(int i) =>
+      _puzzle.solution[i] ? _Signal.spark : _Signal.wave;
+
+  SignalPuzzle _newPuzzle() => SignalPuzzle.forDay(
+    DailyPick.dayNumber(widget.date) + _practiceShift * 1000,
   );
+
+  List<_Signal?> _startingCells() => List<_Signal?>.generate(
+    16,
+    (index) => _givens.contains(index) ? _solutionAt(index) : null,
+  );
+
+  void _practiceRound() {
+    setState(() {
+      _practiceShift++;
+      _puzzle = _newPuzzle();
+      _cells = _startingCells();
+      _errors = <int>{};
+      _hintsLeft = 3;
+      _complete = false;
+      _message = 'Practice grid ready. Balance every row and column.';
+    });
+  }
+
   Set<int> _errors = <int>{};
   int _hintsLeft = 3;
   String _message = 'Tap an empty cell to cycle between spark and wave.';
@@ -62,19 +74,22 @@ class _SignalGridPageState extends State<SignalGridPage> {
   void _check() {
     final empty = _cells.where((cell) => cell == null).length;
     if (empty > 0) {
-      setState(() => _message = '$empty cells are still waiting for a signal.');
+      setState(
+        () => _message =
+            '$empty ${empty == 1 ? 'cell is' : 'cells are'} still waiting for a signal.',
+      );
       return;
     }
-    final errors = <int>{};
-    for (var index = 0; index < _cells.length; index++) {
-      if (_cells[index] != _solution[index]) errors.add(index);
-    }
+    // Any board that follows the rules is right — not just the stored one.
+    final errors = SignalPuzzle.violations([
+      for (final cell in _cells) cell == _Signal.spark,
+    ])..removeAll(_givens);
     if (errors.isNotEmpty) {
       HapticFeedback.heavyImpact();
       setState(() {
         _errors = errors;
         _message =
-            '${errors.length} signals break the balance. Recheck the highlighted cells.';
+            'Some rows or columns break the balance. Recheck the highlighted ones.';
       });
       return;
     }
@@ -84,23 +99,18 @@ class _SignalGridPageState extends State<SignalGridPage> {
       _errors.clear();
       _message = 'Every signal is in perfect balance.';
     });
-    CurioScope.of(context).completeActivity(
-      id: CurioState.dailyActivityId('signal_grid'),
-      xp: 100,
-      skill: 'Reasoning',
-      factId: 'binary_patterns',
-    );
+    if (!_practice) _alreadyDone = awardDaily(context, 'signal_grid');
   }
 
   void _hint() {
     if (_hintsLeft == 0 || _complete) return;
     final index = List.generate(16, (index) => index).firstWhere(
-      (index) => !_givens.contains(index) && _cells[index] != _solution[index],
+      (index) => !_givens.contains(index) && _cells[index] != _solutionAt(index),
       orElse: () => -1,
     );
     if (index < 0) return;
     setState(() {
-      _cells[index] = _solution[index];
+      _cells[index] = _solutionAt(index);
       _errors.remove(index);
       _hintsLeft--;
       _message =
@@ -159,8 +169,12 @@ class _SignalGridPageState extends State<SignalGridPage> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
         children: [
+          if (_practice) ...[
+            const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
+            const SizedBox(height: 10),
+          ],
           CurioEyebrow(
-            'Daily logic puzzle',
+            _practice ? 'Practice logic puzzle' : 'Daily logic puzzle',
             color: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
           ),
           const SizedBox(height: 6),
@@ -178,13 +192,19 @@ class _SignalGridPageState extends State<SignalGridPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              const GameMetaChip(
-                icon: Icons.schedule_rounded,
-                label: '4–6 min',
+              const Expanded(
+                child: Wrap(
+                  spacing: 15,
+                  runSpacing: 6,
+                  children: [
+                    GameMetaChip(icon: Icons.schedule_rounded, label: '4–6 min'),
+                    GameMetaChip(
+                      icon: Icons.grid_view_rounded,
+                      label: 'Reasoning',
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 15),
-              const GameMetaChip(icon: Icons.grid_view_rounded, label: 'Logic'),
-              const Spacer(),
               TextButton.icon(
                 onPressed: _hintsLeft > 0 && !_complete ? _hint : null,
                 icon: const Icon(Icons.lightbulb_outline_rounded, size: 18),
@@ -201,7 +221,13 @@ class _SignalGridPageState extends State<SignalGridPage> {
                 child: Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: curioColor(context, CurioColors.navy, CurioColorsLight.navy),
+                    // Light mode's `navy` is bright coral, which fights the
+                    // green clue tiles; a calm sunken tone frames them instead.
+                    color: curioColor(
+                      context,
+                      CurioColors.navy,
+                      CurioColorsLight.surfaceMuted,
+                    ),
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(
@@ -315,14 +341,26 @@ class _SignalGridPageState extends State<SignalGridPage> {
             ),
           ),
           const SizedBox(height: 13),
-          PrimaryButton(
-            label: _complete ? '+100 XP earned' : 'Check my grid',
-            icon: _complete
-                ? Icons.emoji_events_rounded
-                : Icons.task_alt_rounded,
-            onPressed: _complete ? null : _check,
-            color: curioColor(context, CurioColors.teal, CurioColorsLight.teal),
-          ),
+          if (!_complete)
+            PrimaryButton(
+              label: 'Check my grid',
+              icon: Icons.task_alt_rounded,
+              onPressed: _check,
+              color: curioColor(context, CurioColors.teal, CurioColorsLight.teal),
+            )
+          else
+            GameResultCard(
+              gameId: 'signal_grid',
+              title: _hintsLeft == 3 ? 'Pure deduction!' : 'Balanced!',
+              score: _hintsLeft == 3
+                  ? 'No hints'
+                  : '${3 - _hintsLeft} hint${3 - _hintsLeft == 1 ? '' : 's'}',
+              shareText:
+                  'Curio · Signal Grid\n🟨🟦🟨🟦\nBalanced with ${3 - _hintsLeft} hints',
+              xp: _practice ? null : gameRewards['signal_grid']!.xp,
+              alreadyDone: _alreadyDone,
+              onPractice: _practiceRound,
+            ),
         ],
       ),
     );

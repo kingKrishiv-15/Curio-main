@@ -8,7 +8,12 @@ class FamilyService {
   FamilyService({SupabaseClient? client})
     : _client =
           client ??
-          (SupabaseConfig.isConfigured ? Supabase.instance.client : null);
+          // Guests (Supabase configured, nobody signed in) use the on-device
+          // settings, same as demo mode.
+          (SupabaseConfig.isConfigured &&
+                  Supabase.instance.client.auth.currentUser != null
+              ? Supabase.instance.client
+              : null);
   final SupabaseClient? _client;
   bool get isDemo => _client == null;
   String get _userId => _client!.auth.currentUser!.id;
@@ -22,12 +27,26 @@ class FamilyService {
           ? const FamilySettings()
           : FamilySettings.fromJson(jsonDecode(raw));
     }
-    final data = await _client
-        .from('family_settings')
-        .select()
-        .eq('parent_id', _userId)
-        .single();
-    return FamilySettings.fromJson(data);
+    final cacheKey = 'curio_family_$_userId';
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final data = await _client
+          .from('family_settings')
+          .select()
+          .eq('parent_id', _userId)
+          .maybeSingle();
+      final settings = data == null
+          ? const FamilySettings()
+          : FamilySettings.fromJson(data);
+      await prefs.setString(cacheKey, jsonEncode(settings.toJson()));
+      return settings;
+    } catch (_) {
+      // Offline: the last settings we saw beat silently falling back to the
+      // defaults (which would show the wrong daily goal).
+      final cached = prefs.getString(cacheKey);
+      if (cached == null) rethrow;
+      return FamilySettings.fromJson(jsonDecode(cached));
+    }
   }
 
   Future<void> saveSettings(FamilySettings settings) async {
@@ -38,12 +57,16 @@ class FamilyService {
       );
       return;
     }
+    // consent_at is stamped by the database when the version changes, and an
+    // ordinary save can't clear an agreed version (202610080001).
     await _client.from('family_settings').upsert({
       'parent_id': _userId,
       ...settings.toJson(),
-      if (settings.consentVersion != null)
-        'consent_at': DateTime.now().toUtc().toIso8601String(),
     });
+    await (await SharedPreferences.getInstance()).setString(
+      'curio_family_$_userId',
+      jsonEncode(settings.toJson()),
+    );
   }
 
   Future<List<Map<String, dynamic>>> notifications() async => _client == null

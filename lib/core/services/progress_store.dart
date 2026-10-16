@@ -21,6 +21,15 @@ class ProgressSnapshot {
           (key, value) => MapEntry(key, (value as num).toDouble()),
         ),
       );
+  ProgressSnapshot copyWith({String? childName}) => ProgressSnapshot(
+    childName: childName ?? this.childName,
+    totalXp: totalXp,
+    streak: streak,
+    completedActivities: completedActivities,
+    collectedFacts: collectedFacts,
+    skills: skills,
+  );
+
   Map<String, dynamic> toJson() => {
     'childName': childName,
     'totalXp': totalXp,

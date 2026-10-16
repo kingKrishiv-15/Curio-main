@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/services/family_service.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../../core/widgets/text_prompt_dialog.dart';
 import '../../auth/presentation/auth_layout.dart';
 
 class PrivacyPage extends StatefulWidget {
@@ -60,40 +61,18 @@ class _PrivacyPageState extends State<PrivacyPage> {
   }
 
   Future<void> _delete() async {
-    final password = TextEditingController();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete your family account?'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'This permanently deletes your account, learner progress, reports, and notification preferences. This cannot be undone. Enter your password to confirm.',
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: password,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Account password'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Keep account'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete permanently'),
-          ),
-        ],
-      ),
+    final value = await showTextPrompt(
+      context,
+      title: 'Delete your family account?',
+      message:
+          'This permanently deletes your account, learner progress, reports, and notification preferences. This cannot be undone. Enter your password to confirm.',
+      label: 'Account password',
+      obscure: true,
+      cancelLabel: 'Keep account',
+      confirmLabel: 'Delete permanently',
+      validator: (value) => value.isEmpty ? 'Enter your password.' : null,
     );
-    final value = password.text;
-    password.dispose();
-    if (confirmed != true || !mounted) return;
+    if (value == null || !mounted) return;
     setState(() {
       _busy = true;
       _error = null;

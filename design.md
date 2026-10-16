@@ -311,6 +311,16 @@ purpose — round everything. Same scale in both modes.
 | `AuthFrame` / `WelcomePanel` | `auth_layout.dart` | Frame for every signed-out step: back + logo, one column on phones, art beside the form when wide |
 | `OrbitHero`, `GameFanArt`, `DiscoveryArt`, `GrowthArt`, `InboxArt` | `features/auth/presentation/widgets/welcome_art.dart` | Illustrations for the landing page and intro slides — decorative, excluded from semantics |
 | `OtpCodeField` | `features/auth/presentation/widgets/otp_code_field.dart` | Digit boxes over one real text field (paste, iOS code autofill, screen readers) |
+| `gameCatalog` / `skillColor` | `features/games/game_catalog.dart` | The one list of activities (title, tagline, icon, duration) that Home, Learn and Skill Quest render, plus the per-skill colour and icon. Add a game here, not on each screen |
+| `gameRewards` / `awardDaily` | `features/games/common/game_rewards.dart`, `game_kit.dart` | XP, skill and discovery per activity — mirrors the server's `activity_rewards` table (a test compares them) |
+| `GameHeader`, `GameResultCard`, `PracticeBadge`, `showHowToPlay` | `features/games/common/game_kit.dart` | Shared game chrome: header, end-of-game card (says "already earned" on replays), practice rounds |
+| `GameCard` (`tile` / `row` / `hero`) | `features/games/presentation/game_card.dart` | The one way a game is shown anywhere: art panel in the skill gradient, title, tagline, skill · time · XP chips, and a Play / Play again action. `tile` for grids and shelves, `row` for lists, `hero` for today's featured quest. Badges on the art: DONE, QUEST, NEW |
+| `GameArt` / `gameGradient` | `game_card.dart` | The art panel on its own, and the skill gradient behind it (lighter top-left, hue-shifted darker bottom-right) |
+| `GamePreview` | `features/games/presentation/game_preview.dart` | A tiny drawing of each game's board (tiles, chips, grid, scales…) on a fixed 150×84 canvas that scales down. New game → add a case, or it falls back to its icon |
+| `GameGrid` | `game_card.dart` | Equal-height rows of tiles; 1–4 columns by width. Use it instead of `GridView` so cards never clip at large text sizes |
+| `BadgeShelf`, `BadgeMedal`, `showBadgesSheet` | `features/profile/presentation/badges_view.dart` | Profile's badges: medals coloured by family once earned, ringed by progress until then. The badges themselves are computed from activity history in `profile/domain/badges.dart`, never stored |
+| `ParentalGate` | `core/widgets/parental_gate.dart` | "Grown-ups only" times-table check in front of the parent dashboard and privacy pages |
+| `showTextPrompt` | `core/widgets/text_prompt_dialog.dart` | One-field dialog that owns its controller — use it instead of disposing a controller after `showDialog` |
 | `_ThemeToggleTile` | `profile_page.dart` | The one light/dark switch (§2) |
 | `_FloatingNav` | `main_shell.dart` | Bottom pill nav (§6) — private to the shell, not reused elsewhere |
 

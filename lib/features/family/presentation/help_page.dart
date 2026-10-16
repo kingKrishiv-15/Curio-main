@@ -84,12 +84,23 @@ class _HelpPageState extends State<HelpPage> {
           ],
         ),
         const ExpansionTile(
+          title: Text('Can we play without an account?'),
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Yes — choose “Continue as guest” on the welcome screen. Progress is kept on this device only. Create a family account later and Curio offers to bring that progress with you.',
+              ),
+            ),
+          ],
+        ),
+        const ExpansionTile(
           title: Text('Can I play again?'),
           children: [
             Padding(
               padding: EdgeInsets.all(16),
               child: Text(
-                'Yes. A daily activity earns XP once per day. Replaying is always available for practice.',
+                'Yes. Each daily game earns XP once a day, and you can replay it any time just for fun. Many games also offer a practice round with a different puzzle when you finish. The Frostlands story earns its XP once.',
               ),
             ),
           ],
@@ -100,7 +111,8 @@ class _HelpPageState extends State<HelpPage> {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 16),
-        if (SupabaseConfig.isConfigured) ...[
+        if (SupabaseConfig.isConfigured &&
+            Supabase.instance.client.auth.currentUser != null) ...[
           TextField(
             controller: _message,
             enabled: !_sending,
@@ -117,7 +129,9 @@ class _HelpPageState extends State<HelpPage> {
             child: Text(_sending ? 'Sending…' : 'Send feedback'),
           ),
         ] else
-          const Text('Sign in to send feedback to the Curio team.'),
+          const Text(
+            'Sign in with a family account to send feedback to the Curio team.',
+          ),
         if (_notice != null) ...[
           const SizedBox(height: 16),
           AuthNotice(_notice!, error: _error),

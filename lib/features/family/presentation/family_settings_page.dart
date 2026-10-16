@@ -15,6 +15,10 @@ class FamilySettingsPage extends StatefulWidget {
 class _FamilySettingsPageState extends State<FamilySettingsPage> {
   final _service = FamilyService();
   bool _loading = true, _saving = false, _reminders = false, _email = false;
+
+  /// Only true once real settings arrived — saving defaults over settings we
+  /// failed to load would wipe the family's choices (and consent).
+  bool _loaded = false;
   int _goal = 3, _hour = 18;
   String _timezone = 'UTC';
   String? _consent, _error, _saved;
@@ -40,6 +44,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
           _email = s.weeklyEmailEnabled;
           _timezone = s.timezone;
           _consent = s.consentVersion;
+          _loaded = true;
         });
     } catch (_) {
       if (mounted)
@@ -97,11 +102,6 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                 'Choose a small daily goal and decide how you’d like to hear from Curio.',
               ),
               const SizedBox(height: 24),
-              if (_error != null && _consent == null && _saved == null)
-                TextButton(
-                  onPressed: _load,
-                  child: const Text('Reload settings'),
-                ),
               CurioGloss(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +119,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                       min: 1,
                       max: 5,
                       divisions: 4,
-                      label: '$_goal activities',
+                      label: '$_goal ${_goal == 1 ? 'activity' : 'activities'}',
                       onChanged: _saving
                           ? null
                           : (v) => setState(() => _goal = v.round()),
@@ -140,12 +140,12 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                       subtitle: const Text(
                         'A gentle reminder in your Curio inbox.',
                       ),
-                      value: _reminders,
-                      onChanged: _saving
+                      value: _reminders && !_service.isDemo,
+                      onChanged: _saving || _service.isDemo
                           ? null
                           : (v) => setState(() => _reminders = v),
                     ),
-                    if (_reminders)
+                    if (_reminders && !_service.isDemo)
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Reminder time'),
@@ -165,8 +165,17 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                                   helpText:
                                       'Reminders are sent at the selected hour',
                                 );
-                                if (value != null && mounted)
-                                  setState(() => _hour = value.hour);
+                                if (value == null || !mounted) return;
+                                setState(() => _hour = value.hour);
+                                if (value.minute != 0 && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Reminders go out on the hour, so it’s set for ${TimeOfDay(hour: value.hour, minute: 0).format(context)}.',
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                       ),
                     const Divider(),
@@ -176,8 +185,8 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                       subtitle: const Text(
                         'Last week’s practice, delivered Monday after 8 AM. Turn off anytime.',
                       ),
-                      value: _email,
-                      onChanged: _saving
+                      value: _email && !_service.isDemo,
+                      onChanged: _saving || _service.isDemo
                           ? null
                           : (v) => setState(() => _email = v),
                     ),
@@ -206,7 +215,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
               if (_service.isDemo) ...[
                 const SizedBox(height: 20),
                 const AuthNotice(
-                  'Demo preferences stay on this device. Sign in to receive reports and notifications.',
+                  'Your daily goal is saved on this device. Reminders and the weekly email need a family account — create one from Profile.',
                 ),
               ],
               if (_error != null) ...[
@@ -218,8 +227,16 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                 AuthNotice(_saved!),
               ],
               const SizedBox(height: 24),
+              if (!_loaded) ...[
+                OutlinedButton.icon(
+                  onPressed: _load,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Reload settings'),
+                ),
+                const SizedBox(height: 10),
+              ],
               FilledButton(
-                onPressed: _saving ? null : _save,
+                onPressed: _saving || !_loaded ? null : _save,
                 child: Text(_saving ? 'Saving…' : 'Save preferences'),
               ),
             ],

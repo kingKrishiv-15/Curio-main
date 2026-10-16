@@ -87,4 +87,76 @@ const discoveries = <Discovery>[
     category: 'Computing',
     icon: Icons.memory_rounded,
   ),
+  Discovery(
+    id: 'sample_size',
+    title: 'Who did they ask?',
+    fact:
+        'A survey can only speak for the people who answered it. If someone else chose who to ask, the result may say more about the choosing than about everyone.',
+    category: 'Thinking',
+    icon: Icons.poll_rounded,
+  ),
+  Discovery(
+    id: 'giant_rings',
+    title: 'Rings on every giant',
+    fact:
+        'Jupiter, Saturn, Uranus and Neptune all have rings. Saturn’s are simply the brightest and easiest to see.',
+    category: 'Space',
+    icon: Icons.public_rounded,
+  ),
+  Discovery(
+    id: 'triangular_numbers',
+    title: 'Numbers with corners',
+    fact:
+        'Ten-pin bowling pins stand in rows of 1, 2, 3 and 4. Numbers you can arrange as a triangle like that — 1, 3, 6, 10, 15 — are called triangular numbers.',
+    category: 'Maths',
+    icon: Icons.change_history_rounded,
+  ),
+  Discovery(
+    id: 'traffic_evaporation',
+    title: 'Vanishing traffic',
+    fact:
+        'When streets close to cars, not all the traffic moves elsewhere. Some trips disappear as people walk, cycle, take the bus or travel at other times — planners call it traffic evaporation.',
+    category: 'Cities',
+    icon: Icons.directions_bike_rounded,
+  ),
+  Discovery(
+    id: 'order_matters',
+    title: 'Order changes everything',
+    fact:
+        'Doubling 3 and then adding 4 makes 10, but adding 4 and then doubling makes 14. The same steps in a different order can land somewhere new.',
+    category: 'Maths',
+    icon: Icons.swap_vert_rounded,
+  ),
+  Discovery(
+    id: 'equal_fractions',
+    title: 'Same amount, new name',
+    fact:
+        '1/2, 2/4, 0.5 and 50% are four ways of writing exactly the same amount — like eating half a pizza whether it was cut into 2 slices or 4.',
+    category: 'Maths',
+    icon: Icons.pie_chart_rounded,
+  ),
+  Discovery(
+    id: 'mirror_symmetry',
+    title: 'Mirrors in nature',
+    fact:
+        'A butterfly’s two wings are mirror images of each other. Scientists call this bilateral symmetry, and most animals — people included — are built this way.',
+    category: 'Nature',
+    icon: Icons.flip_rounded,
+  ),
+  Discovery(
+    id: 'correlation',
+    title: 'Together isn’t because',
+    fact:
+        'Ice-cream sales and sunburns both rise in summer. They go together, but ice cream doesn’t cause sunburn — hot, sunny weather causes both.',
+    category: 'Thinking',
+    icon: Icons.icecream_rounded,
+  ),
+  Discovery(
+    id: 'logic_grid',
+    title: 'Solving by ruling out',
+    fact:
+        'Logic puzzles are solved by ruling things out. Detectives, doctors and computer programs all use the same “if it isn’t this, it must be that” thinking.',
+    category: 'Thinking',
+    icon: Icons.fact_check_rounded,
+  ),
 ];
