@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'progress_store.dart';
+import '../../features/games/common/game_rewards.dart';
 
 class SupabaseProgressStore implements ProgressStore {
   SupabaseProgressStore({SupabaseClient? client})
@@ -8,6 +9,7 @@ class SupabaseProgressStore implements ProgressStore {
 
   final SupabaseClient _client;
   String? _childId;
+  final Set<String> _verifiedRewards = {};
 
   String get _userId {
     final id = _client.auth.currentUser?.id;
@@ -93,6 +95,25 @@ class SupabaseProgressStore implements ProgressStore {
   Future<void> save(ProgressSnapshot snapshot) async {
     final child = await _child();
     final childId = child['id'] as String;
+
+    // Older databases silently ignore activities absent from their reward
+    // table. Keep the durable outbox pending until the migration is applied,
+    // rather than reporting success and losing the child's new-game XP.
+    final unverified = snapshot.completedActivities
+        .map(activityGame)
+        .where(gameRewards.containsKey)
+        .toSet()
+        .difference(_verifiedRewards);
+    if (unverified.isNotEmpty) {
+      final rows = await _client
+          .from('activity_rewards')
+          .select('activity')
+          .inFilter('activity', unverified.toList());
+      _verifiedRewards.addAll(rows.map((row) => row['activity'] as String));
+      if (!unverified.every(_verifiedRewards.contains)) {
+        throw StateError('The game reward catalogue needs a database update.');
+      }
+    }
 
     await _client.rpc(
       'sync_learning_progress',

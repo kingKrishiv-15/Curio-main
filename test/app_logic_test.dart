@@ -81,7 +81,7 @@ void main() {
     test('today’s picks rotate and lead with the featured game', () {
       final a = todaysPicks(date: DateTime(2026, 10, 8));
       final b = todaysPicks(date: DateTime(2026, 10, 9));
-      expect(a.length, 5);
+      expect(a.length, 3);
       expect(a.first, featuredGame(date: DateTime(2026, 10, 8)));
       expect(a.map((g) => g.id), isNot(b.map((g) => g.id)));
       expect(a.every((g) => g.isDaily), isTrue);
@@ -169,7 +169,7 @@ void main() {
     });
   });
 
-  test('Skill Quest recommends a game for the weakest skill', () {
+  test('Skill Quest recommends a game from today’s plan', () {
     final state = CurioState()
       ..skills.addAll({
         'Number sense': .8,
@@ -178,8 +178,8 @@ void main() {
         'Reasoning': .5,
       });
     final (skill, game) = SkillQuestPage.recommendation(state);
-    expect(skill, 'Evidence');
-    expect(game.skill, 'Evidence');
+    expect(skill, game.skill);
+    expect(todaysPicks(date: state.today), contains(game));
     expect(SkillQuestPage.levelFor(1), 5);
     expect(SkillQuestPage.levelFor(0), 1);
     state.dispose();

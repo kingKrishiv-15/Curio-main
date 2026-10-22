@@ -168,8 +168,8 @@ class _Headline extends StatelessWidget {
 }
 
 const _promise =
-    'Five-minute brain games that grow reasoning, number sense and pattern '
-    'skills — with a calm, clear view for grown-ups.';
+    'A fresh game in Maths, Memory and English every day. Little adventures, '
+    'earned points and discoveries to share — with a clear view for grown-ups.';
 
 class _PhoneHero extends StatelessWidget {
   const _PhoneHero({
@@ -411,14 +411,14 @@ class _HowItWorks extends StatelessWidget {
         '01',
         Icons.extension_rounded,
         'Play for five minutes',
-        'One short, focused game a day — logic, numbers, patterns or evidence.',
+        'Choose a daily game in Maths, Memory or English. Each takes about five minutes.',
         WelcomeSkill.all[0],
       ),
       (
         '02',
         Icons.auto_awesome_rounded,
         'Unlock a discovery',
-        'Every finished game adds a surprising fact to their collection.',
+        'Daily play earns points, badges and surprising facts to collect.',
         WelcomeSkill.all[1],
       ),
       (
@@ -549,15 +549,15 @@ class _GameShelf extends StatelessWidget {
   final bool wide;
   final double gutter;
 
-  /// A taste of the catalog — at least one game from every skill — drawn
+  /// A taste of the catalog — two games from every daily section — drawn
   /// with the same art as inside the app.
   static const _ids = [
     'scale',
-    'odd_cluster',
-    'mirror',
-    'verdict',
-    'whos_who',
-    'loophole',
+    'sequence',
+    'memory_match',
+    'memory_trail',
+    'word_builder',
+    'word_wise',
   ];
 
   @override

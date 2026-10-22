@@ -212,6 +212,7 @@ class _CurioExperienceState extends State<_CurioExperience> {
   @override
   void initState() {
     super.initState();
+    _state.startDailyClock();
     _state.hydrate().then((_) => _offerGuestProgress());
   }
 
@@ -315,7 +316,9 @@ class _CurioExperienceState extends State<_CurioExperience> {
                     onPressed: widget.isGuest
                         ? () => GuestSession.instance.end()
                         : AuthService().signOut,
-                    child: Text(widget.isGuest ? 'Leave guest mode' : 'Sign out'),
+                    child: Text(
+                      widget.isGuest ? 'Leave guest mode' : 'Sign out',
+                    ),
                   ),
                 ],
               ),

@@ -7,6 +7,7 @@ import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../discoveries/domain/discovery.dart';
 import 'game_rewards.dart';
+import 'daily_game_session.dart';
 
 /// Shared pieces for Curio's daily games, so each game file is only the
 /// game: which puzzle is today's, the page header, the how-to-play sheet and
@@ -23,8 +24,12 @@ abstract final class DailyPick {
 
   /// Today's index into a bank of [length] puzzles, offset by [shift] for
   /// practice rounds.
-  static int index(int length, {DateTime? date, int shift = 0}) =>
-      (dayNumber(date) + shift) % length;
+  static int index(int length, {DateTime? date, int shift = 0}) {
+    if (length < 1) {
+      throw ArgumentError.value(length, 'length', 'Must be positive');
+    }
+    return (dayNumber(date) + shift) % length;
+  }
 }
 
 /// Records completion of [game] (today's, for daily games) using its entry in
@@ -36,7 +41,12 @@ bool awardDaily(BuildContext context, String game) {
   assert(reward != null, 'No reward for $game — add it to gameRewards');
   final state = context.getInheritedWidgetOfExactType<CurioScope>()?.notifier;
   if (state == null || reward == null) return false;
-  final id = reward.dated ? CurioState.dailyActivityId(game) : game;
+  final id = reward.dated
+      ? CurioState.dailyActivityId(
+          game,
+          DailyGameSession.of(context)?.date ?? state.today,
+        )
+      : game;
   final already = state.completedActivities.contains(id);
   state.completeActivity(
     id: id,
@@ -54,7 +64,12 @@ bool completedAlready(BuildContext context, String game) {
   final state = context.getInheritedWidgetOfExactType<CurioScope>()?.notifier;
   if (state == null || reward == null) return false;
   return state.completedActivities.contains(
-    reward.dated ? CurioState.dailyActivityId(game) : game,
+    reward.dated
+        ? CurioState.dailyActivityId(
+            game,
+            DailyGameSession.of(context)?.date ?? state.today,
+          )
+        : game,
   );
 }
 
@@ -279,13 +294,7 @@ class GameResultCard extends StatelessWidget {
         unlocked = discoveries.where((d) => d.id == reward.factId).firstOrNull;
       }
     }
-    final daily = [
-      for (final MapEntry(key: id, value: r) in gameRewards.entries)
-        if (r.dated) id,
-    ];
-    final doneToday = state == null
-        ? 0
-        : daily.where(state.completedToday).length;
+    final doneToday = state?.sectionsCompleted().length ?? 0;
 
     return GlassCard(
       padding: const EdgeInsets.all(20),
@@ -362,40 +371,23 @@ class GameResultCard extends StatelessWidget {
           ),
           if (state != null && reward != null) ...[
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$doneToday of ${daily.length} daily games done today',
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      CurioProgressBar(
-                        value: doneToday / daily.length,
-                        height: 6,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                TextButton.icon(
-                  key: const Key('result_more_games'),
-                  onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.grid_view_rounded, size: 18),
-                  label: const Text('More games'),
-                ),
-              ],
+            Text(
+              '$doneToday of 3 sections complete today',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            CurioProgressBar(value: doneToday / 3, height: 6),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              key: const Key('result_more_games'),
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.grid_view_rounded, size: 18),
+              label: const Text('Back to today’s games'),
             ),
           ],
           const SizedBox(height: 10),
           Text(
-            'A new daily puzzle arrives tomorrow.',
+            'New games arrive in Maths, Memory and English tomorrow.',
             style: TextStyle(color: muted, fontSize: 12.5),
           ),
         ],

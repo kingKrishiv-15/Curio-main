@@ -17,27 +17,35 @@ Curio is a polished Flutter learning-and-puzzle platform for curious young
 thinkers. It combines finite daily brain breaks, skill-building adventures,
 knowledge rewards and family insight in one responsive product experience.
 
-## Prototype features
+## Daily learning
 
-- Responsive phone, tablet and desktop navigation
-- Refined indigo–teal design system with reusable product-grade components
-- Personalised daily dashboard, XP, streak and three-challenge daily goal
-- Link Lab daily categorisation puzzle with spoiler-free result sharing
-- Signal Grid daily binary-logic puzzle with teaching hints
-- Daily Squeeze number-hunting game with range narrowing and maths clues
-- Pattern Forge multi-question pattern game with explanations
-- Evidence Detective source-ranking critical-thinking game
-- Frostlands branching story adventure
-- Skill Quest mastery map
-- XP, streak, companion-stage and discovery progression
-- Parent dashboard with skill insights and family controls
-- Accessible semantics, large tap targets, interaction feedback and page motion
+- Three daily sections: **Maths**, **Memory**, and **English**.
+- Exactly one scheduled game per section, shared by Home and Games.
+- Games rotate by the device's local calendar date and refresh at midnight or
+  when the app resumes. A run opened before midnight keeps its original date.
+- A game's puzzle bank advances on each appearance so the rotation does not
+  accidentally repeat the same puzzle every time.
+- Memory Match and Memory Trail teach picture and sequence recall. Word Wise
+  and Word Builder add vocabulary, reading, grammar and spelling practice.
+- Existing number, pattern, logic and reading games join their section's rotation.
+- Daily goals range from one to three sections. XP is earned once per daily
+  game; practice rounds add no extra XP. New learners start at zero.
+- Total XP, today's XP, daily completion and weekly progress are shown separately.
+- Guest progress is saved on the device. Signed-in progress uses Supabase with
+  a durable retry queue; unsynced rewards remain on the device.
 
-Progress currently lives in an in-memory `CurioState`. Daily activity keys use a
-full calendar date so completions cannot collide across months. The architecture maps in
-`resources/mmd_files` define the Firebase production boundary. Scores, answers,
-rewards, streaks and mastery will eventually be validated by callable Cloud
-Functions rather than trusted to the Flutter client.
+For Supabase SQL Editor setup, run the complete [`supabase/setup.sql`](supabase/setup.sql)
+installer. It creates dependencies in order and can repair a partial setup while
+preserving existing learning progress. CLI-managed projects should continue to
+apply their ordered migrations with `supabase db push`.
+
+Email confirmation, sign-in and password recovery accept the full 6–10 digit
+code from Supabase. The app waits for the parent to submit, so an eight-digit
+code is never truncated or submitted after its sixth digit.
+
+For Android publishing, see [`RELEASE.md`](RELEASE.md). Run
+`python3 tool/release_check.py --platform android` before building. Release builds
+require the real upload keystore and never fall back to debug signing.
 
 ## Source layout
 
@@ -68,9 +76,9 @@ resources/
   mmd_files/           production architecture maps
 ```
 
-Each feature owns its presentation and, where needed, domain logic. Firebase
-data sources and repository implementations can be added per feature without
-moving UI code between modules.
+Each feature owns its presentation and domain logic. Shared scheduling lives in
+`lib/features/games/common/daily_schedule.dart`; rewards are declared in
+`game_rewards.dart` and mirrored in the Supabase migrations.
 
 ## Run and verify
 

@@ -39,19 +39,21 @@ class _HelpPageState extends State<HelpPage> {
         'parent_id': client.auth.currentUser!.id,
         'message': _message.text.trim(),
       });
-      if (mounted)
+      if (mounted) {
         setState(() {
           _message.clear();
           _error = false;
           _notice = 'Your message has been saved for the Curio team.';
         });
+      }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = true;
           _notice =
               'We couldn’t send this. Your message is still here — please retry.';
         });
+      }
     } finally {
       if (mounted) setState(() => _sending = false);
     }

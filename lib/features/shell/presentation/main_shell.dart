@@ -437,6 +437,7 @@ class _CurioRail extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: ListTile(
+                  key: Key('nav_${item.label}'),
                   selected: selected,
                   onTap: () => onSelected(itemIndex),
                   leading: Icon(

@@ -16,10 +16,21 @@ class GameReward {
   final bool dated;
 }
 
-/// The four skills every game feeds, in display order.
-const learningSkills = ['Number sense', 'Patterns', 'Evidence', 'Reasoning'];
+/// Skills tracked within the three learning sections, in display order.
+const learningSkills = [
+  'Number sense',
+  'Patterns',
+  'Evidence',
+  'Reasoning',
+  'Memory',
+  'English',
+];
 
 const gameRewards = <String, GameReward>{
+  'memory_match': GameReward(80, 'Memory', 'memory_pairs'),
+  'memory_trail': GameReward(80, 'Memory', 'memory_order'),
+  'word_wise': GameReward(80, 'English', 'word_synonyms'),
+  'word_builder': GameReward(80, 'English', 'word_anagrams'),
   'squeeze': GameReward(80, 'Number sense', 'prime_numbers'),
   'link_lab': GameReward(90, 'Reasoning', 'classification_science'),
   'signal_grid': GameReward(100, 'Reasoning', 'binary_patterns'),

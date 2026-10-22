@@ -6,11 +6,20 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Release signing reads android/key.properties (git-ignored). Without it,
-// release builds fall back to the debug key, which Google Play rejects.
+// Release signing reads android/key.properties (git-ignored).
 val keystoreProperties = Properties().apply {
     val file = rootProject.file("key.properties")
     if (file.exists()) file.inputStream().use { load(it) }
+}
+val releaseRequested = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
+if (releaseRequested) {
+    val required = listOf("keyAlias", "keyPassword", "storeFile", "storePassword")
+    if (required.any { keystoreProperties.getProperty(it).isNullOrBlank() }) {
+        throw GradleException("Release signing is missing. Configure android/key.properties using key.properties.example before building a release.")
+    }
+    if (!file(keystoreProperties.getProperty("storeFile")).exists()) {
+        throw GradleException("The release keystore in android/key.properties does not exist.")
+    }
 }
 
 android {
@@ -45,11 +54,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystoreProperties.isEmpty) {
-                signingConfigs.getByName("debug")
-            } else {
-                signingConfigs.getByName("release")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

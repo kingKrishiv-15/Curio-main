@@ -36,7 +36,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
     });
     try {
       final s = await _service.loadSettings();
-      if (mounted)
+      if (mounted) {
         setState(() {
           _goal = s.dailyGoal;
           _hour = s.reminderHour;
@@ -46,9 +46,11 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
           _consent = s.consentVersion;
           _loaded = true;
         });
+      }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => _error = 'Settings could not be loaded. Please retry.');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -76,10 +78,11 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
         setState(() => _saved = 'Your family preferences are saved.');
       }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _error = 'Could not save your changes. Please try again.',
         );
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -117,15 +120,15 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                     Slider(
                       value: _goal.toDouble(),
                       min: 1,
-                      max: 5,
-                      divisions: 4,
+                      max: 3,
+                      divisions: 2,
                       label: '$_goal ${_goal == 1 ? 'activity' : 'activities'}',
                       onChanged: _saving
                           ? null
                           : (v) => setState(() => _goal = v.round()),
                     ),
                     const Text(
-                      'A goal is an invitation, never a screen-time limit.',
+                      'One daily game each in Maths, Memory and English. Replays are for practice.',
                     ),
                   ],
                 ),

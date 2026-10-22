@@ -68,7 +68,14 @@ class LocalProgressStore implements ProgressStore {
     streak: 0,
     completedActivities: {},
     collectedFacts: {},
-    skills: {'Number sense': 0, 'Patterns': 0, 'Evidence': 0, 'Reasoning': 0},
+    skills: {
+      'Number sense': 0,
+      'Patterns': 0,
+      'Evidence': 0,
+      'Reasoning': 0,
+      'Memory': 0,
+      'English': 0,
+    },
   );
 
   @override

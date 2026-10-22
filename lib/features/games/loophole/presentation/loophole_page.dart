@@ -19,7 +19,8 @@ import '../domain/loophole_local.dart';
 /// reach, play the same statements on the device ([LoopholeLocalGame]),
 /// which answers in the same shape.
 class LoopholePage extends StatefulWidget {
-  const LoopholePage({super.key, this.service});
+  const LoopholePage({super.key, this.service, this.date});
+  final DateTime? date;
 
   /// Injectable for tests; defaults to the real service.
   final MinigameService? service;
@@ -122,20 +123,16 @@ class _LoopholePageState extends State<LoopholePage> {
         _error = error.message;
         _loading = false;
       });
-    } catch (error) {
+    } catch (_) {
       if (!mounted) return;
-      setState(() {
-        _error =
-            'We couldn’t load today’s puzzle. Check your connection and try again.';
-        _loading = false;
-      });
+      _startLocal();
     }
   }
 
   void _startLocal({bool practice = false}) {
     if (practice) _practiceShift++;
     // Practice replays *past* days, so it never spoils tomorrow's puzzle.
-    final game = LoopholeLocalGame.forDay(shift: -_practiceShift);
+    final game = LoopholeLocalGame.forDay(date: widget.date, shift: -_practiceShift);
     setState(() {
       _local = game;
       _practice = practice;

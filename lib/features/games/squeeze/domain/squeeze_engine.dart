@@ -1,5 +1,6 @@
 class SqueezeEngine {
-  SqueezeEngine({int? target}) : target = target ?? _dailyTarget();
+  SqueezeEngine({int? target, DateTime? date})
+    : target = target ?? _dailyTarget(date);
 
   static const maxGuesses = 7;
   final int target;
@@ -11,8 +12,8 @@ class SqueezeEngine {
   bool get finished => solved || guesses.length >= maxGuesses;
   int get guessesLeft => maxGuesses - guesses.length;
 
-  static int _dailyTarget() {
-    final now = DateTime.now();
+  static int _dailyTarget(DateTime? date) {
+    final now = date ?? DateTime.now();
     final seed = now.year * 372 + now.month * 31 + now.day;
     return ((seed * 47 + 23) % 100) + 1;
   }

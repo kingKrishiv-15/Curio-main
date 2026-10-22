@@ -46,11 +46,34 @@ void main() {
     expect(_find(badges, 'growing').earned, isTrue);
     expect(_find(badges, 'bright_spark').earned, isFalse);
 
-    final dailyCount = gameRewards.values.where((r) => r.dated).length;
+    const dailyCount = 14;
     expect(
       _find(badges, 'try_everything').progressLabel,
       '4 / $dailyCount games',
     );
+  });
+
+  test('catalogue expansion keeps previously earned collection badges', () {
+    final legacy = gameRewards.keys.where(
+      (id) => ![
+        'memory_match',
+        'memory_trail',
+        'word_wise',
+        'word_builder',
+      ].contains(id),
+    );
+    final badges = computeBadges(
+      activities: {
+        for (final id in legacy) gameRewards[id]!.dated ? '${id}_20261022' : id,
+      },
+      factsCollected: 18,
+      discoveriesTotal: 22,
+      totalXp: 2000,
+      longestStreak: 14,
+    );
+    expect(_find(badges, 'all_rounder').earned, isTrue);
+    expect(_find(badges, 'try_everything').earned, isTrue);
+    expect(_find(badges, 'fact_keeper').earned, isTrue);
   });
 
   test('progress never runs past the target', () {

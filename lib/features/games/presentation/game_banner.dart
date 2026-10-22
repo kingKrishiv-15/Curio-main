@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 /// evidence blues and teals, reasoning violets) so a skill still reads at a
 /// glance, but no two games share a colour.
 const _gameColors = <String, Color>{
+  'memory_match': Color(0xFF9B65D6),
+  'memory_trail': Color(0xFF735DD8),
+  'word_wise': Color(0xFF218C92),
+  'word_builder': Color(0xFF3286C2),
   // Number sense
   'squeeze': Color(0xFFFF8A34),
   'bridge': Color(0xFFF2A527),

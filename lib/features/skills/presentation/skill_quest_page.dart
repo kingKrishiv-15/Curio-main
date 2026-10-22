@@ -19,12 +19,15 @@ class SkillQuestPage extends StatelessWidget {
   /// The skill with the least mastery, and a game for it — preferring one
   /// not yet played today.
   static (String, GameEntry) recommendation(CurioState state) {
-    final weakest = learningSkills.reduce(
-      (a, b) => (state.skills[a] ?? 0) <= (state.skills[b] ?? 0) ? a : b,
+    final todays = todaysPicks(date: state.today);
+    final fresh = todays.where((g) => !state.completedToday(g.id)).toList();
+    final options = fresh.isEmpty ? todays : fresh;
+    options.sort(
+      (a, b) =>
+          (state.skills[a.skill] ?? 0).compareTo(state.skills[b.skill] ?? 0),
     );
-    final options = dailyGames.where((g) => g.skill == weakest).toList();
-    final fresh = options.where((g) => !state.completedToday(g.id));
-    return (weakest, fresh.isNotEmpty ? fresh.first : options.first);
+    final next = options.first;
+    return (next.skill, next);
   }
 
   @override

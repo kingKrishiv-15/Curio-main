@@ -266,7 +266,7 @@ class ProfilePage extends StatelessWidget {
                       try {
                         await AuthService().signOut();
                       } catch (_) {
-                        if (context.mounted)
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
@@ -274,6 +274,7 @@ class ProfilePage extends StatelessWidget {
                               ),
                             ),
                           );
+                        }
                       }
                     },
                   ),

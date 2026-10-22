@@ -17,9 +17,13 @@ class ThemeController extends ChangeNotifier {
     if (motion != null) reduceMotion = motion;
     if (scale != null) readingScale = scale.clamp(1, 1.5);
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('curio_reduce_motion', reduceMotion);
-    await prefs.setDouble('curio_reading_scale', readingScale);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('curio_reduce_motion', reduceMotion);
+      await prefs.setDouble('curio_reading_scale', readingScale);
+    } catch (_) {
+      // Reading controls still work when local storage is unavailable.
+    }
   }
 
   ThemeMode _mode = ThemeMode.dark;
@@ -72,6 +76,9 @@ class CurioThemeScope extends InheritedNotifier<ThemeController> {
     required super.child,
     super.key,
   }) : super(notifier: controller);
+
+  static ThemeController? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CurioThemeScope>()?.notifier;
 
   static ThemeController of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<CurioThemeScope>();

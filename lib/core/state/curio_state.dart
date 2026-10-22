@@ -5,11 +5,34 @@ import 'package:flutter/material.dart';
 import '../services/progress_store.dart';
 import '../services/cached_progress_store.dart';
 import '../services/family_service.dart';
+import '../../features/games/common/daily_schedule.dart';
+import '../../features/games/common/game_rewards.dart';
 
 class CurioState extends ChangeNotifier with WidgetsBindingObserver {
-  CurioState({this.store, this.isGuest = false}) {
+  CurioState({this.store, this.isGuest = false, DateTime Function()? now})
+    : _now = now ?? DateTime.now {
     WidgetsBinding.instance.addObserver(this);
   }
+  final DateTime Function() _now;
+  DateTime get today => _now();
+  Timer? _dayTimer;
+
+  /// Refresh the plan even if the app stays open across midnight.
+  void startDailyClock() {
+    _dayTimer?.cancel();
+    final now = today;
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    _dayTimer = Timer(
+      midnight.difference(now) + const Duration(milliseconds: 100),
+      () {
+        if (_disposed) return;
+        streak = calculateStreak(completedActivities, today);
+        notifyListeners();
+        startDailyClock();
+      },
+    );
+  }
+
   bool _disposed = false;
   Future<void> _saveQueue = Future.value();
   bool loadFailed = false;
@@ -17,6 +40,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void dispose() {
     _disposed = true;
+    _dayTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -31,14 +55,14 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     if (state != AppLifecycleState.resumed || isLoading) return;
     // Coming back the next morning: "done today", the daily goal and the
     // streak are all date-based, so recompute rather than show yesterday.
-    streak = calculateStreak(completedActivities, DateTime.now());
+    streak = calculateStreak(completedActivities, today);
     notifyListeners();
     // Only resend when a save is actually waiting.
     if (store != null && syncError != null) unawaited(retrySync());
   }
 
   void setDailyGoal(int value) {
-    dailyGoal = value;
+    dailyGoal = value.clamp(1, 3);
     notifyListeners();
   }
 
@@ -51,19 +75,12 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   String? syncError;
 
   String childName = 'Explorer';
-  int totalXp = 360;
-  int streak = 4;
+  int totalXp = 0;
+  int streak = 0;
   final Set<String> completedActivities = <String>{};
-  final Set<String> collectedFacts = <String>{
-    'octopus_hearts',
-    'shortest_war',
-    'diwali_light',
-  };
+  final Set<String> collectedFacts = <String>{};
   final Map<String, double> skills = <String, double>{
-    'Number sense': 0.62,
-    'Patterns': 0.35,
-    'Evidence': 0.18,
-    'Reasoning': 0.42,
+    for (final skill in learningSkills) skill: 0,
   };
 
   int get companionStage => (totalXp ~/ 250) + 1;
@@ -73,19 +90,23 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   int get longestStreak => calculateLongestStreak(completedActivities);
   int get xpIntoStage => totalXp % 250;
   int get activitiesCompleted => completedActivities.length;
-  int get dailyGoalCompleted {
-    final suffix = _dateKey(DateTime.now());
-    return completedActivities
-        .where((id) => id.endsWith(suffix))
-        .length
-        .clamp(0, dailyGoal);
+  Set<LearningSection> sectionsCompleted([DateTime? date]) {
+    final suffix = '_${_dateKey(date ?? today)}';
+    return {
+      for (final id in completedActivities)
+        if (id.endsWith(suffix) && gameRewards.containsKey(activityGame(id)))
+          sectionForGame(activityGame(id)),
+    };
   }
 
-  bool completedToday(String activity) {
-    return completedActivities.contains(
-      '${activity}_${_dateKey(DateTime.now())}',
-    );
-  }
+  int get dailyGoalCompleted => sectionsCompleted().length.clamp(0, dailyGoal);
+
+  int get todayXp => completedActivities
+      .where((id) => id.endsWith('_${_dateKey(today)}'))
+      .fold(0, (sum, id) => sum + (gameRewards[activityGame(id)]?.xp ?? 0));
+
+  bool completedToday(String activity) =>
+      completedActivities.contains(dailyActivityId(activity, today));
 
   Future<void> hydrate() async {
     if (store == null) return;
@@ -96,7 +117,10 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     try {
       final snapshot = await store!.load();
       try {
-        dailyGoal = (await FamilyService().loadSettings()).dailyGoal;
+        dailyGoal = (await FamilyService().loadSettings()).dailyGoal.clamp(
+          1,
+          3,
+        );
       } catch (_) {
         /* Settings can be retried separately. */
       }
@@ -114,16 +138,11 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
         ..addAll(snapshot.collectedFacts);
       skills
         ..clear()
-        ..addAll({
-          'Number sense': 0,
-          'Patterns': 0,
-          'Evidence': 0,
-          'Reasoning': 0,
-        })
+        ..addAll({for (final skill in learningSkills) skill: 0})
         ..addAll(snapshot.skills);
       // Recomputed from the activity dates rather than trusting the stored
       // number, which never decays on days the app isn't opened.
-      streak = calculateStreak(completedActivities, DateTime.now());
+      streak = calculateStreak(completedActivities, today);
     } catch (_) {
       loadFailed = true;
       syncError = 'Could not load your learning trail.';
@@ -163,7 +182,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     totalXp += xp;
     skills[skill] = ((skills[skill] ?? 0) + 0.12).clamp(0, 1);
     if (factId != null) collectedFacts.add(factId);
-    streak = calculateStreak(completedActivities, DateTime.now());
+    streak = calculateStreak(completedActivities, today);
     final best = longestStreak;
     for (final MapEntry(key: days, value: fact) in streakDiscoveries.entries) {
       if (best >= days) collectedFacts.add(fact);
@@ -222,7 +241,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   /// reward table rather than being recomputed here.
   Future<void> mergeActivities(Iterable<String> ids) async {
     completedActivities.addAll(ids);
-    streak = calculateStreak(completedActivities, DateTime.now());
+    streak = calculateStreak(completedActivities, today);
     notifyListeners();
     await _save();
     if (syncError == null) await hydrate();
@@ -238,8 +257,9 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
         .map((id) => id.substring(id.length - 8))
         .toSet();
     var day = DateTime(now.year, now.month, now.day);
-    if (!days.contains(_dateKey(day)))
+    if (!days.contains(_dateKey(day))) {
       day = DateTime(day.year, day.month, day.day - 1);
+    }
     var count = 0;
     while (days.contains(_dateKey(day))) {
       count++;

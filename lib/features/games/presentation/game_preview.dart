@@ -35,6 +35,10 @@ class GamePreview extends StatelessWidget {
   }
 
   Widget _build(_Ink ink) => switch (gameId) {
+    'memory_match' => _memoryMatch(ink),
+    'memory_trail' => _memoryTrail(ink),
+    'word_wise' => _wordWise(ink),
+    'word_builder' => _wordBuilder(ink),
     'odd_cluster' => _oddCluster(ink),
     'sequence' => _sequence(ink),
     'bridge' => _bridge(ink),
@@ -52,6 +56,68 @@ class GamePreview extends StatelessWidget {
     'whos_who' => _whosWho(ink),
     _ => const Icon(Icons.extension_rounded, color: Colors.white, size: 48),
   };
+
+  Widget _memoryMatch(_Ink ink) => Wrap(
+    spacing: 6,
+    runSpacing: 6,
+    alignment: WrapAlignment.center,
+    children: [
+      for (final icon in [
+        Icons.star_rounded,
+        Icons.question_mark_rounded,
+        Icons.favorite_rounded,
+        Icons.question_mark_rounded,
+        Icons.star_rounded,
+        Icons.question_mark_rounded,
+      ])
+        _cell(36, child: Icon(icon, size: 23, color: Colors.white)),
+    ],
+  );
+
+  Widget _memoryTrail(_Ink ink) => Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Icon(Icons.local_florist_rounded, color: Colors.white, size: 32),
+      _arrow(),
+      const Icon(Icons.star_rounded, color: Colors.white, size: 32),
+      _arrow(),
+      const Icon(Icons.bedtime_rounded, color: Colors.white, size: 32),
+    ],
+  );
+
+  Widget _wordWise(_Ink ink) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Text(
+        'happy = ?',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _chip('glad', ink, width: 60),
+          const SizedBox(width: 6),
+          _chip('cold', ink, width: 60, solid: false),
+        ],
+      ),
+    ],
+  );
+
+  Widget _wordBuilder(_Ink ink) => Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      for (final letter in ['W', 'O', 'R', 'D'])
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: _chip(letter, ink, width: 28, height: 38),
+        ),
+    ],
+  );
 
   // --- Pieces -----------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 # Supabase setup for Curio
 
 This guide takes a Supabase project from empty to a working Curio sign-up:
-a parent enters their email and a password, receives a **6-digit code** by
+a parent enters their email and a password, receives a verification code by
 email, types it in, sets up their explorer, and lands on Home. The same code
 flow handles **password resets** and password-free **"email me a code"**
 sign-in.
@@ -46,40 +46,35 @@ contains a secret key, and a test fails the build for the same reason.
 > **⋯** menu → create a new secret key, then delete the old one. Nothing in
 > the Flutter app needs changing.
 
-## 2. Create Curio's database tables
+## 2. Create or repair Curio’s database
 
-1. In the dashboard, open **SQL Editor → New query**.
-2. Run each of these files **in this order** — open the file locally, copy all
-   of it, paste, press **Run**, and wait for "Success" before the next:
-   1. `supabase/migrations/202608270001_initial_schema.sql`
-   2. `supabase/migrations/202609030001_minigames.sql`
-   3. `supabase/migrations/202609030002_loophole.sql`
-   4. `supabase/migrations/202609180001_family_launch.sql`
-   5. `supabase/migrations/202610080001_launch_hardening.sql`
-   6. `supabase/migrations/202610090001_more_games.sql`
-3. Open **Table Editor** and check you can see `profiles`, `child_profiles`,
-   `activity_completions`, `unlocked_discoveries`, `skill_progress`,
-   `family_settings`, `notifications`, `parent_reports`, `support_requests`,
-   `activity_rewards` and the puzzle tables (`daily_puzzles`,
-   `puzzle_attempts`, `puzzle_moves`, `puzzle_streaks`).
+For dashboard setup, use **one file**: [`supabase/setup.sql`](supabase/setup.sql).
+Open Supabase **SQL Editor → New query**, paste the entire file, and run it.
+Wait for `Curio database setup complete`.
 
-> **Already ran the earlier files?** Run whichever of 5 and 6 you haven't —
-> both are safe to re-run, and they matter: the server only rewards games
-> it has a row for, so without them progress from the newer games is
-> silently dropped and disappears for signed-in families after a restart.
-> File 5 also closes two functions that were callable with the publishable
-> key.
+This installer creates the tables, functions, policies and rewards in order.
+It also works after an interrupted setup, is safe to run again, and preserves
+existing accounts, XP, completed games and discoveries. Existing parent profiles
+and settings are backfilled when needed. No dummy learners or demo scores are
+inserted.
 
-Every table has Row Level Security on, so a parent can only ever read their
-own family's rows. (XP is still calculated on the device and sent to the
-server, so a determined parent could edit their own child's numbers — fine
-for a family app, not for leaderboards.)
+If you saw `relation "public.activity_rewards" does not exist`, a later migration
+was run before the base schema. Run the entire installer above instead of
+running another isolated numbered file. Regenerate it after changing a migration:
 
-Using the Supabase CLI instead? `supabase link --project-ref <ref>` then
-`supabase db push` applies the same migrations. Pick one route and stick to
-it: files pasted into the SQL Editor aren't recorded in the CLI's migration
-history, so a later `db push` would try to re-run them (fix with
-`supabase migration repair --status applied <version>` for each one).
+```bash
+python3 tool/build_supabase_setup.py
+```
+
+The numbered files in `supabase/migrations/` remain the source for CLI projects.
+Use `supabase db push` for a project whose migrations are already CLI-managed.
+For an existing dashboard-managed project, keep using the single installer;
+don’t mix the two history mechanisms without reconciling the migration history.
+See [Supabase’s migration guide](https://supabase.com/docs/guides/deployment/database-migrations).
+
+Do not run `seed_dummy_data.sql`, `seed_demo_account.sql`, `seed_five_students.sql`
+or `seed_loophole.sql` to install the production app. Loophole already has an
+on-device fallback. The optional server puzzle setup is described in step 10.
 
 ## 3. Connect the app
 
@@ -132,7 +127,7 @@ again — the file is read once, at start-up.
 Open **Authentication → Sign In / Providers**.
 
 1. Under **User Signups**, make sure **Allow new users to sign up** is on and
-   **Confirm email** is **on**. This is what makes Supabase email the 6-digit
+   **Confirm email** is **on**. This is what makes Supabase email a verification
    code after sign-up. (With it off, sign-up signs people straight in with no
    email — Curio handles that too, but you lose the proof that the parent
    owns the address.)
@@ -145,8 +140,8 @@ Open **Authentication → Sign In / Providers**.
    | Secure password change | On | |
    | Minimum password length | `8` | Matches the app's checklist |
    | Password requirements | **Letters and digits** | Matches the app's checklist |
-   | Email OTP expiration | `3600` seconds | The templates say "expires in 1 hour" |
-   | Email OTP length | `6` | Must equal `OTP_LENGTH` in `config/supabase.json` |
+   | Email OTP expiration | `3600` seconds | Recommended expiry; use only the newest email |
+   | Email OTP length | `6` or your current 6–10 digit setting | The app accepts the full code without truncating it |
 
 3. Press **Save**.
 
@@ -214,7 +209,7 @@ contents, and **Save**:
 | **Magic Link** | `Your Curio sign-in code` | `supabase/templates/magic_link.html` |
 | **Reset Password** | `Reset your Curio password` | `supabase/templates/recovery.html` |
 
-Each file contains `{{ .Token }}` — Supabase swaps in the 6-digit code. Use
+Each file contains `{{ .Token }}` — Supabase swaps in the complete code at the length configured in your project. Use
 the **Preview** tab to check it; you should see a big code in a cream box and
 no button.
 
@@ -251,7 +246,7 @@ Run `flutter run` and go through this list. It takes about five minutes.
    step 5), a password like `curious123`, tick the parent/guardian box, and
    tap **Create account**.
 4. The **Confirm your email** screen opens. Within a minute the email
-   arrives; type the 6 digits. The screen submits by itself.
+   arrives; enter every digit from the email, then tap **Confirm and continue**.
 5. **Learner setup** opens: nickname → daily goal → reminders → "Welcome,
    _name_!" → **Start exploring** → Home.
 6. In **Table Editor**, check `child_profiles` has the nickname and
@@ -362,12 +357,13 @@ on the server, with a per-game streak.
 
 | What you see | Cause and fix |
 |---|---|
+| `relation "public.activity_rewards" does not exist` or tables already exist | Run the entire `supabase/setup.sql` installer (step 2). It handles dependency order and repeated setup. |
 | `flutter run` still opens Home without asking to sign in | Curio is in demo mode. The console says why: `config/supabase.json` is missing or still has the `YOUR_…` placeholders, or you ran with `CURIO_DEMO=true`. |
 | App stops at launch: "…contains SUPABASE_SECRET_KEY…" | A secret key is in `config/supabase.json`. Remove it and rotate it (step 1). |
 | No email arrives, or "Email address not authorized" | You're on the built-in mailer and the address isn't a team member. Set up custom SMTP (step 5). Also check spam. |
 | The email has a "Confirm your mail" link instead of a code | The template wasn't replaced or saved. Redo step 6 for that template. |
 | "That code isn't right or has expired" | Only the **newest** code works, each works once, and they expire after an hour. Tap **Send a new code**. |
-| The code has 8 digits but the app shows 6 boxes | Set **Email OTP length** to 6 (step 4), or set `"OTP_LENGTH": "8"` in `config/supabase.json`. |
+| The code has 8 digits but the app shows 6 boxes | Update the app to this build: it accepts 6–10 digits, expands the boxes, and waits for you to submit. `OTP_LENGTH` only controls the initial display. |
 | "Please wait 42 seconds before asking for another email" | Supabase allows one email per address per minute. Wait, then resend. |
 | "We've sent a lot of emails…" | The project's hourly email limit was hit. Raise it (step 7) once custom SMTP is on, or wait an hour. |
 | "We couldn't find a Curio account for that email" on code sign-in | Code sign-in only works for existing accounts, by design. Create an account instead. |

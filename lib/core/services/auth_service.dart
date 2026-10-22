@@ -6,7 +6,7 @@ import '../config/supabase_config.dart';
 import '../models/family_settings.dart';
 import 'family_service.dart';
 
-/// Why a 6-digit code was emailed. Each maps to a different Supabase email
+/// Why a verification code was emailed. Each maps to a Supabase email
 /// template and verification type.
 enum CodePurpose {
   /// "Confirm signup" template — proves a new parent owns the address.
@@ -192,8 +192,11 @@ class AuthService {
     await _client.auth.signOut();
     if (userId != null) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('curio_progress_$userId');
-      await prefs.remove('curio_pending_$userId');
+      // Account-scoped pending rewards must survive signing out while offline.
+      if (prefs.getBool('curio_pending_$userId') != true) {
+        await prefs.remove('curio_progress_$userId');
+        await prefs.remove('curio_pending_$userId');
+      }
     }
   }
 }

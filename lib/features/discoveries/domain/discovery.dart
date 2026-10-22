@@ -17,6 +17,37 @@ class Discovery {
 
 const discoveries = <Discovery>[
   Discovery(
+    id: 'memory_pairs',
+    title: 'Picture partners',
+    fact:
+        'Give each picture a name and connect it to its place. That gives you two clues to remember it.',
+    category: 'Memory',
+    icon: Icons.style_rounded,
+  ),
+  Discovery(
+    id: 'memory_order',
+    title: 'Make a memory story',
+    fact:
+        'Try joining a sequence of pictures into a little story to help remember their order.',
+    category: 'Memory',
+    icon: Icons.route_rounded,
+  ),
+  Discovery(
+    id: 'word_synonyms',
+    title: 'Word neighbours',
+    fact: 'Synonyms are words with similar meanings, like happy and glad.',
+    category: 'English',
+    icon: Icons.menu_book_rounded,
+  ),
+  Discovery(
+    id: 'word_anagrams',
+    title: 'Letters can travel',
+    fact:
+        'An anagram rearranges the letters of a word. LISTEN and SILENT use exactly the same letters.',
+    category: 'English',
+    icon: Icons.abc_rounded,
+  ),
+  Discovery(
     id: 'octopus_hearts',
     title: 'Three hearts',
     fact:

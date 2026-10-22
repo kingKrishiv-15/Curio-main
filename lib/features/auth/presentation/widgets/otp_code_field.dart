@@ -13,7 +13,7 @@ class OtpCodeField extends StatefulWidget {
   const OtpCodeField({
     required this.controller,
     required this.length,
-    this.onCompleted,
+    this.onSubmitted,
     this.hasError = false,
     this.enabled = true,
     this.autofocus = true,
@@ -22,7 +22,7 @@ class OtpCodeField extends StatefulWidget {
 
   final TextEditingController controller;
   final int length;
-  final ValueChanged<String>? onCompleted;
+  final ValueChanged<String>? onSubmitted;
   final bool hasError;
   final bool enabled;
   final bool autofocus;
@@ -70,23 +70,31 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
   @override
   Widget build(BuildContext context) {
     final code = widget.controller.text;
+    final length = code.length > widget.length
+        ? code.length.clamp(6, 10)
+        : widget.length.clamp(6, 10);
     return LayoutBuilder(
       builder: (context, constraints) {
         final gap = constraints.maxWidth < 340 ? 6.0 : 10.0;
-        final box =
-            ((constraints.maxWidth - gap * (widget.length - 1)) / widget.length)
-                .clamp(34.0, 56.0);
+        final columns = length > 6 && constraints.maxWidth < 520
+            ? (length / 2).ceil()
+            : length;
+        final box = ((constraints.maxWidth - gap * (columns - 1)) / columns)
+            .clamp(24.0, 56.0);
         final height = box * 1.16;
         return SizedBox(
-          height: height,
+          height:
+              height * (length / columns).ceil() +
+              gap * ((length / columns).ceil() - 1),
           child: Stack(
             children: [
               ExcludeSemantics(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: gap,
+                  runSpacing: gap,
                   children: [
-                    for (var i = 0; i < widget.length; i++) ...[
-                      if (i > 0) SizedBox(width: gap),
+                    for (var i = 0; i < length; i++)
                       _DigitBox(
                         width: box,
                         height: height,
@@ -95,12 +103,10 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
                             _focus.hasFocus &&
                             widget.enabled &&
                             (i == code.length ||
-                                (code.length == widget.length &&
-                                    i == widget.length - 1)),
+                                (code.length == length && i == length - 1)),
                         hasError: widget.hasError,
                         enabled: widget.enabled,
                       ),
-                    ],
                   ],
                 ),
               ),
@@ -123,7 +129,7 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
                     enableSuggestions: false,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(widget.length),
+                      LengthLimitingTextInputFormatter(10),
                     ],
                     decoration: InputDecoration(
                       isCollapsed: true,
@@ -133,16 +139,11 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
                       focusedBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       counterText: '',
-                      labelText: 'Verification code, ${widget.length} digits',
+                      labelText: 'Verification code, 6 to 10 digits',
                     ),
-                    onChanged: (value) {
-                      if (value.length == widget.length) {
-                        widget.onCompleted?.call(value);
-                      }
-                    },
                     onSubmitted: (value) {
-                      if (value.length == widget.length) {
-                        widget.onCompleted?.call(value);
+                      if (value.length >= 6 && value.length <= 10) {
+                        widget.onSubmitted?.call(value);
                       }
                     },
                   ),

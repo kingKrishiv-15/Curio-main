@@ -36,7 +36,7 @@ class SkillGamesPage extends StatelessWidget {
         ? state.completedToday(g.id)
         : state.completedActivities.contains(g.id);
     final games = [
-      for (final g in gameCatalog)
+      for (final g in todaysPicks(date: state.today))
         if (g.skill == skill) g,
     ]..sort((a, b) => (done(a) ? 1 : 0).compareTo(done(b) ? 1 : 0));
 
@@ -102,9 +102,13 @@ class SkillGamesPage extends StatelessWidget {
           const SizedBox(height: 24),
           SectionHeading(
             '${games.length} games',
-            subtitle: 'A fresh puzzle in each daily game, every day',
+            subtitle: 'Today’s scheduled game for this skill',
           ),
           const SizedBox(height: 12),
+          if (games.isEmpty)
+            const Text(
+              'A game for this skill will return on another day. Today’s games are in the Games tab.',
+            ),
           GameGrid(
             children: [for (final g in games) GameCard(game: g, done: done(g))],
           ),

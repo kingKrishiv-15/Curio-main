@@ -140,11 +140,13 @@ class FamilyService {
       'delete-account',
       body: {'password': password},
     );
-    if (response.status != 200)
+    if (response.status != 200) {
       throw StateError('Account could not be deleted.');
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('curio_progress_$_userId');
     await prefs.remove('curio_pending_$_userId');
+    await prefs.remove('curio_family_$_userId');
     await client.auth.signOut(scope: SignOutScope.local);
   }
 }

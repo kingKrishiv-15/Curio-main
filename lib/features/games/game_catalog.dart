@@ -6,7 +6,10 @@ import '../../core/widgets/curio_ui.dart';
 import '../story/presentation/frostlands_story_page.dart';
 import 'bridge/presentation/bridge_page.dart';
 import 'cascade/presentation/cascade_page.dart';
-import 'common/game_kit.dart';
+import 'common/daily_game_session.dart';
+import 'common/daily_schedule.dart';
+import 'memory/presentation/memory_page.dart';
+import 'english/presentation/english_page.dart';
 import 'common/game_rewards.dart';
 import 'evidence/presentation/evidence_detective_page.dart';
 import 'link_lab/presentation/link_lab_page.dart';
@@ -32,7 +35,7 @@ class GameEntry {
     required this.tagline,
     required this.icon,
     required this.duration,
-    required this.open,
+    required this.builder,
     this.isNew = false,
   });
 
@@ -42,7 +45,18 @@ class GameEntry {
   final String tagline;
   final IconData icon;
   final String duration;
-  final Widget Function() open;
+  final Widget Function(DateTime date) builder;
+  LearningSection get section => sectionForGame(id);
+
+  Widget open({DateTime? date}) {
+    final started = date ?? DateTime.now();
+    return DailyGameSession(
+      gameId: id,
+      date: started,
+      child: builder(isDaily ? puzzleDateForGame(id, started) : started),
+    );
+  }
+
   final bool isNew;
 
   GameReward get reward => gameRewards[id]!;
@@ -53,12 +67,45 @@ class GameEntry {
 
 final gameCatalog = <GameEntry>[
   GameEntry(
+    id: 'memory_match',
+    title: 'Memory Match',
+    tagline: 'Turn over two cards. Remember where each picture is hiding.',
+    icon: Icons.style_rounded,
+    duration: '3 min',
+    builder: (date) => MemoryPage(date: date),
+  ),
+  GameEntry(
+    id: 'memory_trail',
+    title: 'Memory Trail',
+    tagline: 'Study a trail of pictures, then remember their order.',
+    icon: Icons.route_rounded,
+    duration: '3 min',
+    builder: (date) => MemoryPage(date: date, trail: true),
+  ),
+  GameEntry(
+    id: 'word_wise',
+    title: 'Word Wise',
+    tagline:
+        'Find the right word, explore its meaning and finish the sentence.',
+    icon: Icons.menu_book_rounded,
+    duration: '3 min',
+    builder: (date) => EnglishPage(date: date),
+  ),
+  GameEntry(
+    id: 'word_builder',
+    title: 'Word Builder',
+    tagline: 'Use the clue and put the letters in order to build a word.',
+    icon: Icons.abc_rounded,
+    duration: '3 min',
+    builder: (date) => EnglishPage(date: date, builder: true),
+  ),
+  GameEntry(
     id: 'odd_cluster',
     title: 'Odd Cluster',
     tagline: 'Sixteen tiles, four hidden groups — and one of them is a trap.',
     icon: Icons.workspaces_rounded,
     duration: '3–5 min',
-    open: OddClusterPage.new,
+    builder: (date) => OddClusterPage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -67,7 +114,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Guess the next number early, or buy more clues first.',
     icon: Icons.format_list_numbered_rounded,
     duration: '3 min',
-    open: SequencePage.new,
+    builder: (date) => SequencePage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -76,7 +123,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Order every tile to turn one number into another.',
     icon: Icons.linear_scale_rounded,
     duration: '3–5 min',
-    open: BridgePage.new,
+    builder: (date) => BridgePage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -85,7 +132,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Chain five consequences — evidence over hunches.',
     icon: Icons.waterfall_chart_rounded,
     duration: '4 min',
-    open: CascadePage.new,
+    builder: (date) => CascadePage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -94,7 +141,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Which is more: 3/4 or 0.7? Weigh it up, or call it equal.',
     icon: Icons.balance_rounded,
     duration: '3 min',
-    open: ScalePage.new,
+    builder: (date) => ScalePage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -103,7 +150,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Does the evidence back the claim — or can’t it tell yet?',
     icon: Icons.gavel_rounded,
     duration: '3 min',
-    open: VerdictPage.new,
+    builder: (date) => VerdictPage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -112,16 +159,17 @@ final gameCatalog = <GameEntry>[
     tagline: 'Paint the other half so the pattern reflects perfectly.',
     icon: Icons.flip_rounded,
     duration: '3–4 min',
-    open: MirrorPage.new,
+    builder: (date) => MirrorPage(date: date),
     isNew: true,
   ),
   GameEntry(
     id: 'whos_who',
     title: 'Who’s Who',
-    tagline: 'Match every child to their pet and favourite, using only the clues.',
+    tagline:
+        'Match every child to their pet and favourite, using only the clues.',
     icon: Icons.groups_rounded,
     duration: '4–6 min',
-    open: WhosWhoPage.new,
+    builder: (date) => WhosWhoPage(date: date),
     isNew: true,
   ),
   GameEntry(
@@ -130,7 +178,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Find the one word making a true statement mislead.',
     icon: Icons.format_quote_rounded,
     duration: '2 min',
-    open: LoopholePage.new,
+    builder: (date) => LoopholePage(date: date),
   ),
   GameEntry(
     id: 'squeeze',
@@ -138,7 +186,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Find the secret number before the range closes in.',
     icon: Icons.calculate_rounded,
     duration: '2–4 min',
-    open: SqueezePage.new,
+    builder: (date) => SqueezePage(date: date),
   ),
   GameEntry(
     id: 'link_lab',
@@ -146,7 +194,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Sort sixteen clues into four knowledge groups.',
     icon: Icons.hub_outlined,
     duration: '3–5 min',
-    open: LinkLabPage.new,
+    builder: (date) => LinkLabPage(date: date),
   ),
   GameEntry(
     id: 'signal_grid',
@@ -154,7 +202,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Balance the grid by deduction alone.',
     icon: Icons.grid_view_rounded,
     duration: '4–6 min',
-    open: SignalGridPage.new,
+    builder: (date) => SignalGridPage(date: date),
   ),
   GameEntry(
     id: 'pattern_forge',
@@ -162,15 +210,16 @@ final gameCatalog = <GameEntry>[
     tagline: 'Pick the next number, name the rule, fix the broken pattern.',
     icon: Icons.blur_on_rounded,
     duration: '3–5 min',
-    open: PatternForgePage.new,
+    builder: (date) => PatternForgePage(date: date),
   ),
   GameEntry(
     id: 'evidence_garden',
     title: 'Evidence Detective',
-    tagline: 'A new case each day: rank the clues before you jump to conclusions.',
+    tagline:
+        'A new case each day: rank the clues before you jump to conclusions.',
     icon: Icons.manage_search_rounded,
     duration: '4–6 min',
-    open: EvidenceDetectivePage.new,
+    builder: (date) => EvidenceDetectivePage(date: date),
   ),
   GameEntry(
     id: 'frostlands_night_1',
@@ -178,7 +227,7 @@ final gameCatalog = <GameEntry>[
     tagline: 'Help Ash home — careful, brave or kind? Four endings to find.',
     icon: Icons.ac_unit_rounded,
     duration: '5 min',
-    open: FrostlandsStoryPage.new,
+    builder: (_) => const FrostlandsStoryPage(),
   ),
 ];
 
@@ -197,24 +246,41 @@ List<GameEntry> get dailyGames => [
     if (g.isDaily) g,
 ];
 
-/// A rotating handful of daily games for Home, so it isn't the whole list
-/// in the same order every day. The first is today's featured quest.
-List<GameEntry> todaysPicks({DateTime? date, int count = 5}) {
-  final games = dailyGames;
-  final start = DailyPick.index(games.length, date: date);
+/// Exactly one game per section; this is the shared daily plan for all screens.
+List<GameEntry> todaysPicks({DateTime? date, int count = 3}) {
+  final today = date ?? DateTime.now();
   return [
-    for (var i = 0; i < count && i < games.length; i++)
-      games[(start + i) % games.length],
+    for (final section in LearningSection.values.take(count.clamp(0, 3)))
+      gameById(scheduledGameId(section, today)),
   ];
 }
 
 GameEntry featuredGame({DateTime? date}) => todaysPicks(date: date).first;
 
+IconData sectionIcon(LearningSection section) => switch (section) {
+  LearningSection.maths => Icons.calculate_rounded,
+  LearningSection.memory => Icons.psychology_rounded,
+  LearningSection.english => Icons.menu_book_rounded,
+};
+
+Color sectionColor(BuildContext context, LearningSection section) =>
+    skillColor(context, switch (section) {
+      LearningSection.maths => 'Number sense',
+      LearningSection.memory => 'Patterns',
+      LearningSection.english => 'Evidence',
+    });
+
 /// The skill colours from design.md §3: number sense gold, patterns coral,
 /// evidence blue, reasoning plum.
 Color skillColor(BuildContext context, String skill) => switch (skill) {
-  'Number sense' => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
+  'Number sense' => curioColor(
+    context,
+    CurioColors.saffron,
+    CurioColorsLight.saffron,
+  ),
+  'Memory' ||
   'Patterns' => curioColor(context, CurioColors.coral, CurioColorsLight.coral),
+  'English' ||
   'Evidence' => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
   _ => curioColor(context, CurioColors.plum, CurioColorsLight.plum),
 };
@@ -222,6 +288,8 @@ Color skillColor(BuildContext context, String skill) => switch (skill) {
 IconData skillIcon(String skill) => switch (skill) {
   'Number sense' => Icons.calculate_rounded,
   'Patterns' => Icons.blur_on_rounded,
+  'Memory' => Icons.psychology_rounded,
+  'English' => Icons.menu_book_rounded,
   'Evidence' => Icons.manage_search_rounded,
   _ => Icons.psychology_rounded,
 };

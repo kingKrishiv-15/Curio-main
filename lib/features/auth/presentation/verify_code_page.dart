@@ -32,7 +32,8 @@ class VerifyCodePage extends StatefulWidget {
   /// Optional context shown above the boxes, e.g. why a code was re-sent.
   final String? notice;
 
-  /// Defaults to [SupabaseConfig.otpLength].
+  /// Preferred number of boxes, not a restriction on the emailed code.
+  /// Supabase supports 6–10 digits; hosted settings may differ from a build.
   final int? codeLength;
 
   /// Supabase lets each address request one email per minute.
@@ -78,8 +79,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   }
 
   Future<void> _verify([String? value]) async {
-    final code = value ?? _code.text;
-    if (_verifying || code.length != _length) return;
+    final code = (value ?? _code.text).trim();
+    if (_verifying || _resending || !RegExp(r'^\d{6,10}$').hasMatch(code)) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() {
       _verifying = true;
@@ -94,7 +97,6 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       );
     } catch (error) {
       if (!mounted) return;
-      _code.clear();
       setState(() => _error = authErrorMessage(error));
     } finally {
       if (mounted) setState(() => _verifying = false);
@@ -102,7 +104,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   }
 
   Future<void> _resend() async {
-    if (_resending || _resendIn > 0) return;
+    if (_resending || _verifying || _resendIn > 0) return;
     setState(() {
       _resending = true;
       _error = null;
@@ -137,10 +139,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   };
 
   String get _lead => switch (widget.purpose) {
-    CodePurpose.signUp => 'Enter the $_length-digit code we sent to',
-    CodePurpose.signIn => 'Enter the $_length-digit sign-in code we sent to',
+    CodePurpose.signUp => 'Enter the full confirmation code we sent to',
+    CodePurpose.signIn => 'Enter the full sign-in code we sent to',
     CodePurpose.recovery =>
-      'If there’s a Curio account for this address, we’ve sent a $_length-digit code to',
+      'If there’s a Curio account for this address, we’ve sent a code to',
   };
 
   String get _cta => switch (widget.purpose) {
@@ -205,8 +207,13 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             controller: _code,
             length: _length,
             hasError: _error != null,
-            enabled: !_verifying,
-            onCompleted: _verify,
+            enabled: !_verifying && !_resending,
+            onSubmitted: _verify,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Use every digit from the newest email, then tap the button below.',
+            style: TextStyle(color: muted, fontSize: 13),
           ),
           if (_error != null) ...[
             const SizedBox(height: 14),
@@ -217,7 +224,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             listenable: _code,
             builder: (context, _) => FilledButton(
               key: const Key('verify_submit'),
-              onPressed: _verifying || _code.text.length != _length
+              onPressed:
+                  _verifying ||
+                      _resending ||
+                      !RegExp(r'^\d{6,10}$').hasMatch(_code.text)
                   ? null
                   : _verify,
               child: _verifying

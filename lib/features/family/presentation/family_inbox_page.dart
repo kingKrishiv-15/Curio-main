@@ -29,9 +29,10 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
     child: FutureBuilder<List<Map<String, dynamic>>>(
       future: _items,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done)
+        if (snapshot.connectionState != ConnectionState.done) {
           return const Center(child: CircularProgressIndicator());
-        if (snapshot.hasError)
+        }
+        if (snapshot.hasError) {
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -44,6 +45,7 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
               ],
             ),
           );
+        }
         final items = snapshot.data ?? [];
         return RefreshIndicator(
           onRefresh: () async {
@@ -128,7 +130,7 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                                       );
                                       if (mounted) setState(_reload);
                                     } catch (_) {
-                                      if (context.mounted)
+                                      if (context.mounted) {
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
@@ -138,6 +140,7 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                                             ),
                                           ),
                                         );
+                                      }
                                     }
                                   },
                                   child: const Text('Mark as read'),

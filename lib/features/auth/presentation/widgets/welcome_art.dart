@@ -11,6 +11,7 @@ import '../../../../core/widgets/curio_ui.dart';
 import '../../../discoveries/domain/discovery.dart';
 import '../../../games/game_catalog.dart';
 import '../../../games/presentation/game_banner.dart';
+import '../../../games/presentation/game_emblem.dart';
 
 /// Illustrations for the signed-out journey. Every piece is decorative —
 /// wrapped in [ExcludeSemantics] and fixed text scaling — because the words
@@ -19,28 +20,28 @@ import '../../../games/presentation/game_banner.dart';
 /// A skill as it appears across Curio: the same solid colour its games
 /// and Home's skill tiles use.
 class WelcomeSkill {
-  const WelcomeSkill(this.label, this.icon, this.skill);
+  const WelcomeSkill(this.label, this.icon, this.skill, this.gameId);
   final String label;
   final IconData icon;
 
   /// The learning skill it stands for (see `learningSkills`).
   final String skill;
+  final String gameId;
 
   /// The fill colour (art, tiles).
   Color of(BuildContext context) =>
-      bannerFill(context, skillSolidColor(skill, skillColor(context, skill)));
+      gameColor(gameId, skillColor(context, skill));
 
   /// The same colour, deepened on light backgrounds so small text reads.
   Color ink(BuildContext context) {
-    final solid = skillSolidColor(skill, skillColor(context, skill));
+    final solid = of(context);
     return curioColor(context, solid, Color.lerp(solid, Colors.black, .3)!);
   }
 
   static const all = [
-    WelcomeSkill('Numbers', Icons.calculate_rounded, 'Number sense'),
-    WelcomeSkill('Patterns', Icons.blur_on_rounded, 'Patterns'),
-    WelcomeSkill('Evidence', Icons.manage_search_rounded, 'Evidence'),
-    WelcomeSkill('Reasoning', Icons.psychology_rounded, 'Reasoning'),
+    WelcomeSkill('Maths', Icons.calculate_rounded, 'Number sense', 'scale'),
+    WelcomeSkill('Memory', Icons.style_rounded, 'Memory', 'memory_match'),
+    WelcomeSkill('English', Icons.abc_rounded, 'Language', 'word_builder'),
   ];
 }
 
@@ -52,8 +53,8 @@ class _Decorative extends StatelessWidget {
       ExcludeSemantics(child: MediaQuery.withNoTextScaling(child: child));
 }
 
-/// Nova at the centre of the logo's "c", with the four thinking skills in
-/// slow orbit around them — the brand idea drawn large.
+/// Curio's mark surrounded by the three daily sections. The toys bob gently
+/// in place, leaving their labels stable and readable throughout the loop.
 class OrbitHero extends StatefulWidget {
   const OrbitHero({this.size = 320, super.key});
   final double size;
@@ -66,7 +67,7 @@ class _OrbitHeroState extends State<OrbitHero>
     with SingleTickerProviderStateMixin {
   late final _spin = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 70),
+    duration: const Duration(seconds: 8),
   );
 
   @override
@@ -101,8 +102,8 @@ class _OrbitHeroState extends State<OrbitHero>
       CurioColors.forest,
       CurioColorsLight.forest,
     );
-    final planet = s * .15;
-    final orbit = s * .43;
+    final planet = s * .24;
+    final orbit = s * .36;
     return _Decorative(
       child: SizedBox.square(
         dimension: s,
@@ -129,19 +130,23 @@ class _OrbitHeroState extends State<OrbitHero>
                 Center(
                   child: CurioFloat(
                     distance: 4,
-                    child: MascotBadge(size: s * .34),
+                    child: Transform.rotate(
+                      angle: -.06,
+                      child: CurioLogoMark(size: s * .35),
+                    ),
                   ),
                 ),
                 for (var i = 0; i < WelcomeSkill.all.length; i++)
                   () {
-                    final angle = -math.pi * .75 + i * math.pi / 2 + turn;
+                    final angle = [-2.35, -.25, 1.85][i];
+                    final bob = still ? 0.0 : math.sin(turn + i * 2) * s * .012;
                     final center = Offset(
                       s / 2 + math.cos(angle) * orbit,
-                      s / 2 + math.sin(angle) * orbit,
+                      s / 2 + math.sin(angle) * orbit + bob,
                     );
                     return Positioned(
                       left: center.dx - planet * .9,
-                      top: center.dy - planet / 2,
+                      top: center.dy - planet * .62,
                       width: planet * 1.8,
                       child: _Planet(skill: WelcomeSkill.all[i], size: planet),
                     );
@@ -171,24 +176,7 @@ class _Planet extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color,
-            border: Border.all(color: surface, width: size * .06),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: .18),
-                blurRadius: size * .5,
-                offset: Offset(0, size * .14),
-              ),
-            ],
-          ),
-          child: Icon(skill.icon, color: Colors.white, size: size * .48),
-        ),
-        SizedBox(height: size * .1),
+        GameEmblem(icon: skill.icon, color: color, size: size * 1.25),
         Container(
           padding: EdgeInsets.symmetric(
             horizontal: size * .16,
@@ -296,7 +284,7 @@ class GameFanArt extends StatelessWidget {
   Widget build(BuildContext context) {
     // Mirrors Home's own game list (icons, skills, durations).
     final cards = [
-      for (final id in const ['squeeze', 'link_lab', 'pattern_forge'])
+      for (final id in const ['scale', 'memory_match', 'word_builder'])
         if (findGame(id) case final game?)
           (
             game.title,
@@ -777,7 +765,7 @@ class GrowthArt extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      for (var i = 0; i < 4; i++) ...[
+                      for (var i = 0; i < WelcomeSkill.all.length; i++) ...[
                         Row(
                           children: [
                             Icon(

@@ -37,10 +37,11 @@ class _PrivacyPageState extends State<PrivacyPage> {
             TextButton(
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: data));
-                if (context.mounted)
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Account data copied.')),
                   );
+                }
               },
               child: const Text('Copy JSON'),
             ),
@@ -52,11 +53,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
         ),
       );
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _error =
               'Could not export your account. Please reconnect and try again.',
         );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -83,11 +85,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
       await _service.deleteAccount(value);
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _error =
               'Deletion failed. Check your password and connection, then try again.',
         );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }

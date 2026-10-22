@@ -28,3 +28,12 @@ jobs:
 
       - name: Run pgTAP tests
         run: supabase test db
+
+      - name: Check the SQL Editor installer
+        run: python3 tool/build_supabase_setup.py --check
+
+      - name: Verify installer can be rerun on an existing database
+        run: |
+          psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -v ON_ERROR_STOP=1 -f supabase/setup.sql
+          psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -v ON_ERROR_STOP=1 -f supabase/setup.sql
+          supabase test db

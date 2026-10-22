@@ -11,14 +11,15 @@ import '../../common/game_rewards.dart';
 import '../domain/squeeze_engine.dart';
 
 class SqueezePage extends StatefulWidget {
-  const SqueezePage({super.key});
+  const SqueezePage({super.key, this.date});
+  final DateTime? date;
 
   @override
   State<SqueezePage> createState() => _SqueezePageState();
 }
 
 class _SqueezePageState extends State<SqueezePage> {
-  SqueezeEngine _engine = SqueezeEngine();
+  late SqueezeEngine _engine = SqueezeEngine(date: widget.date);
   final _controller = TextEditingController();
   String _message = 'Pick a smart first guess. Halfway is often powerful.';
   bool _practice = false;
@@ -70,14 +71,42 @@ class _SqueezePageState extends State<SqueezePage> {
       Colors.white.withValues(alpha: .85),
     );
     final cardBar = curioColor(context, CurioColors.coral, Colors.white);
-    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
-    final greenSoft = curioColor(context, CurioColors.greenSoft, CurioColorsLight.greenSoft);
-    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
-    final green = curioColor(context, CurioColors.green, CurioColorsLight.green);
+    final onDark = curioColor(
+      context,
+      CurioColors.onDark,
+      CurioColorsLight.onDark,
+    );
+    final greenSoft = curioColor(
+      context,
+      CurioColors.greenSoft,
+      CurioColorsLight.greenSoft,
+    );
+    final tealSoft = curioColor(
+      context,
+      CurioColors.tealSoft,
+      CurioColorsLight.tealSoft,
+    );
+    final green = curioColor(
+      context,
+      CurioColors.green,
+      CurioColorsLight.green,
+    );
     final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
-    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
-    final goldSoft = curioColor(context, CurioColors.goldSoft, CurioColorsLight.goldSoft);
-    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final tealDark = curioColor(
+      context,
+      CurioColors.tealDark,
+      CurioColorsLight.tealDark,
+    );
+    final goldSoft = curioColor(
+      context,
+      CurioColors.goldSoft,
+      CurioColorsLight.goldSoft,
+    );
+    final surface = curioColor(
+      context,
+      CurioColors.surface,
+      CurioColorsLight.surface,
+    );
     return CurioPage(
       title: 'Daily Squeeze',
       child: ListView(

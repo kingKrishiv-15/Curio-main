@@ -6,6 +6,7 @@ import 'package:curio/core/config/supabase_config.dart';
 import 'package:curio/core/models/family_settings.dart';
 import 'package:curio/core/services/auth_service.dart';
 import 'package:curio/core/theme/curio_theme.dart';
+import 'package:curio/core/theme/theme_controller.dart';
 import 'package:curio/features/auth/presentation/auth_gate.dart';
 import 'package:curio/features/auth/presentation/auth_page.dart';
 import 'package:curio/features/auth/presentation/intro_page.dart';
@@ -137,14 +138,27 @@ Future<void> phone(
   addTearDown(tester.view.resetDevicePixelRatio);
 }
 
-Widget app(Widget home, {bool dark = false}) => MaterialApp(
-  theme: dark ? CurioTheme.dark : CurioTheme.light,
-  builder: (context, child) => MediaQuery(
-    data: MediaQuery.of(context).copyWith(disableAnimations: true),
-    child: child!,
-  ),
-  home: home,
-);
+Widget app(Widget home, {bool dark = false, ThemeController? reading}) {
+  Widget materialApp() => MaterialApp(
+    theme: dark ? CurioTheme.dark : CurioTheme.light,
+    builder: (context, child) => MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        disableAnimations: true,
+        textScaler: TextScaler.linear(reading?.readingScale ?? 1),
+      ),
+      child: child!,
+    ),
+    home: home,
+  );
+  if (reading == null) return materialApp();
+  return CurioThemeScope(
+    controller: reading,
+    child: ListenableBuilder(
+      listenable: reading,
+      builder: (_, _) => materialApp(),
+    ),
+  );
+}
 
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
@@ -291,7 +305,7 @@ void main() {
   });
 
   testWidgets(
-    'Code screen auto-verifies, recovers from a wrong code, and paces resends',
+    'Code verification preserves the full code, recovers from an error, and paces resends',
     (tester) async {
       await phone(tester);
       final auth = FakeAuth()
@@ -315,33 +329,80 @@ void main() {
       );
       await tester.pump();
       expect(find.textContaining('send a new code in 1:00'), findsOneWidget);
-
       await tester.enterText(find.byKey(const Key('otp_input')), '123456');
       await tester.pump();
+      expect(
+        auth.verified,
+        isEmpty,
+        reason: 'six digits may be only the beginning of an eight-digit code',
+      );
+      await tapVisible(tester, find.byKey(const Key('verify_submit')));
       expect(auth.verified, [(CodePurpose.signUp, '123456')]);
-      await tester.pump();
       expect(find.textContaining('isn’t right or has expired'), findsOneWidget);
       expect(
         tester
             .widget<TextField>(find.byKey(const Key('otp_input')))
             .controller!
             .text,
-        isEmpty,
+        '123456',
       );
-
-      // Letters and extra digits are ignored; the 6th digit submits.
-      await tester.enterText(find.byKey(const Key('otp_input')), '65a43219');
+      await tester.enterText(find.byKey(const Key('otp_input')), '01 23-4567');
       await tester.pump();
-      expect(auth.verified.last, (CodePurpose.signUp, '654321'));
-
+      expect(auth.verified.length, 1);
+      await tapVisible(tester, find.byKey(const Key('verify_submit')));
+      expect(auth.verified.last, (CodePurpose.signUp, '01234567'));
       await tester.pump(const Duration(seconds: 61));
       await tapVisible(tester, find.byKey(const Key('verify_resend')));
       expect(auth.sent, [CodePurpose.signUp]);
       expect(find.textContaining('A new code is on its way'), findsOneWidget);
-      expect(find.textContaining('send a new code in 1:00'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
     },
   );
+
+  for (final purpose in CodePurpose.values) {
+    for (final length in [6, 8, 10]) {
+      testWidgets(
+        'Verification accepts $length digits for $purpose even with six configured boxes',
+        (tester) async {
+          await phone(tester, const Size(320, 640));
+          final auth = FakeAuth();
+          await tester.pumpWidget(
+            calm(
+              app(
+                VerifyCodePage(
+                  authService: auth,
+                  purpose: purpose,
+                  email: 'parent@example.com',
+                  codeLength: 6,
+                ),
+              ),
+            ),
+          );
+          final code = '0123456789'.substring(0, length);
+          await tester.enterText(
+            find.byKey(const Key('otp_input')),
+            code.substring(0, 6),
+          );
+          await tester.pump();
+          expect(auth.verified, isEmpty);
+          await tester.enterText(find.byKey(const Key('otp_input')), code);
+          await tester.pump();
+          expect(auth.verified, isEmpty);
+          await tapVisible(tester, find.byKey(const Key('verify_submit')));
+          expect(auth.verified, [(purpose, code)]);
+          expect(
+            tester
+                .widget<TextField>(find.byKey(const Key('otp_input')))
+                .controller!
+                .text,
+            code,
+          );
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox());
+        },
+      );
+    }
+  }
 
   testWidgets('Forgot password sends a recovery code', (tester) async {
     await phone(tester);
@@ -386,11 +447,14 @@ void main() {
       ..failSave = true
       ..consentRecorded = false;
     var complete = false;
+    final reading = ThemeController();
+    addTearDown(reading.dispose);
     await tester.pumpWidget(
       calm(
         app(
           OnboardingPage(authService: auth, onComplete: () => complete = true),
           dark: true,
+          reading: reading,
         ),
       ),
     );
@@ -399,17 +463,29 @@ void main() {
     await tester.enterText(find.byType(TextFormField), 'Alex');
     await tapVisible(tester, find.byKey(const Key('onboarding_continue')));
     expect(find.text('How much play a day?'), findsOneWidget);
-    await tapVisible(tester, find.byKey(const Key('goal_5')));
+    await tapVisible(tester, find.byKey(const Key('goal_2')));
+    await tapVisible(tester, find.byKey(const Key('onboarding_continue')));
+    expect(find.text('Make it comfortable.'), findsOneWidget);
+    await tapVisible(tester, find.byKey(const Key('reading_1.4')));
+    await tapVisible(tester, find.byKey(const Key('onboarding_reduce_motion')));
+    expect(reading.readingScale, 1.4);
+    expect(reading.reduceMotion, isTrue);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getDouble('curio_reading_scale'), 1.4);
+    expect(preferences.getBool('curio_reduce_motion'), isTrue);
     await tapVisible(tester, find.byKey(const Key('onboarding_continue')));
     expect(find.text('How should we keep you posted?'), findsOneWidget);
     await tapVisible(tester, find.text('Back'));
     await tapVisible(tester, find.text('Back'));
+    await tapVisible(tester, find.text('Back'));
     expect(find.text('Alex'), findsOneWidget);
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 4; i++) {
       await tapVisible(tester, find.byKey(const Key('onboarding_continue')));
     }
     expect(find.text('Welcome, Alex!'), findsOneWidget);
-    expect(find.text('5 games a day'), findsOneWidget);
+    expect(find.text('2 games a day'), findsOneWidget);
+    expect(find.text('140%'), findsOneWidget);
+    expect(find.text('Gentler'), findsOneWidget);
 
     // Signed up another way, so consent is asked for here.
     await tapVisible(tester, find.byKey(const Key('onboarding_continue')));
@@ -423,7 +499,7 @@ void main() {
     await tapVisible(tester, find.byKey(const Key('onboarding_continue')));
     expect(complete, isTrue);
     expect(auth.savedName, 'Alex');
-    expect(auth.savedSettings?.dailyGoal, 5);
+    expect(auth.savedSettings?.dailyGoal, 2);
     expect(
       auth.savedSettings?.consentVersion,
       FamilySettings.currentConsentVersion,
@@ -618,6 +694,12 @@ void main() {
         tester,
       ) async {
         await phone(tester, size);
+        final previousErrorHandler = FlutterError.onError;
+        FlutterError.onError = (details) {
+          debugPrint(details.toString());
+          previousErrorHandler?.call(details);
+        };
+        addTearDown(() => FlutterError.onError = previousErrorHandler);
         final auth = FakeAuth();
         final screens = <Widget>[
           LandingPage(authService: auth),

@@ -210,7 +210,7 @@ String _encouragement(CurioState state, List<MapEntry<String, double>> skills) {
   final (weakest, next) = SkillQuestPage.recommendation(state);
   final even = skills.first.value - skills.last.value < .01;
   final lead = even
-      ? '${state.childName} has been practising evenly across all four skills.'
+      ? '${state.childName} has been practising evenly across their learning skills.'
       : '${skills.first.key} is currently ${state.childName}’s strongest area.';
   return '$lead To grow ${weakest.toLowerCase()}, try ${next.title} together — and ask them to explain their thinking out loud.';
 }

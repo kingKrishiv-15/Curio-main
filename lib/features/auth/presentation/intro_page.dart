@@ -60,7 +60,7 @@ final _slides = [
     eyebrow: 'Play',
     title: 'Five minutes.\nOne big idea.',
     body:
-        'Short, focused games build real thinking skills — logic, numbers, patterns and weighing up evidence. Each fits between breakfast and the school run.',
+        'A fresh game in Maths, Memory and English every day. Pick a little adventure, think it through and earn points for your daily play.',
     skill: WelcomeSkill.all[0],
     art: (h) => GameFanArt(height: h),
   ),

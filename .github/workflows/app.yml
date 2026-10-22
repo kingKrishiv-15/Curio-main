@@ -1,0 +1,22 @@
+name: App
+on:
+  push:
+    branches: [main, krishiv-2, vaibhav]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: python3 tool/build_supabase_setup.py --check
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build web --dart-define=CURIO_DEMO=true

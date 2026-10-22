@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -12,10 +11,7 @@ import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../games/common/game_rewards.dart';
-import '../../games/game_catalog.dart';
-import '../../games/presentation/game_banner.dart';
-import '../../games/presentation/game_card.dart';
-import '../../learn/presentation/skill_games_page.dart';
+import '../../games/presentation/daily_plan.dart';
 
 /// Home's dark mode: a deep, textured evergreen backdrop with neutral-slate
 /// cards (deliberately not another shade of green) and gold flames.
@@ -199,8 +195,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final featured = featuredGame();
-    final picks = todaysPicks();
 
     return Scaffold(
       backgroundColor: _hc(context, _HomeDark.bgBottom, _HomeLight.bgBottom),
@@ -243,33 +237,15 @@ class HomePage extends StatelessWidget {
                         child: _WeeklyGrowth(state: state),
                       ),
                       const SizedBox(height: _sectionGap),
-                      _FadeSlideIn(
-                        delay: const Duration(milliseconds: 160),
-                        child: _SectionHeader(
-                          title: 'Today’s picks',
-                          action: 'See all',
-                          onAction: onExplore,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _FadeSlideIn(
-                        delay: const Duration(milliseconds: 180),
-                        child: _PicksCarousel(
-                          games: picks,
-                          featuredId: featured.id,
-                          state: state,
-                        ),
-                      ),
+                      const DailyPointsCard(),
                       const SizedBox(height: _sectionGap),
-                      const _FadeSlideIn(
-                        delay: Duration(milliseconds: 240),
-                        child: _SectionHeader(title: 'Explore by skill'),
+                      _SectionHeader(
+                        title: 'Today’s three adventures',
+                        action: 'Games',
+                        onAction: onExplore,
                       ),
                       const SizedBox(height: 12),
-                      _FadeSlideIn(
-                        delay: const Duration(milliseconds: 260),
-                        child: _SkillGrid(state: state),
-                      ),
+                      const DailyPlan(),
                     ],
                   ),
                 ),
@@ -322,10 +298,6 @@ const _months = [
   'November',
   'December',
 ];
-
-bool _isDone(CurioState state, GameEntry game) => game.isDaily
-    ? state.completedToday(game.id)
-    : state.completedActivities.contains(game.id);
 
 /// The page backdrop: a textured evergreen gradient in dark mode, a clean
 /// warm cream wash in light mode — both with just a hint of grain/glow,
@@ -425,7 +397,7 @@ class _Header extends StatelessWidget {
               const SizedBox(height: 5),
               Text(
                 goalDone
-                    ? 'Daily goal done. Explore anything you like!'
+                    ? 'Goal complete! Come back for new games tomorrow.'
                     : 'What will you discover today?',
                 style: TextStyle(color: inkMuted, fontSize: 14),
               ),
@@ -568,7 +540,7 @@ class _WeekCard extends StatelessWidget {
       CurioColorsLight.forest,
     );
 
-    final now = DateTime.now();
+    final now = state.today;
     final week = _thisWeek();
     final played = [
       for (final day in week)
@@ -686,15 +658,16 @@ class _WeekCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Text(
-                    '$doneToday of $goal games',
-                    style: TextStyle(
-                      color: inkMuted,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12.5,
-                    ),
-                  ),
                 ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '$doneToday of $goal games',
+                style: TextStyle(
+                  color: inkMuted,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12.5,
+                ),
               ),
               const SizedBox(height: 9),
               CurioProgressBar(
@@ -754,178 +727,6 @@ class _WeeklyGrowth extends StatelessWidget {
               '${skills.length} of ${learningSkills.length} skills practised this week',
         ),
       ],
-    );
-  }
-}
-
-/// Today's picks as big cards in a sideways carousel; the next card peeks in
-/// from the edge so it's clear there's more. The featured quest comes first.
-class _PicksCarousel extends StatelessWidget {
-  const _PicksCarousel({
-    required this.games,
-    required this.featuredId,
-    required this.state,
-  });
-  final List<GameEntry> games;
-  final String featuredId;
-  final CurioState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // About two-thirds of a phone's width, so the next card is clearly
-        // there to swipe to.
-        final width = math.min(250.0, constraints.maxWidth * .7);
-        // A scrolling Row (not a fixed-height ListView) so cards grow with
-        // the reader's text size; IntrinsicHeight keeps them the same height.
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var i = 0; i < games.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 14),
-                  SizedBox(
-                    width: width,
-                    child: GameCard(
-                      game: games[i],
-                      style: GameCardStyle.spotlight,
-                      featured: games[i].id == featuredId,
-                      done: _isDone(state, games[i]),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// The four skills as tiles: how many games each has, the level reached, and
-/// mastery so far. A tile opens that skill's games.
-class _SkillGrid extends StatelessWidget {
-  const _SkillGrid({required this.state});
-  final CurioState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return GameGrid(
-      children: [
-        for (final skill in learningSkills)
-          _SkillTile(
-            skill: skill,
-            mastery: (state.skills[skill] ?? 0).clamp(0, 1).toDouble(),
-            games: gameCatalog.where((g) => g.skill == skill).length,
-          ),
-      ],
-    );
-  }
-}
-
-class _SkillTile extends StatelessWidget {
-  const _SkillTile({
-    required this.skill,
-    required this.mastery,
-    required this.games,
-  });
-
-  final String skill;
-  final double mastery;
-  final int games;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = skillColor(context, skill);
-    final solid = skillSolidColor(skill, color);
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    final percent = (mastery * 100).round();
-    void open() => openPage(context, SkillGamesPage(skill: skill));
-    return Semantics(
-      button: true,
-      label: '$skill. $games games. $percent% mastery',
-      excludeSemantics: true,
-      onTap: open,
-      child: CurioGloss(
-        radius: 22,
-        padding: EdgeInsets.zero,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            key: Key('skill_tile_$skill'),
-            onTap: open,
-            borderRadius: BorderRadius.circular(22),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: bannerFill(context, solid),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Icon(
-                          skillIcon(skill),
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        skill,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(color: ink, fontWeight: FontWeight.w800),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '$games games',
-                        style: TextStyle(color: inkMuted, fontSize: 12.5),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CurioProgressBar(
-                            value: mastery,
-                            color: color,
-                            height: 6,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '$percent%',
-                          style: TextStyle(
-                            color: inkMuted,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 11.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

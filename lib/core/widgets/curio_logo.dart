@@ -6,10 +6,9 @@ import '../theme/curio_colors.dart';
 import '../theme/curio_colors_light.dart';
 
 /// Curio's mark: a "C" for Curio, with a magnifying lens resting on its
-/// tip — the curious look-closer that every game asks for. Drawn flat and
-/// calm: an even, round-capped mint stroke, a gold lens ring with a short
-/// handle reaching into the C's opening, and a clean gap where the C passes
-/// behind the lens, so it reads as depth without gloss or shadows.
+/// tip — the curious look-closer that every game asks for. A softly raised
+/// mint C and a gold glass lens sit on an evergreen tile. The simple outline
+/// stays readable at small sizes; light and side walls add depth up close.
 ///
 /// All geometry lives in a 1×1 unit square so the widget, the launcher icons
 /// and the SVG exported by `tool/generate_brand_assets.dart` are drawn from
@@ -159,9 +158,44 @@ class CurioMarkPainter extends CustomPainter {
       side,
     );
     if (drawTile) {
+      final shape = RRect.fromRectAndRadius(
+        tile,
+        Radius.circular(side * cornerRadius),
+      );
+      canvas.drawRRect(shape, Paint()..shader = colors.tile.createShader(tile));
+      canvas.save();
+      canvas.clipRRect(shape);
+      canvas.drawOval(
+        Rect.fromLTWH(
+          tile.left - side * .25,
+          tile.top - side * .5,
+          side * 1.3,
+          side,
+        ),
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white.withValues(alpha: .14),
+              Colors.white.withValues(alpha: .015),
+            ],
+          ).createShader(tile),
+      );
+      canvas.restore();
       canvas.drawRRect(
-        RRect.fromRectAndRadius(tile, Radius.circular(side * cornerRadius)),
-        Paint()..shader = colors.tile.createShader(tile),
+        shape.deflate(side * .008),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = side * .009
+          ..shader = LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withValues(alpha: .25),
+              Colors.white.withValues(alpha: .02),
+            ],
+          ).createShader(tile),
       );
     }
 
@@ -171,30 +205,73 @@ class CurioMarkPainter extends CustomPainter {
     final lens = unit(CurioMarkGeometry.lensCenter);
 
     // The "C", with a clean circle cut where it passes behind the lens.
-    canvas.drawPath(
-      Path.combine(
-        PathOperation.difference,
-        CurioMarkGeometry.cPath(glyph),
-        Path()..addOval(
-          Rect.fromCircle(
-            center: lens,
-            radius: CurioMarkGeometry.cutRadius * s,
-          ),
-        ),
+    final c = Path.combine(
+      PathOperation.difference,
+      CurioMarkGeometry.cPath(glyph),
+      Path()..addOval(
+        Rect.fromCircle(center: lens, radius: CurioMarkGeometry.cutRadius * s),
       ),
-      Paint()..color = colors.glyph,
+    );
+    canvas.drawShadow(
+      c.shift(Offset(0, s * .018)),
+      Colors.black.withValues(alpha: .6),
+      s * .035,
+      true,
+    );
+    for (var i = 5; i > 0; i--) {
+      canvas.drawPath(
+        c.shift(Offset(0, s * .005 * i)),
+        Paint()..color = Color.lerp(colors.glyph, Colors.black, .42)!,
+      );
+    }
+    canvas.drawPath(
+      c,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.lerp(colors.glyph, Colors.white, .5)!,
+            colors.glyph,
+            Color.lerp(colors.glyph, Colors.black, .1)!,
+          ],
+        ).createShader(glyph),
     );
 
     // The lens: a hint of clear glass, the ring, a small glint, the handle.
     canvas.drawCircle(
       lens,
       CurioMarkGeometry.lensRadius * s,
-      Paint()..color = Colors.white.withValues(alpha: .08),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: .3),
+            colors.glyph.withValues(alpha: .05),
+          ],
+        ).createShader(Rect.fromCircle(center: lens, radius: s * .12)),
     );
     final ring = Paint()
       ..style = PaintingStyle.stroke
-      ..color = colors.spark
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color.lerp(colors.spark, Colors.white, .55)!,
+          colors.spark,
+          Color.lerp(colors.spark, Colors.black, .2)!,
+        ],
+      ).createShader(Rect.fromCircle(center: lens, radius: s * .13))
       ..strokeWidth = CurioMarkGeometry.lensWeight * s;
+    canvas.drawCircle(
+      lens + Offset(0, s * .014),
+      CurioMarkGeometry.lensRadius * s,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..color = Color.lerp(colors.spark, Colors.black, .45)!
+        ..strokeWidth = CurioMarkGeometry.lensWeight * s,
+    );
     canvas.drawCircle(lens, CurioMarkGeometry.lensRadius * s, ring);
     canvas.drawArc(
       Rect.fromCircle(

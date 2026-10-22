@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
+import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_gloss.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../game_catalog.dart';
 import 'game_banner.dart';
+import 'game_emblem.dart';
 import 'game_preview.dart';
 
 /// How a [GameCard] is laid out.
@@ -50,15 +52,16 @@ class GameCard extends StatelessWidget {
   /// Defaults to opening the game.
   final VoidCallback? onTap;
 
-  void _open(BuildContext context) =>
-      onTap != null ? onTap!() : openPage(context, game.open());
+  void _open(BuildContext context) => onTap != null
+      ? onTap!()
+      : openPage(context, game.open(date: CurioScope.of(context).today));
 
   String get _semanticLabel => [
     game.title,
     if (featured) 'today’s quest',
     if (game.isNew) 'new',
     game.tagline,
-    '${game.skill}, ${game.duration}',
+    '${game.section.title}, ${game.duration}',
     done ? 'done ${game.isDaily ? 'today' : ''}, XP earned' : '${game.xp} XP',
   ].join('. ');
 
@@ -244,7 +247,7 @@ class GameCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CurioEyebrow(
-                  featured ? 'Today’s featured quest' : game.skill,
+                  featured ? 'Today’s featured quest' : game.section.title,
                   color: curioColor(
                     context,
                     color,
@@ -284,8 +287,7 @@ class GameCard extends StatelessWidget {
   }
 }
 
-/// Vivid art for a game: a block of its own solid [gameColor], a big faded
-/// icon, the game's [GamePreview], and status badges.
+/// A sculpted game emblem and a glimpse of its puzzle, on a lit colour stage.
 class GameArt extends StatelessWidget {
   const GameArt({
     required this.game,
@@ -320,28 +322,60 @@ class GameArt extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.white.withValues(alpha: .22)),
         ),
-        color: bannerFill(context, color),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color.lerp(color, Colors.white, .24)!,
+              bannerFill(context, color),
+              Color.lerp(color, Colors.black, .3)!,
+            ],
+          ),
+        ),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Positioned(
-              right: -height * .14,
-              bottom: -height * .2,
-              child: Icon(
-                game.icon,
-                size: height * .9,
-                color: Colors.white.withValues(alpha: .12),
+              right: -height * .3,
+              top: -height * .65,
+              child: Container(
+                width: height * 1.7,
+                height: height * 1.7,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: .12),
+                    width: height * .18,
+                  ),
+                ),
               ),
             ),
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  14,
-                  compactBadges ? 26 : 30,
-                  14,
-                  12,
+                padding: EdgeInsets.fromLTRB(8, badges ? 22 : 4, 8, 4),
+                child: LayoutBuilder(
+                  builder: (context, box) {
+                    final emblem = GameEmblem(
+                      icon: game.icon,
+                      color: color,
+                      size: box.maxHeight * 1.12,
+                    );
+                    if (box.maxWidth < 210) return Center(child: emblem);
+                    return Row(
+                      children: [
+                        Expanded(flex: 4, child: Center(child: emblem)),
+                        Expanded(
+                          flex: 5,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 6, 12, 6),
+                            child: GamePreview(gameId: game.id, color: color),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                child: GamePreview(gameId: game.id, color: color),
               ),
             ),
             if (badges)
@@ -512,11 +546,11 @@ class _Meta extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(skillIcon(game.skill), size: 12, color: color),
+              Icon(sectionIcon(game.section), size: 12, color: color),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  game.skill,
+                  game.section.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -613,7 +647,7 @@ class _PlayPill extends StatelessWidget {
           const SizedBox(width: 4),
           Flexible(
             child: Text(
-              done ? 'Play again' : 'Play',
+              done ? 'Practice again' : 'Play today’s game',
               style: TextStyle(
                 color: ink,
                 fontWeight: FontWeight.w800,

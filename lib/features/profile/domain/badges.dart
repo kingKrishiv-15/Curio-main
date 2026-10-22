@@ -136,24 +136,25 @@ List<CurioBadge> computeBadges({
       14,
       'days',
     ),
+    // Preserve the original milestone when new skills are added.
     badge(
       'all_rounder',
       'All-rounder',
-      'Play a game from each of the four skills.',
+      'Play games that train four different skills.',
       Icons.diversity_3_rounded,
       BadgeTone.explore,
       skillsPlayed.length,
-      learningSkills.length,
+      4,
       'skills',
     ),
     badge(
       'try_everything',
       'Try everything',
-      'Play every daily game at least once.',
+      'Play 14 different daily games.',
       Icons.explore_rounded,
       BadgeTone.explore,
       games.intersection(dailyGames).length,
-      dailyGames.length,
+      dailyGames.length < 14 ? dailyGames.length : 14,
       'games',
     ),
     badge(
@@ -179,11 +180,11 @@ List<CurioBadge> computeBadges({
     badge(
       'fact_keeper',
       'Fact keeper',
-      'Collect every discovery in Curio.',
+      'Collect 18 discoveries.',
       Icons.menu_book_rounded,
       BadgeTone.discovery,
       factsCollected,
-      discoveriesTotal,
+      discoveriesTotal < 18 ? discoveriesTotal : 18,
       'found',
     ),
     badge(

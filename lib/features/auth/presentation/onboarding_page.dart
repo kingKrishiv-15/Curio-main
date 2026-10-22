@@ -4,16 +4,18 @@ import '../../../core/models/family_settings.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_gloss.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'widgets/auth_fields.dart';
+import 'widgets/welcome_art.dart';
 
 /// Learner setup, right after a parent's email is confirmed: a nickname, a
-/// gentle daily goal, how they'd like to hear from Curio, then a welcome.
-/// Everything here maps onto `child_profiles` and `family_settings`, and can
-/// be changed later from Profile.
+/// gentle daily goal, reading comfort, how they'd like to hear from Curio,
+/// then a welcome. Reading preferences stay on this device; the learner and
+/// family choices are saved to their account. All can be changed in Profile.
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({
     required this.authService,
@@ -29,7 +31,7 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  static const _steps = 4;
+  static const _steps = 5;
 
   final _name = TextEditingController();
   final _nameForm = GlobalKey<FormState>();
@@ -44,6 +46,27 @@ class _OnboardingPageState extends State<OnboardingPage> {
   bool _consentMissing = false;
   bool _saving = false;
   String? _error;
+  bool _reduceMotion = false;
+  double _readingScale = 1;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reading = CurioThemeScope.maybeOf(context);
+    if (reading != null) {
+      _reduceMotion = reading.reduceMotion;
+      _readingScale = reading.readingScale;
+    }
+  }
+
+  Future<void> _setReading({bool? motion, double? scale}) async {
+    final controller = CurioThemeScope.maybeOf(context);
+    setState(() {
+      if (motion != null) _reduceMotion = motion;
+      if (scale != null) _readingScale = scale;
+    });
+    await controller?.setReading(motion: motion, scale: scale);
+  }
 
   String get _learner =>
       _name.text.trim().isEmpty ? 'your explorer' : _name.text.trim();
@@ -119,9 +142,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
       1 => (
         'A gentle rhythm',
         'How much play a day?',
-        'Pick a daily goal for $_learner. It’s an invitation, never a limit — you can change it anytime.',
+        'Pick a daily goal for $_learner. There’s one daily game in Maths, Memory and English. You can change the goal anytime.',
       ),
       2 => (
+        'Made for your explorer',
+        'Make it comfortable.',
+        'Try a reading size and choose how much things move. These settings apply on this device and can be changed in Profile.',
+      ),
+      3 => (
         'Staying in the loop',
         'How should we keep you posted?',
         'Small nudges help a habit stick. Choose what works for your family.',
@@ -167,7 +195,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   switch (_step) {
                     0 => _nameStep(),
                     1 => _goalStep(),
-                    2 => _loopStep(),
+                    2 => _comfortStep(),
+                    3 => _loopStep(),
                     _ => _readyStep(),
                   },
                 ],
@@ -235,8 +264,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget _goalStep() {
     const options = [
       (1, 'A quick spark', 'One game a day · about 5 minutes'),
-      (3, 'A steady habit', 'Three games a day · about 15 minutes'),
-      (5, 'A deep dive', 'Five games a day · about 25 minutes'),
+      (2, 'A little adventure', 'Two games a day · about 10 minutes'),
+      (3, 'A steady habit', 'One in each section · about 15 minutes'),
     ];
     return Column(
       children: [
@@ -255,6 +284,54 @@ class _OnboardingPageState extends State<OnboardingPage> {
       ],
     );
   }
+
+  Widget _comfortStep() => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      CurioGloss(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CurioFloat(distance: 3, child: MascotBadge(size: 64)),
+            const SizedBox(height: 16),
+            Text(
+              'A little wonder, every day.',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            const Text('Play, discover and grow at your own pace.'),
+          ],
+        ),
+      ),
+      const SizedBox(height: 20),
+      for (final (scale, title, detail) in const [
+        (1.0, 'Standard', 'The usual reading size'),
+        (1.2, 'Larger', 'A little more room for every word'),
+        (1.4, 'Largest', 'Big, clear text throughout Curio'),
+      ]) ...[
+        _ChoiceCard(
+          key: Key('reading_$scale'),
+          selected: (_readingScale - scale).abs() < .01,
+          title: title,
+          detail: detail,
+          leading: 'Aa',
+          onTap: () => _setReading(scale: scale),
+        ),
+        const SizedBox(height: 12),
+      ],
+      SwitchListTile.adaptive(
+        key: const Key('onboarding_reduce_motion'),
+        contentPadding: EdgeInsets.zero,
+        title: const Text('Gentler motion'),
+        subtitle: const Text(
+          'Keep illustrations still and skip moving transitions. Your device’s reduced-motion setting is always respected.',
+        ),
+        value: _reduceMotion,
+        onChanged: (value) => _setReading(motion: value),
+      ),
+    ],
+  );
 
   Widget _loopStep() {
     return CurioGloss(
@@ -342,6 +419,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
         'Weekly email',
         _weeklyEmail ? 'Mondays' : 'Off',
       ),
+      (
+        Icons.text_fields_rounded,
+        'Reading size',
+        '${(_readingScale * 100).round()}%',
+      ),
+      (
+        Icons.animation_rounded,
+        'Motion',
+        _reduceMotion ? 'Gentler' : 'Playful',
+      ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -368,15 +455,43 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       Icon(icon, size: 20, color: forest),
                       const SizedBox(width: 12),
                       Expanded(child: Text(label)),
-                      Text(
-                        value,
-                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      Flexible(
+                        child: Text(
+                          value,
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
                       ),
                     ],
                   ),
                 ),
             ],
           ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Three little adventures, refreshed daily.',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final section in WelcomeSkill.all)
+              Chip(
+                avatar: Icon(
+                  section.icon,
+                  size: 18,
+                  color: section.ink(context),
+                ),
+                label: Text(section.label),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'One game per section each day. Replay for practice; points are awarded once.',
         ),
         if (_needsConsent) ...[
           const SizedBox(height: 18),
@@ -455,7 +570,9 @@ class _StepBar extends StatelessWidget {
                 if (i > 0) const SizedBox(width: 6),
                 Expanded(
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 280),
+                    duration: MediaQuery.disableAnimationsOf(context)
+                        ? Duration.zero
+                        : const Duration(milliseconds: 280),
                     height: 5,
                     decoration: BoxDecoration(
                       color: i <= step ? coral : idle,
@@ -525,7 +642,9 @@ class _ChoiceCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 180),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: selected

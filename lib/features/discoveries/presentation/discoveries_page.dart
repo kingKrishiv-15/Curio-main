@@ -7,6 +7,7 @@ import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/game_catalog.dart';
+import '../../learn/presentation/learn_hub_page.dart';
 import '../../games/presentation/game_banner.dart';
 import '../domain/discovery.dart';
 
@@ -306,10 +307,25 @@ void _showDiscovery(BuildContext context, Discovery discovery, bool collected) {
                   : FilledButton.icon(
                       onPressed: () {
                         Navigator.of(sheetContext).pop();
-                        openPage(context, game.open());
+                        final today = CurioScope.of(context).today;
+                        if (!game.isDaily ||
+                            todaysPicks(
+                              date: today,
+                            ).any((g) => g.id == game.id)) {
+                          openPage(context, game.open(date: today));
+                        } else {
+                          openPage(context, const LearnHubPage());
+                        }
                       },
                       icon: Icon(game.icon, size: 18),
-                      label: Text('Play ${game.title}'),
+                      label: Text(
+                        !game.isDaily ||
+                                todaysPicks(
+                                  date: CurioScope.of(context).today,
+                                ).any((g) => g.id == game.id)
+                            ? 'Play ${game.title}'
+                            : 'See today’s games',
+                      ),
                     ),
             ),
           ],
