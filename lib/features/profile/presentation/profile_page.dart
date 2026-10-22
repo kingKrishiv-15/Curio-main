@@ -54,36 +54,6 @@ class ProfilePage extends StatelessWidget {
       CurioColors.inkMuted,
       CurioColorsLight.inkMuted,
     );
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final orange = curioColor(
-      context,
-      CurioColors.orange,
-      CurioColorsLight.orange,
-    );
-    final tealDark = curioColor(
-      context,
-      CurioColors.tealDark,
-      CurioColorsLight.tealDark,
-    );
-    final coralSoft = curioColor(
-      context,
-      CurioColors.coralSoft,
-      CurioColorsLight.coralSoft,
-    );
-    final orangeSoft = curioColor(
-      context,
-      CurioColors.orangeSoft,
-      CurioColorsLight.orangeSoft,
-    );
-    final tealSoft = curioColor(
-      context,
-      CurioColors.tealSoft,
-      CurioColorsLight.tealSoft,
-    );
     final forest = curioColor(
       context,
       CurioColors.forest,
@@ -112,75 +82,50 @@ class ProfilePage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 25, 16, 104),
         children: [
-          const Center(child: CurioEyebrow('Explorer profile')),
+          Center(child: ExplorerAvatar(name: state.childName, size: 84)),
           const SizedBox(height: 14),
           Center(
             child: Text(
               state.childName,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
+          const SizedBox(height: 2),
           Center(
             child: Text(
               'Curious Explorer · Stage ${state.companionStage}',
               style: TextStyle(color: inkMuted),
             ),
           ),
+          const SizedBox(height: 6),
           Center(
             child: TextButton.icon(
               onPressed: () => _rename(context, state),
-              icon: const Icon(Icons.edit_outlined, size: 15),
-              label: const Text('EDIT NAME'),
+              icon: const Icon(Icons.edit_outlined, size: 16),
+              label: const Text('Edit name'),
             ),
           ),
-          const SizedBox(height: 18),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxWidth < 520;
-              final stats = <Widget>[
-                StatPill(
-                  icon: Icons.bolt_rounded,
-                  value: '${state.totalXp}',
-                  label: 'total XP',
-                  color: coral,
-                  background: coralSoft,
-                ),
-                StatPill(
-                  icon: Icons.local_fire_department_rounded,
-                  value: '${state.streak}',
-                  label: 'day streak',
-                  color: orange,
-                  background: orangeSoft,
-                ),
-                StatPill(
-                  icon: Icons.auto_stories_rounded,
-                  value: '${state.collectedFacts.length}',
-                  label: 'discoveries',
-                  color: tealDark,
-                  background: tealSoft,
-                ),
-              ];
-              if (!compact) {
-                return Row(
-                  children: [
-                    stats[0],
-                    const SizedBox(width: 10),
-                    stats[1],
-                    const SizedBox(width: 10),
-                    stats[2],
-                  ],
-                );
-              }
-              return Column(
-                children: [
-                  Row(
-                    children: [stats[0], const SizedBox(width: 10), stats[1]],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(children: [stats[2], const Spacer()]),
-                ],
-              );
-            },
+          const SizedBox(height: 16),
+          CurioStatRow(
+            tiles: [
+              CurioStatTile(
+                value: '${state.totalXp}',
+                label: 'Total XP',
+                tone: StatTone.coral,
+              ),
+              CurioStatTile(
+                value: '${state.streak}',
+                label: 'Day streak',
+                tone: StatTone.gold,
+                semanticLabel: '${state.streak} day streak',
+              ),
+              CurioStatTile(
+                value: '${state.collectedFacts.length}',
+                label: 'Discoveries',
+                tone: StatTone.forest,
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           CurioCard(

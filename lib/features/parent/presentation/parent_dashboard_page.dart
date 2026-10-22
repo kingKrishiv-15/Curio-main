@@ -47,7 +47,7 @@ class ParentDashboardPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CurioEyebrow('Growing, one discovery at a time'),
+                      const CurioEyebrow('Your explorer'),
                       const SizedBox(height: 10),
                       Text(
                         state.childName,

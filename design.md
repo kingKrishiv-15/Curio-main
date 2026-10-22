@@ -303,7 +303,9 @@ purpose — round everything. Same scale in both modes.
 | `CurioCard` | `curio_ui.dart` | Simpler opaque card (no glass sheen) — fine for dense list rows |
 | `ModeTile` | `curio_ui.dart` | Icon + title/subtitle + accent stripe list row (game/mode pickers) |
 | `PrimaryButton` | `curio_ui.dart` | Full-width `FilledButton` wrapper; inherits theme colours by default — pass `color:` explicitly only when you also know the right foreground pairing (see §7) |
-| `StatPill` / `CurioIconTile` | `curio_ui.dart` | Small stat readouts with an icon medallion |
+| `CurioStatTile` / `CurioStatRow` | `curio_ui.dart` | Pastel stat tiles (big Fraunces number over a short label) in gold, plum, forest or coral; the row keeps them equal height and stacks them at large text sizes. Home's weekly growth and Profile's totals |
+| `ExplorerAvatar` | `curio_ui.dart` | The explorer's round letter avatar — Home's header (opens Profile) and Profile's header |
+| `CurioIconTile` | `curio_ui.dart` | An icon on a soft tinted square — list rows, info cards |
 | `CurioProgressBar` / `ProgressRing` | `curio_ui.dart` | Animated linear/circular progress, colour passed in per skill or defaults to the theme accent |
 | `MascotBadge` / `CurioBrand` | `curio_ui.dart` | Mascot avatar; `CurioBrand` is the logo lockup used in page headers |
 | `CurioLogo` / `CurioLogoMark` / `CurioWordmark` | `curio_logo.dart` | The logo (§13): lockup, square mark, wordmark alone |
@@ -314,10 +316,11 @@ purpose — round everything. Same scale in both modes.
 | `gameCatalog` / `skillColor` | `features/games/game_catalog.dart` | The one list of activities (title, tagline, icon, duration) that Home, Learn and Skill Quest render, plus the per-skill colour and icon. Add a game here, not on each screen |
 | `gameRewards` / `awardDaily` | `features/games/common/game_rewards.dart`, `game_kit.dart` | XP, skill and discovery per activity — mirrors the server's `activity_rewards` table (a test compares them) |
 | `GameHeader`, `GameResultCard`, `PracticeBadge`, `showHowToPlay` | `features/games/common/game_kit.dart` | Shared game chrome: header, end-of-game card (says "already earned" on replays), practice rounds |
-| `GameCard` (`tile` / `row` / `hero`) | `features/games/presentation/game_card.dart` | The one way a game is shown anywhere: art panel in the skill gradient, title, tagline, skill · time · XP chips, and a Play / Play again action. `tile` for grids and shelves, `row` for lists, `hero` for today's featured quest. Badges on the art: DONE, QUEST, NEW |
-| `GameArt` / `gameGradient` | `game_card.dart` | The art panel on its own, and the skill gradient behind it (lighter top-left, hue-shifted darker bottom-right) |
+| `GameCard` (`tile` / `row` / `hero` / `spotlight`) | `features/games/presentation/game_card.dart` | The one way a game is shown anywhere: art panel in the skill gradient, title, tagline, skill · time · XP chips, and a Play / Play again action. `tile` for grids and shelves, `row` for lists, `hero` for today's featured quest, `spotlight` (big art, round play button on its edge) for Home's carousel. Badges on the art: DONE, QUEST, NEW |
+| `GameArt` / `gameColor` | `game_card.dart`, `game_banner.dart` | The art panel: one bold solid colour per game (kept within its skill's colour family, settled slightly in dark mode via `bannerFill`), a faded icon and the game's preview. A card's Play button and borders use the same colour; the skill chip keeps the skill colour. Home's skill tiles use `skillSolidColor`. New game → add its colour, or it falls back to the skill colour |
 | `GamePreview` | `features/games/presentation/game_preview.dart` | A tiny drawing of each game's board (tiles, chips, grid, scales…) on a fixed 150×84 canvas that scales down. New game → add a case, or it falls back to its icon |
 | `GameGrid` | `game_card.dart` | Equal-height rows of tiles; 1–4 columns by width. Use it instead of `GridView` so cards never clip at large text sizes |
+| `SkillGamesPage` | `features/learn/presentation/skill_games_page.dart` | One skill's level and games, opened from Home's skill tiles |
 | `BadgeShelf`, `BadgeMedal`, `showBadgesSheet` | `features/profile/presentation/badges_view.dart` | Profile's badges: medals coloured by family once earned, ringed by progress until then. The badges themselves are computed from activity history in `profile/domain/badges.dart`, never stored |
 | `ParentalGate` | `core/widgets/parental_gate.dart` | "Grown-ups only" times-table check in front of the parent dashboard and privacy pages |
 | `showTextPrompt` | `core/widgets/text_prompt_dialog.dart` | One-field dialog that owns its controller — use it instead of disposing a controller after `showDialog` |
@@ -378,30 +381,34 @@ identical in both modes:
 
 ## 13. The logo
 
-**Idea.** A lowercase "c" drawn as one brush stroke — the shape of a
-question still being asked — with a spark leaping from its tip: the moment
-the answer lands. The stroke starts fine and swells, the way a thought
-gathers weight. The spark is the same four-point sparkle Nova wears, so the
-mark and the mascot read as one family. On the landing page the same "c"
-becomes Nova's orbit, with the four skills travelling around it
+**Idea.** A "C" for Curio with a magnifying lens resting on its tip — the
+look-closer every game asks for. Flat and calm on purpose: one even mint
+stroke, a gold lens ring with a short handle reaching into the C's
+opening, and a clean gap where the C passes behind the lens, so it reads
+as depth without gloss, glass rims or shadows. On the landing page the
+same C becomes Nova's orbit, with the four skills travelling around it
 (`OrbitHero`).
 
 **Construction.** All geometry lives in `CurioMarkGeometry`
-(`lib/core/widgets/curio_logo.dart`) in a 1×1 unit square: the "c" is an
-arc (centre .465/.535, radius .235, weight .158) opening towards the upper
-right, sweeping 268°, tapered over its first 45%; the spark sits at
-.735/.265 with a small twinkle below it. Change the numbers there and
-everything follows.
+(`lib/core/widgets/curio_logo.dart`) in a 1×1 unit square: the C is an
+arc (centre .452/.52, radius .25, weight .122, round caps) opening to the
+right and sweeping 274°; the lens (centre .667/.295, radius .1, ring .048)
+has a .054-wide handle at 45°, and a .028 gap is cut out of the C around
+it. Change the numbers there and everything follows.
+
+**Colours.** `markGradient` (a deep evergreen tile with only a whisper of
+gradient), `markGlyph` (mint, the C) and `spark` (gold, the lens). The
+lens holds a faint clear-glass tint and one small glint.
 
 **Parts.**
 - `CurioLogoMark` — the evergreen tile. Minimum size 16px; it still reads.
-- `CurioWordmark` — "curio" in Fraunces with the i's dot replaced by the
-  spark (the text uses a dotless ı, U+0131, which Fraunces includes).
+- `CurioWordmark` — "curio" in Fraunces with the i's dot in the mark's
+  gold (the text uses a dotless ı, U+0131, which Fraunces includes).
 - `CurioLogo` — mark + wordmark, horizontal or `vertical`.
 
 **Rules.**
-- The tile is always `markGradient` with a `markGlyph` "c" and a `spark`
-  sparkle — in **both** modes. Don't recolour it to match a screen.
+- The tile is always `markGradient` with a `markGlyph` C and a `spark`
+  lens — in **both** modes. Don't recolour it to match a screen.
 - Don't place the mark on another green; it sits on `canvas`, cards, or
   photos with enough contrast.
 - Give it clear space of at least a quarter of its own width.

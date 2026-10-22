@@ -1,30 +1,30 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
+import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_gloss.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/parental_gate.dart';
+import '../../family/presentation/family_inbox_page.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/game_catalog.dart';
+import '../../games/presentation/game_banner.dart';
 import '../../games/presentation/game_card.dart';
-import '../../../core/widgets/curio_gloss.dart';
-import '../../parent/presentation/parent_dashboard_page.dart';
-import '../../family/presentation/family_inbox_page.dart';
-import '../../skills/presentation/skill_quest_page.dart';
+import '../../learn/presentation/skill_games_page.dart';
 
 /// Home's dark mode: a deep, textured evergreen backdrop with neutral-slate
-/// cards (deliberately not another shade of green) and a lime "this is
-/// live right now" accent.
+/// cards (deliberately not another shade of green) and gold flames.
 abstract final class _HomeDark {
   static const bgTop = Color(0xFF0E211B);
   static const bgBottom = Color(0xFF05100D);
 
   static const surface = Color(0xFF2B3032);
   static const surfaceRaised = Color(0xFF3C4346);
-  static const surfaceSunken = Color(0xFF15191A);
 
   static const line = Color(0x26FFFFFF);
   static const lineStrong = Color(0x3DFFFFFF);
@@ -32,7 +32,6 @@ abstract final class _HomeDark {
   static const inkMuted = Color(0xFFC4CDC9);
   static const inkFaint = Color(0xFF8D948F);
 
-  static const accent = Color(0xFFDCE66A);
   static const gold = Color(0xFFE7BE6B);
   static const sky = Color(0xFF8FC3D9);
 }
@@ -45,7 +44,6 @@ abstract final class _HomeLight {
   static const bgBottom = Color(0xFFFDF1E2);
 
   static const surface = Color(0xFFFFFFFF);
-  static const surfaceSunken = Color(0xFFF3E9D8);
 
   static const line = Color(0xFFF0E4D0);
   static const lineStrong = Color(0xFFE7D7BC);
@@ -78,19 +76,13 @@ class _GlassPanel extends StatelessWidget {
     required this.child,
     this.padding = EdgeInsets.zero,
     this.radius = 22,
-    this.darkTint,
   });
   final Widget child;
   final EdgeInsets padding;
   final double radius;
-  final Color? darkTint;
   @override
-  Widget build(BuildContext context) => CurioGloss(
-    padding: padding,
-    radius: radius,
-    tint: Theme.of(context).brightness == Brightness.dark ? darkTint : null,
-    child: child,
-  );
+  Widget build(BuildContext context) =>
+      CurioGloss(padding: padding, radius: radius, child: child);
 }
 
 /// A gentle looping scale pulse — used on "live" streak flames so they read
@@ -192,18 +184,21 @@ class _FadeSlideInState extends State<_FadeSlideIn>
   }
 }
 
+/// Home, in five sections that each do one job, top to bottom: who you are,
+/// this week at a glance, how the week is going, today's games, and every
+/// skill to explore.
 class HomePage extends StatelessWidget {
-  const HomePage({required this.onExplore, super.key});
+  const HomePage({required this.onExplore, this.onProfile, super.key});
 
+  /// Switches to the Games tab.
   final VoidCallback onExplore;
+
+  /// Switches to the Profile tab (the avatar).
+  final VoidCallback? onProfile;
 
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final now = DateTime.now();
-
-    // One catalog for every screen; Home shows a rotating handful as today's
-    // picks (the first is the featured quest) and every game by skill below.
     final featured = featuredGame();
     final picks = todaysPicks();
 
@@ -227,62 +222,53 @@ class HomePage extends StatelessWidget {
                       20,
                       18,
                       20,
-                      96 + MediaQuery.viewPaddingOf(context).bottom,
+                      104 + MediaQuery.viewPaddingOf(context).bottom,
                     ),
                     children: [
                       _Header(
                         name: state.childName,
-                        streak: state.streak,
-                        onParentTap: () => ParentalGate.open(
-                          context,
-                          const ParentDashboardPage(),
-                        ),
-                      ),
-                      const SizedBox(height: 26),
-                      _FadeSlideIn(
-                        child: _Opening(
-                          onExplore: onExplore,
-                          completed: state.dailyGoalCompleted,
-                        ),
+                        goalDone: state.dailyGoalCompleted >= state.dailyGoal,
+                        onProfile: onProfile,
                       ),
                       const SizedBox(height: 22),
+                      _FadeSlideIn(child: _WeekCard(state: state)),
+                      const SizedBox(height: _sectionGap),
+                      const _FadeSlideIn(
+                        delay: Duration(milliseconds: 80),
+                        child: _SectionHeader(title: 'Weekly growth'),
+                      ),
+                      const SizedBox(height: 12),
                       _FadeSlideIn(
                         delay: const Duration(milliseconds: 100),
-                        child: _WeekPracticeCard(state: state),
+                        child: _WeeklyGrowth(state: state),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: _sectionGap),
                       _FadeSlideIn(
-                        delay: const Duration(milliseconds: 180),
-                        child: _SectionTitle(
+                        delay: const Duration(milliseconds: 160),
+                        child: _SectionHeader(
                           title: 'Today’s picks',
-                          subtitle:
-                              '${_dateLabel(now)} · Small puzzles, designed for a satisfying finish.',
                           action: 'See all',
                           onAction: onExplore,
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
                       _FadeSlideIn(
-                        delay: const Duration(milliseconds: 200),
-                        child: _TodayPicksShelf(
+                        delay: const Duration(milliseconds: 180),
+                        child: _PicksCarousel(
                           games: picks,
                           featuredId: featured.id,
                           state: state,
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: _sectionGap),
+                      const _FadeSlideIn(
+                        delay: Duration(milliseconds: 240),
+                        child: _SectionHeader(title: 'Explore by skill'),
+                      ),
+                      const SizedBox(height: 12),
                       _FadeSlideIn(
                         delay: const Duration(milliseconds: 260),
-                        child: const _SectionTitle(
-                          title: 'Pick your next adventure',
-                          subtitle:
-                              'Choose a skill, then dive into a focused challenge.',
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      _FadeSlideIn(
-                        delay: const Duration(milliseconds: 300),
-                        child: _AdventurePicker(state: state),
+                        child: _SkillGrid(state: state),
                       ),
                     ],
                   ),
@@ -294,26 +280,52 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-
-  static String _dateLabel(DateTime value) {
-    const weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-    const months = [
-      'JAN',
-      'FEB',
-      'MAR',
-      'APR',
-      'MAY',
-      'JUN',
-      'JUL',
-      'AUG',
-      'SEP',
-      'OCT',
-      'NOV',
-      'DEC',
-    ];
-    return '${weekdays[value.weekday - 1]} · ${months[value.month - 1]} ${value.day}';
-  }
 }
+
+/// Space between Home's sections — one value, so the rhythm is even.
+const _sectionGap = 30.0;
+
+String _dateKey(DateTime date) =>
+    '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+
+/// Monday to Sunday of the current week, as calendar days (not 24-hour
+/// steps, so a clock change can't skip one).
+List<DateTime> _thisWeek() {
+  final now = DateTime.now();
+  final monday = DateTime(now.year, now.month, now.day - (now.weekday - 1));
+  return [
+    for (var i = 0; i < 7; i++)
+      DateTime(monday.year, monday.month, monday.day + i),
+  ];
+}
+
+const _weekdays = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+const _months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+bool _isDone(CurioState state, GameEntry game) => game.isDaily
+    ? state.completedToday(game.id)
+    : state.completedActivities.contains(game.id);
 
 /// The page backdrop: a textured evergreen gradient in dark mode, a clean
 /// warm cream wash in light mode — both with just a hint of grain/glow,
@@ -379,42 +391,111 @@ class _HomeTexturePainter extends CustomPainter {
       oldDelegate.dark != dark;
 }
 
-class _Avatar extends StatelessWidget {
-  const _Avatar({required this.name});
+/// "Hello, Krishiv!", a one-line nudge, and on the right only what a child
+/// reaches for: family messages and their own profile.
+class _Header extends StatelessWidget {
+  const _Header({required this.name, required this.goalDone, this.onProfile});
+
   final String name;
+  final bool goalDone;
+  final VoidCallback? onProfile;
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final trimmed = name.trim();
-    final letter = trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
-    return Container(
-      width: 46,
-      height: 46,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: dark
-              ? const [Color(0xFF1F6B50), Color(0xFF49BB8C)]
-              : const [_HomeLight.accent, Color(0xFFD8362B)],
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final surface = _hc(context, _HomeDark.surface, _HomeLight.surface);
+    final line = _hc(context, _HomeDark.line, _HomeLight.line);
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hello, $name!',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: ink,
+                  fontSize: 28,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                goalDone
+                    ? 'Daily goal done. Explore anything you like!'
+                    : 'What will you discover today?',
+                style: TextStyle(color: inkMuted, fontSize: 14),
+              ),
+            ],
+          ),
         ),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: _hc(context, _HomeDark.line, _HomeLight.line),
-          width: 1.4,
+        const SizedBox(width: 12),
+        IconButton(
+          tooltip: 'Family messages',
+          onPressed: () => openPage(context, const FamilyInboxPage()),
+          style: IconButton.styleFrom(
+            minimumSize: const Size(44, 44),
+            backgroundColor: surface,
+            foregroundColor: ink,
+            side: BorderSide(color: line),
+          ),
+          icon: const Icon(Icons.notifications_none_rounded, size: 21),
         ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        letter,
-        style: const TextStyle(
-          fontFamily: 'Fraunces',
-          color: Colors.white,
-          fontSize: 19,
-          fontWeight: FontWeight.w600,
+        const SizedBox(width: 10),
+        ExplorerAvatar(name: name, onTap: onProfile),
+      ],
+    );
+  }
+}
+
+/// Section title with an optional "See all" on the right.
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title, this.action, this.onAction});
+  final String title;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
+    final link = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forestStrong,
+    );
+    return Row(
+      children: [
+        Expanded(
+          child: Semantics(
+            header: true,
+            child: Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 22),
+            ),
+          ),
         ),
-      ),
+        if (action != null)
+          TextButton(
+            onPressed: onAction,
+            style: TextButton.styleFrom(foregroundColor: link),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  action!,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(width: 2),
+                const Icon(Icons.chevron_right_rounded, size: 20),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
@@ -426,196 +507,48 @@ class _StreakChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final chipColor = dark ? _HomeDark.surfaceRaised : _HomeLight.yellowTile;
-    final flameColor = dark ? _HomeDark.gold : _HomeLight.yellowInk;
-    final textColor = dark ? _HomeDark.ink : _HomeLight.yellowInk;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-      decoration: BoxDecoration(
-        color: chipColor,
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(
-          color: _hc(context, _HomeDark.line, _HomeLight.lineStrong),
+    return Semantics(
+      label: '$streak day streak',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(
+          color: dark ? _HomeDark.surfaceRaised : _HomeLight.yellowTile,
+          borderRadius: BorderRadius.circular(99),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Pulse(
-            child: Icon(
-              Icons.local_fire_department_rounded,
-              color: flameColor,
-              size: 16,
-            ),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            '$streak',
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.name,
-    required this.streak,
-    required this.onParentTap,
-  });
-
-  final String name;
-  final int streak;
-  final VoidCallback onParentTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    final surface = _hc(context, _HomeDark.surfaceRaised, _HomeLight.surface);
-    final line = _hc(context, _HomeDark.line, _HomeLight.line);
-    return Row(
-      children: [
-        _Avatar(name: name),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'HELLO THERE',
-                style: TextStyle(
-                  color: inkMuted,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.1,
-                ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$streak',
+              style: TextStyle(
+                color: dark ? _HomeDark.ink : _HomeLight.yellowInk,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
               ),
-              Text(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'Fraunces',
-                  color: ink,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w500,
-                ),
+            ),
+            const SizedBox(width: 4),
+            _Pulse(
+              child: Icon(
+                Icons.local_fire_department_rounded,
+                color: dark ? _HomeDark.gold : _HomeLight.accent,
+                size: 17,
               ),
-            ],
-          ),
-        ),
-        IconButton(
-          tooltip: 'Notifications',
-          onPressed: () => openPage(context, const FamilyInboxPage()),
-          icon: const Icon(Icons.notifications_outlined),
-        ),
-        _StreakChip(streak: streak),
-        const SizedBox(width: 10),
-        IconButton(
-          tooltip: 'Family dashboard',
-          onPressed: onParentTap,
-          style: IconButton.styleFrom(
-            minimumSize: const Size(42, 42),
-            backgroundColor: surface,
-            foregroundColor: ink,
-            side: BorderSide(color: line),
-            shape: const CircleBorder(),
-          ),
-          icon: const Icon(Icons.family_restroom_outlined, size: 19),
-        ),
-      ],
-    );
-  }
-}
-
-class _Opening extends StatelessWidget {
-  const _Opening({required this.completed, required this.onExplore});
-  final int completed;
-  final VoidCallback onExplore;
-
-  @override
-  Widget build(BuildContext context) {
-    final goal = CurioScope.of(context).dailyGoal;
-    final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
-    return CurioGloss(
-      key: const Key('daily_goal_banner'),
-      radius: 24,
-      padding: const EdgeInsets.all(18),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const MascotBadge(size: 52),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'A little discovery today?',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontSize: 22, height: 1.15),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$completed of $goal daily activities complete',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 10),
-                CurioProgressBar(
-                  value: completed / goal,
-                  color: accent,
-                  height: 4,
-                ),
-              ],
             ),
-          ),
-          const SizedBox(width: 8),
-          IconButton.filledTonal(
-            tooltip: 'Choose an activity',
-            onPressed: onExplore,
-            style: IconButton.styleFrom(
-              backgroundColor: accent.withValues(alpha: .14),
-              foregroundColor: accent,
-            ),
-            icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _WeekPracticeCard extends StatelessWidget {
-  const _WeekPracticeCard({required this.state});
+/// Today's date and streak, a flame for every day played this week, and
+/// today's goal underneath.
+class _WeekCard extends StatelessWidget {
+  const _WeekCard({required this.state});
   final CurioState state;
 
-  static const _goal = 5;
-  static const _labels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-  static String _dateKey(DateTime date) {
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '${date.year}$month$day';
-  }
-
-  List<bool> _practicedDays() {
-    final now = DateTime.now();
-    // Calendar days, not 24-hour durations, so DST changes can't skip a day.
-    final sunday = DateTime(now.year, now.month, now.day - now.weekday % 7);
-    return List.generate(7, (i) {
-      final day = DateTime(sunday.year, sunday.month, sunday.day + i);
-      final suffix = _dateKey(day);
-      return state.completedActivities.any((id) => id.endsWith('_$suffix'));
-    });
-  }
+  static const _labels = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   @override
   Widget build(BuildContext context) {
@@ -623,122 +556,153 @@ class _WeekPracticeCard extends StatelessWidget {
     final ink = dark ? _HomeDark.ink : _HomeLight.ink;
     final inkMuted = dark ? _HomeDark.inkMuted : _HomeLight.inkMuted;
     final inkFaint = dark ? _HomeDark.inkFaint : _HomeLight.inkFaint;
+    final line = dark ? _HomeDark.line : _HomeLight.line;
     final lineStrong = dark ? _HomeDark.lineStrong : _HomeLight.lineStrong;
-    final surfaceRaised = dark
-        ? _HomeDark.surfaceRaised
-        : _HomeLight.surfaceSunken;
-    final surfaceSunken = dark
-        ? _HomeDark.surfaceSunken
-        : _HomeLight.surfaceSunken;
-    final flameColor = dark ? _HomeDark.gold : _HomeLight.yellowInk;
-    final practicedFill = dark ? _HomeDark.gold : _HomeLight.accent;
-    final practicedCheck = dark ? _HomeDark.surfaceSunken : Colors.white;
+    final accent = dark ? _HomeDark.gold : _HomeLight.accent;
+    final flameFill = dark
+        ? _HomeDark.gold.withValues(alpha: .2)
+        : _HomeLight.yellowTile;
+    final success = curioColor(
+      context,
+      CurioColors.success,
+      CurioColorsLight.forest,
+    );
 
-    final days = _practicedDays();
-    final count = days.where((d) => d).length;
-    final remaining = (_goal - count).clamp(0, _goal);
-    final todayIndex = DateTime.now().weekday % 7;
-    // Days still playable this week (today counts if not yet practised), so
-    // we never ask for five more days on a Friday.
-    final available = [
-      for (var i = todayIndex; i < 7; i++) !days[i],
-    ].where((open) => open).length;
-    final message = remaining == 0
-        ? 'Weekly goal reached — amazing focus!'
-        : remaining <= available
-        ? 'Just $remaining more day${remaining == 1 ? '' : 's'} to hit your goal'
-        : available == 0
-        ? 'Great week. A fresh one starts on Sunday.'
-        : '$available day${available == 1 ? '' : 's'} left this week — every one counts.';
+    final now = DateTime.now();
+    final week = _thisWeek();
+    final played = [
+      for (final day in week)
+        state.completedActivities.any((id) => id.endsWith('_${_dateKey(day)}')),
+    ];
+    final todayIndex = now.weekday - 1;
+    final goal = state.dailyGoal;
+    final doneToday = state.dailyGoalCompleted;
+    final goalMet = doneToday >= goal;
 
     return _GlassPanel(
       radius: 24,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Practiced $count day${count == 1 ? '' : 's'}',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(color: ink, fontSize: 21),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      message,
-                      style: TextStyle(color: inkMuted, fontSize: 12),
-                    ),
-                  ],
+                child: Text(
+                  '${_weekdays[now.weekday - 1]}, ${now.day} ${_months[now.month - 1]}',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: ink,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: surfaceSunken,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: lineStrong),
-                ),
-                child: Icon(Icons.calendar_today_rounded, color: ink, size: 16),
-              ),
+              const SizedBox(width: 8),
+              _StreakChip(streak: state.streak),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Row(
-            children: List.generate(7, (i) {
-              final practiced = days[i];
-              final isToday = i == todayIndex;
-              return Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: practiced
-                            ? practicedFill
-                            : (isToday ? surfaceRaised : surfaceSunken),
-                        border: Border.all(
-                          color: practiced ? Colors.transparent : lineStrong,
-                          width: 1.3,
+            children: [
+              for (var i = 0; i < 7; i++)
+                Expanded(
+                  child: Semantics(
+                    label:
+                        '${_weekdays[i]}${i == todayIndex ? ', today' : ''}: '
+                        '${played[i] ? 'played' : 'not played'}',
+                    excludeSemantics: true,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: played[i] ? flameFill : Colors.transparent,
+                            border: Border.all(
+                              color: i == todayIndex
+                                  ? accent
+                                  : played[i]
+                                  ? Colors.transparent
+                                  : lineStrong,
+                              width: i == todayIndex ? 2 : 1.3,
+                            ),
+                          ),
+                          child: played[i]
+                              ? Icon(
+                                  Icons.local_fire_department_rounded,
+                                  color: accent,
+                                  size: 19,
+                                )
+                              : i == todayIndex
+                              ? _Pulse(
+                                  child: Icon(
+                                    Icons.local_fire_department_outlined,
+                                    color: accent.withValues(alpha: .7),
+                                    size: 17,
+                                  ),
+                                )
+                              : null,
                         ),
-                      ),
-                      child: practiced
-                          ? Icon(
-                              Icons.check_rounded,
-                              color: practicedCheck,
-                              size: 16,
-                            )
-                          : isToday
-                          ? _Pulse(
-                              child: Icon(
-                                Icons.local_fire_department_rounded,
-                                color: flameColor,
-                                size: 16,
-                              ),
-                            )
-                          : null,
+                        const SizedBox(height: 6),
+                        Text(
+                          _labels[i],
+                          style: TextStyle(
+                            color: i == todayIndex ? ink : inkFaint,
+                            fontSize: 12,
+                            fontWeight: i == todayIndex
+                                ? FontWeight.w800
+                                : FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _labels[i],
-                      style: TextStyle(
-                        color: isToday ? ink : inkFaint,
-                        fontSize: 9.5,
-                        fontWeight: isToday ? FontWeight.w800 : FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              );
-            }),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Divider(height: 1, color: line),
+          const SizedBox(height: 14),
+          Column(
+            key: const Key('daily_goal_banner'),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    goalMet ? Icons.emoji_events_rounded : Icons.flag_rounded,
+                    color: goalMet ? success : accent,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      goalMet ? 'Today’s goal reached!' : 'Today’s goal',
+                      style: TextStyle(
+                        color: ink,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '$doneToday of $goal games',
+                    style: TextStyle(
+                      color: inkMuted,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 9),
+              CurioProgressBar(
+                value: goal == 0 ? 1 : doneToday / goal,
+                color: goalMet ? success : accent,
+                height: 8,
+              ),
+            ],
           ),
         ],
       ),
@@ -746,58 +710,58 @@ class _WeekPracticeCard extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({
-    required this.title,
-    required this.subtitle,
-    this.action,
-    this.onAction,
-  });
-  final String title;
-  final String subtitle;
-  final String? action;
-  final VoidCallback? onAction;
+/// Three pastel tiles: games played, XP earned and skills practised, all
+/// counted for this week only.
+class _WeeklyGrowth extends StatelessWidget {
+  const _WeeklyGrowth({required this.state});
+  final CurioState state;
 
   @override
   Widget build(BuildContext context) {
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    final accent = _hc(context, _HomeDark.accent, _HomeLight.accent);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 24),
-              ),
-              const SizedBox(height: 4),
-              Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 11.5)),
-            ],
-          ),
+    final keys = {for (final day in _thisWeek()) _dateKey(day)};
+    final thisWeek = [
+      for (final id in state.completedActivities)
+        if (keys.any((key) => id.endsWith('_$key'))) activityGame(id),
+    ];
+    final xp = thisWeek.fold(
+      0,
+      (sum, game) => sum + (gameRewards[game]?.xp ?? 0),
+    );
+    final skills = {
+      for (final game in thisWeek)
+        if (gameRewards[game] case final reward?) reward.skill,
+    };
+
+    return CurioStatRow(
+      tiles: [
+        CurioStatTile(
+          value: '${thisWeek.length}',
+          label: 'Games played',
+          tone: StatTone.gold,
+          semanticLabel: '${thisWeek.length} games played this week',
         ),
-        if (action != null)
-          TextButton(
-            onPressed: onAction,
-            style: TextButton.styleFrom(foregroundColor: accent),
-            child: Text(action!.toUpperCase()),
-          ),
+        CurioStatTile(
+          value: '$xp',
+          label: 'XP earned',
+          tone: StatTone.plum,
+          semanticLabel: '$xp XP earned this week',
+        ),
+        CurioStatTile(
+          value: '${skills.length}/${learningSkills.length}',
+          label: 'Skills practised',
+          tone: StatTone.forest,
+          semanticLabel:
+              '${skills.length} of ${learningSkills.length} skills practised this week',
+        ),
       ],
     );
   }
 }
 
-bool _isDone(CurioState state, GameEntry game) => game.isDaily
-    ? state.completedToday(game.id)
-    : state.completedActivities.contains(game.id);
-
-class _TodayPicksShelf extends StatelessWidget {
-  const _TodayPicksShelf({
+/// Today's picks as big cards in a sideways carousel; the next card peeks in
+/// from the edge so it's clear there's more. The featured quest comes first.
+class _PicksCarousel extends StatelessWidget {
+  const _PicksCarousel({
     required this.games,
     required this.featuredId,
     required this.state,
@@ -808,208 +772,157 @@ class _TodayPicksShelf extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // A scrolling Row (not a fixed-height ListView) so cards grow with the
-    // reader's text size; IntrinsicHeight keeps them the same height.
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      clipBehavior: Clip.none,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (var i = 0; i < games.length; i++) ...[
-              if (i > 0) const SizedBox(width: 12),
-              SizedBox(
-                width: 196,
-                child: GameCard(
-                  game: games[i],
-                  featured: games[i].id == featuredId,
-                  done: _isDone(state, games[i]),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // About two-thirds of a phone's width, so the next card is clearly
+        // there to swipe to.
+        final width = math.min(250.0, constraints.maxWidth * .7);
+        // A scrolling Row (not a fixed-height ListView) so cards grow with
+        // the reader's text size; IntrinsicHeight keeps them the same height.
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < games.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 14),
+                  SizedBox(
+                    width: width,
+                    child: GameCard(
+                      game: games[i],
+                      style: GameCardStyle.spotlight,
+                      featured: games[i].id == featuredId,
+                      done: _isDone(state, games[i]),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-class _AdventurePicker extends StatefulWidget {
-  const _AdventurePicker({required this.state});
+/// The four skills as tiles: how many games each has, the level reached, and
+/// mastery so far. A tile opens that skill's games.
+class _SkillGrid extends StatelessWidget {
+  const _SkillGrid({required this.state});
   final CurioState state;
 
   @override
-  State<_AdventurePicker> createState() => _AdventurePickerState();
-}
-
-class _AdventurePickerState extends State<_AdventurePicker> {
-  String _selected = learningSkills.first;
-
-  @override
   Widget build(BuildContext context) {
-    final skills = learningSkills;
-    final matches = gameCatalog
-        .where((game) => game.skill == _selected)
-        .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return GameGrid(
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          child: Row(
-            children: [
-              for (final skill in skills)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: _SkillTab(
-                    label: skill,
-                    selected: skill == _selected,
-                    color: skillColor(context, skill),
-                    onTap: () => setState(() => _selected = skill),
-                  ),
-                ),
-            ],
+        for (final skill in learningSkills)
+          _SkillTile(
+            skill: skill,
+            mastery: (state.skills[skill] ?? 0).clamp(0, 1).toDouble(),
+            games: gameCatalog.where((g) => g.skill == skill).length,
           ),
-        ),
-        const SizedBox(height: 16),
-        _SkillProgressCard(
-          skill: _selected,
-          progress: widget.state.skills[_selected] ?? 0,
-          color: skillColor(context, _selected),
-        ),
-        for (final game in matches) ...[
-          const SizedBox(height: 12),
-          GameCard(
-            game: game,
-            style: GameCardStyle.row,
-            done: _isDone(widget.state, game),
-          ),
-        ],
       ],
     );
   }
 }
 
-class _SkillTab extends StatelessWidget {
-  const _SkillTab({
-    required this.label,
-    required this.selected,
-    required this.color,
-    required this.onTap,
-  });
-  final String label;
-  final bool selected;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final surface = _hc(context, _HomeDark.surface, _HomeLight.surface);
-    final line = _hc(context, _HomeDark.line, _HomeLight.line);
-    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(99),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(99),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: selected ? color.withValues(alpha: .16) : surface,
-            borderRadius: BorderRadius.circular(99),
-            border: Border.all(color: selected ? color : line),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected
-                  ? (color.computeLuminance() > .5 ? ink : color)
-                  : inkMuted,
-              fontSize: 12,
-              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SkillProgressCard extends StatelessWidget {
-  const _SkillProgressCard({
+class _SkillTile extends StatelessWidget {
+  const _SkillTile({
     required this.skill,
-    required this.progress,
-    required this.color,
+    required this.mastery,
+    required this.games,
   });
+
   final String skill;
-  final double progress;
-  final Color color;
+  final double mastery;
+  final int games;
 
   @override
   Widget build(BuildContext context) {
+    final color = skillColor(context, skill);
+    final solid = skillSolidColor(skill, color);
     final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(22),
-      child: InkWell(
-        onTap: () => openPage(context, const SkillQuestPage()),
-        borderRadius: BorderRadius.circular(22),
-        child: _GlassPanel(
-          radius: 22,
-          darkTint: _HomeDark.surfaceRaised,
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: .16),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.trending_up_rounded, color: color, size: 22),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+    final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
+    final percent = (mastery * 100).round();
+    void open() => openPage(context, SkillGamesPage(skill: skill));
+    return Semantics(
+      button: true,
+      label: '$skill. $games games. $percent% mastery',
+      excludeSemantics: true,
+      onTap: open,
+      child: CurioGloss(
+        radius: 22,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: Key('skill_tile_$skill'),
+            onTap: open,
+            borderRadius: BorderRadius.circular(22),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: bannerFill(context, solid),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          skillIcon(skill),
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        skill,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: ink, fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$games games',
+                        style: TextStyle(color: inkMuted, fontSize: 12.5),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            '$skill path',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleMedium?.copyWith(color: ink),
+                          child: CurioProgressBar(
+                            value: mastery,
+                            color: color,
+                            height: 6,
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Text(
-                          '${(progress * 100).round()}%',
+                          '$percent%',
                           style: TextStyle(
-                            color: color,
+                            color: inkMuted,
                             fontWeight: FontWeight.w800,
-                            fontSize: 12,
+                            fontSize: 11.5,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    CurioProgressBar(value: progress, color: color, height: 6),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: ink.withValues(alpha: .5),
-              ),
-            ],
+            ),
           ),
         ),
       ),

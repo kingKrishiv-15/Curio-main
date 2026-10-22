@@ -9,6 +9,8 @@ import '../../../core/widgets/curio_gloss.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
+import '../../games/game_catalog.dart';
+import '../../games/presentation/game_card.dart';
 import 'auth_layout.dart';
 import 'auth_page.dart';
 import 'guest_sheet.dart';
@@ -499,7 +501,7 @@ class _StepCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              gradient: vividGradient(color),
+              color: color,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, color: Colors.white, size: 24),
@@ -547,68 +549,22 @@ class _GameShelf extends StatelessWidget {
   final bool wide;
   final double gutter;
 
+  /// A taste of the catalog — at least one game from every skill — drawn
+  /// with the same art as inside the app.
+  static const _ids = [
+    'scale',
+    'odd_cluster',
+    'mirror',
+    'verdict',
+    'whos_who',
+    'loophole',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    // Mirrors the games on Home and in the Learn hub.
-    final games = [
-      (
-        'Squeeze',
-        'Find the secret number before the range closes in.',
-        Icons.calculate_rounded,
-        'Number sense',
-        CurioColors.saffron,
-        CurioColorsLight.saffron,
-      ),
-      (
-        'Link Lab',
-        'Sort sixteen clues into four hidden groups.',
-        Icons.hub_outlined,
-        'Reasoning',
-        CurioColors.plum,
-        CurioColorsLight.plum,
-      ),
-      (
-        'Pattern Forge',
-        'Crack the rule behind the sequence.',
-        Icons.blur_on_rounded,
-        'Patterns',
-        CurioColors.coral,
-        CurioColorsLight.coral,
-      ),
-      (
-        'Evidence Detective',
-        'Separate reliable clues from tempting distractions.',
-        Icons.manage_search_rounded,
-        'Evidence',
-        CurioColors.blue,
-        CurioColorsLight.blue,
-      ),
-      (
-        'Signal Grid',
-        'Balance a binary grid using deduction alone.',
-        Icons.grid_view_rounded,
-        'Logic',
-        CurioColors.forest,
-        CurioColorsLight.forest,
-      ),
-      (
-        'Loophole',
-        'Spot the one word that makes a true statement mislead.',
-        Icons.format_quote_rounded,
-        'Scepticism',
-        CurioColors.saffronStrong,
-        CurioColorsLight.saffronStrong,
-      ),
-    ];
     final cards = [
-      for (final (title, body, icon, skill, dark, light) in games)
-        _ShelfCard(
-          title: title,
-          body: body,
-          icon: icon,
-          skill: skill,
-          color: curioColor(context, dark, light),
-        ),
+      for (final id in _ids)
+        if (findGame(id) case final game?) _ShelfCard(game: game),
     ];
     if (wide) {
       return Padding(
@@ -648,17 +604,9 @@ class _GameShelf extends StatelessWidget {
 }
 
 class _ShelfCard extends StatelessWidget {
-  const _ShelfCard({
-    required this.title,
-    required this.body,
-    required this.icon,
-    required this.skill,
-    required this.color,
-  });
+  const _ShelfCard({required this.game});
 
-  final String title, body, skill;
-  final IconData icon;
-  final Color color;
+  final GameEntry game;
 
   @override
   Widget build(BuildContext context) {
@@ -667,6 +615,7 @@ class _ShelfCard extends StatelessWidget {
       CurioColors.inkSoft,
       CurioColorsLight.inkSoft,
     );
+    final skill = skillColor(context, game.skill);
     return CurioGloss(
       radius: 22,
       padding: const EdgeInsets.all(10),
@@ -675,28 +624,7 @@ class _ShelfCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ExcludeSemantics(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                height: 104,
-                decoration: BoxDecoration(gradient: vividGradient(color)),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned(
-                      right: -18,
-                      bottom: -26,
-                      child: Icon(
-                        icon,
-                        size: 110,
-                        color: Colors.white.withValues(alpha: .2),
-                      ),
-                    ),
-                    Center(child: Icon(icon, size: 40, color: Colors.white)),
-                  ],
-                ),
-              ),
-            ),
+            child: GameArt(game: game, height: 104, badges: false),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(6, 12, 6, 6),
@@ -704,19 +632,23 @@ class _ShelfCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  skill.toUpperCase(),
+                  game.skill.toUpperCase(),
                   style: TextStyle(
-                    color: color,
+                    color: curioColor(
+                      context,
+                      skill,
+                      Color.lerp(skill, Colors.black, .3)!,
+                    ),
                     fontSize: 9.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
+                Text(game.title, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 4),
                 Text(
-                  body,
+                  game.tagline,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: muted, fontSize: 12.5, height: 1.4),

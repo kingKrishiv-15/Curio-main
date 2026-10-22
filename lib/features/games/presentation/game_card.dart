@@ -6,6 +6,7 @@ import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_gloss.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../game_catalog.dart';
+import 'game_banner.dart';
 import 'game_preview.dart';
 
 /// How a [GameCard] is laid out.
@@ -18,6 +19,9 @@ enum GameCardStyle {
 
   /// Big art and a play button — for today's featured quest.
   hero,
+
+  /// Big art with a round play button on its lower edge — Home's carousel.
+  spotlight,
 }
 
 /// The one card every screen uses to show a game: vivid art with a preview
@@ -60,7 +64,9 @@ class GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = skillColor(context, game.skill);
+    // Buttons and borders take the banner's own colour, so each card reads
+    // as one piece; the skill chip keeps the skill's colour.
+    final color = gameColor(game.id, skillColor(context, game.skill));
     final radius = switch (style) {
       GameCardStyle.hero => 28.0,
       _ => 24.0,
@@ -69,6 +75,7 @@ class GameCard extends StatelessWidget {
       GameCardStyle.tile => _tile(context, color),
       GameCardStyle.row => _row(context, color),
       GameCardStyle.hero => _hero(context, color),
+      GameCardStyle.spotlight => _spotlight(context, color),
     };
     return Semantics(
       button: true,
@@ -147,15 +154,84 @@ class GameCard extends StatelessWidget {
               child: _Details(game: game, done: done, taglineLines: 3),
             ),
           ),
-          Center(child: _ArrowButton(color: color, done: done)),
+          Center(
+            child: _ArrowButton(color: color, done: done),
+          ),
           const SizedBox(width: 6),
         ],
       ),
     ),
   );
 
+  // The play button hangs half over the art; the card itself is the tap
+  // target, so the button is only a signpost.
+  Widget _spotlight(BuildContext context, Color color) {
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  GameArt(
+                    game: game,
+                    height: 122,
+                    done: done,
+                    featured: featured,
+                  ),
+                  Positioned(
+                    right: 12,
+                    bottom: -21,
+                    child: _PlayCircle(color: color, done: done),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 14, 56, 0),
+                child: Text(
+                  game.title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontSize: 18),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
+                child: Text(
+                  game.tagline,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: muted, fontSize: 13, height: 1.4),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 6),
+            child: _Meta(game: game, done: done),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _hero(BuildContext context, Color color) {
-    final muted = curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft);
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -169,10 +245,17 @@ class GameCard extends StatelessWidget {
               children: [
                 CurioEyebrow(
                   featured ? 'Today’s featured quest' : game.skill,
-                  color: color,
+                  color: curioColor(
+                    context,
+                    color,
+                    Color.lerp(color, Colors.black, .3)!,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                Text(game.title, style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  game.title,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 6),
                 Text(
                   game.tagline,
@@ -201,8 +284,8 @@ class GameCard extends StatelessWidget {
   }
 }
 
-/// Vivid art for a game: its skill colour as a two-tone gradient, a big
-/// faded icon, the game's [GamePreview], and status badges.
+/// Vivid art for a game: a block of its own solid [gameColor], a big faded
+/// icon, the game's [GamePreview], and status badges.
 class GameArt extends StatelessWidget {
   const GameArt({
     required this.game,
@@ -210,6 +293,7 @@ class GameArt extends StatelessWidget {
     this.done = false,
     this.featured = false,
     this.compactBadges = false,
+    this.badges = true,
     super.key,
   });
 
@@ -220,14 +304,23 @@ class GameArt extends StatelessWidget {
   /// Icon-only badges, for narrow art.
   final bool compactBadges;
 
+  /// DONE / QUEST / NEW. Off where they'd mean nothing, like the signed-out
+  /// landing page.
+  final bool badges;
+
   @override
   Widget build(BuildContext context) {
-    final color = skillColor(context, game.skill);
+    final color = gameColor(game.id, skillColor(context, game.skill));
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Container(
         height: height,
-        decoration: BoxDecoration(gradient: gameGradient(color)),
+        // A fine light rim keeps the edge crisp against glass cards.
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: .22)),
+        ),
+        color: bannerFill(context, color),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -237,7 +330,7 @@ class GameArt extends StatelessWidget {
               child: Icon(
                 game.icon,
                 size: height * .9,
-                color: Colors.white.withValues(alpha: .14),
+                color: Colors.white.withValues(alpha: .12),
               ),
             ),
             Positioned.fill(
@@ -251,64 +344,44 @@ class GameArt extends StatelessWidget {
                 child: GamePreview(gameId: game.id, color: color),
               ),
             ),
-            Positioned(
-              left: 8,
-              top: 8,
-              right: 8,
-              child: Row(
-                children: [
-                  if (done)
-                    _Badge(
-                      icon: Icons.check_rounded,
-                      label: compactBadges ? null : 'DONE',
-                      foreground: curioColor(
-                        context,
-                        CurioColors.forestStrong,
-                        CurioColorsLight.forestStrong,
+            if (badges)
+              Positioned(
+                left: 8,
+                top: 8,
+                right: 8,
+                child: Row(
+                  children: [
+                    if (done)
+                      _Badge(
+                        icon: Icons.check_rounded,
+                        label: compactBadges ? null : 'DONE',
+                        foreground: curioColor(
+                          context,
+                          CurioColors.forestStrong,
+                          CurioColorsLight.forestStrong,
+                        ),
                       ),
-                    ),
-                  const Spacer(),
-                  if (featured)
-                    _Badge(
-                      icon: Icons.star_rounded,
-                      label: compactBadges ? null : 'QUEST',
-                      background: CurioColors.spark,
-                      foreground: CurioColorsLight.ink,
-                    )
-                  else if (game.isNew && !done)
-                    _Badge(
-                      label: 'NEW',
-                      foreground: Color.lerp(color, Colors.black, .55)!,
-                    ),
-                ],
+                    const Spacer(),
+                    if (featured)
+                      _Badge(
+                        icon: Icons.star_rounded,
+                        label: compactBadges ? null : 'QUEST',
+                        background: CurioColors.spark,
+                        foreground: CurioColorsLight.ink,
+                      )
+                    else if (game.isNew && !done)
+                      _Badge(
+                        label: 'NEW',
+                        foreground: Color.lerp(color, Colors.black, .5)!,
+                      ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
-}
-
-/// Home's full-saturation banner treatment, shared by every game card.
-LinearGradient gameGradient(Color color) {
-  final hsl = HSLColor.fromColor(color);
-  return LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      hsl
-          .withLightness((hsl.lightness + .08).clamp(0.0, 1.0))
-          .withSaturation((hsl.saturation + .08).clamp(0.0, 1.0))
-          .toColor(),
-      // Shift *down* the hue wheel: saffron warms to amber instead of
-      // drifting into acid green, coral deepens to red, blue to teal.
-      hsl
-          .withHue((hsl.hue - 16) % 360)
-          .withLightness((hsl.lightness - .12).clamp(0.0, 1.0))
-          .toColor(),
-    ],
-  );
 }
 
 class _Badge extends StatelessWidget {
@@ -325,12 +398,19 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.symmetric(horizontal: label == null ? 4 : 8, vertical: 3),
+    padding: EdgeInsets.symmetric(
+      horizontal: label == null ? 4 : 8,
+      vertical: 3,
+    ),
     decoration: BoxDecoration(
       color: background,
       borderRadius: BorderRadius.circular(99),
       boxShadow: const [
-        BoxShadow(color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 2)),
+        BoxShadow(
+          color: Color(0x33000000),
+          blurRadius: 6,
+          offset: Offset(0, 2),
+        ),
       ],
     ),
     child: Row(
@@ -367,7 +447,11 @@ class _Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft);
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -399,9 +483,21 @@ class _Meta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = skillColor(context, game.skill);
-    final muted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
-    final success = curioColor(context, CurioColors.success, CurioColorsLight.forestStrong);
-    final gold = curioColor(context, CurioColors.saffron, CurioColorsLight.saffronStrong);
+    final muted = curioColor(
+      context,
+      CurioColors.inkMuted,
+      CurioColorsLight.inkMuted,
+    );
+    final success = curioColor(
+      context,
+      CurioColors.success,
+      CurioColorsLight.forestStrong,
+    );
+    final gold = curioColor(
+      context,
+      CurioColors.saffron,
+      CurioColorsLight.saffronStrong,
+    );
     return Wrap(
       spacing: 10,
       runSpacing: 6,
@@ -425,7 +521,11 @@ class _Meta extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     // Skill hues are bright: darken them for text on light cards.
-                    color: curioColor(context, color, Color.lerp(color, Colors.black, .35)!),
+                    color: curioColor(
+                      context,
+                      color,
+                      Color.lerp(color, Colors.black, .35)!,
+                    ),
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
@@ -434,17 +534,33 @@ class _Meta extends StatelessWidget {
             ],
           ),
         ),
-        _MetaItem(icon: Icons.schedule_rounded, label: game.duration, color: muted),
+        _MetaItem(
+          icon: Icons.schedule_rounded,
+          label: game.duration,
+          color: muted,
+        ),
         done
-            ? _MetaItem(icon: Icons.check_circle_rounded, label: 'XP earned', color: success)
-            : _MetaItem(icon: Icons.bolt_rounded, label: '+${game.xp} XP', color: gold),
+            ? _MetaItem(
+                icon: Icons.check_circle_rounded,
+                label: 'XP earned',
+                color: success,
+              )
+            : _MetaItem(
+                icon: Icons.bolt_rounded,
+                label: '+${game.xp} XP',
+                color: gold,
+              ),
       ],
     );
   }
 }
 
 class _MetaItem extends StatelessWidget {
-  const _MetaItem({required this.icon, required this.label, required this.color});
+  const _MetaItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
   final IconData icon;
   final String label;
   final Color color;
@@ -460,7 +576,11 @@ class _MetaItem extends StatelessWidget {
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: color, fontSize: 11.5, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: color,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     ],
@@ -494,13 +614,46 @@ class _PlayPill extends StatelessWidget {
           Flexible(
             child: Text(
               done ? 'Play again' : 'Play',
-              style: TextStyle(color: ink, fontWeight: FontWeight.w800, fontSize: 13),
+              style: TextStyle(
+                color: ink,
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _PlayCircle extends StatelessWidget {
+  const _PlayCircle({required this.color, required this.done});
+  final Color color;
+  final bool done;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 46,
+    height: 46,
+    decoration: BoxDecoration(
+      color: curioColor(context, CurioColors.surface, CurioColorsLight.surface),
+      shape: BoxShape.circle,
+      border: Border.all(color: color, width: 2),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: .16),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Icon(
+      done ? Icons.replay_rounded : Icons.play_arrow_rounded,
+      color: curioColor(context, color, Color.lerp(color, Colors.black, .3)!),
+      size: 25,
+    ),
+  );
 }
 
 class _ArrowButton extends StatelessWidget {
@@ -553,7 +706,9 @@ class GameGrid extends StatelessWidget {
                   for (var i = start; i < start + columns; i++) ...[
                     if (i > start) SizedBox(width: spacing),
                     Expanded(
-                      child: i < children.length ? children[i] : const SizedBox(),
+                      child: i < children.length
+                          ? children[i]
+                          : const SizedBox(),
                     ),
                   ],
                 ],

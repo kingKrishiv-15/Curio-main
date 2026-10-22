@@ -9,67 +9,39 @@ import '../../../../core/widgets/curio_logo.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../../discoveries/domain/discovery.dart';
+import '../../../games/game_catalog.dart';
+import '../../../games/presentation/game_banner.dart';
 
 /// Illustrations for the signed-out journey. Every piece is decorative —
 /// wrapped in [ExcludeSemantics] and fixed text scaling — because the words
 /// next to it carry the meaning.
 
-/// A skill as it appears across Curio (design.md §3, "Skill colour mapping").
+/// A skill as it appears across Curio: the same solid colour its games
+/// and Home's skill tiles use.
 class WelcomeSkill {
-  const WelcomeSkill(this.label, this.icon, this.dark, this.light);
+  const WelcomeSkill(this.label, this.icon, this.skill);
   final String label;
   final IconData icon;
-  final Color dark;
-  final Color light;
 
-  Color of(BuildContext context) => curioColor(context, dark, light);
+  /// The learning skill it stands for (see `learningSkills`).
+  final String skill;
+
+  /// The fill colour (art, tiles).
+  Color of(BuildContext context) =>
+      bannerFill(context, skillSolidColor(skill, skillColor(context, skill)));
+
+  /// The same colour, deepened on light backgrounds so small text reads.
+  Color ink(BuildContext context) {
+    final solid = skillSolidColor(skill, skillColor(context, skill));
+    return curioColor(context, solid, Color.lerp(solid, Colors.black, .3)!);
+  }
 
   static const all = [
-    WelcomeSkill(
-      'Numbers',
-      Icons.calculate_rounded,
-      CurioColors.saffron,
-      CurioColorsLight.saffron,
-    ),
-    WelcomeSkill(
-      'Patterns',
-      Icons.blur_on_rounded,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    ),
-    WelcomeSkill(
-      'Evidence',
-      Icons.manage_search_rounded,
-      CurioColors.blue,
-      CurioColorsLight.blue,
-    ),
-    WelcomeSkill(
-      'Reasoning',
-      Icons.psychology_rounded,
-      CurioColors.plum,
-      CurioColorsLight.plum,
-    ),
+    WelcomeSkill('Numbers', Icons.calculate_rounded, 'Number sense'),
+    WelcomeSkill('Patterns', Icons.blur_on_rounded, 'Patterns'),
+    WelcomeSkill('Evidence', Icons.manage_search_rounded, 'Evidence'),
+    WelcomeSkill('Reasoning', Icons.psychology_rounded, 'Reasoning'),
   ];
-}
-
-/// Home's full-saturation banner treatment (`_CardArt._vividGradient`), so
-/// the games look the same here as they do once signed in.
-LinearGradient vividGradient(Color color) {
-  final hsl = HSLColor.fromColor(color);
-  return LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      hsl
-          .withLightness((hsl.lightness + .1).clamp(0.0, 1.0))
-          .withSaturation((hsl.saturation + .08).clamp(0.0, 1.0))
-          .toColor(),
-      hsl
-          .withHue((hsl.hue + 26) % 360)
-          .withLightness((hsl.lightness - .1).clamp(0.0, 1.0))
-          .toColor(),
-    ],
-  );
 }
 
 class _Decorative extends StatelessWidget {
@@ -204,7 +176,7 @@ class _Planet extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: vividGradient(color),
+            color: color,
             border: Border.all(color: surface, width: size * .06),
             boxShadow: [
               BoxShadow(
@@ -279,7 +251,7 @@ class _OrbitPainter extends CustomPainter {
       );
     }
 
-    // Inner orbit: the logo's "c", opening towards its spark.
+    // Inner orbit: the logo's "C", fading in round its sweep.
     final r = s * .27;
     final arcPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -296,17 +268,6 @@ class _OrbitPainter extends CustomPainter {
       CurioMarkGeometry.sweep,
       false,
       arcPaint,
-    );
-    final tipAngle = CurioMarkGeometry.startAngle + CurioMarkGeometry.sweep;
-    final tip = c + Offset(math.cos(tipAngle), math.sin(tipAngle)) * r;
-    canvas.drawPath(
-      CurioMarkGeometry.sparkPath(tip + Offset(s * .06, -s * .055), s * .05),
-      Paint()..color = spark,
-    );
-    canvas.drawCircle(
-      tip + Offset(s * .115, s * .02),
-      s * .012,
-      Paint()..color = spark,
     );
     // A couple of far-off twinkles for depth.
     for (final (x, y, radius) in [(.1, .2, .022), (.9, .82, .018)]) {
@@ -335,24 +296,16 @@ class GameFanArt extends StatelessWidget {
   Widget build(BuildContext context) {
     // Mirrors Home's own game list (icons, skills, durations).
     final cards = [
-      (
-        'Squeeze',
-        'Numbers · 2–4 min',
-        Icons.calculate_rounded,
-        WelcomeSkill.all[0],
-      ),
-      (
-        'Link Lab',
-        'Reasoning · 3–5 min',
-        Icons.hub_outlined,
-        WelcomeSkill.all[3],
-      ),
-      (
-        'Pattern Forge',
-        'Patterns · 3–5 min',
-        Icons.blur_on_rounded,
-        WelcomeSkill.all[1],
-      ),
+      for (final id in const ['squeeze', 'link_lab', 'pattern_forge'])
+        if (findGame(id) case final game?)
+          (
+            game.title,
+            // "Numbers", not "Number sense": the card is narrow.
+            '${game.skill == 'Number sense' ? 'Numbers' : game.skill} · '
+                '${game.duration}',
+            game.icon,
+            gameColor(id, skillColor(context, game.skill)),
+          ),
     ];
     final w = height * .48;
     // Left and right first so the centre card sits on top of both.
@@ -381,7 +334,7 @@ class GameFanArt extends StatelessWidget {
                       title: cards[i].$1,
                       meta: cards[i].$2,
                       icon: cards[i].$3,
-                      color: cards[i].$4.of(context),
+                      color: bannerFill(context, cards[i].$4),
                       raised: i == 1,
                     ),
                   ),
@@ -452,7 +405,7 @@ class _GameCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(width * .11),
             child: Container(
               height: width * .82,
-              decoration: BoxDecoration(gradient: vividGradient(color)),
+              color: color,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -633,7 +586,7 @@ class _FactCard extends StatelessWidget {
               width: width * .2,
               height: width * .2,
               decoration: BoxDecoration(
-                gradient: vividGradient(color),
+                color: color,
                 borderRadius: BorderRadius.circular(width * .06),
               ),
               child: Icon(

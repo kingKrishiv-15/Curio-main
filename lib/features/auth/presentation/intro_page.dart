@@ -223,7 +223,7 @@ class _SlideView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        CurioEyebrow(slide.eyebrow, color: slide.skill.of(context)),
+        CurioEyebrow(slide.eyebrow, color: slide.skill.ink(context)),
         const SizedBox(height: 12),
         Semantics(
           header: true,

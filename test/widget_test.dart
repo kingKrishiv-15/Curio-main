@@ -58,8 +58,8 @@ void main() {
   ) async {
     await tester.pumpWidget(const CurioApp());
 
-    expect(find.text('Explorer'), findsOneWidget);
-    expect(find.text('A little discovery today?'), findsOneWidget);
+    expect(find.text('Hello, Explorer!'), findsOneWidget);
+    expect(find.text('Weekly growth'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('nav_Games')));
     await tester.pump();
@@ -195,8 +195,20 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.textContaining('Practiced'), findsOneWidget);
+    expect(find.text('Today’s goal'), findsOneWidget);
     expect(find.text('Today’s picks'), findsOneWidget);
+    final tile = find.byKey(const Key('skill_tile_Evidence'));
+    await tester.scrollUntilVisible(
+      tile,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Explore by skill'), findsOneWidget);
+
+    await tester.tap(tile);
+    await tester.pumpAndSettle();
+    expect(find.text('4 games'), findsWidgets);
+    expect(find.text('Verdict'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

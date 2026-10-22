@@ -7,6 +7,7 @@ import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/game_catalog.dart';
+import '../../games/presentation/game_banner.dart';
 import '../domain/discovery.dart';
 
 class DiscoveriesPage extends StatelessWidget {
@@ -16,25 +17,46 @@ class DiscoveriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final progress = state.collectedFacts.length / discoveries.length;
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+    final coral = curioColor(
+      context,
+      CurioColors.coral,
+      CurioColorsLight.coral,
+    );
     final forestStrong = curioColor(
       context,
       CurioColors.forestStrong,
       CurioColorsLight.forestStrong,
     );
-    final saffron = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
-    final onDark = curioColor(context, CurioColors.onDark, CurioColorsLight.onDark);
-    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
+    final saffron = curioColor(
+      context,
+      CurioColors.saffron,
+      CurioColorsLight.saffron,
+    );
+    final onDark = curioColor(
+      context,
+      CurioColors.onDark,
+      CurioColorsLight.onDark,
+    );
+    final surface = curioColor(
+      context,
+      CurioColors.surface,
+      CurioColorsLight.surface,
+    );
     final surfaceMuted = curioColor(
       context,
       CurioColors.surfaceMuted,
       CurioColorsLight.surfaceMuted,
     );
-    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
-    final creamDeep = curioColor(context, CurioColors.creamDeep, CurioColorsLight.creamDeep);
-    final tealSoft = curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft);
-    final tealDark = curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark);
-    final navyMuted = curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted);
+    final creamDeep = curioColor(
+      context,
+      CurioColors.creamDeep,
+      CurioColorsLight.creamDeep,
+    );
+    final navyMuted = curioColor(
+      context,
+      CurioColors.navyMuted,
+      CurioColorsLight.navyMuted,
+    );
     return CurioPage(
       extendBehindBottom: true,
       maxWidth: 820,
@@ -107,7 +129,8 @@ class DiscoveriesPage extends StatelessWidget {
           const SizedBox(height: 25),
           const SectionHeading(
             'Collected cards',
-            subtitle: 'Tap a card to read the whole fact, or to see how to unlock it',
+            subtitle:
+                'Tap a card to read the whole fact, or to see how to unlock it',
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
@@ -133,11 +156,12 @@ class DiscoveriesPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final discovery = discoveries[index];
                   final collected = state.collectedFacts.contains(discovery.id);
+                  final tint = discoveryColor(context, discovery.id);
                   return CurioCard(
                     onTap: () => _showDiscovery(context, discovery, collected),
                     color: collected ? surface : surfaceMuted,
                     borderColor: collected
-                        ? teal.withValues(alpha: .2)
+                        ? tint.withValues(alpha: .3)
                         : creamDeep,
                     padding: const EdgeInsets.all(13),
                     elevation: false,
@@ -150,12 +174,12 @@ class DiscoveriesPage extends StatelessWidget {
                               width: 46,
                               height: 46,
                               decoration: BoxDecoration(
-                                color: collected ? tealSoft : surface,
+                                color: collected ? tint : surface,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
                                 collected ? discovery.icon : Icons.lock_outline,
-                                color: collected ? tealDark : navyMuted,
+                                color: collected ? Colors.white : navyMuted,
                               ),
                             ),
                             const Spacer(),
@@ -227,9 +251,21 @@ GameEntry? _unlockingGame(String discoveryId) {
   return null;
 }
 
+/// A discovery's colour: the solid colour of the game that unlocks it, or
+/// brand green for the streak discoveries.
+Color discoveryColor(BuildContext context, String discoveryId) {
+  final game = _unlockingGame(discoveryId);
+  return bannerFill(
+    context,
+    game == null
+        ? CurioColorsLight.forest
+        : gameColor(game.id, skillColor(context, game.skill)),
+  );
+}
+
 void _showDiscovery(BuildContext context, Discovery discovery, bool collected) {
   final game = collected ? null : _unlockingGame(discovery.id);
-  final accent = curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+  final accent = discoveryColor(context, discovery.id);
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -241,7 +277,8 @@ void _showDiscovery(BuildContext context, Discovery discovery, bool collected) {
           children: [
             CurioIconTile(
               icon: collected ? discovery.icon : Icons.lock_outline,
-              color: accent,
+              color: collected ? Colors.white : accent,
+              background: collected ? accent : accent.withValues(alpha: .14),
               size: 56,
               iconSize: 28,
               radius: 18,

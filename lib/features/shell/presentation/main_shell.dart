@@ -56,7 +56,7 @@ class _MainShellState extends State<MainShell>
   }
 
   late final List<Widget> _pages = <Widget>[
-    HomePage(onExplore: () => _select(1)),
+    HomePage(onExplore: () => _select(1), onProfile: () => _select(3)),
     const LearnHubPage(),
     const DiscoveriesPage(),
     const ProfilePage(),

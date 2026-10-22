@@ -64,12 +64,20 @@ treadmill.
   in the UI yet (see §9).
 
 ### 3.2 Home
-The daily landing screen: greeting, a "what will you solve today"
-prompt, a weekly practice tracker (days practised this week vs. a
-5-day goal, with day-by-day checkmarks), a horizontally-scrolling shelf of
-today's picks (five daily games that rotate by date, the first badged as
-today's featured quest), and a skill-filtered "pick your next adventure"
-section that surfaces one in-progress skill and its matching game(s).
+Five sections, each with one job:
+1. **Greeting** — "Hello, <name>!", a one-line prompt, family messages and
+   the avatar (opens Profile).
+2. **This week** — today's date and streak, a flame for every day played
+   Monday–Sunday, and today's goal ("1 of 3 games") with a progress bar.
+3. **Weekly growth** — three pastel tiles counted for this week: games
+   played, XP earned, skills practised (x/4). They stack into full-width
+   rows at large text sizes.
+4. **Today's picks** — a carousel of big game cards (five daily games that
+   rotate by date; the first is today's featured quest), with "See all"
+   jumping to the Games tab.
+5. **Explore by skill** — a tile per skill (game count, mastery); each
+   opens that skill's games with its level.
+
 Every game everywhere is drawn by the same `GameCard`: a skill-coloured
 art panel with a tiny preview of the board, skill · time · XP chips, and
 DONE / QUEST / NEW badges.

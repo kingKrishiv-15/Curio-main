@@ -5,82 +5,91 @@ import 'package:flutter/material.dart';
 import '../theme/curio_colors.dart';
 import '../theme/curio_colors_light.dart';
 
-/// Curio's mark: a lowercase "c" drawn as one confident brush stroke — the
-/// shape of a question still being asked — with a spark leaping from its
-/// tip, the moment the answer arrives. The stroke starts fine and swells,
-/// the way a thought gathers weight; the spark echoes the sparkle Nova
-/// wears, so the logo and the mascot read as one family.
+/// Curio's mark: a "C" for Curio, with a magnifying lens resting on its
+/// tip — the curious look-closer that every game asks for. Drawn flat and
+/// calm: an even, round-capped mint stroke, a gold lens ring with a short
+/// handle reaching into the C's opening, and a clean gap where the C passes
+/// behind the lens, so it reads as depth without gloss or shadows.
 ///
 /// All geometry lives in a 1×1 unit square so the widget, the launcher icons
 /// and the SVG exported by `tool/generate_brand_assets.dart` are drawn from
 /// exactly the same numbers.
 abstract final class CurioMarkGeometry {
-  static const center = Offset(.465, .535);
-  static const radius = .235;
-  static const weight = .158;
+  // The "C": one even stroke opening to the right.
+  static const center = Offset(.452, .52);
+  static const radius = .25;
+  static const weight = .122;
 
-  /// The "c" opens to the upper right, towards the spark.
-  static const startAngle = 42 * math.pi / 180;
-  static const sweep = 268 * math.pi / 180;
+  /// From the lower tip, clockwise round the left, to the upper tip (which
+  /// slips behind the lens).
+  static const startAngle = 38 * math.pi / 180;
+  static const sweep = 274 * math.pi / 180;
 
-  static const sparkCenter = Offset(.735, .265);
-  static const sparkRadius = .13;
-  static const twinkleCenter = Offset(.845, .43);
-  static const twinkleRadius = .032;
+  // The lens: a ring over the C's upper tip, handle angled down-right.
+  static const lensCenter = Offset(.667, .295);
+  static const lensRadius = .1;
+  static const lensWeight = .048;
+  static const handleAngle = 45 * math.pi / 180;
+  static const handleLength = .12;
+  static const handleWeight = .054;
 
-  static double _halfWidth(double t) {
-    // A fine tail that swells to full weight over the first ~45% of the
-    // stroke — calligraphic rather than mechanical.
-    final eased = Curves.easeOutCubic.transform((t / .45).clamp(0, 1));
-    return weight / 2 * (.28 + .72 * eased);
-  }
+  /// Clear space between the lens ring and the C where they cross.
+  static const gap = .028;
 
-  /// Outline of the tapered "c" as points, tail → head along the outer edge
-  /// then back along the inner edge. Shared by [cPath] and the SVG writer.
-  static ({List<Offset> outer, List<Offset> inner, double tail, double head})
-  cOutline() {
+  static Offset _onC(double angle, double r) =>
+      center + Offset(math.cos(angle), math.sin(angle)) * r;
+
+  /// Outline of the "C" as points, lower tip → upper tip along the outer
+  /// edge, then back along the inner edge. Shared by [cPath] and the SVG
+  /// writer.
+  static ({List<Offset> outer, List<Offset> inner, double cap}) cOutline() {
     const steps = 120;
-    final outer = <Offset>[];
-    final inner = <Offset>[];
-    for (var i = 0; i <= steps; i++) {
-      final t = i / steps;
-      final angle = startAngle + sweep * t;
-      final direction = Offset(math.cos(angle), math.sin(angle));
-      final half = _halfWidth(t);
-      outer.add(center + direction * (radius + half));
-      inner.add(center + direction * (radius - half));
-    }
     return (
-      outer: outer,
-      inner: inner,
-      tail: _halfWidth(0),
-      head: _halfWidth(1),
+      outer: [
+        for (var i = 0; i <= steps; i++)
+          _onC(startAngle + sweep * i / steps, radius + weight / 2),
+      ],
+      inner: [
+        for (var i = 0; i <= steps; i++)
+          _onC(startAngle + sweep * i / steps, radius - weight / 2),
+      ],
+      cap: weight / 2,
     );
   }
 
+  /// The "C" in [box], round caps included, before the lens cuts into it.
   static Path cPath(Rect box) {
     final shape = cOutline();
-    Offset p(Offset unit) => box.topLeft + Offset(unit.dx, unit.dy) * box.width;
+    Offset p(Offset unit) => box.topLeft + unit * box.width;
+    final cap = Radius.circular(shape.cap * box.width);
     final path = Path()
       ..moveTo(p(shape.outer.first).dx, p(shape.outer.first).dy);
     for (final point in shape.outer.skip(1)) {
       path.lineTo(p(point).dx, p(point).dy);
     }
-    path.arcToPoint(
-      p(shape.inner.last),
-      radius: Radius.circular(shape.head * box.width),
-    );
+    path.arcToPoint(p(shape.inner.last), radius: cap);
     for (final point in shape.inner.reversed.skip(1)) {
       path.lineTo(p(point).dx, p(point).dy);
     }
-    path.arcToPoint(
-      p(shape.outer.first),
-      radius: Radius.circular(shape.tail * box.width),
-    );
+    path.arcToPoint(p(shape.outer.first), radius: cap);
     return path..close();
   }
 
-  /// A four-point sparkle with gently concave sides.
+  /// The circle cut out of the "C" around the lens.
+  static double get cutRadius => lensRadius + lensWeight / 2 + gap;
+
+  /// Where the handle starts (the ring's outer edge) and ends.
+  static Offset get handleStart =>
+      lensCenter +
+      Offset(math.cos(handleAngle), math.sin(handleAngle)) *
+          (lensRadius + lensWeight / 2);
+  static Offset get handleEnd =>
+      lensCenter +
+      Offset(math.cos(handleAngle), math.sin(handleAngle)) *
+          (lensRadius + lensWeight / 2 + handleLength);
+
+  /// A four-point sparkle with gently concave sides — Nova's sparkle, used
+  /// by the mascot and the landing art.
   static Path sparkPath(Offset center, double radius, {double pinch = .16}) {
     final k = radius * pinch;
     final c = center;
@@ -106,7 +115,11 @@ class CurioMarkColors {
   });
 
   final Gradient tile;
+
+  /// The "C".
   final Color glyph;
+
+  /// The lens.
   final Color spark;
 
   static const brand = CurioMarkColors(
@@ -146,68 +159,64 @@ class CurioMarkPainter extends CustomPainter {
       side,
     );
     if (drawTile) {
-      final rrect = RRect.fromRectAndRadius(
-        tile,
-        Radius.circular(side * cornerRadius),
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(tile, Radius.circular(side * cornerRadius)),
+        Paint()..shader = colors.tile.createShader(tile),
       );
-      canvas.drawRRect(rrect, Paint()..shader = colors.tile.createShader(tile));
-      // A soft top-left sheen, the same light direction as CurioGloss.
-      canvas.save();
-      canvas.clipRRect(rrect);
-      canvas.drawCircle(
-        tile.topLeft + Offset(side * .18, side * .1),
-        side * .72,
-        Paint()
-          ..shader =
-              RadialGradient(
-                colors: [
-                  Colors.white.withValues(alpha: .2),
-                  Colors.white.withValues(alpha: 0),
-                ],
-              ).createShader(
-                Rect.fromCircle(
-                  center: tile.topLeft + Offset(side * .18, side * .1),
-                  radius: side * .72,
-                ),
-              ),
-      );
-      canvas.restore();
     }
 
-    final glyphSide = side * glyphScale;
-    final glyph = Rect.fromCenter(
-      center: tile.center,
-      width: glyphSide,
-      height: glyphSide,
-    );
-    Offset unit(Offset u) => glyph.topLeft + u * glyphSide;
+    final s = side * glyphScale;
+    final glyph = Rect.fromCenter(center: tile.center, width: s, height: s);
+    Offset unit(Offset u) => glyph.topLeft + u * s;
+    final lens = unit(CurioMarkGeometry.lensCenter);
 
-    // A whisper of shadow under the stroke gives it a little lift off the
-    // tile without adding a second colour.
-    final shadow = Paint()
-      ..color = const Color(0xFF062A1F).withValues(alpha: .28)
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, glyphSide * .012);
+    // The "C", with a clean circle cut where it passes behind the lens.
     canvas.drawPath(
-      CurioMarkGeometry.cPath(glyph.shift(Offset(0, glyphSide * .014))),
-      shadow,
-    );
-    canvas.drawPath(
-      CurioMarkGeometry.cPath(glyph),
+      Path.combine(
+        PathOperation.difference,
+        CurioMarkGeometry.cPath(glyph),
+        Path()..addOval(
+          Rect.fromCircle(
+            center: lens,
+            radius: CurioMarkGeometry.cutRadius * s,
+          ),
+        ),
+      ),
       Paint()..color = colors.glyph,
     );
 
-    final sparkPaint = Paint()..color = colors.spark;
-    canvas.drawPath(
-      CurioMarkGeometry.sparkPath(
-        unit(CurioMarkGeometry.sparkCenter),
-        CurioMarkGeometry.sparkRadius * glyphSide,
-      ),
-      sparkPaint,
-    );
+    // The lens: a hint of clear glass, the ring, a small glint, the handle.
     canvas.drawCircle(
-      unit(CurioMarkGeometry.twinkleCenter),
-      CurioMarkGeometry.twinkleRadius * glyphSide,
-      sparkPaint,
+      lens,
+      CurioMarkGeometry.lensRadius * s,
+      Paint()..color = Colors.white.withValues(alpha: .08),
+    );
+    final ring = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = colors.spark
+      ..strokeWidth = CurioMarkGeometry.lensWeight * s;
+    canvas.drawCircle(lens, CurioMarkGeometry.lensRadius * s, ring);
+    canvas.drawArc(
+      Rect.fromCircle(
+        center: lens,
+        radius: CurioMarkGeometry.lensRadius * s * .55,
+      ),
+      200 * math.pi / 180,
+      62 * math.pi / 180,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = CurioMarkGeometry.lensWeight * s * .42
+        ..color = Colors.white.withValues(alpha: .6),
+    );
+    canvas.drawLine(
+      unit(CurioMarkGeometry.handleStart),
+      unit(CurioMarkGeometry.handleEnd),
+      Paint()
+        ..color = colors.spark
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = CurioMarkGeometry.handleWeight * s,
     );
   }
 
@@ -239,7 +248,7 @@ class CurioLogoMark extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: (dark ? Colors.black : const Color(0xFF1F6B50))
-                        .withValues(alpha: dark ? .34 : .22),
+                        .withValues(alpha: dark ? .34 : .14),
                     blurRadius: size * .38,
                     offset: Offset(0, size * .14),
                     spreadRadius: -size * .06,
@@ -253,8 +262,8 @@ class CurioLogoMark extends StatelessWidget {
   }
 }
 
-/// "curio" set in Fraunces, with the tittle of the i replaced by the same
-/// spark the mark carries — so the wordmark works on its own, too.
+/// "curio" set in Fraunces, with the dot of the i in the mark's gold — so
+/// the wordmark works on its own, too.
 class CurioWordmark extends StatelessWidget {
   const CurioWordmark({this.fontSize = 29, this.color, super.key});
 
@@ -293,8 +302,8 @@ class _WordmarkPainter extends CustomPainter {
   final Color ink;
   final Color spark;
 
-  // "ı" (U+0131) is the dotless i — Fraunces ships it, so the spark can take
-  // the dot's place instead of sitting on top of it.
+  // "ı" (U+0131) is the dotless i — Fraunces ships it, so the gold dot can
+  // take the dot's place instead of sitting on top of it.
   static const _text = 'curıo';
 
   late final TextPainter _text$ = TextPainter(
@@ -313,7 +322,7 @@ class _WordmarkPainter extends CustomPainter {
     textScaler: TextScaler.noScaling,
   )..layout();
 
-  // Room above the x-height so the spark never clips at small sizes.
+  // Room above the x-height so the dot never clips at small sizes.
   double get _headroom => fontSize * .06;
 
   Size measure() =>
@@ -337,10 +346,7 @@ class _WordmarkPainter extends CustomPainter {
       (left.dx + right.dx) / 2 + fontSize * .004,
       _headroom + baseline - fontSize * .655,
     );
-    canvas.drawPath(
-      CurioMarkGeometry.sparkPath(center, fontSize * .16, pinch: .15),
-      Paint()..color = spark,
-    );
+    canvas.drawCircle(center, fontSize * .085, Paint()..color = spark);
   }
 
   @override

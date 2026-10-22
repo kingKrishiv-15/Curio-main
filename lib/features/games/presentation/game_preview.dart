@@ -87,10 +87,11 @@ class GamePreview extends StatelessWidget {
     ),
   );
 
-  static Widget _arrow({IconData icon = Icons.arrow_forward_rounded}) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 1),
-    child: Icon(icon, size: 11, color: Colors.white.withValues(alpha: .85)),
-  );
+  static Widget _arrow({IconData icon = Icons.arrow_forward_rounded}) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 1),
+        child: Icon(icon, size: 11, color: Colors.white.withValues(alpha: .85)),
+      );
 
   static Widget _cell(double size, {double alpha = .28, Widget? child}) =>
       Container(
@@ -208,9 +209,25 @@ class GamePreview extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _chip('90%', ink, solid: false, width: 36, height: 20, size: 10, display: false),
+              _chip(
+                '90%',
+                ink,
+                solid: false,
+                width: 36,
+                height: 20,
+                size: 10,
+                display: false,
+              ),
               const SizedBox(width: 4),
-              _chip('agree', ink, solid: false, width: 42, height: 20, size: 10, display: false),
+              _chip(
+                'agree',
+                ink,
+                solid: false,
+                width: 42,
+                height: 20,
+                size: 10,
+                display: false,
+              ),
             ],
           ),
           const SizedBox(height: 5),
@@ -219,7 +236,14 @@ class GamePreview extends StatelessWidget {
             decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.white, width: 2)),
             ),
-            child: _chip('surveyed', ink, width: 66, height: 22, size: 11, display: false),
+            child: _chip(
+              'surveyed',
+              ink,
+              width: 66,
+              height: 22,
+              size: 11,
+              display: false,
+            ),
           ),
         ],
       ),
@@ -278,10 +302,8 @@ class GamePreview extends StatelessWidget {
     );
   }
 
-  Widget _linkLab() => CustomPaint(
-    size: const Size(120, 76),
-    painter: _NetworkPainter(),
-  );
+  Widget _linkLab() =>
+      CustomPaint(size: const Size(120, 76), painter: _NetworkPainter());
 
   Widget _signalGrid(_Ink ink) {
     const pattern = [
@@ -401,10 +423,8 @@ class GamePreview extends StatelessWidget {
     ),
   );
 
-  Widget _frostlands() => CustomPaint(
-    size: const Size(140, 76),
-    painter: _MountainPainter(),
-  );
+  Widget _frostlands() =>
+      CustomPaint(size: const Size(140, 76), painter: _MountainPainter());
 
   Widget _scale(_Ink ink) => SizedBox(
     width: 140,
@@ -416,8 +436,16 @@ class GamePreview extends StatelessWidget {
           top: 0,
           child: Icon(Icons.balance_rounded, size: 56, color: Colors.white),
         ),
-        Positioned(left: 4, bottom: 4, child: _chip('3/4', ink, width: 40, height: 24, size: 12)),
-        Positioned(right: 4, bottom: 14, child: _chip('0.7', ink, width: 40, height: 24, size: 12)),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: _chip('3/4', ink, width: 40, height: 24, size: 12),
+        ),
+        Positioned(
+          right: 4,
+          bottom: 14,
+          child: _chip('0.7', ink, width: 40, height: 24, size: 12),
+        ),
       ],
     ),
   );
@@ -432,7 +460,13 @@ class GamePreview extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _grid(4, 3, 12, 3, (r, c) => _cell(12, alpha: pattern[r][c] == 1 ? 1 : .2)),
+        _grid(
+          4,
+          3,
+          12,
+          3,
+          (r, c) => _cell(12, alpha: pattern[r][c] == 1 ? 1 : .2),
+        ),
         Container(
           width: 2,
           height: 60,
@@ -445,7 +479,9 @@ class GamePreview extends StatelessWidget {
             width: 12,
             height: 12,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: filled && c == 0 ? .7 : .12),
+              color: Colors.white.withValues(
+                alpha: filled && c == 0 ? .7 : .12,
+              ),
               borderRadius: BorderRadius.circular(3.4),
               border: filled
                   ? Border.all(color: Colors.white, width: 1.2)
@@ -575,7 +611,11 @@ class _MountainPainter extends CustomPainter {
       Paint()..color = Colors.white,
     );
     // A star.
-    canvas.drawCircle(Offset(w * .86, h * .12), 3, Paint()..color = Colors.white);
+    canvas.drawCircle(
+      Offset(w * .86, h * .12),
+      3,
+      Paint()..color = Colors.white,
+    );
   }
 
   @override

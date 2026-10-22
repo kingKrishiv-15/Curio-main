@@ -54,12 +54,12 @@ abstract final class CurioColors {
   static const markGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF3FA67C), Color(0xFF1F6B50), Color(0xFF123F30)],
+    colors: [Color(0xFF1D4E3F), Color(0xFF143D31), Color(0xFF0D2B23)],
     stops: [0, .55, 1],
   );
-  static const markGlyph = Color(0xFFFFF8EE);
+  static const markGlyph = Color(0xFF8FE3BD);
 
-  /// The brand spark — the mark's sparkle and the wordmark's i-dot. Also a
+  /// The brand gold — the mark's lens and the wordmark's i-dot. Also a
   /// fine accent wherever a "moment of discovery" is being celebrated.
   static const spark = Color(0xFFF2C660);
 

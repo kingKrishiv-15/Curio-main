@@ -503,84 +503,6 @@ class _MascotEye extends StatelessWidget {
   }
 }
 
-class StatPill extends StatelessWidget {
-  const StatPill({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-    required this.background,
-    super.key,
-  });
-
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    final inkMuted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(CurioRadius.medium),
-          border: Border.all(color: color.withValues(alpha: .16)),
-        ),
-        child: Row(
-          children: [
-            CurioIconTile(
-              icon: icon,
-              color: color,
-              background: color.withValues(alpha: .1),
-              size: 30,
-              iconSize: 17,
-              radius: 10,
-            ),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 14.5,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: inkMuted,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 9.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CurioIconTile extends StatelessWidget {
   const CurioIconTile({
     required this.icon,
@@ -859,28 +781,44 @@ class CurioProgressBar extends StatelessWidget {
     final resolved =
         color ??
         curioColor(context, CurioColors.forest, CurioColorsLight.forest);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          height: height,
-          decoration: BoxDecoration(
-            color: resolved.withValues(alpha: .12),
-            borderRadius: BorderRadius.circular(height),
-          ),
-          alignment: Alignment.centerLeft,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 450),
-            curve: Curves.easeOutCubic,
-            width: math.max(height, constraints.maxWidth * value.clamp(0, 1)),
-            decoration: BoxDecoration(
-              color: resolved,
-              borderRadius: BorderRadius.circular(height),
-            ),
-          ),
-        );
-      },
+    // Painted rather than laid out with a LayoutBuilder, so the bar can sit
+    // inside IntrinsicHeight rows (equal-height card grids).
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: value.clamp(0, 1).toDouble()),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
+      builder: (context, animated, _) => SizedBox(
+        height: height,
+        width: double.infinity,
+        child: CustomPaint(painter: _BarPainter(animated, resolved)),
+      ),
     );
   }
+}
+
+class _BarPainter extends CustomPainter {
+  const _BarPainter(this.value, this.color);
+  final double value;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final radius = Radius.circular(size.height);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Offset.zero & size, radius),
+      Paint()..color = color.withValues(alpha: .12),
+    );
+    // Never thinner than a dot, so an empty bar still shows where it starts.
+    final filled = math.max(size.height, size.width * value);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, filled, size.height), radius),
+      Paint()..color = color,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BarPainter old) =>
+      old.value != value || old.color != color;
 }
 
 class CurioStatusStrip extends StatelessWidget {
@@ -940,6 +878,216 @@ class CurioStatusStrip extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The colour families a [CurioStatTile] comes in.
+enum StatTone { gold, plum, forest, coral }
+
+/// A pastel stat tile: a big number over a short label. Home's weekly
+/// growth and Profile's totals share it, so numbers look the same app-wide.
+class CurioStatTile extends StatelessWidget {
+  const CurioStatTile({
+    required this.value,
+    required this.label,
+    required this.tone,
+    this.semanticLabel,
+    super.key,
+  });
+
+  final String value, label;
+  final StatTone tone;
+
+  /// Read instead of "value label" when that alone would be unclear.
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, fill, valueColor) = switch (tone) {
+      StatTone.gold => (
+        curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
+        CurioColorsLight.saffronSoft,
+        curioColor(
+          context,
+          CurioColors.saffron,
+          CurioColorsLight.saffronStrong,
+        ),
+      ),
+      StatTone.plum => (
+        curioColor(context, CurioColors.plum, CurioColorsLight.plum),
+        CurioColorsLight.plumSoft,
+        curioColor(context, CurioColors.plum, const Color(0xFF6448C4)),
+      ),
+      StatTone.forest => (
+        curioColor(context, CurioColors.forest, CurioColorsLight.forest),
+        CurioColorsLight.forestSoft,
+        curioColor(context, CurioColors.forest, CurioColorsLight.forestStrong),
+      ),
+      StatTone.coral => (
+        curioColor(context, CurioColors.coral, CurioColorsLight.coral),
+        CurioColorsLight.coralSoft,
+        curioColor(context, CurioColors.coral, CurioColorsLight.coralStrong),
+      ),
+    };
+    return Semantics(
+      label: semanticLabel ?? '$value $label',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(8, 16, 8, 14),
+        decoration: BoxDecoration(
+          // Dark mode tints the neutral card slate rather than the page, so
+          // gold stays gold instead of turning olive on green.
+          color: curioColor(
+            context,
+            Color.alphaBlend(color.withValues(alpha: .16), CurioColors.surface),
+            fill,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: .28)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontFamily: 'Fraunces',
+                  color: valueColor,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  height: 1.1,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: curioColor(
+                  context,
+                  CurioColors.inkSoft,
+                  CurioColorsLight.inkSoft,
+                ),
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                height: 1.25,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// [CurioStatTile]s side by side, equal heights; at large text sizes one
+/// full-width row each, so labels never break mid-word in a narrow tile.
+class CurioStatRow extends StatelessWidget {
+  const CurioStatRow({required this.tiles, super.key});
+  final List<Widget> tiles;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.textScalerOf(context).scale(10) > 13) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < tiles.length; i++) ...[
+            if (i > 0) const SizedBox(height: 10),
+            tiles[i],
+          ],
+        ],
+      );
+    }
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < tiles.length; i++) ...[
+            if (i > 0) const SizedBox(width: 10),
+            Expanded(child: tiles[i]),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// The explorer's round letter avatar: evergreen in dark mode, coral in
+/// light. Home's header (where it opens Profile) and Profile's own header.
+class ExplorerAvatar extends StatelessWidget {
+  const ExplorerAvatar({
+    required this.name,
+    this.size = 52,
+    this.onTap,
+    super.key,
+  });
+
+  final String name;
+  final double size;
+
+  /// When set, the avatar is a "Your profile" button.
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final trimmed = name.trim();
+    final letter = trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
+    final avatar = Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * .06),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: curioColor(
+          context,
+          CurioColors.surface,
+          CurioColorsLight.surface,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: dark ? .3 : .1),
+            blurRadius: size * .24,
+            offset: Offset(0, size * .08),
+          ),
+        ],
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: dark
+                ? const [Color(0xFF1F6B50), Color(0xFF49BB8C)]
+                : const [Color(0xFFF2564A), Color(0xFFD8362B)],
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          letter,
+          textScaler: TextScaler.noScaling,
+          style: TextStyle(
+            fontFamily: 'Fraunces',
+            color: Colors.white,
+            fontSize: size * .4,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+    if (onTap == null) return ExcludeSemantics(child: avatar);
+    return Semantics(
+      button: true,
+      label: 'Your profile',
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(onTap: onTap, child: avatar),
     );
   }
 }
