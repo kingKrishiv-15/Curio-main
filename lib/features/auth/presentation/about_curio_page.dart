@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/game_catalog.dart';
 import '../../games/presentation/game_card.dart';
@@ -188,7 +188,7 @@ class _StepCard extends StatelessWidget {
       CurioColors.inkSoft,
       CurioColorsLight.inkSoft,
     );
-    return CurioGloss(
+    return CurioClay(
       radius: 22,
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -313,7 +313,7 @@ class _ShelfCard extends StatelessWidget {
       CurioColorsLight.inkSoft,
     );
     final skill = skillColor(context, game.skill);
-    return CurioGloss(
+    return CurioClay(
       radius: 22,
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -417,7 +417,7 @@ class _ForGrownUps extends StatelessWidget {
           ],
         ),
     ];
-    return CurioGloss(
+    return CurioClay(
       radius: 28,
       padding: EdgeInsets.all(wide ? 36 : 22),
       child: Column(

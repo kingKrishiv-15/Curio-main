@@ -1,5 +1,5 @@
 import 'package:curio/app/curio_app.dart';
-import 'package:curio/core/widgets/curio_gloss.dart';
+import 'package:curio/core/widgets/curio_clay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,7 +36,7 @@ void main() {
           await tester.pump(const Duration(milliseconds: 350));
           // The list's viewport must reach the physical bottom, not stop at 840.
           expect(tester.getBottomRight(find.byType(ListView).first).dy, 874);
-          expect(find.byType(CurioGloss), findsWidgets);
+          expect(find.byType(CurioClay), findsWidgets);
           expect(
             tester.getBottomRight(find.byKey(const Key('bottom_capsule'))).dy,
             lessThanOrEqualTo(840),

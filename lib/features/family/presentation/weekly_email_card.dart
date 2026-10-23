@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/models/family_settings.dart';
 import '../../../core/services/family_service.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 
 /// An explicit opt-in, next to the reports it delivers. Existing families
 /// keep their saved choice; the dashboard never subscribes them silently.
@@ -69,7 +69,9 @@ class _WeeklyEmailCardState extends State<WeeklyEmailCard> {
   }
 
   @override
-  Widget build(BuildContext context) => CurioGloss(
+  Widget build(BuildContext context) => CurioClay(
+    padding: const EdgeInsets.all(20),
+    radius: 26,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

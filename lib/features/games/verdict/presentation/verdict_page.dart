@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
+import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -417,16 +418,16 @@ class _AnswerButton extends StatelessWidget {
       CurioColorsLight.danger,
     );
 
-    final Color fill, border, tile, tileIcon, text;
+    // Before judging, the themed clay button. After, it goes flat and a
+    // clay body shows how each verdict fared; the ones that weren't in play
+    // sink back as dents.
+    final Color? fill, ring, tile;
+    final Color tileIcon, text;
     final IconData icon;
     final String? status;
     if (!answered) {
-      fill = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
-      border = curioColor(
-        context,
-        CurioColors.outline,
-        CurioColorsLight.outline,
-      );
+      fill = null;
+      ring = null;
       tile = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
       tileIcon = onBright;
       text = ink;
@@ -438,7 +439,7 @@ class _AnswerButton extends StatelessWidget {
         CurioColors.successSoft,
         CurioColorsLight.successSoft,
       );
-      border = success;
+      ring = success;
       tile = success;
       tileIcon = onBright;
       text = ink;
@@ -450,39 +451,29 @@ class _AnswerButton extends StatelessWidget {
         CurioColors.dangerSoft,
         CurioColorsLight.dangerSoft,
       );
-      border = danger;
+      ring = danger;
       tile = danger;
       tileIcon = onBright;
       text = ink;
       icon = Icons.close_rounded;
       status = 'Your verdict — not this time';
     } else {
-      fill = Colors.transparent;
-      border = curioColor(
-        context,
-        CurioColors.outlineSoft,
-        CurioColorsLight.outlineSoft,
-      );
-      tile = curioColor(
-        context,
-        CurioColors.surfaceMuted,
-        CurioColorsLight.surfaceMuted,
-      );
+      fill = null;
+      ring = null;
+      tile = null;
       tileIcon = muted;
       text = muted;
       icon = _verdictIcon(verdict);
       status = null;
     }
 
-    return OutlinedButton(
+    final button = OutlinedButton(
       key: Key('verdict_${verdict.name}'),
       onPressed: answered ? null : onPressed,
       style: OutlinedButton.styleFrom(
-        backgroundColor: fill,
-        disabledBackgroundColor: fill,
+        disabledBackgroundColor: Colors.transparent,
         foregroundColor: ink,
         disabledForegroundColor: text,
-        side: BorderSide(color: border, width: status == null ? 1.4 : 1.8),
         padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
         alignment: Alignment.centerLeft,
         minimumSize: const Size.fromHeight(62),
@@ -490,11 +481,14 @@ class _AnswerButton extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(color: tile, shape: BoxShape.circle),
-            child: Icon(icon, size: 21, color: tileIcon),
+          SizedBox.square(
+            dimension: 38,
+            child: CurioClay(
+              radius: 19,
+              color: tile,
+              pressed: tile == null,
+              child: Icon(icon, size: 21, color: tileIcon),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -527,6 +521,14 @@ class _AnswerButton extends StatelessWidget {
         ],
       ),
     );
+    if (!answered) return button;
+    return CurioClay(
+      radius: 18,
+      color: fill,
+      outline: ring,
+      pressed: ring == null,
+      child: button,
+    );
   }
 }
 
@@ -540,16 +542,13 @@ class _ToolPill extends StatelessWidget {
     return Semantics(
       label: 'Thinking tool: ${tool.label}',
       excludeSemantics: true,
-      child: Container(
+      child: CurioClay(
+        radius: 99,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: curioColor(
-            context,
-            CurioColors.blueSoft,
-            CurioColorsLight.blueSoft,
-          ),
-          borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: blue.withValues(alpha: .45)),
+        color: curioColor(
+          context,
+          CurioColors.blueSoft,
+          CurioColorsLight.blueSoft,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -645,18 +644,22 @@ class _RecapTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 28,
-            height: 28,
-            margin: const EdgeInsets.only(top: 1),
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: Icon(
-              right ? Icons.check_rounded : Icons.close_rounded,
-              size: 17,
-              color: curioColor(
-                context,
-                CurioColors.night,
-                CurioColorsLight.ink,
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: SizedBox.square(
+              dimension: 28,
+              child: CurioClay(
+                radius: 14,
+                color: color,
+                child: Icon(
+                  right ? Icons.check_rounded : Icons.close_rounded,
+                  size: 17,
+                  color: curioColor(
+                    context,
+                    CurioColors.night,
+                    CurioColorsLight.ink,
+                  ),
+                ),
               ),
             ),
           ),

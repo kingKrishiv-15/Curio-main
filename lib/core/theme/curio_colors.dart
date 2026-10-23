@@ -12,6 +12,9 @@ abstract final class CurioColors {
   static const canvasDeep = Color(0xFF0A1A15);
   static const surface = Color(0xFF232A2C);
   static const surfaceMuted = Color(0xFF15191A);
+
+  /// The default clay body (`CurioClay`): a raised slate on evergreen.
+  static const clay = Color(0xFF2E3538);
   static const onDark = Color(0xFFF4FAF6);
   static const ink = Color(0xFFF4FAF6);
   static const inkSoft = Color(0xFFC7D0CC);

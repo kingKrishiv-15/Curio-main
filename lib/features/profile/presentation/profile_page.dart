@@ -69,12 +69,6 @@ class ProfilePage extends StatelessWidget {
       CurioColors.forest,
       CurioColorsLight.forestStrong,
     );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-
     return CurioPage(
       extendBehindBottom: true,
       maxWidth: 760,
@@ -129,7 +123,6 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 16),
           CurioCard(
             color: forestSoft,
-            borderColor: forest.withValues(alpha: .18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -147,12 +140,10 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 11),
-                LinearProgressIndicator(
+                CurioProgressBar(
                   value: state.xpIntoStage / 250,
-                  minHeight: 10,
-                  borderRadius: BorderRadius.circular(99),
-                  backgroundColor: surface,
                   color: forest,
+                  height: 10,
                 ),
                 const SizedBox(height: 7),
                 Text(
@@ -215,11 +206,14 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _ProfileTile(
-            icon: Icons.privacy_tip_outlined,
-            title: 'Privacy and account',
-            subtitle: 'Your data and your choices',
-            onTap: () => ParentalGate.open(context, const PrivacyPage()),
+          CurioCard(
+            padding: EdgeInsets.zero,
+            child: _ProfileTile(
+              icon: Icons.privacy_tip_outlined,
+              title: 'Privacy and account',
+              subtitle: 'Your data and your choices',
+              onTap: () => ParentalGate.open(context, const PrivacyPage()),
+            ),
           ),
           if (SupabaseConfig.isConfigured) ...[
             const SizedBox(height: 16),
@@ -323,18 +317,13 @@ class _ThemeToggleTile extends StatelessWidget {
             horizontal: 14,
             vertical: 5,
           ),
-          leading: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: forestSoft,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(
-              isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-              color: forest,
-              size: 21,
-            ),
+          leading: CurioIconTile(
+            icon: isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+            color: forest,
+            background: forestSoft,
+            size: 40,
+            iconSize: 21,
+            radius: 13,
           ),
           title: const Text(
             'Dark mode',
@@ -389,14 +378,13 @@ class _ProfileTile extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: forestSoft,
-          borderRadius: BorderRadius.circular(13),
-        ),
-        child: Icon(icon, color: forest, size: 21),
+      leading: CurioIconTile(
+        icon: icon,
+        color: forest,
+        background: forestSoft,
+        size: 40,
+        iconSize: 21,
+        radius: 13,
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 11)),

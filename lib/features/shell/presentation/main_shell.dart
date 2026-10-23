@@ -5,7 +5,7 @@ import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../discoveries/presentation/discoveries_page.dart';
 import '../../home/presentation/home_page.dart';
 import '../../learn/presentation/learn_hub_page.dart';
@@ -235,7 +235,7 @@ class _NavGlyph extends StatelessWidget {
   }
 }
 
-/// A compact glass capsule with one sliding selection lens. Its dimensions
+/// A compact clay capsule with one sliding, puffed-up selection. Its dimensions
 /// stay fixed as destinations change, so the dock never jumps or stretches.
 class _FloatingNav extends StatelessWidget {
   const _FloatingNav({
@@ -265,9 +265,8 @@ class _FloatingNav extends StatelessWidget {
     return ConstrainedBox(
       key: const Key('bottom_capsule'),
       constraints: const BoxConstraints(maxWidth: 304),
-      child: CurioGloss(
+      child: CurioClay(
         radius: 32,
-        blur: true,
         padding: const EdgeInsets.all(5),
         child: SizedBox(
           height: itemHeight,
@@ -283,34 +282,12 @@ class _FloatingNav extends StatelessWidget {
                     child: FractionallySizedBox(
                       widthFactor: .25,
                       heightFactor: 1,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(26),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color.lerp(
-                                accent,
-                                Colors.white,
-                                light ? .6 : .2,
-                              )!.withValues(alpha: light ? .35 : .3),
-                              accent.withValues(alpha: light ? .14 : .13),
-                            ],
-                          ),
-                          border: Border.all(
-                            color: Colors.white.withValues(
-                              alpha: light ? .65 : .16,
-                            ),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: accent.withValues(alpha: .09),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: CurioClay(
+                          radius: 26,
+                          color: accent.withValues(alpha: light ? .16 : .2),
+                          child: const SizedBox.expand(),
                         ),
                       ),
                     ),
@@ -404,10 +381,6 @@ class _CurioRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final surface = dark ? CurioColors.surface : CurioColorsLight.surface;
-    final outlineSoft = dark
-        ? CurioColors.outlineSoft
-        : CurioColorsLight.outlineSoft;
     final coral = dark ? CurioColors.coral : CurioColorsLight.coral;
     final coralSoft = dark ? CurioColors.coralSoft : CurioColorsLight.coralSoft;
     final inkMuted = dark ? CurioColors.inkMuted : CurioColorsLight.inkMuted;
@@ -417,10 +390,7 @@ class _CurioRail extends StatelessWidget {
     final orange = dark ? CurioColors.orange : CurioColorsLight.orange;
     return Container(
       width: 244,
-      decoration: BoxDecoration(
-        color: surface.withValues(alpha: .94),
-        border: Border(right: BorderSide(color: outlineSoft)),
-      ),
+      color: clayBase(context),
       padding: const EdgeInsets.fromLTRB(16, 25, 16, 20),
       child: Column(
         children: [

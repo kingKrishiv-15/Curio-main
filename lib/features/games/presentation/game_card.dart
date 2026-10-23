@@ -4,7 +4,7 @@ import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../game_catalog.dart';
 import 'game_banner.dart';
@@ -86,10 +86,10 @@ class GameCard extends StatelessWidget {
       excludeSemantics: true,
       // excludeSemantics drops the InkWell's action, so restate it here.
       onTap: () => _open(context),
-      child: CurioGloss(
+      child: CurioClay(
         radius: radius,
         padding: EdgeInsets.zero,
-        borderColor: featured ? color.withValues(alpha: .7) : null,
+        outline: featured ? color.withValues(alpha: .7) : null,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -317,11 +317,6 @@ class GameArt extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       child: Container(
         height: height,
-        // A fine light rim keeps the edge crisp against glass cards.
-        foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withValues(alpha: .22)),
-        ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -336,6 +331,18 @@ class GameArt extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
+            // Puffed up like the clay card around it.
+            Positioned.fill(
+              child: CustomPaint(
+                painter: ClayPainter(
+                  color: color,
+                  radius: 18,
+                  dark: Theme.of(context).brightness == Brightness.dark,
+                  fill: false,
+                  lift: false,
+                ),
+              ),
+            ),
             Positioned(
               right: -height * .3,
               top: -height * .65,
@@ -629,34 +636,32 @@ class _PlayPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 9),
-      decoration: BoxDecoration(
-        color: done ? Colors.transparent : color.withValues(alpha: .16),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: done ? .45 : .3)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            done ? Icons.replay_rounded : Icons.play_arrow_rounded,
-            size: 18,
-            color: ink,
-          ),
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              done ? 'Practice again' : 'Play today’s game',
-              style: TextStyle(
-                color: ink,
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
+    final label = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          done ? Icons.replay_rounded : Icons.play_arrow_rounded,
+          size: 18,
+          color: ink,
+        ),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            done ? 'Practice again' : 'Play today’s game',
+            style: TextStyle(
+              color: ink,
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+    return CurioClay(
+      radius: 16,
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      color: color.withValues(alpha: done ? .1 : .24),
+      child: label,
     );
   }
 }
@@ -667,25 +672,16 @@ class _PlayCircle extends StatelessWidget {
   final bool done;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 46,
-    height: 46,
-    decoration: BoxDecoration(
-      color: curioColor(context, CurioColors.surface, CurioColorsLight.surface),
-      shape: BoxShape.circle,
-      border: Border.all(color: color, width: 2),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: .16),
-          blurRadius: 12,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Icon(
-      done ? Icons.replay_rounded : Icons.play_arrow_rounded,
-      color: curioColor(context, color, Color.lerp(color, Colors.black, .3)!),
-      size: 25,
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: 46,
+    child: CurioClay(
+      radius: 23,
+      outline: color,
+      child: Icon(
+        done ? Icons.replay_rounded : Icons.play_arrow_rounded,
+        color: curioColor(context, color, Color.lerp(color, Colors.black, .3)!),
+        size: 25,
+      ),
     ),
   );
 }
@@ -696,17 +692,20 @@ class _ArrowButton extends StatelessWidget {
   final bool done;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 38,
-    height: 38,
-    decoration: BoxDecoration(
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: 38,
+    child: CurioClay(
+      radius: 19,
       color: color.withValues(alpha: done ? .1 : .18),
-      shape: BoxShape.circle,
-    ),
-    child: Icon(
-      done ? Icons.replay_rounded : Icons.play_arrow_rounded,
-      color: curioColor(context, color, Color.lerp(color, Colors.black, .35)!),
-      size: 20,
+      child: Icon(
+        done ? Icons.replay_rounded : Icons.play_arrow_rounded,
+        color: curioColor(
+          context,
+          color,
+          Color.lerp(color, Colors.black, .35)!,
+        ),
+        size: 20,
+      ),
     ),
   );
 }

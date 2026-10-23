@@ -4,7 +4,7 @@ import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/game_catalog.dart';
 import '../../skills/presentation/skill_quest_page.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../family/presentation/family_settings_page.dart';
 import '../../family/presentation/privacy_page.dart';
@@ -50,8 +50,10 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
       child: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          CurioGloss(
-            tint: Theme.of(context).colorScheme.secondaryContainer,
+          CurioClay(
+            padding: const EdgeInsets.all(20),
+            radius: 26,
+            color: Theme.of(context).colorScheme.secondaryContainer,
             child: Row(
               children: [
                 const MascotBadge(size: 68),
@@ -81,7 +83,9 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 14),
-          CurioGloss(
+          CurioClay(
+            padding: const EdgeInsets.all(20),
+            radius: 26,
             child: Wrap(
               spacing: 32,
               runSpacing: 20,
@@ -98,7 +102,9 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 14),
-          CurioGloss(
+          CurioClay(
+            padding: const EdgeInsets.all(20),
+            radius: 26,
             child: Column(
               children: [
                 for (final skill in skills)
@@ -120,7 +126,9 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             ),
           ),
           const SizedBox(height: 20),
-          CurioGloss(
+          CurioClay(
+            padding: const EdgeInsets.all(20),
+            radius: 26,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -144,7 +152,8 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
           const SizedBox(height: 14),
           WeeklyEmailCard(key: ValueKey(_emailRevision)),
           const SizedBox(height: 16),
-          CurioGloss(
+          CurioClay(
+            radius: 26,
             padding: EdgeInsets.zero,
             child: Column(
               children: [

@@ -1,17 +1,19 @@
 # Curio Design System
 
 This is the living reference for Curio's visual language: one evergreen
-"glass" system with a genuine **dark and light mode**, both rolled out
-app-wide with a persisted toggle. Read this before touching UI code; it
-exists so the app stays visually consistent as more screens are added,
-and so hard-won lessons (mostly about glass/blur, and about what actually
-needs to flip between modes) aren't relearned the hard way.
+**clay** system (soft, puffed-up surfaces — see §5) with a genuine **dark
+and light mode**, both rolled out app-wide with a persisted toggle. Read
+this before touching UI code; it exists so the app stays visually
+consistent as more screens are added, and so hard-won lessons (about
+surfaces and blur, and about what actually needs to flip between modes)
+aren't relearned the hard way.
 
 Source of truth in code:
 - [`lib/core/theme/curio_colors.dart`](lib/core/theme/curio_colors.dart) — every **dark**-mode colour token
 - [`lib/core/theme/curio_colors_light.dart`](lib/core/theme/curio_colors_light.dart) — the **light**-mode counterpart, same field names
 - [`lib/core/theme/curio_theme.dart`](lib/core/theme/curio_theme.dart) — builds both `ThemeData`s from the two token classes
 - [`lib/core/theme/theme_controller.dart`](lib/core/theme/theme_controller.dart) — holds and persists the current mode
+- [`lib/core/widgets/curio_clay.dart`](lib/core/widgets/curio_clay.dart) — `CurioClay`, the one surface every card, tile and chip is built from (§5)
 - [`lib/core/widgets/curio_ui.dart`](lib/core/widgets/curio_ui.dart) — shared page shell/components, all brightness-aware
 - [`lib/features/home/presentation/home_page.dart`](lib/features/home/presentation/home_page.dart) — the reference implementation, both modes; when in doubt, match Home
 
@@ -103,16 +105,16 @@ to *both* classes under the same field name.
 |---|---|---|---|
 | `canvas` | `#05100D` | `#FDF1E2` | Deepest/page background |
 | `canvasDeep` | `#0A1A15` | `#FFF8EE` | Gradient mid-stop |
-| `surface` | `#232A2C` | `#FFFFFF` | Default card/glass base |
+| `surface` | `#232A2C` | `#FFFFFF` | Material's surface (`ColorScheme.surface`) |
+| `clay` | `#2E3538` | `#FFFCF7` | The default clay body — every card, tile and quiet button (§5) |
 | `surfaceMuted` | `#15191A` | `#F3E9D8` | Sunken/recessed fill (chips, empty states) |
 | `night` | `#05100D` | `#2E2417` | "The darkest possible ink" — spinners/icons on a bright button, not a page background |
 | `navy` | `#123A30` | `#E24A3D` | A deep/bold **hero card** fill, independent of `ink`/`canvas`. One bold stat/reward display per screen (e.g. Squeeze's secret-range card), not general cards |
 
-Dark mode's `surface` is a neutral warm slate, deliberately **not** a
-green tint, so cards separate from the page by hue as well as brightness
-(see §4). Light mode's `surface` is plain white for the same reason it
-would be redundant to tint it — white already reads as distinctly
-"elevated" against the cream backdrop.
+Dark mode's `clay` is a neutral warm slate, deliberately **not** a green
+tint, so cards separate from the page by hue as well as brightness (see
+§4). Light mode's `clay` is a warm white rather than pure white, so its
+highlight and shadows read as soft clay instead of paper.
 
 ### Text
 
@@ -183,7 +185,7 @@ progress bars, and badges wherever that skill appears, in both modes:
 Early dark-mode iterations made cards a slightly-lighter version of the
 same green as the page background — it read as flat and monotonous. The
 fix that stuck: **cards are a neutral, slightly warm slate in dark mode**
-(not a green tint at all), and **plain white in light mode** — either way,
+(not a green tint at all), and **warm white in light mode** — either way,
 cards separate from the page by *hue* as well as brightness, not by
 brightness alone.
 
@@ -199,40 +201,78 @@ The page backdrop itself is never a flat fill in either mode —
 If you add a new full-page screen, use `CurioPage` and you get this for
 free, in both modes. Don't build a flat `Scaffold(backgroundColor: canvas)`.
 
-## 5. Glass cards — and the mistakes not to repeat
+## 5. Clay surfaces
 
-`GlassCard` (`curio_ui.dart`) is the standard elevated-card look: a
-translucent tinted fill, a crisp border, a soft top-left sheen, and a lift
-shadow — in dark mode. In light mode it's simply a plain white card with a
-soft shadow; a translucent "glass" fill is a dark-mode trick that just
-reads as solid-white-with-extra-steps once the backdrop is already light,
-so `GlassCard` and Home's `_GlassPanel` both branch on brightness
-internally rather than trying to force one recipe to cover both.
+Every surface in Curio — cards, tiles, chips, game tokens, buttons, the
+nav capsule — is **clay**: soft, rounded, and a little inflated, like
+something a kid could squish. It replaced an earlier glass look (October
+2026); the reasons it suits Curio are the same as §1 — warm and tactile
+for a child, calm enough for a parent.
 
-**It does not use a real `BackdropFilter` blur.** Two things went wrong
-before this was fixed, in this order:
+### Anatomy
 
-1. **Opacity too high.** The first dark-mode version tinted at ~70%
-   opacity — that just reads as a solid, flatly-coloured card, not glass.
-   Real glassmorphism needs a *light* fill (roughly 30–35%, sometimes
-   lower) so blur (or, here, the neutral surface colour plus a bright
-   border and sheen) does the work of separating it from the backdrop.
-2. **Stacked blur.** Every card additionally had its own `BackdropFilter`.
-   With several cards in a scrolling shelf plus the nav bar all blurring
-   independently in the same frame, blur started rendering in visibly
-   wrong places on a real device (Impeller), even though it looked fine
-   in web testing (Skia). The fix was architectural, not another value
-   tweak: **there is exactly one real `BackdropFilter` in the entire
-   app**, on the bottom nav pill, clipped tightly to the pill's own
-   stadium shape so only the pixels directly behind it blur. Every card
-   fakes the rest of the "glass" look with plain translucency (or, in
-   light mode, doesn't need to fake anything — a plain white fill already
-   separates cleanly).
+`CurioClay` (`curio_clay.dart`) paints, back to front:
 
-If you're tempted to add blur to a new card: don't. Reach for `GlassCard`
-as-is. If a screen genuinely needs a frosted look, treat it the same way
-the nav bar is treated — one `BackdropFilter`, clipped to exactly the
-shape that needs it, nothing else blurring in the same frame.
+1. **A drop shadow in the body's own hue** (a yellow tile casts a warm
+   shadow, not a grey one; plain black in dark mode). Only ever outside
+   the body.
+2. **An opaque body.** Pass `color:` — opaque, or a translucent accent
+   wash (`accent.withValues(alpha: .16)`, a `*Soft` token), which
+   `clayFill` tints onto the `clay` token so it becomes a pastel body
+   rather than a see-through one. Never alpha-blend by hand.
+3. **Two inner shadows**: a light one along the top-left edge and a deeper
+   one along the bottom-right, which is what makes it look puffed up.
+
+Depth scales with size (7% of the shortest side, 2–8px), so one widget
+works from a 36px day bubble to a full card.
+
+### Raised, pressed, outlined
+
+- **Raised** (default): anything that holds content or can be tapped.
+- **`pressed: true`**: the inner shadows swap sides and the drop shadow
+  goes, so it reads as a **dent** — empty slots, wells, drop targets,
+  progress tracks, "not yet" days. Home's week row is the reference:
+  played days puff up, the rest are dents.
+- **`outline:`**: a 2px ring just inside the edge, for selected, featured
+  or "today" — state that clay's shading alone can't carry.
+
+A state that was ever distinguishable must stay distinguishable: express
+it with tint and/or `outline`, and keep the icon or text that carried it.
+
+### Buttons
+
+`FilledButton` and `OutlinedButton` are clay through the theme, so call
+sites don't change: the button's Material paints the body, its
+**elevation** paints the drop shadow (a button clips its background
+layer, so it can't paint one itself), and `clayButtonLayer` — a
+`ButtonStyle.backgroundBuilder` — adds the inner shadows. While held,
+elevation drops to 0 and the inner shadows swap: the button squishes in
+under the finger. `OutlinedButton` has no outline any more; it's the
+quiet, `clay`-coloured button beside a coral `FilledButton`. Text fields
+are wells: `surfaceMuted` fill, no outline until focused.
+
+### Rules learned the hard way
+
+- **HSL saturation runs to 100% on near-whites**, so tinting a warm-white
+  card's shadow by its own hue gave it an orange shadow. `paintClay` caps
+  saturation at 55% before deepening.
+- **Over vivid art the light highlight washes colour out.** Game art gets
+  only the inner shadows, with a much weaker highlight (`fill: false`).
+- **`CurioClay` clips its child to its radius.** Anything that used to
+  poke past a rounded corner (a sparkle, a badge) gets cut off — put the
+  clay *behind* it in a `Stack` instead (see `MascotBadge`).
+- **Faint borders are a glass habit.** They separated a translucent card
+  from the page; clay's shadows already do that. `CurioCard` ignores a
+  `borderColor` at or under 50% alpha and draws stronger ones as a ring.
+- **Widget tests draw elevation shadows as solid outlines**
+  (`debugDisableShadows`), so clay buttons look ringed in test
+  screenshots. Turn it off (and back on before the test ends) when
+  rendering previews.
+- **Still no `BackdropFilter`.** The glass era learned that several
+  independent blurs in one frame render in the wrong place on Impeller.
+  Clay needs none — its shadows are `MaskFilter` blurs on the element's
+  own canvas, not reads of the pixels behind it. Don't reintroduce a
+  backdrop blur.
 
 ## 6. Navigation
 
@@ -244,14 +284,13 @@ pill on a real device. The fix was to stop using the slot at all — the
 nav is a `Positioned` widget inside the *same* `Stack` as the page body,
 so there is structurally no other layer that can paint behind it.
 
-- The pill's whole treatment flips with the **global** mode (not per tab
-  — every tab shares one mode now): dark-glass with a lime active pill in
-  dark mode, warm cream-glass with a coral active pill in light mode.
-  `_FloatingNav`'s `light` parameter is driven by
+- The pill is a clay capsule with one sliding, puffed-up selection tinted
+  in the accent: evergreen in dark mode, coral in light. It flips with the
+  **global** mode; `_FloatingNav`'s `light` parameter is driven by
   `Theme.of(context).brightness`, computed once in `MainShell.build`.
-- The one `BackdropFilter` blur (§5) lives here, clipped to the pill.
 - Desktop/wide layouts get a side rail (`_CurioRail` in `main_shell.dart`)
-  instead — same tokens, different shape, same brightness-aware pattern.
+  instead — a `clay`-coloured panel, same tokens, same brightness-aware
+  pattern.
 
 ## 7. Hard-won contrast rules
 
@@ -299,9 +338,12 @@ purpose — round everything. Same scale in both modes.
 | Widget | Where | Use |
 |---|---|---|
 | `CurioPage` | `curio_ui.dart` | Standard page shell: gradient + textured backdrop (both modes), optional `AppBar`, max-width content column |
-| `GlassCard` | `curio_ui.dart` | Standard elevated card (§5), both modes |
-| `CurioCard` | `curio_ui.dart` | Simpler opaque card (no glass sheen) — fine for dense list rows |
-| `ModeTile` | `curio_ui.dart` | Icon + title/subtitle + accent stripe list row (game/mode pickers) |
+| `CurioClay` | `curio_clay.dart` | The clay surface (§5): raised, `pressed` dent, `outline` ring, tinted `color`. Build bespoke tiles, chips and game pieces from it |
+| `ClayPainter` / `paintClay` | `curio_clay.dart` | The same clay for custom painters (board cells, progress bars, art panels) |
+| `clayButtonLayer` | `curio_clay.dart` | The theme's button `backgroundBuilder` that makes `FilledButton`/`OutlinedButton` clay — not for direct use |
+| `GlassCard` | `curio_ui.dart` | Standard card: clay with an ink ripple when tappable; `tint` becomes the clay colour. (Named from the glass era) |
+| `CurioCard` | `curio_ui.dart` | Same clay card with a `color`, a ring for a strong `borderColor` (faint ones are ignored, §5), and a tap ripple — fine for dense list rows |
+| `ModeTile` | `curio_ui.dart` | Clay icon tile + title/subtitle list row (game/mode pickers) |
 | `PrimaryButton` | `curio_ui.dart` | Full-width `FilledButton` wrapper; inherits theme colours by default — pass `color:` explicitly only when you also know the right foreground pairing (see §7) |
 | `CurioStatTile` / `CurioStatRow` | `curio_ui.dart` | Pastel stat tiles (big Fraunces number over a short label) in gold, plum, forest or coral; the row keeps them equal height and stacks them at large text sizes. Home's weekly growth and Profile's totals |
 | `ExplorerAvatar` | `curio_ui.dart` | The explorer's round letter avatar — Home's header (opens Profile) and Profile's header |
@@ -367,7 +409,9 @@ identical in both modes:
    edge-to-edge control the shared shell doesn't offer — even so, Home
    still supports both modes internally).
 2. Reach for `GlassCard`, `CurioCard`, `PrimaryButton`, `ModeTile` before
-   writing a new bespoke container — they already handle both modes.
+   writing a new bespoke container — they already handle both modes. When
+   you do need a bespoke surface, build it from `CurioClay` (raised,
+   `pressed` or `outline`d, §5), never a bordered `BoxDecoration`.
 3. Pick colours from §3 — if the right one doesn't exist, add a named
    token to *both* `CurioColors` and `CurioColorsLight` under the same
    field name, not just one.

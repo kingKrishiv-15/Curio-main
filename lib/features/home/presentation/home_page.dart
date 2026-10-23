@@ -6,24 +6,22 @@ import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/presentation/daily_plan.dart';
 
-/// Home's dark mode: a deep, textured evergreen backdrop with neutral-slate
+/// Home's dark mode: a deep, textured evergreen backdrop with slate clay
 /// cards (deliberately not another shade of green) and gold flames.
 abstract final class _HomeDark {
   static const bgTop = Color(0xFF0E211B);
   static const bgBottom = Color(0xFF05100D);
 
-  static const surface = Color(0xFF2B3032);
   static const surfaceRaised = Color(0xFF3C4346);
 
   static const line = Color(0x26FFFFFF);
-  static const lineStrong = Color(0x3DFFFFFF);
   static const ink = Color(0xFFF4FAF6);
   static const inkMuted = Color(0xFFC4CDC9);
   static const inkFaint = Color(0xFF8D948F);
@@ -32,17 +30,14 @@ abstract final class _HomeDark {
   static const sky = Color(0xFF8FC3D9);
 }
 
-/// Home's light mode: a bright, warm cream backdrop with white cards and a
-/// saturated coral "this is live right now" accent — kid-friendly and
+/// Home's light mode: a bright, warm cream backdrop with warm-white clay
+/// cards and a saturated coral "this is live right now" accent — kid-friendly and
 /// vibrant rather than moody.
 abstract final class _HomeLight {
   static const bgTop = Color(0xFFFFF8EE);
   static const bgBottom = Color(0xFFFDF1E2);
 
-  static const surface = Color(0xFFFFFFFF);
-
   static const line = Color(0xFFF0E4D0);
-  static const lineStrong = Color(0xFFE7D7BC);
   static const ink = Color(0xFF2E2417);
   static const inkMuted = Color(0xFF8C7C63);
   static const inkFaint = Color(0xFFB8AB92);
@@ -62,23 +57,6 @@ Color _hc(BuildContext context, Color darkColor, Color lightColor) {
   return Theme.of(context).brightness == Brightness.dark
       ? darkColor
       : lightColor;
-}
-
-/// A card surface: translucent dark glass in dark mode, a plain white card
-/// with a soft shadow in light mode. See design.md §5 for why dark mode
-/// avoids a real `BackdropFilter` blur here.
-class _GlassPanel extends StatelessWidget {
-  const _GlassPanel({
-    required this.child,
-    this.padding = EdgeInsets.zero,
-    this.radius = 22,
-  });
-  final Widget child;
-  final EdgeInsets padding;
-  final double radius;
-  @override
-  Widget build(BuildContext context) =>
-      CurioGloss(padding: padding, radius: radius, child: child);
 }
 
 /// A gentle looping scale pulse — used on "live" streak flames so they read
@@ -376,8 +354,15 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
     final inkMuted = _hc(context, _HomeDark.inkMuted, _HomeLight.inkMuted);
-    final surface = _hc(context, _HomeDark.surface, _HomeLight.surface);
-    final line = _hc(context, _HomeDark.line, _HomeLight.line);
+    final bell = IconButton(
+      tooltip: 'Family messages',
+      onPressed: () => openPage(context, const FamilyInboxPage()),
+      style: IconButton.styleFrom(
+        minimumSize: const Size(44, 44),
+        foregroundColor: ink,
+      ),
+      icon: const Icon(Icons.notifications_none_rounded, size: 21),
+    );
     return Row(
       children: [
         Expanded(
@@ -405,17 +390,7 @@ class _Header extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        IconButton(
-          tooltip: 'Family messages',
-          onPressed: () => openPage(context, const FamilyInboxPage()),
-          style: IconButton.styleFrom(
-            minimumSize: const Size(44, 44),
-            backgroundColor: surface,
-            foregroundColor: ink,
-            side: BorderSide(color: line),
-          ),
-          icon: const Icon(Icons.notifications_none_rounded, size: 21),
-        ),
+        CurioClay(radius: 22, child: bell),
         const SizedBox(width: 10),
         ExplorerAvatar(name: name, onTap: onProfile),
       ],
@@ -479,36 +454,35 @@ class _StreakChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final count = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$streak',
+          style: TextStyle(
+            color: dark ? _HomeDark.ink : _HomeLight.yellowInk,
+            fontWeight: FontWeight.w800,
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(width: 4),
+        _Pulse(
+          child: Icon(
+            Icons.local_fire_department_rounded,
+            color: dark ? _HomeDark.gold : _HomeLight.accent,
+            size: 17,
+          ),
+        ),
+      ],
+    );
     return Semantics(
       label: '$streak day streak',
       excludeSemantics: true,
-      child: Container(
+      child: CurioClay(
+        radius: 99,
+        color: dark ? _HomeDark.surfaceRaised : _HomeLight.yellowTile,
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-        decoration: BoxDecoration(
-          color: dark ? _HomeDark.surfaceRaised : _HomeLight.yellowTile,
-          borderRadius: BorderRadius.circular(99),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '$streak',
-              style: TextStyle(
-                color: dark ? _HomeDark.ink : _HomeLight.yellowInk,
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(width: 4),
-            _Pulse(
-              child: Icon(
-                Icons.local_fire_department_rounded,
-                color: dark ? _HomeDark.gold : _HomeLight.accent,
-                size: 17,
-              ),
-            ),
-          ],
-        ),
+        child: count,
       ),
     );
   }
@@ -529,7 +503,6 @@ class _WeekCard extends StatelessWidget {
     final inkMuted = dark ? _HomeDark.inkMuted : _HomeLight.inkMuted;
     final inkFaint = dark ? _HomeDark.inkFaint : _HomeLight.inkFaint;
     final line = dark ? _HomeDark.line : _HomeLight.line;
-    final lineStrong = dark ? _HomeDark.lineStrong : _HomeLight.lineStrong;
     final accent = dark ? _HomeDark.gold : _HomeLight.accent;
     final flameFill = dark
         ? _HomeDark.gold.withValues(alpha: .2)
@@ -551,7 +524,7 @@ class _WeekCard extends StatelessWidget {
     final doneToday = state.dailyGoalCompleted;
     final goalMet = doneToday >= goal;
 
-    return _GlassPanel(
+    return CurioClay(
       radius: 24,
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       child: Column(
@@ -585,36 +558,11 @@ class _WeekCard extends StatelessWidget {
                     excludeSemantics: true,
                     child: Column(
                       children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: played[i] ? flameFill : Colors.transparent,
-                            border: Border.all(
-                              color: i == todayIndex
-                                  ? accent
-                                  : played[i]
-                                  ? Colors.transparent
-                                  : lineStrong,
-                              width: i == todayIndex ? 2 : 1.3,
-                            ),
-                          ),
-                          child: played[i]
-                              ? Icon(
-                                  Icons.local_fire_department_rounded,
-                                  color: accent,
-                                  size: 19,
-                                )
-                              : i == todayIndex
-                              ? _Pulse(
-                                  child: Icon(
-                                    Icons.local_fire_department_outlined,
-                                    color: accent.withValues(alpha: .7),
-                                    size: 17,
-                                  ),
-                                )
-                              : null,
+                        _DayBubble(
+                          played: played[i],
+                          today: i == todayIndex,
+                          fill: flameFill,
+                          accent: accent,
                         ),
                         const SizedBox(height: 6),
                         Text(
@@ -678,6 +626,51 @@ class _WeekCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// One day of the week: played days puff up with a flame, the rest are
+/// dents pressed into the card, and today is ringed (with a pulsing outline
+/// flame while it's still to play).
+class _DayBubble extends StatelessWidget {
+  const _DayBubble({
+    required this.played,
+    required this.today,
+    required this.fill,
+    required this.accent,
+  });
+
+  final bool played, today;
+  final Color fill, accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 36,
+      child: CurioClay(
+        radius: 18,
+        pressed: !played,
+        color: played ? fill : null,
+        outline: today ? accent : null,
+        child: Center(
+          child: played
+              ? Icon(
+                  Icons.local_fire_department_rounded,
+                  color: accent,
+                  size: 19,
+                )
+              : today
+              ? _Pulse(
+                  child: Icon(
+                    Icons.local_fire_department_outlined,
+                    color: accent.withValues(alpha: .7),
+                    size: 17,
+                  ),
+                )
+              : null,
+        ),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../discoveries/domain/discovery.dart';
 import 'game_rewards.dart';
@@ -219,13 +220,10 @@ class GameNotice extends StatelessWidget {
     };
     return Semantics(
       liveRegion: true,
-      child: Container(
+      child: CurioClay(
+        radius: 18,
+        color: color.withValues(alpha: .14),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: .1),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: .3)),
-        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -334,18 +332,15 @@ class GameResultCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 14),
-          Container(
+          // The share line sits in a well pressed into the card.
+          SizedBox(
             width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: curioColor(
-                context,
-                CurioColors.surfaceMuted,
-                CurioColorsLight.surfaceMuted,
-              ),
-              borderRadius: BorderRadius.circular(14),
+            child: CurioClay(
+              radius: 18,
+              pressed: true,
+              padding: const EdgeInsets.all(14),
+              child: Text(shareText, style: const TextStyle(height: 1.6)),
             ),
-            child: Text(shareText, style: const TextStyle(height: 1.6)),
           ),
           const SizedBox(height: 12),
           // Stacked, not side by side, so long labels and large text fit.
@@ -403,12 +398,10 @@ class PracticeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
-    return Container(
+    return CurioClay(
+      radius: 99,
+      color: plum.withValues(alpha: .16),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: plum.withValues(alpha: .14),
-        borderRadius: BorderRadius.circular(99),
-      ),
       child: Text(
         'PRACTICE',
         style: TextStyle(

@@ -5,7 +5,7 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
@@ -288,7 +288,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget _comfortStep() => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      CurioGloss(
+      CurioClay(
+        radius: 26,
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,7 +335,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   );
 
   Widget _loopStep() {
-    return CurioGloss(
+    return CurioClay(
       radius: 22,
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
       child: Column(

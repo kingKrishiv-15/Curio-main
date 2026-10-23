@@ -1,4 +1,4 @@
-import 'curio_gloss.dart';
+import 'curio_clay.dart';
 import 'curio_logo.dart';
 import 'dart:math' as math;
 
@@ -171,13 +171,8 @@ class _CurioBackdropPainter extends CustomPainter {
       oldDelegate.dark != dark;
 }
 
-/// Curio's standard "glass" card: a translucent tinted fill, a crisp bright
-/// border, a top sheen, and a lift shadow. Deliberately does **not** use a
-/// real `BackdropFilter` blur — stacking many independent blurs (one per
-/// card in a scrolling list, say) is what caused blur to render in the
-/// wrong place on real devices during the home-screen redesign. Reserve an
-/// actual blur for a single, well-contained floating element (like the
-/// bottom nav) rather than every card that wants a "glass" look.
+/// Curio's standard card: a [CurioClay] body, optionally tinted, with an
+/// ink ripple when tappable. (Named from Curio's earlier glass look.)
 class GlassCard extends StatelessWidget {
   const GlassCard({
     required this.child,
@@ -198,10 +193,9 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CurioGloss(
+    return CurioClay(
       radius: radius,
-      padding: EdgeInsets.zero,
-      tint: tint,
+      color: tint,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -246,11 +240,13 @@ class CurioCard extends StatelessWidget {
       CurioColors.forest,
       CurioColorsLight.forest,
     );
-    return CurioGloss(
+    return CurioClay(
       radius: radius,
-      tint: color == surface ? null : color,
-      borderColor: borderColor,
-      padding: EdgeInsets.zero,
+      color: color == surface ? null : color,
+      // A faint border is how glass kept a tinted card off the page; clay's
+      // shadows already do that, so only a strong one (selected, solved)
+      // still draws.
+      outline: borderColor != null && borderColor!.a > .5 ? borderColor : null,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -422,48 +418,44 @@ class MascotBadge extends StatelessWidget {
     final ink = dark ? CurioColors.ink : CurioColorsLight.ink;
     return Semantics(
       label: 'Nova, your Curio companion',
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: forestSoft,
-          borderRadius: BorderRadius.circular(size * .36),
-          border: Border.all(color: surface, width: 4),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x18291C12),
-              blurRadius: 15,
-              offset: Offset(0, 7),
-            ),
-          ],
-        ),
+      child: SizedBox.square(
+        dimension: size,
+        // The sparkle pokes past the badge's rounded corner, so the clay
+        // body sits behind the face instead of clipping it.
         child: Stack(
           alignment: Alignment.center,
           children: [
+            Positioned.fill(
+              child: CurioClay(
+                radius: size * .36,
+                color: forestSoft,
+                child: const SizedBox.expand(),
+              ),
+            ),
             Transform.rotate(
               angle: -.08,
-              child: Container(
+              child: SizedBox(
                 width: size * .7,
                 height: size * .62,
-                decoration: BoxDecoration(
+                child: CurioClay(
+                  radius: size * .28,
                   color: forest,
-                  borderRadius: BorderRadius.circular(size * .28),
-                ),
-                child: Center(
-                  child: Container(
-                    width: size * .48,
-                    height: size * .28,
-                    decoration: BoxDecoration(
-                      color: surface,
-                      borderRadius: BorderRadius.circular(size * .14),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _MascotEye(size: size * .065, color: ink),
-                        SizedBox(width: size * .13),
-                        _MascotEye(size: size * .065, color: ink),
-                      ],
+                  child: Center(
+                    child: Container(
+                      width: size * .48,
+                      height: size * .28,
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(size * .14),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _MascotEye(size: size * .065, color: ink),
+                          SizedBox(width: size * .13),
+                          _MascotEye(size: size * .065, color: ink),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -523,14 +515,14 @@ class CurioIconTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
-      decoration: BoxDecoration(
+      child: CurioClay(
+        radius: radius,
         color: background ?? color.withValues(alpha: .11),
-        borderRadius: BorderRadius.circular(radius),
+        child: Icon(icon, color: color, size: iconSize),
       ),
-      child: Icon(icon, color: color, size: iconSize),
     );
   }
 }
@@ -603,9 +595,8 @@ class ModeTile extends StatelessWidget {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            Container(width: 5, color: color),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 9, 12),
+              padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
               child: CurioIconTile(icon: icon, color: color),
             ),
             Expanded(
@@ -631,8 +622,8 @@ class ModeTile extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: color.withValues(alpha: .1),
-                              borderRadius: BorderRadius.circular(6),
+                              color: color.withValues(alpha: .12),
+                              borderRadius: BorderRadius.circular(99),
                             ),
                             child: Text(
                               badge!,
@@ -787,38 +778,56 @@ class CurioProgressBar extends StatelessWidget {
       tween: Tween(end: value.clamp(0, 1).toDouble()),
       duration: const Duration(milliseconds: 450),
       curve: Curves.easeOutCubic,
+      // A groove pressed into the card, a little deeper than [height] asks
+      // so the clay reads, filled with a puffy strip.
       builder: (context, animated, _) => SizedBox(
-        height: height,
+        height: height + 4,
         width: double.infinity,
-        child: CustomPaint(painter: _BarPainter(animated, resolved)),
+        child: CustomPaint(
+          painter: _BarPainter(
+            animated,
+            resolved,
+            clayBase(context),
+            Theme.of(context).brightness == Brightness.dark,
+          ),
+        ),
       ),
     );
   }
 }
 
 class _BarPainter extends CustomPainter {
-  const _BarPainter(this.value, this.color);
+  const _BarPainter(this.value, this.color, this.base, this.dark);
   final double value;
-  final Color color;
+  final Color color, base;
+  final bool dark;
 
   @override
   void paint(Canvas canvas, Size size) {
     final radius = Radius.circular(size.height);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, radius),
-      Paint()..color = color.withValues(alpha: .12),
-    );
+    final track = RRect.fromRectAndRadius(Offset.zero & size, radius);
     // Never thinner than a dot, so an empty bar still shows where it starts.
     final filled = math.max(size.height, size.width * value);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, filled, size.height), radius),
-      Paint()..color = color,
+    final bar = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, filled, size.height),
+      radius,
     );
+    paintClay(
+      canvas,
+      track,
+      Color.alphaBlend(color.withValues(alpha: .12), base),
+      dark: dark,
+      pressed: true,
+    );
+    paintClay(canvas, bar, color, dark: dark);
   }
 
   @override
   bool shouldRepaint(_BarPainter old) =>
-      old.value != value || old.color != color;
+      old.value != value ||
+      old.color != color ||
+      old.base != base ||
+      old.dark != dark;
 }
 
 class CurioStatusStrip extends StatelessWidget {
@@ -845,13 +854,10 @@ class CurioStatusStrip extends StatelessWidget {
       CurioColors.inkMuted,
       CurioColorsLight.inkMuted,
     );
-    return Container(
+    return CurioClay(
+      radius: 18,
+      color: resolved.withValues(alpha: .1),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: resolved.withValues(alpha: .075),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: resolved.withValues(alpha: .16)),
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -933,19 +939,12 @@ class CurioStatTile extends StatelessWidget {
     return Semantics(
       label: semanticLabel ?? '$value $label',
       excludeSemantics: true,
-      child: Container(
+      child: CurioClay(
+        radius: 24,
+        // Dark mode tints the clay slate rather than the page, so gold stays
+        // gold instead of turning olive on green.
+        color: curioColor(context, color.withValues(alpha: .16), fill),
         padding: const EdgeInsets.fromLTRB(8, 16, 8, 14),
-        decoration: BoxDecoration(
-          // Dark mode tints the neutral card slate rather than the page, so
-          // gold stays gold instead of turning olive on green.
-          color: curioColor(
-            context,
-            Color.alphaBlend(color.withValues(alpha: .16), CurioColors.surface),
-            fill,
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withValues(alpha: .28)),
-        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1038,47 +1037,25 @@ class ExplorerAvatar extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final trimmed = name.trim();
     final letter = trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
-    final avatar = Container(
+    final initial = Text(
+      letter,
+      textScaler: TextScaler.noScaling,
+      style: TextStyle(
+        fontFamily: 'Fraunces',
+        color: Colors.white,
+        fontSize: size * .4,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+    final avatar = SizedBox(
       width: size,
       height: size,
-      padding: EdgeInsets.all(size * .06),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: curioColor(
-          context,
-          CurioColors.surface,
-          CurioColorsLight.surface,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: dark ? .3 : .1),
-            blurRadius: size * .24,
-            offset: Offset(0, size * .08),
-          ),
-        ],
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: dark
-                ? const [Color(0xFF1F6B50), Color(0xFF49BB8C)]
-                : const [Color(0xFFF2564A), Color(0xFFD8362B)],
-          ),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          letter,
-          textScaler: TextScaler.noScaling,
-          style: TextStyle(
-            fontFamily: 'Fraunces',
-            color: Colors.white,
-            fontSize: size * .4,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+      child: CurioClay(
+        radius: size / 2,
+        color: dark
+            ? Color.lerp(CurioColors.forestStrong, CurioColors.forest, .5)
+            : CurioColorsLight.coral,
+        child: Center(child: initial),
       ),
     );
     if (onTap == null) return ExcludeSemantics(child: avatar);

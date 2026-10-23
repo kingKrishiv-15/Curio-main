@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/family_service.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 
 class FamilyInboxPage extends StatefulWidget {
   const FamilyInboxPage({this.reportsOnly = false, super.key});
@@ -57,7 +57,9 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
             padding: const EdgeInsets.all(24),
             children: [
               if (items.isEmpty)
-                CurioGloss(
+                CurioClay(
+                  padding: const EdgeInsets.all(20),
+                  radius: 26,
                   child: Column(
                     children: [
                       Icon(
@@ -90,7 +92,9 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: widget.reportsOnly
                       ? WeeklyReportCard(report: item)
-                      : CurioGloss(
+                      : CurioClay(
+                          padding: const EdgeInsets.all(20),
+                          radius: 26,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -175,7 +179,9 @@ class WeeklyReportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final summary = (report['summary'] as Map?)?.cast<String, dynamic>() ?? {};
     final learners = summary['learners'] as List? ?? const [];
-    return CurioGloss(
+    return CurioClay(
+      padding: const EdgeInsets.all(20),
+      radius: 26,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

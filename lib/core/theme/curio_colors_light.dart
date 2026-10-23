@@ -13,6 +13,9 @@ abstract final class CurioColorsLight {
   static const canvasDeep = Color(0xFFFFF8EE);
   static const surface = Color(0xFFFFFFFF);
   static const surfaceMuted = Color(0xFFF3E9D8);
+
+  /// The default clay body (`CurioClay`): warm white on cream.
+  static const clay = Color(0xFFFFFCF7);
   static const onDark = Color(0xFFFFFFFF);
   static const ink = Color(0xFF2E2417);
   static const inkSoft = Color(0xFF5B4E3B);

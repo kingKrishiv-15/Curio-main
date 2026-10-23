@@ -6,7 +6,7 @@ import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import 'widgets/welcome_art.dart';
 
 /// Pushes a signed-out step with the same fade-and-drift as `openPage`
@@ -125,7 +125,7 @@ class AuthFrame extends StatelessWidget {
                       const SizedBox(width: 28),
                       Expanded(
                         child: SingleChildScrollView(
-                          child: CurioGloss(
+                          child: CurioClay(
                             radius: 28,
                             padding: const EdgeInsets.all(36),
                             child: content,
@@ -219,7 +219,7 @@ class AuthLayout extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final wide = constraints.maxWidth >= 800;
-                final form = CurioGloss(
+                final form = CurioClay(
                   radius: 28,
                   padding: EdgeInsets.all(wide ? 36 : 24),
                   child: child,

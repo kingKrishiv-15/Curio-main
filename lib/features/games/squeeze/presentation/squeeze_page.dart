@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
+import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
@@ -63,7 +64,6 @@ class _SqueezePageState extends State<SqueezePage> {
   Widget build(BuildContext context) {
     final progress = _engine.guesses.length / SqueezeEngine.maxGuesses;
     final navy = curioColor(context, CurioColors.navy, CurioColorsLight.navy);
-    final gold = curioColor(context, CurioColors.gold, CurioColorsLight.gold);
     // `navy` is coral in light mode: gold text and a coral bar vanish on it.
     final cardLabel = curioColor(
       context,
@@ -91,7 +91,6 @@ class _SqueezePageState extends State<SqueezePage> {
       CurioColors.green,
       CurioColorsLight.green,
     );
-    final teal = curioColor(context, CurioColors.teal, CurioColorsLight.teal);
     final tealDark = curioColor(
       context,
       CurioColors.tealDark,
@@ -102,11 +101,6 @@ class _SqueezePageState extends State<SqueezePage> {
       CurioColors.goldSoft,
       CurioColorsLight.goldSoft,
     );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
     return CurioPage(
       title: 'Daily Squeeze',
       child: ListView(
@@ -114,7 +108,6 @@ class _SqueezePageState extends State<SqueezePage> {
         children: [
           CurioCard(
             color: navy,
-            borderColor: navy,
             child: Column(
               children: [
                 Text(
@@ -159,7 +152,8 @@ class _SqueezePageState extends State<SqueezePage> {
           const SizedBox(height: 16),
           CurioCard(
             color: _engine.solved ? greenSoft : tealSoft,
-            borderColor: _engine.solved ? green : teal,
+            // Only the find gets a ring: the hint itself is just a card.
+            borderColor: _engine.solved ? green : null,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -210,7 +204,6 @@ class _SqueezePageState extends State<SqueezePage> {
           ] else ...[
             CurioCard(
               color: goldSoft,
-              borderColor: gold,
               child: Column(
                 children: [
                   Text(
@@ -250,14 +243,18 @@ class _SqueezePageState extends State<SqueezePage> {
               runSpacing: 8,
               children: _engine.guesses
                   .map(
-                    (guess) => Chip(
-                      label: Text(
+                    (guess) => CurioClay(
+                      radius: 12,
+                      color: guess == _engine.target ? greenSoft : null,
+                      outline: guess == _engine.target ? green : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      child: Text(
                         '$guess',
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
-                      backgroundColor: guess == _engine.target
-                          ? greenSoft
-                          : surface,
                     ),
                   )
                   .toList(),

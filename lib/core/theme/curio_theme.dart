@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../widgets/curio_clay.dart';
 import 'curio_colors.dart';
 import 'curio_colors_light.dart';
 
@@ -57,6 +58,15 @@ abstract final class CurioTheme {
       onSurfaceVariant: c(CurioColors.inkSoft, CurioColorsLight.inkSoft),
       error: c(CurioColors.danger, CurioColorsLight.danger),
     );
+    // Buttons are clay: lifted by their elevation, squished flat while held.
+    final clayElevation = WidgetStateProperty.resolveWith<double>(
+      (states) =>
+          states.contains(WidgetState.disabled) ||
+              states.contains(WidgetState.pressed)
+          ? 0
+          : 4,
+    );
+    final clayButton = clayButtonLayer(radius: 18, dark: dark);
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
@@ -217,7 +227,6 @@ abstract final class CurioTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(48, 54),
-          elevation: 0,
           backgroundColor: c(CurioColors.coral, CurioColorsLight.coral),
           // Coral is a bright accent in both modes, so its label needs to
           // go dark-on-bright, matching the ink-on-lime treatment used for
@@ -231,10 +240,7 @@ abstract final class CurioTheme {
             CurioColors.inkMuted,
             CurioColorsLight.inkMuted,
           ),
-          shadowColor: c(
-            CurioColors.coral,
-            CurioColorsLight.coral,
-          ).withValues(alpha: .4),
+          shadowColor: c(Colors.black, CurioColorsLight.coralStrong),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -244,16 +250,16 @@ abstract final class CurioTheme {
             fontWeight: FontWeight.w800,
             letterSpacing: -.1,
           ),
-        ),
+        ).copyWith(elevation: clayElevation, backgroundBuilder: clayButton),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
+        // The quieter clay button: the plain clay body, no outline at all.
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(48, 52),
+          backgroundColor: c(CurioColors.clay, CurioColorsLight.clay),
           foregroundColor: c(CurioColors.ink, CurioColorsLight.ink),
-          side: BorderSide(
-            color: c(CurioColors.outline, CurioColorsLight.outline),
-            width: 1.4,
-          ),
+          shadowColor: c(Colors.black, CurioColorsLight.ink),
+          side: BorderSide.none,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -261,7 +267,7 @@ abstract final class CurioTheme {
             fontFamily: _body,
             fontWeight: FontWeight.w700,
           ),
-        ),
+        ).copyWith(elevation: clayElevation, backgroundBuilder: clayButton),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -308,9 +314,9 @@ abstract final class CurioTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: c(CurioColors.surface, CurioColorsLight.surface),
+        backgroundColor: c(CurioColors.clay, CurioColorsLight.clay),
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         titleTextStyle: TextStyle(
           fontFamily: _display,
           color: c(CurioColors.ink, CurioColorsLight.ink),
@@ -340,7 +346,7 @@ abstract final class CurioTheme {
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: c(CurioColors.surface, CurioColorsLight.surface),
+        backgroundColor: c(CurioColors.clay, CurioColorsLight.clay),
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         shape: const RoundedRectangleBorder(
@@ -368,9 +374,11 @@ abstract final class CurioTheme {
           CurioColorsLight.outlineSoft,
         ),
       ),
+      // Fields are wells: a shade below the clay they sit in, no outline
+      // until focused.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: c(CurioColors.surface, CurioColorsLight.surface),
+        fillColor: c(CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 14,
@@ -394,11 +402,9 @@ abstract final class CurioTheme {
           borderRadius: BorderRadius.all(Radius.circular(14)),
           borderSide: BorderSide.none,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(14)),
-          borderSide: BorderSide(
-            color: c(CurioColors.outline, CurioColorsLight.outline),
-          ),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(14)),

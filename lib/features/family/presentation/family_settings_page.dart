@@ -3,7 +3,7 @@ import '../../../core/models/family_settings.dart';
 import '../../../core/services/family_service.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/curio_gloss.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../auth/presentation/auth_layout.dart';
 
 class FamilySettingsPage extends StatefulWidget {
@@ -105,7 +105,9 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                 'Choose a small daily goal and decide how you’d like to hear from Curio.',
               ),
               const SizedBox(height: 24),
-              CurioGloss(
+              CurioClay(
+                padding: const EdgeInsets.all(20),
+                radius: 26,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -134,7 +136,9 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              CurioGloss(
+              CurioClay(
+                padding: const EdgeInsets.all(20),
+                radius: 26,
                 child: Column(
                   children: [
                     SwitchListTile.adaptive(
