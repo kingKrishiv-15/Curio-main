@@ -8,6 +8,8 @@ import 'package:curio/core/services/auth_service.dart';
 import 'package:curio/core/theme/curio_theme.dart';
 import 'package:curio/core/theme/theme_controller.dart';
 import 'package:curio/features/auth/presentation/auth_gate.dart';
+import 'package:curio/features/auth/presentation/about_curio_page.dart';
+import 'package:curio/features/auth/presentation/widgets/welcome_art.dart';
 import 'package:curio/features/auth/presentation/auth_page.dart';
 import 'package:curio/features/auth/presentation/intro_page.dart';
 import 'package:curio/features/auth/presentation/landing_page.dart';
@@ -187,7 +189,10 @@ void main() {
     final auth = FakeAuth();
     await tester.pumpWidget(calm(app(LandingPage(authService: auth))));
     await settle(tester);
-    expect(find.textContaining('into a daily adventure'), findsOneWidget);
+    expect(find.textContaining('Little games.'), findsOneWidget);
+    expect(find.text('Sign in'), findsNothing);
+    expect(find.byKey(const Key('landing_guest')), findsNothing);
+    expect(find.text('Games that make thinking visible.'), findsNothing);
 
     await tapVisible(tester, find.byKey(const Key('landing_get_started')));
     expect(find.text('Five minutes.\nOne big idea.'), findsOneWidget);
@@ -204,6 +209,123 @@ void main() {
     await tapVisible(tester, find.byKey(const Key('landing_get_started')));
     expect(find.text('Create your family account'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'About Curio is optional and sign-in stays on the welcome actions',
+    (tester) async {
+      await phone(tester);
+      final auth = FakeAuth();
+      await tester.pumpWidget(app(LandingPage(authService: auth)));
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.byKey(const Key('landing_about')));
+      expect(find.byType(AboutCurioPage), findsOneWidget);
+      expect(find.text('Games that make thinking visible.'), findsOneWidget);
+      expect(find.text('Continue as guest'), findsNothing);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.byKey(const Key('landing_sign_in')));
+      expect(find.byType(AuthPage), findsOneWidget);
+      expect(find.byKey(const Key('auth_guest')), findsNothing);
+      expect(find.text('Continue as guest'), findsNothing);
+      await tapVisible(tester, find.byKey(const Key('auth_switch_mode')));
+      expect(find.text('Create your family account'), findsOneWidget);
+      expect(find.byKey(const Key('auth_guest')), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('Welcome section labels remain inside the animated artwork', (
+    tester,
+  ) async {
+    await phone(tester);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: Center(child: OrbitHero(size: 180))),
+      ),
+    );
+    final art = find.byType(OrbitHero);
+    final positions = <double>[];
+    for (var frame = 0; frame < 17; frame++) {
+      await tester.pump(const Duration(milliseconds: 500));
+      final bounds = tester.getRect(art);
+      positions.add(
+        tester
+            .getRect(find.byKey(const ValueKey('welcome_section_English')))
+            .center
+            .dy,
+      );
+      for (final label in ['Maths', 'Memory', 'English']) {
+        final section = tester.getRect(
+          find.byKey(ValueKey('welcome_section_$label')),
+        );
+        expect(section.left, greaterThanOrEqualTo(bounds.left));
+        expect(section.right, lessThanOrEqualTo(bounds.right));
+        expect(section.top, greaterThanOrEqualTo(bounds.top));
+        expect(section.bottom, lessThanOrEqualTo(bounds.bottom));
+      }
+    }
+    positions.sort();
+    expect(
+      positions.last - positions.first,
+      greaterThan(3),
+      reason: 'the welcome illustration visibly moves',
+    );
+    await tester.pumpWidget(const SizedBox());
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'Welcome reserves room for the logo and anchors account buttons at the bottom',
+    (tester) async {
+      await phone(tester, const Size(402, 874));
+      await tester.pumpWidget(app(LandingPage(authService: FakeAuth())));
+      await tester.pumpAndSettle();
+      final art = tester.getRect(find.byKey(const Key('landing_art')));
+      final headline = tester.getRect(
+        find.byKey(const Key('landing_headline')),
+      );
+      final primary = tester.getRect(
+        find.byKey(const Key('landing_get_started')),
+      );
+      final signIn = tester.getRect(find.byKey(const Key('landing_sign_in')));
+      expect(art.height, greaterThanOrEqualTo(300));
+      expect(art.bottom, lessThan(headline.top));
+      expect(primary.top, greaterThan(headline.bottom));
+      expect(signIn.bottom, greaterThanOrEqualTo(874 - 100));
+      expect(signIn.bottom, lessThanOrEqualTo(874));
+    },
+  );
+
+  testWidgets('Welcome animation can be paused and restarted', (tester) async {
+    await phone(tester);
+    await tester.pumpWidget(
+      MaterialApp(home: LandingPage(authService: FakeAuth())),
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await tester.tap(find.byKey(const Key('landing_motion')));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Play welcome animation'), findsOneWidget);
+    final still = tester.getRect(
+      find.byKey(const ValueKey('welcome_section_English')),
+    );
+    await tester.pump(const Duration(seconds: 2));
+    expect(
+      tester.getRect(find.byKey(const ValueKey('welcome_section_English'))),
+      still,
+    );
+    await tester.tap(find.byKey(const Key('landing_motion')));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.byTooltip('Pause welcome animation'), findsOneWidget);
+    final moving = tester.getRect(
+      find.byKey(const ValueKey('welcome_section_English')),
+    );
+    await tester.pump(const Duration(seconds: 2));
+    expect(
+      tester.getRect(find.byKey(const ValueKey('welcome_section_English'))),
+      isNot(moving),
+    );
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets(
@@ -388,6 +510,22 @@ void main() {
           await tester.enterText(find.byKey(const Key('otp_input')), code);
           await tester.pump();
           expect(auth.verified, isEmpty);
+          final input = tester.getRect(find.byKey(const Key('otp_input')));
+          final firstBox = tester.getRect(
+            find.byKey(const ValueKey('otp_digit_0')),
+          );
+          for (var digit = 0; digit < length; digit++) {
+            final box = tester.getRect(
+              find.byKey(ValueKey('otp_digit_$digit')),
+            );
+            expect(
+              box.top,
+              firstBox.top,
+              reason: 'all code digits stay on one line',
+            );
+            expect(box.left, greaterThanOrEqualTo(input.left));
+            expect(box.right, lessThanOrEqualTo(input.right + .01));
+          }
           await tapVisible(tester, find.byKey(const Key('verify_submit')));
           expect(auth.verified, [(purpose, code)]);
           expect(
@@ -694,15 +832,10 @@ void main() {
         tester,
       ) async {
         await phone(tester, size);
-        final previousErrorHandler = FlutterError.onError;
-        FlutterError.onError = (details) {
-          debugPrint(details.toString());
-          previousErrorHandler?.call(details);
-        };
-        addTearDown(() => FlutterError.onError = previousErrorHandler);
         final auth = FakeAuth();
         final screens = <Widget>[
           LandingPage(authService: auth),
+          const AboutCurioPage(),
           IntroPage(authService: auth),
           AuthPage(authService: auth, mode: AuthMode.signUp),
           AuthPage(authService: auth),

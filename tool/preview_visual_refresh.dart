@@ -1,13 +1,14 @@
 // Rebuilds reviewable UI images without signing in or sending any email:
 // flutter test tool/preview_visual_refresh.dart
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:curio/core/services/auth_service.dart';
 import 'package:curio/core/theme/curio_theme.dart';
 import 'package:curio/core/theme/theme_controller.dart';
 import 'package:curio/features/auth/presentation/landing_page.dart';
+import 'package:curio/features/auth/presentation/verify_code_page.dart';
+import 'package:curio/features/auth/presentation/about_curio_page.dart';
 import 'package:curio/features/auth/presentation/onboarding_page.dart';
 import 'package:curio/features/games/game_catalog.dart';
 import 'package:curio/features/games/presentation/game_card.dart';
@@ -38,13 +39,19 @@ void main() {
   testWidgets('render the visual refresh in both themes and at reading sizes', (
     tester,
   ) async {
+    // This tool runs under flutter test, with no device preferences to change.
+    // ignore: invalid_use_of_visible_for_testing_member
     SharedPreferences.setMockInitialValues({});
     await tester.runAsync(_fonts);
-    final client = SupabaseClient(
-      'https://example.supabase.co',
-      'preview-only',
-      authOptions: const AuthClientOptions(autoRefreshToken: false),
-    );
+    // Client setup/disposal uses real asynchronous work, outside the widget
+    // test's fake clock. No authentication or network requests are made.
+    final client = (await tester.runAsync(
+      () async => SupabaseClient(
+        'https://example.supabase.co',
+        'preview-only',
+        authOptions: const AuthClientOptions(autoRefreshToken: false),
+      ),
+    ))!;
     final auth = AuthService(client: client);
     final reading = ThemeController();
     final frame = GlobalKey();
@@ -58,6 +65,7 @@ void main() {
       Size size, {
       bool dark = false,
       double scale = 1,
+      EdgeInsets insets = EdgeInsets.zero,
     }) async {
       tester.view.physicalSize = size;
       await tester.pumpWidget(
@@ -72,6 +80,7 @@ void main() {
                 data: MediaQuery.of(context).copyWith(
                   disableAnimations: true,
                   textScaler: TextScaler.linear(scale),
+                  padding: insets,
                 ),
                 child: child!,
               ),
@@ -99,10 +108,18 @@ void main() {
     for (final dark in [false, true]) {
       await mount(
         LandingPage(authService: auth),
-        const Size(390, 844),
+        const Size(402, 874),
         dark: dark,
+        insets: const EdgeInsets.only(top: 62, bottom: 34),
       );
       await save('welcome-${dark ? 'dark' : 'light'}');
+      await mount(
+        const AboutCurioPage(),
+        const Size(402, 874),
+        dark: dark,
+        insets: const EdgeInsets.only(top: 62, bottom: 34),
+      );
+      await save('about-${dark ? 'dark' : 'light'}');
       await mount(
         LandingPage(authService: auth),
         const Size(1280, 900),
@@ -141,6 +158,19 @@ void main() {
       );
       await save('games-${dark ? 'dark' : 'light'}');
     }
+    await mount(
+      VerifyCodePage(
+        authService: auth,
+        purpose: CodePurpose.signUp,
+        email: 'parent@example.com',
+        codeLength: 8,
+      ),
+      const Size(402, 874),
+      insets: const EdgeInsets.only(top: 62, bottom: 34),
+    );
+    await tester.enterText(find.byKey(const Key('otp_input')), '01234567');
+    await tester.pumpAndSettle();
+    await save('otp-eight-digits');
     await mount(
       OnboardingPage(authService: auth, onComplete: () {}),
       const Size(390, 844),

@@ -371,8 +371,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
             contentPadding: EdgeInsets.zero,
             value: _weeklyEmail,
             onChanged: (v) => setState(() => _weeklyEmail = v),
-            title: const Text('Weekly parent email'),
-            subtitle: const Text('Last week’s practice, every Monday morning.'),
+            title: const Text('Weekly report emails'),
+            subtitle: const Text(
+              'Games, practice days, XP, discoveries and skills. Mondays after 8 AM in your time zone.',
+            ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(

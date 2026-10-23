@@ -184,9 +184,9 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                     const Divider(),
                     SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Weekly parent email'),
+                      title: const Text('Weekly report emails'),
                       subtitle: const Text(
-                        'Last week’s practice, delivered Monday after 8 AM. Turn off anytime.',
+                        'All explorers’ games, practice days, XP, discoveries and skills. Mondays after 8 AM in your time zone. Turn off anytime.',
                       ),
                       value: _email && !_service.isDemo,
                       onChanged: _saving || _service.isDemo

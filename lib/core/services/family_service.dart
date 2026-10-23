@@ -16,6 +16,7 @@ class FamilyService {
               : null);
   final SupabaseClient? _client;
   bool get isDemo => _client == null;
+  String? get parentEmail => _client?.auth.currentUser?.email;
   String get _userId => _client!.auth.currentUser!.id;
 
   Future<FamilySettings> loadSettings() async {
@@ -67,6 +68,26 @@ class FamilyService {
       'curio_family_$_userId',
       jsonEncode(settings.toJson()),
     );
+  }
+
+  /// Patch only the email opt-in so a dashboard toggle cannot overwrite
+  /// another device's goal, timezone, reminders or recorded consent.
+  Future<void> setWeeklyEmailEnabled(bool enabled) async {
+    if (_client == null) throw StateError('A family account is required.');
+    final settings = await _client
+        .from('family_settings')
+        .update({'weekly_email_enabled': enabled})
+        .eq('parent_id', _userId)
+        .select()
+        .single();
+    try {
+      await (await SharedPreferences.getInstance()).setString(
+        'curio_family_$_userId',
+        jsonEncode(settings),
+      );
+    } catch (_) {
+      // The server saved the preference; local caching is best effort.
+    }
   }
 
   Future<List<Map<String, dynamic>>> notifications() async => _client == null

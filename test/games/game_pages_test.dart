@@ -4,7 +4,6 @@ import 'package:curio/core/services/auth_service.dart';
 import 'package:curio/core/services/guest_session.dart';
 import 'package:curio/core/state/curio_state.dart';
 import 'package:curio/core/theme/curio_theme.dart';
-import 'package:curio/core/theme/theme_controller.dart';
 import 'package:curio/features/auth/presentation/auth_gate.dart';
 import 'package:curio/features/auth/presentation/landing_page.dart';
 import 'package:curio/features/games/bridge/presentation/bridge_page.dart';
@@ -215,60 +214,34 @@ void main() {
     expect(state.totalXp, xpBefore + 90);
   });
 
-  testWidgets('Guest: landing → continue as guest → Home, progress on device', (
-    tester,
-  ) async {
-    await phone(tester);
-    final guest = GuestSession.instance..debugSetActive(false);
-    final auth = NoSessionAuth();
-    await tester.pumpWidget(
-      CurioThemeScope(
-        controller: ThemeController(),
-        child: MaterialApp(
+  testWidgets(
+    'A saved guest session returns to welcome and keeps old progress',
+    (tester) async {
+      await phone(tester);
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('curio_guest_active', true);
+      await LocalProgressStore().save(
+        LocalProgressStore.fresh.copyWith(childName: 'Maya'),
+      );
+      final auth = NoSessionAuth();
+      await tester.pumpWidget(
+        MaterialApp(
           theme: CurioTheme.dark,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(disableAnimations: true),
             child: child!,
           ),
-          home: AuthGate(authService: auth, guest: guest),
+          home: AuthGate(authService: auth),
         ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byType(LandingPage), findsOneWidget);
-
-    await tester.ensureVisible(find.byKey(const Key('landing_guest')));
-    await tester.tap(find.byKey(const Key('landing_guest')));
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 60));
-    }
-    await tester.enterText(find.byKey(const Key('guest_name')), 'Maya');
-    await tester.tap(find.byKey(const Key('guest_start')));
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 200));
-    }
-    expect(guest.isActive, isTrue);
-    expect(find.byType(LandingPage), findsNothing);
-    expect(find.textContaining('Maya'), findsWidgets);
-    final saved = await LocalProgressStore().load();
-    expect(saved.childName, 'Maya');
-    expect(saved.totalXp, 0, reason: 'guests start fresh, not on demo numbers');
-
-    await guest.end();
-    for (var i = 0; i < 5; i++) {
-      await tester.pump(const Duration(milliseconds: 200));
-    }
-    expect(find.byType(LandingPage), findsOneWidget);
-    expect(
-      (await LocalProgressStore().load()).childName,
-      'Maya',
-      reason: 'leaving guest mode keeps progress unless erased',
-    );
-    await guest.end(erase: true);
-    expect((await LocalProgressStore().load()).childName, 'Explorer');
-    await tester.pumpWidget(const SizedBox());
-    await auth.changes.close();
-  });
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(LandingPage), findsOneWidget);
+      expect(find.byKey(const Key('landing_guest')), findsNothing);
+      expect((await LocalProgressStore().load()).childName, 'Maya');
+      await tester.pumpWidget(const SizedBox());
+      await auth.changes.close();
+    },
+  );
 
   for (final size in [
     const Size(375, 667),

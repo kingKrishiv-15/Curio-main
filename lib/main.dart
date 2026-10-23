@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import 'app/curio_app.dart';
 import 'core/config/supabase_config.dart';
-import 'core/services/guest_session.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +16,5 @@ Future<void> main() async {
     ),
   );
   await SupabaseConfig.initialize();
-  await GuestSession.instance.load();
   runApp(const CurioApp());
 }

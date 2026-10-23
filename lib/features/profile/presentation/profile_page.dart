@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/services/guest_session.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
@@ -222,11 +221,7 @@ class ProfilePage extends StatelessWidget {
             subtitle: 'Your data and your choices',
             onTap: () => ParentalGate.open(context, const PrivacyPage()),
           ),
-          if (state.isGuest) ...[
-            const SizedBox(height: 16),
-            const _GuestCard(),
-          ],
-          if (SupabaseConfig.isConfigured && !state.isGuest) ...[
+          if (SupabaseConfig.isConfigured) ...[
             const SizedBox(height: 16),
             CurioCard(
               padding: EdgeInsets.zero,
@@ -406,106 +401,6 @@ class _ProfileTile extends StatelessWidget {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 11)),
       trailing: Icon(Icons.chevron_right_rounded, color: inkMuted),
-    );
-  }
-}
-
-/// Shown instead of cloud sync and sign-out while playing without an
-/// account: be clear that progress lives on this device only.
-class _GuestCard extends StatelessWidget {
-  const _GuestCard();
-
-  Future<void> _erase(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Erase guest progress?'),
-        content: const Text(
-          'This removes the explorer’s XP, streak and discoveries from this device. It can’t be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Keep it'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Erase'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-    // Let any save still in flight land first, or it could restore what
-    // we're about to erase.
-    await CurioScope.of(context).flush();
-    await GuestSession.instance.end(erase: true);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final saffron = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffron,
-    );
-    return CurioCard(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CurioIconTile(
-                  icon: Icons.person_outline_rounded,
-                  color: saffron,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Playing as a guest',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        'Progress is saved on this device only. Create a family account to keep it safe and see it on any device.',
-                        style: TextStyle(
-                          color: curioColor(
-                            context,
-                            CurioColors.inkMuted,
-                            CurioColorsLight.inkMuted,
-                          ),
-                          fontSize: 12.5,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1, indent: 66),
-          _ProfileTile(
-            icon: Icons.person_add_alt_rounded,
-            title: 'Create a family account',
-            subtitle: 'You can bring your guest progress with you',
-            onTap: () => GuestSession.instance.end(),
-          ),
-          const Divider(height: 1, indent: 66),
-          _ProfileTile(
-            icon: Icons.delete_outline_rounded,
-            title: 'Erase guest progress',
-            subtitle: 'Start fresh on this device',
-            onTap: () => _erase(context),
-          ),
-        ],
-      ),
     );
   }
 }

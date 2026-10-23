@@ -103,7 +103,7 @@ class _OrbitHeroState extends State<OrbitHero>
       CurioColorsLight.forest,
     );
     final planet = s * .24;
-    final orbit = s * .36;
+    final orbit = s * .33;
     return _Decorative(
       child: SizedBox.square(
         dimension: s,
@@ -129,9 +129,9 @@ class _OrbitHeroState extends State<OrbitHero>
                 ),
                 Center(
                   child: CurioFloat(
-                    distance: 4,
+                    distance: 6,
                     child: Transform.rotate(
-                      angle: -.06,
+                      angle: -.06 + (still ? 0 : math.sin(turn) * .04),
                       child: CurioLogoMark(size: s * .35),
                     ),
                   ),
@@ -139,16 +139,32 @@ class _OrbitHeroState extends State<OrbitHero>
                 for (var i = 0; i < WelcomeSkill.all.length; i++)
                   () {
                     final angle = [-2.35, -.25, 1.85][i];
-                    final bob = still ? 0.0 : math.sin(turn + i * 2) * s * .012;
+                    final bob = still ? 0.0 : math.sin(turn + i * 2) * s * .022;
                     final center = Offset(
                       s / 2 + math.cos(angle) * orbit,
                       s / 2 + math.sin(angle) * orbit + bob,
                     );
                     return Positioned(
-                      left: center.dx - planet * .9,
-                      top: center.dy - planet * .62,
+                      left: (center.dx - planet * .9).clamp(
+                        0.0,
+                        s - planet * 1.8,
+                      ),
+                      top: center.dy - planet * .94,
                       width: planet * 1.8,
-                      child: _Planet(skill: WelcomeSkill.all[i], size: planet),
+                      height: planet * 1.6,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: _Planet(
+                          key: ValueKey(
+                            'welcome_section_${WelcomeSkill.all[i].label}',
+                          ),
+                          skill: WelcomeSkill.all[i],
+                          size: planet,
+                          tilt:
+                              -.12 +
+                              (still ? 0 : math.sin(turn + i * 2) * .065),
+                        ),
+                      ),
                     );
                   }(),
               ],
@@ -161,9 +177,15 @@ class _OrbitHeroState extends State<OrbitHero>
 }
 
 class _Planet extends StatelessWidget {
-  const _Planet({required this.skill, required this.size});
+  const _Planet({
+    required this.skill,
+    required this.size,
+    required this.tilt,
+    super.key,
+  });
   final WelcomeSkill skill;
   final double size;
+  final double tilt;
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +198,12 @@ class _Planet extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GameEmblem(icon: skill.icon, color: color, size: size * 1.25),
+        GameEmblem(
+          icon: skill.icon,
+          color: color,
+          size: size * 1.25,
+          tilt: tilt,
+        ),
         Container(
           padding: EdgeInsets.symmetric(
             horizontal: size * .16,

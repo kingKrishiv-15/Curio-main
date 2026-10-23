@@ -322,7 +322,7 @@ purpose — round everything. Same scale in both modes.
 | `GameGrid` | `game_card.dart` | Equal-height rows of tiles; 1–4 columns by width. Use it instead of `GridView` so cards never clip at large text sizes |
 | `SkillGamesPage` | `features/learn/presentation/skill_games_page.dart` | One skill's level and games, opened from Home's skill tiles |
 | `BadgeShelf`, `BadgeMedal`, `showBadgesSheet` | `features/profile/presentation/badges_view.dart` | Profile's badges: medals coloured by family once earned, ringed by progress until then. The badges themselves are computed from activity history in `profile/domain/badges.dart`, never stored |
-| `ParentalGate` | `core/widgets/parental_gate.dart` | "Grown-ups only" times-table check in front of the parent dashboard and privacy pages |
+| `ParentalGate` | `core/widgets/parental_gate.dart` | Account-password verification on each entry to the parent dashboard and privacy pages |
 | `showTextPrompt` | `core/widgets/text_prompt_dialog.dart` | One-field dialog that owns its controller — use it instead of disposing a controller after `showDialog` |
 | `_ThemeToggleTile` | `profile_page.dart` | The one light/dark switch (§2) |
 | `_FloatingNav` | `main_shell.dart` | Bottom pill nav (§6) — private to the shell, not reused elsewhere |

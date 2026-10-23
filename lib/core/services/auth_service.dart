@@ -61,6 +61,26 @@ class AuthService {
     );
   }
 
+  /// Rechecks the signed-in parent's password with Supabase. Never stores
+  /// credentials or accepts a different account as proof of parent access.
+  Future<void> verifyParentPassword(String password) async {
+    final parent = _client.auth.currentUser;
+    if (parent == null || parent.email == null || password.isEmpty) {
+      throw const AuthException(
+        'Sign in with your family account to continue.',
+      );
+    }
+    final verified = await _client.auth.signInWithPassword(
+      email: parent.email!,
+      password: password,
+    );
+    if (verified.user?.id != parent.id ||
+        _client.auth.currentUser?.id != parent.id ||
+        verified.session == null) {
+      throw const AuthException('The account changed. Please try again.');
+    }
+  }
+
   Future<SignUpOutcome> createAccount({
     required String email,
     required String password,

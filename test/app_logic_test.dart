@@ -1,17 +1,13 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:curio/core/services/progress_store.dart';
 import 'package:curio/core/state/curio_state.dart';
-import 'package:curio/core/theme/curio_theme.dart';
-import 'package:curio/core/widgets/parental_gate.dart';
 import 'package:curio/features/discoveries/domain/discovery.dart';
 import 'package:curio/features/games/common/game_kit.dart';
 import 'package:curio/features/games/common/game_rewards.dart';
 import 'package:curio/features/games/game_catalog.dart';
 import 'package:curio/features/games/signal_grid/domain/signal_grid.dart';
 import 'package:curio/features/skills/presentation/skill_quest_page.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _MemoryStore implements ProgressStore {
@@ -183,42 +179,6 @@ void main() {
     expect(SkillQuestPage.levelFor(1), 5);
     expect(SkillQuestPage.levelFor(0), 1);
     state.dispose();
-  });
-
-  testWidgets('Parental gate lets the right answer through only', (
-    tester,
-  ) async {
-    ParentalGate.reset();
-    bool? result;
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: CurioTheme.light,
-        home: Builder(
-          builder: (context) => TextButton(
-            onPressed: () async =>
-                result = await ParentalGate.check(context, random: Random(1)),
-            child: const Text('open'),
-          ),
-        ),
-      ),
-    );
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-    final question = find.textContaining('What is');
-    final match = RegExp(
-      r'(\d+) × (\d+)',
-    ).firstMatch(tester.widget<Text>(question).data!)!;
-    final answer = int.parse(match.group(1)!) * int.parse(match.group(2)!);
-    await tester.tap(find.byKey(Key('gate_$answer')));
-    await tester.pumpAndSettle();
-    expect(result, isTrue);
-
-    // Recently passed: no second question.
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('What is'), findsNothing);
-    expect(result, isTrue);
-    ParentalGate.reset();
   });
 
   test('DailyPick shifts backwards for practice without going negative', () {

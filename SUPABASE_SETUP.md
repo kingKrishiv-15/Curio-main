@@ -271,6 +271,10 @@ the Android emulator) and the publishable key that `supabase start` prints.
 
 ## 9. Weekly emails, reminders and account deletion
 
+For the report contents, app opt-in and live delivery checklist, see
+[WEEKLY_EMAIL_SETUP.md](WEEKLY_EMAIL_SETUP.md). Parent dashboard and privacy
+access now require the signed-in account's password on each entry.
+
 Two small server functions live in `supabase/functions/`:
 
 - **`parent-digest`** — runs every hour: creates inbox reminders, builds

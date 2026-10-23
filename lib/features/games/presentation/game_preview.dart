@@ -90,6 +90,8 @@ class GamePreview extends StatelessWidget {
     children: [
       const Text(
         'happy = ?',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: Colors.white,
           fontSize: 20,

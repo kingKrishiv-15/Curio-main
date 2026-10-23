@@ -8,9 +8,22 @@ import '../../../core/widgets/curio_gloss.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../family/presentation/family_settings_page.dart';
 import '../../family/presentation/privacy_page.dart';
+import '../../family/presentation/weekly_email_card.dart';
 
-class ParentDashboardPage extends StatelessWidget {
+class ParentDashboardPage extends StatefulWidget {
   const ParentDashboardPage({super.key});
+  @override
+  State<ParentDashboardPage> createState() => _ParentDashboardPageState();
+}
+
+class _ParentDashboardPageState extends State<ParentDashboardPage> {
+  int _emailRevision = 0;
+
+  Future<void> _preferences() async {
+    await openPage(context, const FamilySettingsPage());
+    if (mounted) setState(() => _emailRevision++);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
@@ -129,6 +142,8 @@ class ParentDashboardPage extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 14),
+          WeeklyEmailCard(key: ValueKey(_emailRevision)),
+          const SizedBox(height: 16),
           CurioGloss(
             padding: EdgeInsets.zero,
             child: Column(
@@ -152,7 +167,7 @@ class ParentDashboardPage extends StatelessWidget {
                   Icons.tune_rounded,
                   'Family preferences',
                   '${state.dailyGoal} activities a day · reminders · email',
-                  () => openPage(context, const FamilySettingsPage()),
+                  _preferences,
                 ),
                 _Link(
                   Icons.privacy_tip_outlined,

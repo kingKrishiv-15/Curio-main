@@ -72,8 +72,8 @@ class _HelpPageState extends State<HelpPage> {
     ),
     (
       Icons.person_outline_rounded,
-      'Can we play without an account?',
-      'Yes — choose “Continue as guest” on the welcome screen. Progress is kept on this device only. Create a family account later and Curio offers to bring that progress with you.',
+      'Do we need a family account?',
+      'Yes. A parent or guardian creates the family account and sets up the explorer’s nickname. Your account keeps progress, points and discoveries together across devices.',
     ),
     (
       Icons.replay_rounded,

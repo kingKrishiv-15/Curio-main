@@ -75,27 +75,22 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
         : widget.length.clamp(6, 10);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final gap = constraints.maxWidth < 340 ? 6.0 : 10.0;
-        final columns = length > 6 && constraints.maxWidth < 520
-            ? (length / 2).ceil()
-            : length;
-        final box = ((constraints.maxWidth - gap * (columns - 1)) / columns)
-            .clamp(24.0, 56.0);
-        final height = box * 1.16;
+        final gap = length > 6 ? 4.0 : 8.0;
+        final box = ((constraints.maxWidth - gap * (length - 1)) / length)
+            .clamp(0.0, 56.0);
+        final height = (box * 1.3).clamp(48.0, 65.0);
         return SizedBox(
-          height:
-              height * (length / columns).ceil() +
-              gap * ((length / columns).ceil() - 1),
+          height: height,
           child: Stack(
             children: [
               ExcludeSemantics(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: gap,
-                  runSpacing: gap,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    for (var i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++) ...[
+                      if (i > 0) SizedBox(width: gap),
                       _DigitBox(
+                        key: ValueKey('otp_digit_$i'),
                         width: box,
                         height: height,
                         digit: i < code.length ? code[i] : null,
@@ -107,6 +102,7 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
                         hasError: widget.hasError,
                         enabled: widget.enabled,
                       ),
+                    ],
                   ],
                 ),
               ),
@@ -165,6 +161,7 @@ class _DigitBox extends StatelessWidget {
     required this.active,
     required this.hasError,
     required this.enabled,
+    super.key,
   });
 
   final double width, height;
@@ -228,7 +225,7 @@ class _DigitBox extends StatelessWidget {
               textScaler: TextScaler.noScaling,
               style: TextStyle(
                 fontFamily: 'Fraunces',
-                fontSize: width * .5,
+                fontSize: (width * .6).clamp(14.0, 28.0),
                 fontWeight: FontWeight.w600,
                 color: ink,
               ),

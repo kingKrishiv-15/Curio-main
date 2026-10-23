@@ -10,7 +10,6 @@ import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'email_code_request_page.dart';
-import 'guest_sheet.dart';
 import 'verify_code_page.dart';
 import 'widgets/auth_fields.dart';
 
@@ -290,13 +289,6 @@ class _AuthPageState extends State<AuthPage> {
                     child: Text(_signUp ? 'Sign in' : 'Create an account'),
                   ),
                 ],
-              ),
-              Center(
-                child: TextButton(
-                  key: const Key('auth_guest'),
-                  onPressed: _loading ? null : () => showGuestSheet(context),
-                  child: const Text('Continue as guest'),
-                ),
               ),
             ],
           ),
