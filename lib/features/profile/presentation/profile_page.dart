@@ -69,6 +69,7 @@ class ProfilePage extends StatelessWidget {
       CurioColors.forest,
       CurioColorsLight.forestStrong,
     );
+
     return CurioPage(
       extendBehindBottom: true,
       maxWidth: 760,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/curio_colors.dart';
+import '../../../../core/theme/curio_colors_light.dart';
+import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
@@ -150,6 +153,11 @@ class _MemoryPageState extends State<MemoryPage> {
                 onTap: _match.visible(i) || _match.needsReset
                     ? null
                     : () => _flip(i),
+                state: _match.matched.contains(i)
+                    ? _Face.matched
+                    : _match.flipped.contains(i)
+                    ? _Face.turned
+                    : _Face.down,
               ),
           ]),
           const SizedBox(height: 16),
@@ -254,40 +262,74 @@ class _MemoryPageState extends State<MemoryPage> {
     },
   );
 
+  /// A face-down card is a plum card back; a turned one keeps a plum ring
+  /// until its pair is decided, and a matched pair settles into green.
   Widget _symbolButton({
     required Key key,
     required int? symbol,
     required String label,
     required VoidCallback? onTap,
-  }) => Semantics(
-    label: label,
-    button: true,
-    enabled: onTap != null,
-    excludeSemantics: true,
-    onTap: onTap,
-    child: OutlinedButton(
-      key: key,
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 4),
-        minimumSize: const Size(48, 80),
-        disabledForegroundColor: Theme.of(context).colorScheme.onSurface,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            symbol == null
-                ? Icons.question_mark_rounded
-                : memorySymbols[symbol].$1,
-            size: 28,
+    _Face state = _Face.up,
+  }) {
+    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
+    return Semantics(
+      label: label,
+      button: true,
+      enabled: onTap != null,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: CurioClay(
+        radius: 18,
+        color: switch (state) {
+          _Face.down => plum.withValues(alpha: .16),
+          _Face.matched => curioColor(
+            context,
+            CurioColors.successSoft,
+            CurioColorsLight.successSoft,
           ),
-          if (symbol != null) ...[
-            const SizedBox(height: 4),
-            Text(memorySymbols[symbol].$2, textAlign: TextAlign.center),
-          ],
-        ],
+          _ => null,
+        },
+        outline: state == _Face.turned ? plum : null,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            key: key,
+            onTap: onTap,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 80),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 18,
+                  horizontal: 4,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      symbol == null
+                          ? Icons.question_mark_rounded
+                          : memorySymbols[symbol].$1,
+                      color: symbol == null ? plum : null,
+                      size: 28,
+                    ),
+                    if (symbol != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        memorySymbols[symbol].$2,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
+
+enum _Face { up, down, turned, matched }

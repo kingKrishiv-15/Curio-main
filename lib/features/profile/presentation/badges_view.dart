@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../domain/badges.dart';
 
@@ -41,8 +42,8 @@ String _badgeSemantics(CurioBadge badge) => badge.earned
     ? '${badge.title}, earned'
     : '${badge.title}, ${badge.current} of ${badge.target} ${badge.unit}';
 
-/// A round medal: filled with its family colour once earned; until then a
-/// quiet disc ringed by how far along it is.
+/// A round medal: puffed up in its family colour once earned; until then a
+/// dent ringed by how far along it is.
 class BadgeMedal extends StatelessWidget {
   const BadgeMedal({required this.badge, this.size = 52, super.key});
 
@@ -63,11 +64,6 @@ class BadgeMedal extends StatelessWidget {
       CurioColors.inkMuted,
       CurioColorsLight.inkMuted,
     );
-    final well = curioColor(
-      context,
-      CurioColors.surfaceMuted,
-      CurioColorsLight.surfaceMuted,
-    );
     final track = curioColor(
       context,
       CurioColors.outline,
@@ -76,26 +72,9 @@ class BadgeMedal extends StatelessWidget {
 
     final Widget disc;
     if (badge.earned) {
-      disc = DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color.lerp(color, Colors.white, .32)!, color],
-          ),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: .55),
-            width: size * .04,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: .34),
-              blurRadius: size * .22,
-              offset: Offset(0, size * .07),
-            ),
-          ],
-        ),
+      disc = CurioClay(
+        radius: size / 2,
+        color: color,
         child: Center(
           child: Icon(badge.icon, size: size * .46, color: onColor),
         ),
@@ -109,8 +88,9 @@ class BadgeMedal extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.all(size * .1),
-          child: DecoratedBox(
-            decoration: BoxDecoration(shape: BoxShape.circle, color: well),
+          child: CurioClay(
+            radius: size * .4,
+            pressed: true,
             child: Center(
               child: Icon(
                 badge.icon,
@@ -291,13 +271,10 @@ class _NextUp extends StatelessWidget {
       CurioColors.inkMuted,
       CurioColorsLight.inkMuted,
     );
-    return Container(
+    return CurioClay(
+      radius: 14,
+      color: color.withValues(alpha: .08),
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: .08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: .22)),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -482,7 +459,6 @@ class _BadgeRow extends StatelessWidget {
         key: Key('badge_${badge.id}'),
         padding: const EdgeInsets.all(12),
         color: badge.earned ? color.withValues(alpha: .1) : null,
-        borderColor: badge.earned ? color.withValues(alpha: .34) : null,
         child: Row(
           children: [
             BadgeMedal(badge: badge, size: 54),

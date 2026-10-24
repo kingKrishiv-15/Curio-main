@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
+import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -471,28 +472,30 @@ class _MirrorBoardState extends State<_MirrorBoard>
     // turned sideways.
     final side = (MediaQuery.sizeOf(context).height - 140).clamp(260.0, 430.0);
     final extra = round.markedExtra, missing = round.markedMissing;
-    final tray = curioColor(
+    final success = curioColor(
       context,
-      CurioColors.surfaceMuted,
-      CurioColorsLight.surfaceMuted,
+      CurioColors.success,
+      CurioColorsLight.success,
     );
-    final frame = round.solved
-        ? curioColor(context, CurioColors.success, CurioColorsLight.success)
-        : curioColor(context, CurioColors.outline, CurioColorsLight.outline);
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: side),
         child: AspectRatio(
           aspectRatio: 1,
-          child: AnimatedContainer(
+          // A raised board; the green ring fades in once it's solved.
+          child: TweenAnimationBuilder<Color?>(
             key: const Key('mirror_board'),
+            tween: ColorTween(
+              end: round.solved ? success : success.withValues(alpha: 0),
+            ),
             duration: reduceMotion
                 ? Duration.zero
                 : const Duration(milliseconds: 300),
-            decoration: BoxDecoration(
-              color: tray,
-              borderRadius: BorderRadius.circular(CurioRadius.large),
-              border: Border.all(color: frame, width: 2),
+            builder: (context, ring, child) => CurioClay(
+              radius: CurioRadius.large,
+              outline: ring,
+              padding: const EdgeInsets.all(2),
+              child: child!,
             ),
             child: LayoutBuilder(
               builder: (context, box) {
@@ -533,7 +536,7 @@ class _MirrorBoardState extends State<_MirrorBoard>
                                 CurioColors.ink,
                                 CurioColorsLight.ink,
                               ),
-                              halo: tray,
+                              halo: clayBase(context),
                               shine: curioColor(
                                 context,
                                 CurioColors.spark,
@@ -615,16 +618,6 @@ class _CellFace extends StatelessWidget {
       CurioColors.night,
       CurioColorsLight.ink,
     );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
     final faint = curioColor(
       context,
       CurioColors.outlineSoft,
@@ -638,11 +631,9 @@ class _CellFace extends StatelessWidget {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final radius = _cellRadius(extent);
 
-    final (fill, edge) = switch (look) {
-      _Look.patternEmpty => (Colors.transparent, faint),
-      _Look.patternFilled || _Look.painted || _Look.wrong => (coral, coral),
-      _Look.empty => (surface, outline),
-      _Look.missing || _Look.missed => (surface, Colors.transparent),
+    final filled = switch (look) {
+      _Look.patternFilled || _Look.painted || _Look.wrong => true,
+      _ => false,
     };
     final glyph = switch (look) {
       _Look.patternFilled ||
@@ -660,17 +651,7 @@ class _CellFace extends StatelessWidget {
       _ => null,
     };
 
-    Widget face = AnimatedContainer(
-      duration: reduceMotion
-          ? Duration.zero
-          : const Duration(milliseconds: 140),
-      curve: Curves.easeOut,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: fill,
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: edge, width: 1.2),
-      ),
+    final Widget body = Center(
       child: glyph == null
           ? null
           : TweenAnimationBuilder<double>(
@@ -686,6 +667,30 @@ class _CellFace extends StatelessWidget {
               child: glyph,
             ),
     );
+    // Filled squares are raised coral tiles and paintable blanks are dents
+    // to fill. The pattern side's blanks stay flat: nothing goes there.
+    Widget face = look == _Look.patternEmpty
+        ? DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(color: faint, width: 1.2),
+            ),
+            child: body,
+          )
+        : TweenAnimationBuilder<Color?>(
+            tween: ColorTween(end: filled ? coral : clayBase(context)),
+            duration: reduceMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 140),
+            curve: Curves.easeOut,
+            builder: (context, colour, child) => CurioClay(
+              radius: radius,
+              color: colour,
+              pressed: !filled,
+              child: child!,
+            ),
+            child: body,
+          );
     final key = index;
     if (look == _Look.missing || look == _Look.missed) {
       face = CustomPaint(
