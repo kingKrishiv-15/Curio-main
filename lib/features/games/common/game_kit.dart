@@ -7,6 +7,7 @@ import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../discoveries/domain/discovery.dart';
+import 'daily_schedule.dart';
 import 'game_rewards.dart';
 import 'daily_game_session.dart';
 
@@ -367,11 +368,14 @@ class GameResultCard extends StatelessWidget {
           if (state != null && reward != null) ...[
             const SizedBox(height: 16),
             Text(
-              '$doneToday of 3 sections complete today',
+              '$doneToday of ${LearningSection.values.length} sections complete today',
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            CurioProgressBar(value: doneToday / 3, height: 6),
+            CurioProgressBar(
+              value: doneToday / LearningSection.values.length,
+              height: 6,
+            ),
             const SizedBox(height: 10),
             OutlinedButton.icon(
               key: const Key('result_more_games'),
@@ -382,7 +386,7 @@ class GameResultCard extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Text(
-            'New games arrive in Maths, Memory and English tomorrow.',
+            'New games arrive in Maths, Memory, English and Logic tomorrow.',
             style: TextStyle(color: muted, fontSize: 12.5),
           ),
         ],

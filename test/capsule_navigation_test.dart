@@ -65,7 +65,7 @@ void main() {
             .value,
         1,
       );
-      expect(find.text('Three little adventures'), findsOneWidget);
+      expect(find.text('Four little adventures'), findsOneWidget);
       await tester.tap(find.byKey(const Key('nav_Home')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));

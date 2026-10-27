@@ -1183,9 +1183,52 @@ on conflict (activity) do update
   set xp = excluded.xp, skill = excluded.skill,
       fact = excluded.fact, dated = excluded.dated;
 
--- Older clients offered a five-game goal. There are now three daily slots.
-update public.family_settings set daily_goal = least(daily_goal, 3)
-where daily_goal > 3;
+-- Older clients offered a five-game goal. There are now four daily slots
+-- since Logic joined; capping at three here would undo a goal of four
+-- whenever setup.sql is re-run.
+update public.family_settings set daily_goal = least(daily_goal, 4)
+where daily_goal > 4;
+
+
+-- SOURCE: 202610270001_number_hunt.sql
+-- For dashboard setup, run the complete supabase/setup.sql installer.
+do $$ begin
+  if to_regclass('public.activity_rewards') is null then
+    raise exception 'Curio base schema is missing. Run the entire supabase/setup.sql file first.'
+      using hint = 'The numbered migrations must be applied in order; setup.sql handles this for fresh and partial projects.';
+  end if;
+end $$;
+
+-- Number Hunt: a daily 1-1,000 higher-or-lower hunt in the maths rotation.
+-- Must match gameRewards in lib/features/games/common/game_rewards.dart (a
+-- Flutter test compares them). Safe to re-run.
+insert into public.activity_rewards (activity, xp, skill, fact, dated) values
+  ('number_hunt', 90, 'Number sense', 'halving_search', true)
+on conflict (activity) do update
+  set xp = excluded.xp, skill = excluded.skill,
+      fact = excluded.fact, dated = excluded.dated;
+
+
+-- SOURCE: 202610270002_more_daily_games.sql
+-- For dashboard setup, run the complete supabase/setup.sql installer.
+do $$ begin
+  if to_regclass('public.activity_rewards') is null then
+    raise exception 'Curio base schema is missing. Run the entire supabase/setup.sql file first.'
+      using hint = 'The numbered migrations must be applied in order; setup.sql handles this for fresh and partial projects.';
+  end if;
+end $$;
+
+-- Memory Grid, Word Trails and Crowns join the memory, English and maths
+-- rotations. Must match gameRewards in
+-- lib/features/games/common/game_rewards.dart (a Flutter test compares
+-- them). Safe to re-run.
+insert into public.activity_rewards (activity, xp, skill, fact, dated) values
+  ('memory_grid', 80, 'Memory', 'memory_chunks', true),
+  ('word_trails', 80, 'English', 'context_clues', true),
+  ('crowns', 100, 'Reasoning', 'elimination', true)
+on conflict (activity) do update
+  set xp = excluded.xp, skill = excluded.skill,
+      fact = excluded.fact, dated = excluded.dated;
 
 
 -- Backfill parents who signed up before the application schema was installed.

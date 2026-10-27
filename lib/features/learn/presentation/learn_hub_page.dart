@@ -15,9 +15,9 @@ class LearnHubPage extends StatelessWidget {
       children: const [
         PageIntro(
           eyebrow: 'Your daily playroom',
-          title: 'Three little adventures',
+          title: 'Four little adventures',
           subtitle:
-              'One game each in Maths, Memory and English. A new set arrives at midnight on this device. Take your time and enjoy learning.',
+              'One game each in Maths, Memory, English and Logic. A new set arrives at midnight on this device. Take your time and enjoy learning.',
         ),
         SizedBox(height: 20),
         DailyPointsCard(),

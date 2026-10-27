@@ -63,6 +63,7 @@ class DailyPointsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final completed = state.sectionsCompleted().length;
+    final sections = LearningSection.values.length;
     final available = todaysPicks(
       date: state.today,
     ).fold(0, (sum, g) => sum + g.xp);
@@ -112,12 +113,12 @@ class DailyPointsCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            completed == 3
-                ? 'All three sections complete. Wonderful work!'
-                : '$completed of 3 sections complete · $available XP in today’s plan',
+            completed == sections
+                ? 'All four sections complete. Wonderful work!'
+                : '$completed of $sections sections complete · $available XP in today’s plan',
           ),
           const SizedBox(height: 8),
-          CurioProgressBar(value: completed / 3),
+          CurioProgressBar(value: completed / sections),
           const SizedBox(height: 10),
           const Text('Earn XP once per daily game. Replays are for practice.'),
         ],

@@ -71,6 +71,38 @@ const discoveries = <Discovery>[
     icon: Icons.light_mode_rounded,
   ),
   Discovery(
+    id: 'memory_chunks',
+    title: 'Chunk it',
+    fact:
+        'Your brain remembers more when it groups things. Six squares seen as two little shapes are easier to hold than six separate spots.',
+    category: 'Memory',
+    icon: Icons.grid_view_rounded,
+  ),
+  Discovery(
+    id: 'context_clues',
+    title: 'Clues in the sentence',
+    fact:
+        'When you meet a new word, the words around it often hint at what it means. Readers call these context clues.',
+    category: 'English',
+    icon: Icons.auto_stories_rounded,
+  ),
+  Discovery(
+    id: 'elimination',
+    title: 'Cross it out',
+    fact:
+        'Ruling out what can’t be true is a powerful way to find what must be. Detectives and puzzle solvers do it all the time.',
+    category: 'Thinking',
+    icon: Icons.rule_rounded,
+  ),
+  Discovery(
+    id: 'halving_search',
+    title: 'Halve and conquer',
+    fact:
+        'Guess the middle and every clue cuts what’s left in half. Ten halvings shrink 1,000 numbers to just one — it’s how computers search huge lists fast.',
+    category: 'Maths',
+    icon: Icons.travel_explore_rounded,
+  ),
+  Discovery(
     id: 'prime_numbers',
     title: 'Prime building blocks',
     fact:

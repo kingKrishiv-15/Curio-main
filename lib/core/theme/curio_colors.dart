@@ -37,6 +37,9 @@ abstract final class CurioColors {
   static const blueSoft = Color(0x298FC3D9);
   static const plum = Color(0xFFBFA6E0);
   static const plumSoft = Color(0x29BFA6E0);
+
+  /// A sixth hue for puzzles that need one more distinct colour.
+  static const rose = Color(0xFFF08BB4);
   static const success = Color(0xFF4FD69B);
   static const successSoft = Color(0x294FD69B);
   static const danger = Color(0xFFF0685A);

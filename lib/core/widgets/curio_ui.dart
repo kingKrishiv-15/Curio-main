@@ -545,12 +545,15 @@ class GameMetaChip extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: inkMuted),
         const SizedBox(width: 5),
-        Text(
-          label,
-          style: TextStyle(
-            color: inkMuted,
-            fontSize: 10.5,
-            fontWeight: FontWeight.w600,
+        // Wraps rather than overflowing a narrow row at large text sizes.
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: inkMuted,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

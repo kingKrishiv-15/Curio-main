@@ -7,12 +7,15 @@ import 'package:flutter/material.dart';
 const _gameColors = <String, Color>{
   'memory_match': Color(0xFF9B65D6),
   'memory_trail': Color(0xFF735DD8),
+  'memory_grid': Color(0xFF5D7BE0),
   'word_wise': Color(0xFF218C92),
   'word_builder': Color(0xFF3286C2),
+  'word_trails': Color(0xFF1FA67A),
   // Number sense
   'squeeze': Color(0xFFFF8A34),
   'bridge': Color(0xFFF2A527),
   'scale': Color(0xFFE0735A),
+  'number_hunt': Color(0xFFD6941A),
   // Patterns
   'sequence': Color(0xFFF25F7A),
   'pattern_forge': Color(0xFFFF7EB3),
@@ -27,6 +30,7 @@ const _gameColors = <String, Color>{
   'link_lab': Color(0xFFA66CFF),
   'signal_grid': Color(0xFF6A4CE0),
   'whos_who': Color(0xFFB24BD8),
+  'crowns': Color(0xFF6D3FD9),
   // The story: a night sky.
   'frostlands_night_1': Color(0xFF2F4BA8),
 };

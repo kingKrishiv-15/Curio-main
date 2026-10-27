@@ -60,7 +60,7 @@ final _slides = [
     eyebrow: 'Play',
     title: 'Five minutes.\nOne big idea.',
     body:
-        'A fresh game in Maths, Memory and English every day. Pick a little adventure, think it through and earn points for your daily play.',
+        'A fresh game in Maths, Memory, English and Logic every day. Pick a little adventure, think it through and earn points for your daily play.',
     skill: WelcomeSkill.all[0],
     art: (h) => GameFanArt(height: h),
   ),

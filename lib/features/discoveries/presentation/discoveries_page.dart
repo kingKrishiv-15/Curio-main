@@ -4,6 +4,7 @@ import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/game_catalog.dart';
@@ -38,21 +39,6 @@ class DiscoveriesPage extends StatelessWidget {
       CurioColors.onDark,
       CurioColorsLight.onDark,
     );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final surfaceMuted = curioColor(
-      context,
-      CurioColors.surfaceMuted,
-      CurioColorsLight.surfaceMuted,
-    );
-    final creamDeep = curioColor(
-      context,
-      CurioColors.creamDeep,
-      CurioColorsLight.creamDeep,
-    );
     final navyMuted = curioColor(
       context,
       CurioColors.navyMuted,
@@ -84,20 +70,15 @@ class DiscoveriesPage extends StatelessWidget {
           const SizedBox(height: 24),
           CurioCard(
             color: forestStrong,
-            borderColor: forestStrong,
             child: Row(
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: saffron,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    Icons.collections_bookmark_rounded,
-                    color: forestStrong,
-                  ),
+                CurioIconTile(
+                  icon: Icons.collections_bookmark_rounded,
+                  color: forestStrong,
+                  background: saffron,
+                  size: 56,
+                  iconSize: 24,
+                  radius: 18,
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -158,64 +139,69 @@ class DiscoveriesPage extends StatelessWidget {
                   final discovery = discoveries[index];
                   final collected = state.collectedFacts.contains(discovery.id);
                   final tint = discoveryColor(context, discovery.id);
-                  return CurioCard(
-                    onTap: () => _showDiscovery(context, discovery, collected),
-                    color: collected ? surface : surfaceMuted,
-                    borderColor: collected
-                        ? tint.withValues(alpha: .3)
-                        : creamDeep,
-                    padding: const EdgeInsets.all(13),
-                    elevation: false,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 46,
-                              height: 46,
-                              decoration: BoxDecoration(
-                                color: collected ? tint : surface,
-                                borderRadius: BorderRadius.circular(12),
+                  // Collected cards puff up; locked ones are dents still
+                  // waiting to be filled.
+                  return CurioClay(
+                    radius: CurioRadius.large,
+                    pressed: !collected,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () =>
+                            _showDiscovery(context, discovery, collected),
+                        child: Padding(
+                          padding: const EdgeInsets.all(13),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  CurioIconTile(
+                                    icon: collected
+                                        ? discovery.icon
+                                        : Icons.lock_outline,
+                                    color: collected ? Colors.white : navyMuted,
+                                    background: collected ? tint : null,
+                                    size: 46,
+                                    iconSize: 22,
+                                    radius: 14,
+                                  ),
+                                  const Spacer(),
+                                  if (collected)
+                                    Icon(
+                                      Icons.bookmark_added_rounded,
+                                      color: coral,
+                                      size: 19,
+                                    ),
+                                ],
                               ),
-                              child: Icon(
-                                collected ? discovery.icon : Icons.lock_outline,
-                                color: collected ? Colors.white : navyMuted,
+                              const Spacer(),
+                              CurioEyebrow(
+                                collected ? discovery.category : 'Locked',
+                                color: collected ? coral : navyMuted,
                               ),
-                            ),
-                            const Spacer(),
-                            if (collected)
-                              Icon(
-                                Icons.bookmark_added_rounded,
-                                color: coral,
-                                size: 19,
+                              const SizedBox(height: 5),
+                              Text(
+                                collected ? discovery.title : 'Keep exploring',
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
-                          ],
-                        ),
-                        const Spacer(),
-                        CurioEyebrow(
-                          collected ? discovery.category : 'Locked',
-                          color: collected ? coral : navyMuted,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          collected ? discovery.title : 'Keep exploring',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          collected
-                              ? discovery.fact
-                              : _unlockHint(discovery.id),
-                          maxLines: columns == 1 ? 2 : 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: navyMuted,
-                            fontSize: 11,
-                            height: 1.35,
+                              const SizedBox(height: 5),
+                              Text(
+                                collected
+                                    ? discovery.fact
+                                    : _unlockHint(discovery.id),
+                                maxLines: columns == 1 ? 2 : 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: navyMuted,
+                                  fontSize: 11,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },

@@ -122,15 +122,15 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                     Slider(
                       value: _goal.toDouble(),
                       min: 1,
-                      max: 3,
-                      divisions: 2,
+                      max: 4,
+                      divisions: 3,
                       label: '$_goal ${_goal == 1 ? 'activity' : 'activities'}',
                       onChanged: _saving
                           ? null
                           : (v) => setState(() => _goal = v.round()),
                     ),
                     const Text(
-                      'One daily game each in Maths, Memory and English. Replays are for practice.',
+                      'One daily game each in Maths, Memory, English and Logic. Replays are for practice.',
                     ),
                   ],
                 ),

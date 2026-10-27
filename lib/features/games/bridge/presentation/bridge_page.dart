@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
+import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../domain/bridge.dart';
@@ -187,47 +188,56 @@ class _EndPoint extends StatelessWidget {
     return Semantics(
       label: '$label $value${isTarget && !reached ? ', currently ${current ?? 'not a whole number'}' : ''}',
       excludeSemantics: true,
-      child: Container(
+      // Label and live value stack on the left so a big number never runs
+      // out of room on a small phone at large text.
+      child: CurioClay(
+        radius: 20,
+        color: reached ? success : navy,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        decoration: BoxDecoration(
-          color: reached ? success : navy,
-          borderRadius: BorderRadius.circular(18),
-        ),
         child: Row(
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: reached ? Colors.black87 : labelColor,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.4,
-                fontSize: 12,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: reached ? Colors.black87 : labelColor,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.4,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (isTarget && !reached)
+                    Text(
+                      'now ${current ?? '—'}',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: .7),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                ],
               ),
             ),
-            const Spacer(),
-            if (isTarget && !reached)
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Text(
-                  'now ${current ?? '—'}',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: .7),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
             if (reached)
               const Padding(
                 padding: EdgeInsets.only(right: 8),
                 child: Icon(Icons.check_circle_rounded, color: Colors.black87),
               ),
-            Text(
-              '$value',
-              style: TextStyle(
-                fontFamily: 'Fraunces',
-                fontSize: 30,
-                fontWeight: FontWeight.w600,
-                color: reached ? Colors.black87 : Colors.white,
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '$value',
+                  style: TextStyle(
+                    fontFamily: 'Fraunces',
+                    fontSize: 30,
+                    fontWeight: FontWeight.w600,
+                    color: reached ? Colors.black87 : Colors.white,
+                  ),
+                ),
               ),
             ),
           ],

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/curio_colors.dart';
 import '../../../../core/theme/curio_colors_light.dart';
+import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
@@ -359,53 +360,49 @@ class _RankPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _rankColour(context, rank);
     final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
     return Semantics(
       button: true,
       selected: selected,
       enabled: onTap != null,
       label: 'Rank as ${rank.label}',
       excludeSemantics: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(99),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 44),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-            decoration: BoxDecoration(
-              color: selected
-                  ? color.withValues(alpha: .2)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(99),
-              border: Border.all(
-                color: selected ? color : outline,
-                width: selected ? 2 : 1.3,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // The tick, not just the colour, says which one is chosen.
-                Icon(
-                  selected ? Icons.check_rounded : _rankIcon(rank),
-                  size: 18,
-                  color: selected ? ink : color,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  rank.label,
-                  style: TextStyle(
-                    color: ink,
-                    fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+      // The chosen rank is tinted and ringed, and keeps its tick.
+      child: CurioClay(
+        radius: 99,
+        color: selected ? color.withValues(alpha: .2) : null,
+        outline: selected ? color : null,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(99),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // The tick, not just the colour, says which one is chosen.
+                  Icon(
+                    selected ? Icons.check_rounded : _rankIcon(rank),
+                    size: 18,
+                    color: selected ? ink : color,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  // Wraps rather than overflowing at large text sizes.
+                  Flexible(
+                    child: Text(
+                      rank.label,
+                      style: TextStyle(
+                        color: ink,
+                        fontWeight: selected
+                            ? FontWeight.w900
+                            : FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

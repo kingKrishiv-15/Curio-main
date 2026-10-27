@@ -6,15 +6,18 @@ import '../../core/widgets/curio_ui.dart';
 import '../story/presentation/frostlands_story_page.dart';
 import 'bridge/presentation/bridge_page.dart';
 import 'cascade/presentation/cascade_page.dart';
+import 'crowns/presentation/crowns_page.dart';
 import 'common/daily_game_session.dart';
 import 'common/daily_schedule.dart';
 import 'memory/presentation/memory_page.dart';
+import 'memory_grid/presentation/memory_grid_page.dart';
 import 'english/presentation/english_page.dart';
 import 'common/game_rewards.dart';
 import 'evidence/presentation/evidence_detective_page.dart';
 import 'link_lab/presentation/link_lab_page.dart';
 import 'loophole/presentation/loophole_page.dart';
 import 'mirror/presentation/mirror_page.dart';
+import 'number_hunt/presentation/number_hunt_page.dart';
 import 'odd_cluster/presentation/odd_cluster_page.dart';
 import 'pattern/presentation/pattern_forge_page.dart';
 import 'scale/presentation/scale_page.dart';
@@ -23,6 +26,7 @@ import 'signal_grid/presentation/signal_grid_page.dart';
 import 'squeeze/presentation/squeeze_page.dart';
 import 'verdict/presentation/verdict_page.dart';
 import 'whos_who/presentation/whos_who_page.dart';
+import 'word_trails/presentation/word_trails_page.dart';
 
 /// Every activity in Curio, in one place. Home, the Learn tab and Skill
 /// Quest all read from here, so a game has one name, one skill, one
@@ -83,6 +87,15 @@ final gameCatalog = <GameEntry>[
     builder: (date) => MemoryPage(date: date, trail: true),
   ),
   GameEntry(
+    id: 'memory_grid',
+    title: 'Memory Grid',
+    tagline: 'Squares glow, then vanish. Tap the same ones back.',
+    icon: Icons.grid_view_rounded,
+    duration: '3 min',
+    builder: (date) => MemoryGridPage(date: date),
+    isNew: true,
+  ),
+  GameEntry(
     id: 'word_wise',
     title: 'Word Wise',
     tagline:
@@ -98,6 +111,24 @@ final gameCatalog = <GameEntry>[
     icon: Icons.abc_rounded,
     duration: '3 min',
     builder: (date) => EnglishPage(date: date, builder: true),
+  ),
+  GameEntry(
+    id: 'word_trails',
+    title: 'Word Trails',
+    tagline: 'Trace the story’s missing words, then say what they mean.',
+    icon: Icons.gesture_rounded,
+    duration: '3–4 min',
+    builder: (date) => WordTrailsPage(date: date),
+    isNew: true,
+  ),
+  GameEntry(
+    id: 'crowns',
+    title: 'Crowns',
+    tagline: 'One crown in every row, column and colour — and none touching.',
+    icon: Icons.workspace_premium_rounded,
+    duration: '3–5 min',
+    builder: (date) => CrownsPage(date: date),
+    isNew: true,
   ),
   GameEntry(
     id: 'odd_cluster',
@@ -189,6 +220,15 @@ final gameCatalog = <GameEntry>[
     builder: (date) => SqueezePage(date: date),
   ),
   GameEntry(
+    id: 'number_hunt',
+    title: 'Number Hunt',
+    tagline: 'One number from 1 to 1,000. Ten guesses. Follow the clues.',
+    icon: Icons.travel_explore_rounded,
+    duration: '3–4 min',
+    builder: (date) => NumberHuntPage(date: date),
+    isNew: true,
+  ),
+  GameEntry(
     id: 'link_lab',
     title: 'Link Lab',
     tagline: 'Sort sixteen clues into four knowledge groups.',
@@ -247,10 +287,12 @@ List<GameEntry> get dailyGames => [
 ];
 
 /// Exactly one game per section; this is the shared daily plan for all screens.
-List<GameEntry> todaysPicks({DateTime? date, int count = 3}) {
+List<GameEntry> todaysPicks({DateTime? date, int count = 4}) {
   final today = date ?? DateTime.now();
   return [
-    for (final section in LearningSection.values.take(count.clamp(0, 3)))
+    for (final section in LearningSection.values.take(
+      count.clamp(0, LearningSection.values.length),
+    ))
       gameById(scheduledGameId(section, today)),
   ];
 }
@@ -261,6 +303,7 @@ IconData sectionIcon(LearningSection section) => switch (section) {
   LearningSection.maths => Icons.calculate_rounded,
   LearningSection.memory => Icons.psychology_rounded,
   LearningSection.english => Icons.menu_book_rounded,
+  LearningSection.logic => Icons.extension_rounded,
 };
 
 Color sectionColor(BuildContext context, LearningSection section) =>
@@ -268,6 +311,7 @@ Color sectionColor(BuildContext context, LearningSection section) =>
       LearningSection.maths => 'Number sense',
       LearningSection.memory => 'Patterns',
       LearningSection.english => 'Evidence',
+      LearningSection.logic => 'Reasoning',
     });
 
 /// The skill colours from design.md §3: number sense gold, patterns coral,

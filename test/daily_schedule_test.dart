@@ -20,9 +20,9 @@ void main() {
       for (var d = 0; d < 800; d++) {
         final date = DateTime(start.year, start.month, start.day + d);
         final picks = todaysPicks(date: date);
-        expect(picks.length, 3);
+        expect(picks.length, 4);
         expect(picks.map((g) => g.section).toList(), LearningSection.values);
-        expect(picks.map((g) => g.id).toSet().length, 3);
+        expect(picks.map((g) => g.id).toSet().length, 4);
         expect(
           todaysPicks(date: DateTime(date.year, date.month, date.day, 23, 59)),
           picks,
@@ -30,7 +30,7 @@ void main() {
         final tomorrow = todaysPicks(
           date: DateTime(date.year, date.month, date.day + 1),
         );
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < 4; i++) {
           expect(picks[i].id, isNot(tomorrow[i].id));
         }
       }
@@ -116,10 +116,10 @@ void main() {
     },
   );
 
-  test('old five-game preferences are capped to the three available slots', () {
-    expect(FamilySettings.fromJson({'daily_goal': 5}).dailyGoal, 3);
+  test('old five-game preferences are capped to the four available slots', () {
+    expect(FamilySettings.fromJson({'daily_goal': 5}).dailyGoal, 4);
     final state = CurioState()..setDailyGoal(5);
-    expect(state.dailyGoal, 3);
+    expect(state.dailyGoal, 4);
     state.setDailyGoal(0);
     expect(state.dailyGoal, 1);
     state.dispose();

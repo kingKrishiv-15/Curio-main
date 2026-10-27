@@ -23,6 +23,8 @@ on conflict (activity) do update
   set xp = excluded.xp, skill = excluded.skill,
       fact = excluded.fact, dated = excluded.dated;
 
--- Older clients offered a five-game goal. There are now three daily slots.
-update public.family_settings set daily_goal = least(daily_goal, 3)
-where daily_goal > 3;
+-- Older clients offered a five-game goal. There are now four daily slots
+-- since Logic joined; capping at three here would undo a goal of four
+-- whenever setup.sql is re-run.
+update public.family_settings set daily_goal = least(daily_goal, 4)
+where daily_goal > 4;

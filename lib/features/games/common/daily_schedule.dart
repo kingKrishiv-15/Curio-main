@@ -1,37 +1,43 @@
-/// The three daily learning sections. Keep the order stable across screens.
+/// The four daily learning sections. Keep the order stable across screens.
 enum LearningSection {
   maths('Maths', 'Numbers, patterns and problem solving'),
   memory('Memory', 'Remember pictures, places and sequences'),
-  english('English', 'Words, reading and understanding clues');
+  english('English', 'Words, reading and understanding clues'),
+  logic('Logic', 'Puzzles, clues and careful reasoning');
 
   const LearningSection(this.title, this.description);
   final String title;
   final String description;
 }
 
-/// One game from each pool per calendar day. Existing thinking games stay
-/// available through the section that best describes the task they teach.
+/// One game from each pool per calendar day, each pool holding the games
+/// that best match what its section teaches.
 const sectionRotation = <LearningSection, List<String>>{
   LearningSection.maths: [
     'squeeze',
+    'number_hunt',
     'bridge',
     'scale',
     'sequence',
     'pattern_forge',
-    'signal_grid',
     'mirror',
-    'whos_who',
   ],
-  LearningSection.memory: ['memory_match', 'memory_trail'],
+  LearningSection.memory: ['memory_match', 'memory_trail', 'memory_grid'],
   LearningSection.english: [
     'word_wise',
     'word_builder',
+    'word_trails',
     'loophole',
-    'link_lab',
-    'evidence_garden',
     'verdict',
+  ],
+  LearningSection.logic: [
+    'crowns',
+    'whos_who',
+    'signal_grid',
     'odd_cluster',
+    'link_lab',
     'cascade',
+    'evidence_garden',
   ],
 };
 

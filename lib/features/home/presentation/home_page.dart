@@ -218,7 +218,7 @@ class HomePage extends StatelessWidget {
                       const DailyPointsCard(),
                       const SizedBox(height: _sectionGap),
                       _SectionHeader(
-                        title: 'Today’s three adventures',
+                        title: 'Today’s four adventures',
                         action: 'Games',
                         onAction: onExplore,
                       ),

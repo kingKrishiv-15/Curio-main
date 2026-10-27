@@ -42,6 +42,7 @@ class WelcomeSkill {
     WelcomeSkill('Maths', Icons.calculate_rounded, 'Number sense', 'scale'),
     WelcomeSkill('Memory', Icons.style_rounded, 'Memory', 'memory_match'),
     WelcomeSkill('English', Icons.abc_rounded, 'Language', 'word_builder'),
+    WelcomeSkill('Logic', Icons.extension_rounded, 'Reasoning', 'crowns'),
   ];
 }
 
@@ -53,7 +54,7 @@ class _Decorative extends StatelessWidget {
       ExcludeSemantics(child: MediaQuery.withNoTextScaling(child: child));
 }
 
-/// Curio's mark surrounded by the three daily sections. The toys bob gently
+/// Curio's mark surrounded by the four daily sections. The toys bob gently
 /// in place, leaving their labels stable and readable throughout the loop.
 class OrbitHero extends StatefulWidget {
   const OrbitHero({this.size = 320, super.key});
@@ -138,7 +139,7 @@ class _OrbitHeroState extends State<OrbitHero>
                 ),
                 for (var i = 0; i < WelcomeSkill.all.length; i++)
                   () {
-                    final angle = [-2.35, -.25, 1.85][i];
+                    final angle = [-2.4, -.75, .85, 2.45][i];
                     final bob = still ? 0.0 : math.sin(turn + i * 2) * s * .022;
                     final center = Offset(
                       s / 2 + math.cos(angle) * orbit,
@@ -821,7 +822,8 @@ class GrowthArt extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (i < 3) const SizedBox(height: 10),
+                        if (i < WelcomeSkill.all.length - 1)
+                          const SizedBox(height: 10),
                       ],
                     ],
                   ),

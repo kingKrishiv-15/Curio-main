@@ -27,7 +27,7 @@ void main() {
   });
 
   for (final size in [const Size(375, 667), const Size(1280, 900)]) {
-    testWidgets('Home and Games share exactly three daily games at $size', (
+    testWidgets('Home and Games share the same daily games at $size', (
       tester,
     ) async {
       tester.view.physicalSize = size;
@@ -53,7 +53,7 @@ void main() {
       expect(find.text('English'), findsWidgets);
       await tester.tap(find.byKey(const Key('nav_Games')));
       await tester.pump(const Duration(seconds: 1));
-      expect(find.text('Three little adventures'), findsOneWidget);
+      expect(find.text('Four little adventures'), findsOneWidget);
       await tester.scrollUntilVisible(
         find.byType(DailyPlan),
         300,

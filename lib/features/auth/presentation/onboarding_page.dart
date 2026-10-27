@@ -142,7 +142,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       1 => (
         'A gentle rhythm',
         'How much play a day?',
-        'Pick a daily goal for $_learner. There’s one daily game in Maths, Memory and English. You can change the goal anytime.',
+        'Pick a daily goal for $_learner. There’s one daily game each in Maths, Memory, English and Logic. You can change the goal anytime.',
       ),
       2 => (
         'Made for your explorer',
@@ -265,7 +265,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     const options = [
       (1, 'A quick spark', 'One game a day · about 5 minutes'),
       (2, 'A little adventure', 'Two games a day · about 10 minutes'),
-      (3, 'A steady habit', 'One in each section · about 15 minutes'),
+      (3, 'A steady habit', 'Three games a day · about 15 minutes'),
+      (4, 'The full set', 'One in each section · about 20 minutes'),
     ];
     return Column(
       children: [
@@ -473,7 +474,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         ),
         const SizedBox(height: 20),
         Text(
-          'Three little adventures, refreshed daily.',
+          'Four little adventures, refreshed daily.',
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),

@@ -45,6 +45,10 @@ class GamePreview extends StatelessWidget {
     'cascade' => _cascade(ink),
     'loophole' => _loophole(ink),
     'squeeze' => _squeeze(ink),
+    'number_hunt' => _numberHunt(ink),
+    'memory_grid' => _memoryGrid(),
+    'word_trails' => _wordTrails(ink),
+    'crowns' => _crowns(),
     'link_lab' => _linkLab(),
     'signal_grid' => _signalGrid(ink),
     'pattern_forge' => _patternForge(ink),
@@ -315,6 +319,69 @@ class GamePreview extends StatelessWidget {
           ),
         ],
       ),
+    ],
+  );
+
+  Widget _memoryGrid() => _grid(
+    3,
+    3,
+    24,
+    5,
+    (r, c) => _cell(24, alpha: (r * 3 + c) % 4 == 0 ? .95 : .28),
+  );
+
+  Widget _wordTrails(_Ink ink) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      for (final (row, solid) in [('KITE', true), ('ERG', false)]) ...[
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final letter in row.split('')) ...[
+              _chip(letter, ink, solid: solid, width: 24, height: 24, size: 12),
+              const SizedBox(width: 4),
+            ],
+          ],
+        ),
+        const SizedBox(height: 4),
+      ],
+    ],
+  );
+
+  Widget _crowns() => _grid(
+    4,
+    4,
+    18,
+    4,
+    (r, c) => _cell(
+      18,
+      child: const [1, 3, 0, 2][r] == c
+          ? const Icon(Icons.star_rounded, color: Colors.white, size: 14)
+          : null,
+    ),
+  );
+
+  Widget _numberHunt(_Ink ink) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _chip('500', ink, width: 40, height: 24, size: 12),
+          const SizedBox(width: 4),
+          const Icon(Icons.arrow_upward_rounded, color: Colors.white, size: 16),
+          const SizedBox(width: 8),
+          _chip('750', ink, width: 40, height: 24, size: 12),
+          const SizedBox(width: 4),
+          const Icon(
+            Icons.arrow_downward_rounded,
+            color: Colors.white,
+            size: 16,
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+      _grid(2, 3, 20, 5, (r, c) => _cell(20)),
     ],
   );
 

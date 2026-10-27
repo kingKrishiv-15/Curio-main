@@ -108,7 +108,7 @@ class _HowItWorks extends StatelessWidget {
         '01',
         Icons.extension_rounded,
         'Play for five minutes',
-        'Choose a daily game in Maths, Memory or English. Each takes about five minutes.',
+        'Choose a daily game in Maths, Memory, English or Logic. Each takes about five minutes.',
         WelcomeSkill.all[0],
       ),
       (

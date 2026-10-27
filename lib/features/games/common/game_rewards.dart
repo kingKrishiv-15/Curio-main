@@ -16,7 +16,7 @@ class GameReward {
   final bool dated;
 }
 
-/// Skills tracked within the three learning sections, in display order.
+/// Skills tracked within the four learning sections, in display order.
 const learningSkills = [
   'Number sense',
   'Patterns',
@@ -51,6 +51,10 @@ const gameRewards = <String, GameReward>{
   'mirror': GameReward(80, 'Patterns', 'mirror_symmetry'),
   'verdict': GameReward(80, 'Evidence', 'correlation'),
   'whos_who': GameReward(100, 'Reasoning', 'logic_grid'),
+  'number_hunt': GameReward(90, 'Number sense', 'halving_search'),
+  'memory_grid': GameReward(80, 'Memory', 'memory_chunks'),
+  'word_trails': GameReward(80, 'English', 'context_clues'),
+  'crowns': GameReward(100, 'Reasoning', 'elimination'),
 };
 
 final _dateSuffix = RegExp(r'_[0-9]{8}$');

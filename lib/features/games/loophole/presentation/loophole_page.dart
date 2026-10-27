@@ -437,14 +437,16 @@ class _StatementCard extends StatelessWidget {
             children: [
               Icon(Icons.format_quote_rounded, size: 18, color: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
               const SizedBox(width: 6),
-              Text(
-                guessesUsed == 0
-                    ? 'Two guesses'
-                    : (guessesUsed == 1 ? 'One guess left' : 'Round over'),
-                style: TextStyle(
-                  color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
+              Flexible(
+                child: Text(
+                  guessesUsed == 0
+                      ? 'Two guesses'
+                      : (guessesUsed == 1 ? 'One guess left' : 'Round over'),
+                  style: TextStyle(
+                    color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
