@@ -7,7 +7,7 @@ import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/game_catalog.dart';
-import '../../games/presentation/game_card.dart';
+import '../../games/presentation/game_row.dart';
 
 class SkillQuestPage extends StatelessWidget {
   const SkillQuestPage({super.key});
@@ -39,8 +39,6 @@ class SkillQuestPage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          const CurioEyebrow('Your learning map'),
-          const SizedBox(height: 8),
           Text(
             'Every game moves a skill forward.',
             style: Theme.of(context).textTheme.headlineMedium,
@@ -64,11 +62,7 @@ class SkillQuestPage extends StatelessWidget {
             subtitle: '$weakest has the most room to grow',
           ),
           const SizedBox(height: 12),
-          GameCard(
-            game: next,
-            style: GameCardStyle.row,
-            done: state.completedToday(next.id),
-          ),
+          GameRow(game: next, done: state.completedToday(next.id)),
         ],
       ),
     );
@@ -128,7 +122,7 @@ class _SkillCard extends StatelessWidget {
                 CurioProgressBar(value: mastery, color: color, height: 8),
                 const SizedBox(height: 4),
                 Text(
-                  '${(mastery * 100).round()}% mastery · ${games.join(', ')}',
+                  '${(mastery * 100).round()}% mastery, ${games.join(', ')}',
                   style: TextStyle(
                     color: mutedColor,
                     fontSize: 13,

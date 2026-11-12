@@ -141,7 +141,7 @@ void expectWellFormed(Quantity q) {
 void expectExplains(ScaleRound round) {
   final text = round.explanation;
   final m = RegExp(
-    r'^(.+) · (.+) → (left is more|right is more|they’re equal)$',
+    r'^(.+), (.+) → (left is more|right is more|they’re equal)$',
   ).firstMatch(text);
   expect(m, isNotNull, reason: text);
   expect(
@@ -256,27 +256,27 @@ void main() {
     test('explanations show both values in a shared form', () {
       expect(
         round(Quantity.fraction(3, 4), Quantity.fraction(5, 8)).explanation,
-        '3/4 = 0.750 · 5/8 = 0.625 → left is more',
+        '3/4 = 0.750, 5/8 = 0.625 → left is more',
       );
       expect(
         round(Quantity.fraction(1, 4), Quantity.fraction(1, 3)).explanation,
-        '1/4 = 3/12 · 1/3 = 4/12 → right is more',
+        '1/4 = 3/12, 1/3 = 4/12 → right is more',
       );
       expect(
         round(Quantity.fraction(2, 5), Quantity.percent(40)).explanation,
-        '2/5 = 0.4 · 40% = 0.4 → they’re equal',
+        '2/5 = 0.4, 40% = 0.4 → they’re equal',
       );
       expect(
         round(Quantity.fractionOf(3, 4, 8), Quantity.whole(6)).explanation,
-        '3/4 of 8 = 6 · 6 → they’re equal',
+        '3/4 of 8 = 6, 6 → they’re equal',
       );
       expect(
         round(Quantity.decimal(40), Quantity.decimal(35)).explanation,
-        '0.4 = 0.40 · 0.35 → left is more',
+        '0.4 = 0.40, 0.35 → left is more',
       );
       expect(
         round(Quantity.product(7, 8), Quantity.square(6)).explanation,
-        '7 × 8 = 56 · 6² = 36 → left is more',
+        '7 × 8 = 56, 6² = 36 → left is more',
       );
       expect(
         round(Quantity.quotient(144, 12), Quantity.difference(100, 37)).answer,
@@ -497,7 +497,7 @@ void main() {
       }
       await reveal(tester, find.text('8 / 8'));
       expect(find.text('8 / 8'), findsOneWidget);
-      expect(find.text('Perfectly balanced!'), findsOneWidget);
+      expect(find.text('8 of 8 weighed correctly'), findsOneWidget);
       expect(state.completedToday('scale'), isTrue);
       expect(state.totalXp, xpBefore + 80);
       expect(state.collectedFacts, contains('equal_fractions'));
@@ -511,7 +511,10 @@ void main() {
       await tester.pumpWidget(play(ScalePage(date: day), CurioState()));
       final round = ScaleGame.forDay(DailyPick.dayNumber(day)).rounds.first;
       await tap(tester, find.byKey(keyFor(wrongFor(round.answer))));
-      expect(find.textContaining('Not quite'), findsOneWidget);
+      expect(
+        find.textContaining(RegExp('side is more|exactly equal')),
+        findsWidgets,
+      );
       expect(find.textContaining('More', findRichText: true), findsOneWidget);
       expect(find.textContaining('Less', findRichText: true), findsOneWidget);
       expect(find.byKey(const Key('scale_equal')), findsNothing);
@@ -531,8 +534,8 @@ void main() {
       expect(state.totalXp, xpBefore + 80);
 
       await tap(tester, find.byKey(const Key('game_practice')));
-      await reveal(tester, find.text('PRACTICE'));
-      expect(find.text('PRACTICE'), findsOneWidget);
+      await reveal(tester, find.text('Practice'));
+      expect(find.text('Practice'), findsOneWidget);
       for (final round in ScaleGame.forDay(d, practice: 1).rounds) {
         await tap(tester, find.byKey(keyFor(round.answer)));
         await tap(tester, find.byKey(const Key('scale_next')));

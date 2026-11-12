@@ -76,7 +76,6 @@ bool completedAlready(BuildContext context, String game) {
 
 class GameHeader extends StatelessWidget {
   const GameHeader({
-    required this.eyebrow,
     required this.title,
     required this.subtitle,
     required this.chips,
@@ -84,7 +83,7 @@ class GameHeader extends StatelessWidget {
     super.key,
   });
 
-  final String eyebrow, title, subtitle;
+  final String title, subtitle;
   final List<Widget> chips;
   final Widget? trailing;
 
@@ -92,8 +91,6 @@ class GameHeader extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      CurioEyebrow(eyebrow),
-      const SizedBox(height: 8),
       Semantics(
         header: true,
         child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
@@ -306,7 +303,7 @@ class GameResultCard extends StatelessWidget {
             CurioStatusStrip(
               key: const Key('result_discovery'),
               icon: unlocked.icon,
-              title: 'New discovery · ${unlocked.title}',
+              title: 'New discovery, ${unlocked.title}',
               body: unlocked.fact,
               color: plum,
             ),
@@ -386,7 +383,7 @@ class PracticeBadge extends StatelessWidget {
       color: plum.withValues(alpha: .16),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Text(
-        'PRACTICE',
+        'Practice',
         style: TextStyle(
           color: plum,
           fontSize: 13,

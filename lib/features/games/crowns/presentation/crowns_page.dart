@@ -93,7 +93,7 @@ class _CrownsPageState extends State<CrownsPage> {
   }
 
   String get _share =>
-      'Curio · Crowns\n${'👑' * _boards.length}  '
+      'Curio Crowns\n${'👑' * _boards.length}  '
       '${_hints == 0 ? 'no hints' : '$_hints ${_hints == 1 ? 'hint' : 'hints'}'}';
 
   @override
@@ -106,7 +106,6 @@ class _CrownsPageState extends State<CrownsPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice > 0 ? 'Practice kingdoms' : 'Daily logic puzzle',
             title: _finished
                 ? 'Every kingdom crowned.'
                 : 'Crown every kingdom.',
@@ -121,7 +120,7 @@ class _CrownsPageState extends State<CrownsPage> {
               GameMetaChip(
                 icon: Icons.grid_on_rounded,
                 label:
-                    'Board ${_current + 1} of ${_boards.length} · '
+                    'Board ${_current + 1} of ${_boards.length}, '
                     '${_puzzle.size}×${_puzzle.size}',
               ),
             ],
@@ -210,7 +209,9 @@ class _CrownsPageState extends State<CrownsPage> {
           ] else
             GameResultCard(
               gameId: _game,
-              title: _hints == 0 ? 'No hints needed!' : 'Kingdoms crowned!',
+              title: _hints == 0
+                  ? 'Solved with no hints'
+                  : 'Every crown placed',
               score: '${_boards.length} / ${_boards.length}',
               shareText: _share,
               xp: _practice > 0 ? null : gameRewards[_game]!.xp,

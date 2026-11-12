@@ -335,7 +335,7 @@ void main() {
         if (i != 0) return;
         expect(find.text('Your verdict, not this time'), findsOneWidget);
         expect(find.text('The right verdict'), findsOneWidget);
-        expect(find.textContaining('Not quite'), findsOneWidget);
+        expect(find.textContaining('Here '), findsOneWidget);
         expect(
           tester.getSemantics(
             find.byKey(Key('verdict_${items[0].verdict.name}')),
@@ -364,8 +364,8 @@ void main() {
     final tomorrow = verdictDailySet(d + 1);
     for (var round = 1; round <= 2; round++) {
       await tap(tester, find.byKey(const Key('game_practice')));
-      await reveal(tester, find.text('PRACTICE'));
-      expect(find.text('PRACTICE'), findsOneWidget);
+      await reveal(tester, find.text('Practice'));
+      expect(find.text('Practice'), findsOneWidget);
       final practice = verdictPracticeSet(d, round);
       expect(ids(practice).intersection(ids(tomorrow)), isEmpty);
       await playSet(

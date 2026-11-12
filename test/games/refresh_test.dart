@@ -267,7 +267,7 @@ void main() {
         expect(c.number, i + 1);
         expect(
           c.heading,
-          startsWith('CASE ${(i + 1).toString().padLeft(3, '0')} · '),
+          startsWith('CASE ${(i + 1).toString().padLeft(3, '0')}, '),
         );
         expect(c.question, isNotEmpty);
         expect(c.summary, isNotEmpty);
@@ -288,7 +288,7 @@ void main() {
         greaterThan(1),
         reason: 'not always one of each',
       );
-      expect(evidenceCases[3].heading, 'CASE 004 · THE LIBRARY BOOK');
+      expect(evidenceCases[3].heading, 'CASE 004, THE LIBRARY BOOK');
     });
 
     test(
@@ -373,7 +373,7 @@ void main() {
         expect(state.totalXp, xp + 90);
 
         await tap(tester, find.byKey(const Key('game_practice')));
-        await reveal(tester, find.text('PRACTICE'));
+        await reveal(tester, find.text('Practice'));
         await solveLinkLab(
           tester,
           LinkLabGame.forDay(linkLabDay(dayNumber, practice: 1)),
@@ -421,7 +421,7 @@ void main() {
       expect(state.totalXp, xp + 60);
 
       await tap(tester, find.byKey(const Key('game_practice')));
-      await reveal(tester, find.text('PRACTICE'));
+      await reveal(tester, find.text('Practice'));
       await solveForge(
         tester,
         ForgeDay.forDay(forgeDay(dayNumber, practice: 1)),
@@ -472,7 +472,7 @@ void main() {
 
       await tap(tester, find.byKey(const Key('game_practice')));
       final practice = evidenceCaseFor(dayNumber, practice: 1);
-      await reveal(tester, find.text('PRACTICE'));
+      await reveal(tester, find.text('Practice'));
       expect(find.text(practice.heading), findsOneWidget);
       await solveCase(tester, practice);
       await reveal(tester, find.text('3 / 3'));
@@ -508,7 +508,7 @@ void main() {
       await reveal(tester, find.text(careful.title));
       expect(find.text(careful.title), findsOneWidget);
       await reveal(tester, find.text('Your path'));
-      expect(find.text('Careful 3 · Brave 0 · Kind 0'), findsOneWidget);
+      expect(find.text('Careful 3, Brave 0, Kind 0'), findsOneWidget);
       await reveal(tester, find.textContaining('+50 XP'));
       expect(state.completedActivities, contains('frostlands_night_1'));
       expect(state.totalXp, xp + 50);

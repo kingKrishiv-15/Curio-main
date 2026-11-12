@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 
 import '../../../core/config/supabase_config.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'email_code_request_page.dart';
@@ -174,10 +173,6 @@ class _AuthPageState extends State<AuthPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CurioEyebrow(
-                _signUp ? 'For parents & guardians' : 'Welcome back',
-              ),
-              const SizedBox(height: 12),
               Semantics(
                 header: true,
                 child: Text(

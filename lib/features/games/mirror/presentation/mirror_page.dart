@@ -77,8 +77,8 @@ class _MirrorPageState extends State<MirrorPage> {
     setState(() {
       if (result.correct) {
         _message = round.checks == 1
-            ? 'Perfect reflection, first time! +${round.points} points.'
-            : 'Perfect reflection! +${round.points} points.';
+            ? 'Every square matches, on your first check. +${round.points} points.'
+            : 'Every square matches. +${round.points} points.';
         _tone = GameNoticeTone.good;
       } else if (round.revealed) {
         _message =
@@ -143,14 +143,14 @@ class _MirrorPageState extends State<MirrorPage> {
   }
 
   String get _share =>
-      'Curio · Mirror\n'
+      'Curio Mirror\n'
       '${_rounds.map((r) => r.shareMark).join()}  $_total/$_maxTotal';
 
   String get _resultTitle {
-    if (_total == _maxTotal) return 'Mirror master!';
-    if (_total >= 200) return 'Sharp eyes!';
-    if (_total >= 100) return 'Nicely reflected!';
-    return 'Well tried, mirrors are tricky!';
+    if (_total == _maxTotal) return 'Every board mirrored at full points';
+    if (_total >= 200) return 'Boards mirrored with few checks';
+    if (_total >= 100) return 'Boards mirrored';
+    return 'Mirrors take practice';
   }
 
   @override
@@ -166,7 +166,6 @@ class _MirrorPageState extends State<MirrorPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice round' : 'Daily pattern puzzle',
             title: showResult ? 'All three mirrored.' : 'Paint the reflection',
             subtitle:
                 'Flip the pattern across the dashed mirror line, square by square.',
@@ -288,7 +287,7 @@ class _PuzzleIntro extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'PUZZLE ${index + 1} OF $total',
+                'Puzzle ${index + 1} of $total',
                 style: TextStyle(
                   color: muted,
                   fontSize: 13,

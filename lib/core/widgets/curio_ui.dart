@@ -159,90 +159,6 @@ class CurioCard extends StatelessWidget {
   }
 }
 
-class CurioEyebrow extends StatelessWidget {
-  const CurioEyebrow(this.label, {this.color, super.key});
-
-  final String label;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final resolved = color ?? CurioTokens.accent;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 18,
-          height: 2,
-          decoration: BoxDecoration(
-            color: resolved,
-            borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            label.toUpperCase(),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: resolved,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class PageIntro extends StatelessWidget {
-  const PageIntro({
-    required this.eyebrow,
-    required this.title,
-    required this.subtitle,
-    this.trailing,
-    super.key,
-  });
-
-  final String eyebrow;
-  final String title;
-  final String subtitle;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final inkMuted = CurioTokens.textSecondary;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CurioEyebrow(eyebrow),
-              const SizedBox(height: 8),
-              Text(title, style: Theme.of(context).textTheme.headlineLarge),
-              const SizedBox(height: 8),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Text(
-                  subtitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: inkMuted),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (trailing != null) ...[const SizedBox(width: 16), trailing!],
-      ],
-    );
-  }
-}
-
 class SectionHeading extends StatelessWidget {
   const SectionHeading(this.title, {this.trailing, this.subtitle, super.key});
 
@@ -286,99 +202,6 @@ class CurioBrand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CurioLogo(markSize: compact ? 29 : 34);
-}
-
-class MascotBadge extends StatelessWidget {
-  const MascotBadge({this.size = 72, super.key});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final forestSoft = CurioTokens.surfaceRaised;
-    final surface = CurioTokens.surface;
-    final forest = CurioTokens.accent;
-    final saffron = CurioTokens.tintMaths;
-    final ink = CurioTokens.textPrimary;
-    return Semantics(
-      label: 'Nova, your Curio companion',
-      child: SizedBox.square(
-        dimension: size,
-        // The sparkle pokes past the badge's rounded corner, so the clay
-        // body sits behind the face instead of clipping it.
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned.fill(
-              child: CurioClay(
-                radius: size * .36,
-                color: forestSoft,
-                child: const SizedBox.expand(),
-              ),
-            ),
-            Transform.rotate(
-              angle: -.08,
-              child: SizedBox(
-                width: size * .7,
-                height: size * .62,
-                child: CurioClay(
-                  radius: size * .28,
-                  color: forest,
-                  child: Center(
-                    child: Container(
-                      width: size * .48,
-                      height: size * .28,
-                      decoration: BoxDecoration(
-                        color: surface,
-                        borderRadius: BorderRadius.circular(
-                          CurioTokens.radiusCard,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _MascotEye(size: size * .065, color: ink),
-                          SizedBox(width: size * .13),
-                          _MascotEye(size: size * .065, color: ink),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: size * .015,
-              top: size * .01,
-              child: Transform.rotate(
-                angle: .18,
-                child: Icon(
-                  Icons.auto_awesome,
-                  color: saffron,
-                  size: size * .27,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MascotEye extends StatelessWidget {
-  const _MascotEye({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
 }
 
 class CurioIconTile extends StatelessWidget {
@@ -439,128 +262,6 @@ class GameMetaChip extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class ModeTile extends StatelessWidget {
-  const ModeTile({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-    this.badge,
-    this.duration,
-    this.skill,
-    super.key,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  final String? badge;
-  final String? duration;
-  final String? skill;
-
-  @override
-  Widget build(BuildContext context) {
-    final inkMuted = CurioTokens.textSecondary;
-    return CurioCard(
-      onTap: onTap,
-      padding: EdgeInsets.zero,
-      elevation: true,
-      radius: CurioTokens.radiusCard,
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
-              child: CurioIconTile(icon: icon, color: color),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            title,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                        if (badge != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: color.withValues(alpha: .12),
-                              borderRadius: BorderRadius.circular(
-                                CurioTokens.radiusPill,
-                              ),
-                            ),
-                            child: Text(
-                              badge!,
-                              style: TextStyle(
-                                color: color,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: inkMuted,
-                        fontSize: 13,
-                        height: 1.35,
-                      ),
-                    ),
-                    if (duration != null || skill != null) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 4,
-                        children: [
-                          if (duration != null)
-                            GameMetaChip(
-                              icon: Icons.schedule_rounded,
-                              label: duration!,
-                            ),
-                          if (skill != null)
-                            GameMetaChip(
-                              icon: Icons.psychology_alt_rounded,
-                              label: skill!,
-                            ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Icon(Icons.arrow_forward_rounded, size: 19, color: color),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -931,6 +632,88 @@ class ExplorerAvatar extends StatelessWidget {
       excludeSemantics: true,
       onTap: onTap,
       child: GestureDetector(onTap: onTap, child: avatar),
+    );
+  }
+}
+
+/// A plain list row: a title, at most one supporting line, an optional
+/// 3px section tint on the left edge, and a 1px rule underneath. Rows are
+/// how Curio shows everything that is not the screen's one primary block.
+class CurioRow extends StatelessWidget {
+  const CurioRow({
+    required this.title,
+    this.subtitle,
+    this.tint,
+    this.trailing,
+    this.onTap,
+    super.key,
+  });
+
+  final String title;
+  final String? subtitle;
+  final Color? tint;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final row = DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: CurioTokens.border)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (tint != null) ...[
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: tint,
+                    borderRadius: CurioTokens.pillShape,
+                  ),
+                  child: const SizedBox(width: 3),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: CurioTokens.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 4),
+                      Text(subtitle!, style: CurioTokens.bodySmall),
+                    ],
+                  ],
+                ),
+              ),
+              if (trailing != null) ...[
+                const SizedBox(width: 12),
+                Center(child: trailing),
+              ] else if (onTap != null) ...[
+                const SizedBox(width: 12),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: CurioTokens.textSecondary,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+    if (onTap == null) return row;
+    return Semantics(
+      button: true,
+      child: InkWell(onTap: onTap, child: row),
     );
   }
 }

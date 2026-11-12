@@ -55,8 +55,8 @@ class EvidenceCase {
   /// What the evidence shows, once every clue is weighed.
   final String summary;
 
-  /// "CASE 004 · THE LIBRARY BOOK"
-  String get heading => 'CASE ${number.toString().padLeft(3, '0')} · $name';
+  /// "CASE 004, THE LIBRARY BOOK"
+  String get heading => 'CASE ${number.toString().padLeft(3, '0')}, $name';
 
   /// How many of [ranks] (clue index → rank) are right.
   int score(Map<int, EvidenceRank> ranks) => [

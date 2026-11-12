@@ -82,7 +82,7 @@ class _SqueezePageState extends State<SqueezePage> {
             child: Column(
               children: [
                 Text(
-                  _practice ? 'PRACTICE RANGE' : 'SECRET RANGE',
+                  _practice ? 'Practice range' : 'Secret range',
                   style: TextStyle(
                     color: cardLabel,
                     fontWeight: FontWeight.w900,

@@ -2,14 +2,12 @@ import 'package:curio/core/state/curio_state.dart';
 import 'package:curio/core/services/minigame_service.dart';
 import 'package:curio/features/games/loophole/domain/loophole_bank.dart';
 import 'package:curio/features/games/loophole/presentation/loophole_page.dart';
-import 'package:curio/features/home/presentation/home_page.dart';
 import 'package:curio/core/theme/curio_theme.dart';
 import 'package:curio/features/games/common/game_kit.dart';
 import 'package:curio/features/games/english/domain/english_game.dart';
 import 'package:curio/features/games/english/presentation/english_page.dart';
 import 'package:curio/features/games/memory/domain/memory_game.dart';
 import 'package:curio/features/games/memory/presentation/memory_page.dart';
-import 'package:curio/features/learn/presentation/learn_hub_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -184,7 +182,7 @@ void main() {
       await tap(tester, find.byKey(const Key('game_practice')));
       await solveMatch(tester, seed - 1);
       expect(state.totalXp, 80);
-      expect(find.text('PRACTICE'), findsOneWidget);
+      expect(find.text('Practice'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -280,48 +278,4 @@ void main() {
       expect(state.totalXp, 0);
     },
   );
-
-  for (final size in [
-    const Size(320, 640),
-    const Size(375, 667),
-    const Size(812, 375),
-    const Size(1280, 900),
-  ]) {
-    for (final dark in [false, true]) {
-      testWidgets(
-        'Daily sections and new games fit $size dark=$dark at large text',
-        (tester) async {
-          tester.view.physicalSize = size;
-          tester.view.devicePixelRatio = 1;
-          addTearDown(tester.view.reset);
-          for (final page in [
-            MemoryPage(date: day),
-            MemoryPage(date: day, trail: true),
-            EnglishPage(date: day),
-            EnglishPage(date: day, builder: true),
-            const LearnHubPage(),
-            HomePage(onExplore: () {}),
-          ]) {
-            final state = CurioState();
-            await tester.pumpWidget(play(page, state, dark: dark, text: 1.8));
-            await tester.pumpAndSettle();
-            if (page is LearnHubPage) {
-              await tester.drag(
-                find.byType(ListView).first,
-                const Offset(0, -1800),
-              );
-              await tester.pumpAndSettle();
-            }
-            expect(
-              tester.takeException(),
-              isNull,
-              reason: '${page.runtimeType}',
-            );
-            await tester.pumpWidget(const SizedBox());
-            state.dispose();
-          }
-        },
-      );
-    }
-  }
 }

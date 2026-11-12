@@ -1,10 +1,8 @@
 import 'package:curio/app/curio_app.dart';
 import 'package:curio/core/state/curio_state.dart';
 import 'package:curio/features/games/game_catalog.dart';
-import 'package:curio/features/games/presentation/game_card.dart';
-import 'package:curio/features/games/presentation/daily_plan.dart';
+import 'package:curio/features/games/common/daily_schedule.dart';
 import 'package:curio/features/games/squeeze/domain/squeeze_engine.dart';
-import 'package:curio/features/learn/presentation/learn_hub_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,8 +24,8 @@ void main() {
     );
   });
 
-  for (final size in [const Size(375, 667), const Size(1280, 900)]) {
-    testWidgets('Home and Games share the same daily games at $size', (
+  for (final size in [const Size(390, 844), const Size(1280, 900)]) {
+    testWidgets('Home shows one anchor and the rest of the set at $size', (
       tester,
     ) async {
       tester.view.physicalSize = size;
@@ -35,41 +33,21 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(const CurioApp());
       await tester.pump(const Duration(seconds: 1));
-      expect(find.text('Hello, Explorer!'), findsOneWidget);
-      final picks = todaysPicks();
-      await tester.scrollUntilVisible(
-        find.byType(DailyPlan),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(
-        tester
-            .widgetList<GameCard>(find.byType(GameCard))
-            .map((c) => c.game.id),
-        picks.map((g) => g.id),
-      );
-      expect(find.text('Maths'), findsWidgets);
-      expect(find.text('Memory'), findsWidgets);
-      expect(find.text('English'), findsWidgets);
-      await tester.tap(find.byKey(const Key('nav_Games')));
-      await tester.pump(const Duration(seconds: 1));
-      expect(find.text('Four little adventures'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.byType(DailyPlan),
-        300,
-        scrollable: find
-            .descendant(
-              of: find.byType(LearnHubPage),
-              matching: find.byType(Scrollable),
-            )
-            .first,
-      );
-      expect(
-        tester
-            .widgetList<GameCard>(find.byType(GameCard))
-            .map((c) => c.game.id),
-        picks.map((g) => g.id),
-      );
+      final set = todaysSet();
+      expect(find.byKey(const Key('home_anchor')), findsOneWidget);
+      expect(find.text(set.anchor.title), findsOneWidget);
+      for (final game in set.others) {
+        final row = find.byKey(Key('game_row_${game.id}'));
+        await tester.scrollUntilVisible(
+          row,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(row, findsOneWidget);
+      }
+      expect(set.others.length + 1, dailyGameCount);
+      expect(find.byKey(const Key('nav_Games')), findsNothing);
+      expect(find.byKey(const Key('nav_Discover')), findsOneWidget);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
     });

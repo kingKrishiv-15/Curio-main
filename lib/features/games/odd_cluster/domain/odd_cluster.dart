@@ -19,7 +19,7 @@ class ClusterGroup {
   final String title;
   final List<String> words;
 
-  /// 0 easy · 1 and 2 medium · 3 sneaky.
+  /// 0 easy, 1 and 2 medium, 3 sneaky.
   final int tier;
 
   /// Shown once the group is found or revealed: why these four belong.

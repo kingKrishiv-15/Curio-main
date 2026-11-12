@@ -64,3 +64,14 @@ DateTime puzzleDateForGame(String id, DateTime date) {
   final appearance = (calendarDayNumber(date) / pool.length).floor();
   return DateTime.utc(2026, 1, 1 + appearance);
 }
+
+/// "Maths, Memory, English and Logic". Every screen that names the
+/// sections reads this, so the list can never disagree with the catalogue.
+String get sectionNames {
+  final titles = [for (final s in LearningSection.values) s.title];
+  if (titles.length == 1) return titles.single;
+  return '${titles.sublist(0, titles.length - 1).join(', ')} and ${titles.last}';
+}
+
+/// How many games make up a day's set. Every count in the UI reads this.
+int get dailyGameCount => LearningSection.values.length;

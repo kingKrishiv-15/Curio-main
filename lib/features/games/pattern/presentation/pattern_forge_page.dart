@@ -85,8 +85,8 @@ class _PatternForgePageState extends State<PatternForgePage> {
     const names = ['Next', 'Rule', 'Repair'];
     final marks = [
       for (var i = 0; i < 3; i++) '${names[i]} ${_isRight(i) ? '🟩' : '🟥'}',
-    ].join(' · ');
-    return 'Curio · Pattern Forge\n$marks\n$_score / 3';
+    ].join(', ');
+    return 'Curio Pattern Forge\n$marks\n$_score / 3';
   }
 
   @override
@@ -99,7 +99,6 @@ class _PatternForgePageState extends State<PatternForgePage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice forge' : 'Daily pattern forge',
             title: _finished ? 'Patterns forged.' : 'Crack three patterns',
             subtitle:
                 'Pick what comes next, name the rule, then find the number that doesn’t belong.',

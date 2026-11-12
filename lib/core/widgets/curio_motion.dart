@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:curio/theme/curio_tokens.dart';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -64,64 +63,6 @@ class _CurioFadeSlideInState extends State<CurioFadeSlideIn>
           child: child,
         ),
       ),
-    );
-  }
-}
-
-/// A slow, endless bob, for illustration pieces that should feel alive
-/// without asking for attention.
-class CurioFloat extends StatefulWidget {
-  const CurioFloat({
-    required this.child,
-    this.distance = 6,
-    this.period = const Duration(milliseconds: 3600),
-    this.phase = 0,
-    super.key,
-  });
-
-  final Widget child;
-  final double distance;
-  final Duration period;
-
-  /// 0 to 1, so several floating pieces don't move in lockstep.
-  final double phase;
-
-  @override
-  State<CurioFloat> createState() => _CurioFloatState();
-}
-
-class _CurioFloatState extends State<CurioFloat>
-    with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(
-    vsync: this,
-    duration: widget.period,
-  );
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    syncLoop(_controller, context);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
-    return AnimatedBuilder(
-      animation: _controller,
-      child: widget.child,
-      builder: (context, child) {
-        final t = (_controller.value + widget.phase) * 2 * math.pi;
-        return Transform.translate(
-          offset: Offset(0, math.sin(t) * widget.distance),
-          child: child,
-        );
-      },
     );
   }
 }

@@ -96,9 +96,9 @@ class _OddClusterPageState extends State<OddClusterPage> {
   }
 
   String get _share =>
-      'Curio · Odd Cluster\n${_puzzle.shareGrid()}\n'
+      'Curio Odd Cluster\n${_puzzle.shareGrid()}\n'
       '${_puzzle.won ? 'Solved' : '${_puzzle.found.length}/4 groups'}'
-      ' · ${_puzzle.mistakes} mistakes';
+      ', ${_puzzle.mistakes} mistakes';
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +110,6 @@ class _OddClusterPageState extends State<OddClusterPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice puzzle' : 'Daily knowledge puzzle',
             title: _puzzle.won
                 ? 'Every cluster found.'
                 : _puzzle.lost
@@ -321,7 +320,7 @@ class _GroupBar extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  group.title.toUpperCase(),
+                  group.title,
                   style: TextStyle(
                     color: CurioTokens.textPrimary,
                     fontWeight: FontWeight.w900,
@@ -342,7 +341,7 @@ class _GroupBar extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            group.words.join(' · '),
+            group.words.join(', '),
             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
           const SizedBox(height: 8),

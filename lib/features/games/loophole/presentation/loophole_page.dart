@@ -267,7 +267,7 @@ class _LoopholePageState extends State<LoopholePage> {
         .map((m) => m == 2 ? '🟩' : (m == 1 ? '🟨' : '⬛'))
         .join();
     // Squares only: how it went, never which words were the catch.
-    return 'Curio Loophole · ${months[date.month - 1]} ${date.day}\n'
+    return 'Curio Loophole, ${months[date.month - 1]} ${date.day}\n'
         '$squares  ${_finalScore ?? 0}/6';
   }
 
@@ -349,8 +349,6 @@ class _LoopholePageState extends State<LoopholePage> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: [
-        const CurioEyebrow('Daily reasoning puzzle'),
-        const SizedBox(height: 8),
         Text(
           _finished ? 'Nicely spotted.' : 'Find the catch',
           style: Theme.of(context).textTheme.headlineMedium,
@@ -391,7 +389,7 @@ class _LoopholePageState extends State<LoopholePage> {
           GameResultCard(
             gameId: 'loophole',
             title: (_finalScore ?? 0) >= rounds.length * 2 - 1
-                ? 'Sharp eyes!'
+                ? 'Boards mirrored with few checks'
                 : 'Every catch teaches something.',
             score: '${_finalScore ?? 0} / ${rounds.length * 2}',
             shareText: _shareText,

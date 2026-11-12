@@ -233,7 +233,7 @@ class _NextUp extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: 'NEXT UP  ',
+                  text: 'Next: ',
                   style: TextStyle(
                     color: muted,
                     fontSize: 13,
@@ -245,7 +245,7 @@ class _NextUp extends StatelessWidget {
                   style: TextStyle(color: ink, fontWeight: FontWeight.w800),
                 ),
                 TextSpan(
-                  text: ' · ${badge.description}',
+                  text: ', ${badge.description}',
                   style: TextStyle(color: muted),
                 ),
               ],
@@ -334,8 +334,6 @@ class _BadgesSheet extends StatelessWidget {
         controller: controller,
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
         children: [
-          const CurioEyebrow('Badges'),
-          const SizedBox(height: 8),
           Text(
             'A trail of brave thinking',
             style: Theme.of(context).textTheme.headlineSmall,

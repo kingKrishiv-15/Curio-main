@@ -436,7 +436,7 @@ void main() {
 
       await fillAnswer(tester, puzzles[0]);
       await tap(tester, find.byKey(const Key('whos_who_check')));
-      expect(find.textContaining('Spot on'), findsOneWidget);
+      expect(find.textContaining('Solved with no hints'), findsOneWidget);
       await tap(tester, find.byKey(const Key('whos_who_next')));
 
       expect(find.text(puzzles[1].clueTexts.first), findsOneWidget);
@@ -489,8 +489,8 @@ void main() {
       expect(state.totalXp, xp + 100);
 
       await tap(tester, find.byKey(const Key('game_practice')));
-      await reveal(tester, find.text('PRACTICE'));
-      expect(find.text('PRACTICE'), findsOneWidget);
+      await reveal(tester, find.text('Practice'));
+      expect(find.text('Practice'), findsOneWidget);
       await hintToTheEnd(tester);
       await tap(tester, find.byKey(const Key('whos_who_next')));
       await hintToTheEnd(tester);

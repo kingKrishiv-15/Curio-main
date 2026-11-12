@@ -324,8 +324,8 @@ class ScaleRound {
 
   String get verdict => verdictText(answer);
 
-  /// "3/4 = 0.750 · 5/8 = 0.625 → left is more"
-  String get explanation => '$leftWorking · $rightWorking → $verdict';
+  /// "3/4 = 0.750, 5/8 = 0.625 → left is more"
+  String get explanation => '$leftWorking, $rightWorking → $verdict';
 
   /// The explanation worded for a screen reader.
   String get spokenExplanation {

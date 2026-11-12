@@ -9,7 +9,6 @@ import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
 import '../../game_catalog.dart';
-import '../../presentation/game_banner.dart';
 import '../domain/memory_grid.dart';
 
 class MemoryGridPage extends StatefulWidget {
@@ -99,7 +98,7 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
   }
 
   String get _share =>
-      'Curio · Memory Grid\n'
+      'Curio Memory Grid\n'
       '${'🟪' * _grid.cleared}${'⬜' * (gridRounds.length - _grid.cleared)}  '
       '${_grid.cleared}/${gridRounds.length}';
 
@@ -149,9 +148,6 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice > 0
-                ? 'Practice patterns'
-                : 'Daily flash & recall',
             title: _phase == _Phase.done
                 ? (_grid.won ? 'Sharp as ever.' : 'Great effort.')
                 : 'Watch, then remember.',
@@ -305,7 +301,7 @@ class _Board extends StatelessWidget {
         accent,
         true,
         null,
-        Icons.auto_awesome,
+        Icons.lightbulb_outline_rounded,
       ),
       _Phase.recall when marked => (
         accent.withValues(alpha: .7),
@@ -333,7 +329,7 @@ class _Board extends StatelessWidget {
       ),
       _ => (null, false, null, null),
     };
-    final state = icon == Icons.auto_awesome
+    final state = icon == Icons.lightbulb_outline_rounded
         ? 'glowing'
         : icon == Icons.check_rounded
         ? 'remembered'

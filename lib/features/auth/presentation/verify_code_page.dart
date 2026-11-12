@@ -8,7 +8,6 @@ import '../../../core/services/auth_service.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'widgets/otp_code_field.dart';
-import 'widgets/welcome_art.dart';
 
 /// Where a parent types the code Supabase emailed them. A correct code
 /// creates a session; the [AuthGate] notices and moves on (to learner setup,
@@ -159,8 +158,6 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Align(alignment: Alignment.centerLeft, child: InboxArt()),
-          const SizedBox(height: 16),
           Semantics(
             header: true,
             child: Text(

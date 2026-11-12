@@ -209,8 +209,8 @@ void main() {
     await tap(tester, find.byKey(const Key('cascade_submit')));
     expect(state.totalXp, xpBefore + 90);
     await tap(tester, find.byKey(const Key('game_practice')));
-    await reveal(tester, find.text('PRACTICE'));
-    expect(find.text('PRACTICE'), findsOneWidget);
+    await reveal(tester, find.text('Practice'));
+    expect(find.text('Practice'), findsOneWidget);
     expect(state.totalXp, xpBefore + 90);
   });
 

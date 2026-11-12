@@ -201,7 +201,7 @@ List<CurioBadge> computeBadges({
       'bright_spark',
       'Bright spark',
       'Earn 1,500 XP.',
-      Icons.auto_awesome_rounded,
+      Icons.lightbulb_outline_rounded,
       BadgeTone.xp,
       totalXp,
       1500,

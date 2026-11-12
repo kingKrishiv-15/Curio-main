@@ -66,7 +66,7 @@ class _CascadePageState extends State<CascadePage> {
           },
         )
         .join('⬇️');
-    return 'Curio · Cascade\n$marks\n${_puzzle.score}/100';
+    return 'Curio Cascade\n$marks\n${_puzzle.score}/100';
   }
 
   @override
@@ -79,7 +79,6 @@ class _CascadePageState extends State<CascadePage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice chain' : 'Daily cause-and-effect',
             title: submitted ? 'See where it held.' : 'Follow the chain',
             subtitle:
                 'Pick five consequences that each lead to the next. Evidence beats what merely sounds right.',
@@ -188,7 +187,7 @@ class _ClaimCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'THE CLAIM',
+            'The claim',
             style: TextStyle(
               color: ink,
               fontSize: 13,

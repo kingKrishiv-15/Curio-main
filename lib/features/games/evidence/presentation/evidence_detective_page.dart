@@ -69,7 +69,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
       for (var i = 0; i < _case.clues.length; i++)
         _ranks[i] == _case.clues[i].rank ? '🟩' : '🟥',
     ].join();
-    return 'Curio · Evidence Detective\n'
+    return 'Curio Evidence Detective\n'
         'CASE ${_case.number.toString().padLeft(3, '0')}  $marks  '
         '$_score/${_case.clues.length}';
   }
@@ -84,7 +84,6 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice case' : 'Daily evidence case',
             title: _submitted ? 'Case closed.' : 'Weigh the evidence',
             subtitle:
                 'Rank each clue as strong, weak or misleading before you decide what happened.',

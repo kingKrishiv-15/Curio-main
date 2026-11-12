@@ -176,11 +176,6 @@ class _SignalGridPageState extends State<SignalGridPage> {
             ),
             const SizedBox(height: 12),
           ],
-          CurioEyebrow(
-            _practice ? 'Practice logic puzzle' : 'Daily logic puzzle',
-            color: CurioTokens.accent,
-          ),
-          const SizedBox(height: 8),
           Text(
             _complete ? 'Grid harmonised.' : 'Balance the signals',
             style: Theme.of(context).textTheme.headlineMedium,
@@ -274,7 +269,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                     )
                                   : Icon(
                                       signal == _Signal.spark
-                                          ? Icons.auto_awesome_rounded
+                                          ? Icons.lightbulb_outline_rounded
                                           : Icons.waves_rounded,
                                       key: ValueKey('${signal.name}_$index'),
                                       color: signal == _Signal.spark
@@ -340,12 +335,14 @@ class _SignalGridPageState extends State<SignalGridPage> {
           else
             GameResultCard(
               gameId: 'signal_grid',
-              title: _hintsLeft == 3 ? 'Pure deduction!' : 'Balanced!',
+              title: _hintsLeft == 3
+                  ? 'Balanced with no hints'
+                  : 'Grid balanced',
               score: _hintsLeft == 3
                   ? 'No hints'
                   : '${3 - _hintsLeft} hint${3 - _hintsLeft == 1 ? '' : 's'}',
               shareText:
-                  'Curio · Signal Grid\n🟨🟦🟨🟦\nBalanced with ${3 - _hintsLeft} hints',
+                  'Curio Signal Grid\n🟨🟦🟨🟦\nBalanced with ${3 - _hintsLeft} hints',
               xp: _practice ? null : gameRewards['signal_grid']!.xp,
               alreadyDone: _alreadyDone,
               onPractice: _practiceRound,

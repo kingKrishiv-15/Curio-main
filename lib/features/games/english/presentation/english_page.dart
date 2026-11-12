@@ -118,7 +118,6 @@ class _EnglishPageState extends State<EnglishPage> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       children: [
         GameHeader(
-          eyebrow: 'Today’s English game',
           title: _title,
           subtitle: widget.builder
               ? 'A clue, a handful of letters, a new word to discover.'
@@ -144,7 +143,7 @@ class _EnglishPageState extends State<EnglishPage> {
                 : 'Your words are growing!',
             score: '$_score / 5',
             shareText:
-                'Curio · $_title\n$_score of 5 ${widget.builder ? 'words built' : 'questions answered correctly'}',
+                'Curio $_title\n$_score of 5 ${widget.builder ? 'words built' : 'questions answered correctly'}',
             gameId: _id,
             xp: _practice == 0 ? gameRewards[_id]!.xp : null,
             alreadyDone: _alreadyDone,

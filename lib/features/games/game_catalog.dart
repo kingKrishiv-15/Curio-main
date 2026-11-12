@@ -38,7 +38,6 @@ class GameEntry {
     required this.icon,
     required this.duration,
     required this.builder,
-    this.isNew = false,
   });
 
   /// The activity id the reward table knows it by.
@@ -58,8 +57,6 @@ class GameEntry {
       child: builder(isDaily ? puzzleDateForGame(id, started) : started),
     );
   }
-
-  final bool isNew;
 
   GameReward get reward => gameRewards[id]!;
   String get skill => reward.skill;
@@ -91,7 +88,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.grid_view_rounded,
     duration: '3 min',
     builder: (date) => MemoryGridPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'word_wise',
@@ -117,7 +113,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.gesture_rounded,
     duration: '3 to 4 min',
     builder: (date) => WordTrailsPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'crowns',
@@ -126,7 +121,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.workspace_premium_rounded,
     duration: '3 to 5 min',
     builder: (date) => CrownsPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'odd_cluster',
@@ -135,7 +129,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.workspaces_rounded,
     duration: '3 to 5 min',
     builder: (date) => OddClusterPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'sequence',
@@ -144,7 +137,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.format_list_numbered_rounded,
     duration: '3 min',
     builder: (date) => SequencePage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'bridge',
@@ -153,7 +145,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.linear_scale_rounded,
     duration: '3 to 5 min',
     builder: (date) => BridgePage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'cascade',
@@ -162,7 +153,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.waterfall_chart_rounded,
     duration: '4 min',
     builder: (date) => CascadePage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'scale',
@@ -171,7 +161,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.balance_rounded,
     duration: '3 min',
     builder: (date) => ScalePage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'verdict',
@@ -180,7 +169,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.gavel_rounded,
     duration: '3 min',
     builder: (date) => VerdictPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'mirror',
@@ -189,7 +177,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.flip_rounded,
     duration: '3 to 4 min',
     builder: (date) => MirrorPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'whos_who',
@@ -199,7 +186,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.groups_rounded,
     duration: '4 to 6 min',
     builder: (date) => WhosWhoPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'loophole',
@@ -224,7 +210,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.travel_explore_rounded,
     duration: '3 to 4 min',
     builder: (date) => NumberHuntPage(date: date),
-    isNew: true,
   ),
   GameEntry(
     id: 'link_lab',
@@ -329,3 +314,13 @@ IconData skillIcon(String skill) => switch (skill) {
   'Evidence' => Icons.manage_search_rounded,
   _ => Icons.psychology_rounded,
 };
+
+// Kept only until the games that still call them are removed in Phase 4.
+Color gameColor(String id, Color fallback) => fallback;
+Color bannerFill(BuildContext context, Color color) => CurioTokens.wash(color);
+
+/// Today's set as Home shows it: one anchor game and the rest.
+({GameEntry anchor, List<GameEntry> others}) todaysSet({DateTime? date}) {
+  final picks = todaysPicks(date: date);
+  return (anchor: picks.first, others: picks.sublist(1));
+}

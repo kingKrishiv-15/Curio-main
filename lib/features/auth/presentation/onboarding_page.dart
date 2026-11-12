@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../games/common/daily_schedule.dart';
+import 'package:curio/core/widgets/curio_logo.dart';
 import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/models/family_settings.dart';
@@ -6,10 +8,8 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
-import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'widgets/auth_fields.dart';
-import 'widgets/welcome_art.dart';
 
 /// Learner setup, right after a parent's email is confirmed: a nickname, a
 /// gentle daily goal, reading comfort, how they'd like to hear from Curio,
@@ -173,8 +173,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  CurioEyebrow(eyebrow),
-                  const SizedBox(height: 12),
                   Semantics(
                     header: true,
                     child: Text(
@@ -232,7 +230,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _nameStep() => Column(
     children: [
-      const CurioFloat(distance: 4, child: MascotBadge(size: 104)),
+      const CurioLogoMark(size: 104),
       const SizedBox(height: 24),
       Form(
         key: _nameForm,
@@ -243,7 +241,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           textCapitalization: TextCapitalization.words,
           textInputAction: TextInputAction.done,
           decoration: const InputDecoration(
-            labelText: 'Explorer’s nickname',
+            labelText: 'Learner’s nickname',
             hintText: 'e.g. Alex',
             prefixIcon: Icon(Icons.face_outlined),
           ),
@@ -258,10 +256,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _goalStep() {
     const options = [
-      (1, 'A quick spark', 'One game a day · about 5 minutes'),
-      (2, 'A little adventure', 'Two games a day · about 10 minutes'),
-      (3, 'A steady habit', 'Three games a day · about 15 minutes'),
-      (4, 'The full set', 'One in each section · about 20 minutes'),
+      (1, 'A quick spark', 'About 5 minutes a day'),
+      (2, 'A little adventure', 'About 10 minutes a day'),
+      (3, 'A steady habit', 'About 15 minutes a day'),
+      (4, 'The full set', 'About 20 minutes a day'),
     ];
     return Column(
       children: [
@@ -290,10 +288,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CurioFloat(distance: 3, child: MascotBadge(size: 64)),
+            const CurioLogoMark(size: 64),
             const SizedBox(height: 16),
             Text(
-              'A little wonder, every day.',
+              'Comfort settings',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -436,7 +434,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ),
           child: Column(
             children: [
-              const CurioFloat(distance: 4, child: MascotBadge(size: 92)),
+              const CurioLogoMark(size: 92),
               const SizedBox(height: 16),
               for (final (icon, label, value) in summary)
                 Padding(
@@ -461,28 +459,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
         ),
         const SizedBox(height: 24),
         Text(
-          'Four little adventures, refreshed daily.',
+          '$dailyGameCount games a day: $sectionNames.',
+          key: const Key('onboarding_sections'),
           style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            for (final section in WelcomeSkill.all)
-              Chip(
-                avatar: Icon(
-                  section.icon,
-                  size: 18,
-                  color: section.ink(context),
-                ),
-                label: Text(section.label),
-              ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'One game per section each day. Replay for practice; points are awarded once.',
         ),
         if (_needsConsent) ...[
           const SizedBox(height: 16),

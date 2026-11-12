@@ -186,8 +186,6 @@ class WeeklyReportCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CurioEyebrow('A week of little discoveries'),
-          const SizedBox(height: 12),
           Text(
             '${summary['week_start']}, ${summary['week_end']}',
             style: Theme.of(context).textTheme.titleMedium,
@@ -200,11 +198,11 @@ class WeeklyReportCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${learner['activities']} activities · ${learner['practice_days']} practice days',
+              '${learner['activities']} activities, ${learner['practice_days']} practice days',
             ),
             const SizedBox(height: 8),
             Text(
-              '${learner['total_xp']} lifetime XP · ${learner['discoveries']} discoveries collected',
+              '${learner['total_xp']} lifetime XP, ${learner['discoveries']} discoveries collected',
             ),
             const SizedBox(height: 16),
             for (final entry

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/core/widgets/curio_logo.dart';
 import 'package:curio/theme/curio_tokens.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
@@ -57,20 +58,18 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             color: Theme.of(context).colorScheme.secondaryContainer,
             child: Row(
               children: [
-                const MascotBadge(size: 68),
+                const CurioLogoMark(size: 68),
                 const SizedBox(width: 24),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CurioEyebrow('Your explorer'),
-                      const SizedBox(height: 12),
                       Text(
                         state.childName,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       Text(
-                        '${state.totalXp} XP · Stage ${state.companionStage}',
+                        '${state.totalXp} XP, Stage ${state.companionStage}',
                       ),
                     ],
                   ),
@@ -114,7 +113,7 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${skill.key} · ${(skill.value * 100).round()}%'),
+                        Text('${skill.key}, ${(skill.value * 100).round()}%'),
                         const SizedBox(height: 8),
                         CurioProgressBar(
                           value: skill.value,
@@ -176,7 +175,7 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
                 _Link(
                   Icons.tune_rounded,
                   'Family preferences',
-                  '${state.dailyGoal} activities a day · reminders · email',
+                  '${state.dailyGoal} activities a day, reminders, email',
                   _preferences,
                 ),
                 _Link(

@@ -43,14 +43,14 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
   @override
   Widget build(BuildContext context) {
     return CurioPage(
-      title: 'Frostlands · Night 1',
+      title: 'Frostlands, night 1',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           _SceneArt(
             icon: _complete
-                ? Icons.auto_awesome_rounded
+                ? Icons.lightbulb_outline_rounded
                 : const [
                     Icons.flare_rounded,
                     Icons.backpack_rounded,
@@ -68,11 +68,6 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
     final scene = frostlandsScenes[_path.length];
     final seenBefore = _path.isEmpty && completedAlready(context, _story);
     return [
-      CurioEyebrow(
-        'Scene ${_path.length + 1} of ${frostlandsScenes.length}',
-        color: CurioTokens.tintLogic,
-      ),
-      const SizedBox(height: 8),
       Semantics(
         header: true,
         child: Text(
@@ -123,8 +118,6 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
     final gold = CurioTokens.tintMaths;
     final xp = gameRewards[_story]!.xp;
     return [
-      CurioEyebrow('The end of night 1', color: CurioTokens.tintLogic),
-      const SizedBox(height: 8),
       Semantics(
         header: true,
         child: Text(
@@ -174,7 +167,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
             Text(
               [
                 for (final t in StoryTrait.values) '${t.label} ${tally[t]}',
-              ].join(' · '),
+              ].join(', '),
               style: TextStyle(color: muted, fontWeight: FontWeight.w700),
             ),
           ],
@@ -196,7 +189,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
               child: Text(
                 _alreadyDone
                     ? 'You’ve already earned this story’s XP, this path was for fun.'
-                    : '+$xp XP · Aurora discovery unlocked',
+                    : '+$xp XP, Aurora discovery unlocked',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   height: 1.35,

@@ -87,7 +87,7 @@ class _WeeklyEmailCardState extends State<WeeklyEmailCard> {
         const SizedBox(height: 8),
         if (_settings != null)
           Text(
-            'Mondays after 8 AM · ${_settings!.timezone.replaceAll('_', ' ')}',
+            'Mondays after 8 AM, ${_settings!.timezone.replaceAll('_', ' ')}',
           ),
         if (_service.parentEmail case final email?) ...[
           const SizedBox(height: 4),

@@ -71,7 +71,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 4),
           Center(
             child: Text(
-              'Curious Explorer · Stage ${state.companionStage}',
+              'Stage ${state.companionStage}',
               style: TextStyle(color: inkMuted),
             ),
           ),
@@ -258,7 +258,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 16),
           Center(
             child: Text(
-              'Curio · Learning should feel like discovery',
+              'Curio Learning should feel like discovery',
               style: TextStyle(color: inkMuted, fontSize: 13),
             ),
           ),

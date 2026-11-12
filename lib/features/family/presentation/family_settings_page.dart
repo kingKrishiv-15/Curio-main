@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/features/games/common/daily_schedule.dart';
 import 'package:curio/theme/curio_tokens.dart';
 import '../../../core/models/family_settings.dart';
 import '../../../core/services/family_service.dart';
@@ -130,9 +131,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                           ? null
                           : (v) => setState(() => _goal = v.round()),
                     ),
-                    const Text(
-                      'One daily game each in Maths, Memory, English and Logic. Replays are for practice.',
-                    ),
+                    Text('One daily game each in $sectionNames.'),
                   ],
                 ),
               ),

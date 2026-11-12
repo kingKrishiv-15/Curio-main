@@ -82,7 +82,7 @@ class _BridgePageState extends State<BridgePage> {
 
   String get _share {
     final marks = _rounds.map((r) => r.hints == 0 ? '🟩' : '🟨').join();
-    return 'Curio · Bridge\n$marks  $_total/${_rounds.length * 100}';
+    return 'Curio Bridge\n$marks  $_total/${_rounds.length * 100}';
   }
 
   @override
@@ -96,7 +96,6 @@ class _BridgePageState extends State<BridgePage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice bridges' : 'Daily number puzzle',
             title: _allSolved && last
                 ? 'Every bridge built.'
                 : 'Build the bridge',

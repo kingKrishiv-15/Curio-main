@@ -108,8 +108,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
       '${n == 0 ? 'No' : n} $thing${n == 1 ? '' : 's'}';
 
   String get _share =>
-      'Curio · Link Lab\n${_puzzle.shareGrid()}\n'
-      '${_count(_puzzle.mistakes, 'mistake')} · '
+      'Curio Link Lab\n${_puzzle.shareGrid()}\n'
+      '${_count(_puzzle.mistakes, 'mistake')}, '
       '${_count(_puzzle.hints, 'hint').toLowerCase()}';
 
   @override
@@ -122,9 +122,8 @@ class _LinkLabPageState extends State<LinkLabPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice puzzle' : 'Daily knowledge puzzle',
             title: puzzle.won
-                ? 'Brilliantly connected.'
+                ? 'You found every group'
                 : 'Find the hidden links',
             subtitle:
                 'Make four groups of four. Hints are free and mistakes never end the game.',
@@ -219,7 +218,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
                   ? 'Flawless links!'
                   : puzzle.mistakes == 0
                   ? 'No mistakes!'
-                  : 'All four linked!',
+                  : 'All groups found',
               score: _count(puzzle.mistakes, 'mistake'),
               shareText: _share,
               xp: _practice ? null : gameRewards[_game]!.xp,
@@ -395,7 +394,7 @@ class _GroupBar extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  group.title.toUpperCase(),
+                  group.title,
                   style: TextStyle(
                     color: ink,
                     fontWeight: FontWeight.w900,
@@ -407,7 +406,7 @@ class _GroupBar extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            group.words.join(' · '),
+            group.words.join(', '),
             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
           const SizedBox(height: 8),

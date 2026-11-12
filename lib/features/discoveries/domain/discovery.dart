@@ -132,7 +132,7 @@ const discoveries = <Discovery>[
     fact:
         'Auroras glow when charged solar particles interact with gases in Earth\'s atmosphere.',
     category: 'World',
-    icon: Icons.auto_awesome_rounded,
+    icon: Icons.lightbulb_outline_rounded,
   ),
   Discovery(
     id: 'classification_science',

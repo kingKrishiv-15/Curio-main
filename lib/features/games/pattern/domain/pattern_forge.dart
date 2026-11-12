@@ -33,8 +33,8 @@ class PatternRule {
 
   final RuleKind kind;
 
-  /// add: the step · multiply/divide: the factor · steps: first step and how
-  /// much it grows · alternate: the two steps · doublePlus: × a, then + b.
+  /// add: the step, multiply/divide: the factor, steps: first step and how
+  /// much it grows, alternate: the two steps, doublePlus: × a, then + b.
   final int a, b;
 
   /// Starting numbers the rule needs before it can carry on.

@@ -97,7 +97,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
         _celebrate(
           round,
           round.points == WhoRound.startPoints
-              ? 'Spot on, no help needed!'
+              ? 'Solved with no hints'
               : 'Solved!',
         );
       } else if (result.empty > 0) {
@@ -176,7 +176,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
     final marks = _rounds
         .map((r) => r.points == WhoRound.startPoints ? '🟩' : '🟨')
         .join();
-    return 'Curio · Who’s Who\n$marks  $_total/$_maxTotal';
+    return 'Curio Who’s Who\n$marks  $_total/$_maxTotal';
   }
 
   @override
@@ -192,7 +192,6 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice round' : 'Daily logic puzzle',
             title: showResult ? 'Everyone sorted!' : 'Who has what?',
             subtitle:
                 'Read the clues, then fill in the table. Every clue is true!',
@@ -248,7 +247,9 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
             )
           else
             GameResultCard(
-              title: _total == _maxTotal ? 'Logic legend!' : 'Nicely reasoned.',
+              title: _total == _maxTotal
+                  ? 'Solved at full points'
+                  : 'Puzzles solved',
               score: '$_total / $_maxTotal',
               shareText: _share,
               xp: _practice ? null : gameRewards[_game]!.xp,
@@ -308,7 +309,7 @@ class _ClueCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'PUZZLE $number OF $total · CLUES',
+                    'Puzzle $number of $total',
                     style: TextStyle(
                       color: muted,
                       fontSize: 13,
@@ -728,7 +729,7 @@ class _AnswerCell extends StatelessWidget {
                       children: [
                         if (caption)
                           Text(
-                            category.label.toUpperCase(),
+                            category.label,
                             style: TextStyle(
                               color: soft,
                               fontSize: 13,

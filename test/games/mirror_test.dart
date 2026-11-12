@@ -81,8 +81,8 @@ Future<void> solve(WidgetTester tester, MirrorPuzzle puzzle) async {
     await tap(tester, find.byKey(Key('mirror_cell_$cell')));
   }
   await tap(tester, find.byKey(const Key('mirror_check')));
-  await reveal(tester, find.textContaining('Perfect reflection'));
-  expect(find.textContaining('Perfect reflection'), findsOneWidget);
+  await reveal(tester, find.textContaining('Every square matches'));
+  expect(find.textContaining('Every square matches'), findsOneWidget);
 }
 
 Future<void> playAll(WidgetTester tester, List<MirrorPuzzle> puzzles) async {
@@ -468,7 +468,7 @@ void main() {
     await playAll(tester, today());
     await reveal(tester, find.text('300 / 300'));
     expect(find.text('300 / 300'), findsOneWidget);
-    expect(find.text('Mirror master!'), findsOneWidget);
+    expect(find.text('Every board mirrored at full points'), findsOneWidget);
     expect(find.text('+80 XP earned'), findsOneWidget);
     expect(state.completedToday('mirror'), isTrue);
     expect(state.totalXp, xpBefore + 80);
@@ -524,8 +524,8 @@ void main() {
     await reveal(tester, find.text('No points'));
     expect(find.text('No points'), findsOneWidget);
     await tap(tester, find.byKey(const Key('mirror_next')));
-    await reveal(tester, find.text('PUZZLE 2 OF 3'));
-    expect(find.text('PUZZLE 2 OF 3'), findsOneWidget);
+    await reveal(tester, find.text('Puzzle 2 of 3'));
+    expect(find.text('Puzzle 2 of 3'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -569,8 +569,8 @@ void main() {
     expect(state.totalXp, xpBefore + 80);
 
     await tap(tester, find.byKey(const Key('game_practice')));
-    await reveal(tester, find.text('PRACTICE'));
-    expect(find.text('PRACTICE'), findsOneWidget);
+    await reveal(tester, find.text('Practice'));
+    expect(find.text('Practice'), findsOneWidget);
     await playAll(
       tester,
       mirrorPuzzles(mirrorSeed(DailyPick.dayNumber(day), practice: 1)),

@@ -133,7 +133,7 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
   }
 
   String get _share =>
-      'Curio · Word Trails\n${'📖' * _trail.story.words.length}  '
+      'Curio Word Trails\n${'📖' * _trail.story.words.length}  '
       '${_mistakes == 0 ? 'no slips' : '$_mistakes ${_mistakes == 1 ? 'slip' : 'slips'}'}';
 
   @override
@@ -146,7 +146,6 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice > 0 ? 'Practice story' : 'Daily word trail',
             title: _trail.finished ? 'Story told.' : _trail.story.title,
             subtitle:
                 'Find the story’s missing words in the letters, then show you '

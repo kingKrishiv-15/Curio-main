@@ -103,7 +103,6 @@ class _MemoryPageState extends State<MemoryPage> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       children: [
         GameHeader(
-          eyebrow: 'Today’s memory game',
           title: _title,
           subtitle: widget.trail
               ? 'Look carefully. Remember the order. Follow the trail.'
@@ -127,7 +126,7 @@ class _MemoryPageState extends State<MemoryPage> {
             title: widget.trail ? 'Trail complete!' : 'Every pair found!',
             score: widget.trail ? '${_trail.score} / 5' : '6 / 6 pairs',
             shareText:
-                'Curio · $_title\n${widget.trail ? '${_trail.score} of 5 trails remembered' : 'Six pairs in ${_match.moves} turns'}',
+                'Curio $_title\n${widget.trail ? '${_trail.score} of 5 trails remembered' : 'Six pairs in ${_match.moves} turns'}',
             gameId: _id,
             xp: _practice == 0 ? gameRewards[_id]!.xp : null,
             alreadyDone: _alreadyDone,
@@ -137,7 +136,7 @@ class _MemoryPageState extends State<MemoryPage> {
           ..._trailBoard()
         else ...[
           Text(
-            '${_match.matched.length ~/ 2} of 6 pairs · ${_match.moves} turns',
+            '${_match.matched.length ~/ 2} of 6 pairs, ${_match.moves} turns',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
@@ -182,7 +181,7 @@ class _MemoryPageState extends State<MemoryPage> {
 
   List<Widget> _trailBoard() => [
     Text(
-      'Trail ${_trail.round + 1} of 5 · ${_trail.trail.length} pictures',
+      'Trail ${_trail.round + 1} of 5, ${_trail.trail.length} pictures',
       style: Theme.of(context).textTheme.titleMedium,
     ),
     const SizedBox(height: 12),

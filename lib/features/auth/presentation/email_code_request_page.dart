@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/services/auth_service.dart';
-import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'verify_code_page.dart';
@@ -76,8 +75,6 @@ class _EmailCodeRequestPageState extends State<EmailCodeRequestPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CurioEyebrow(_recovery ? 'Password help' : 'No password needed'),
-            const SizedBox(height: 12),
             Semantics(
               header: true,
               child: Text(

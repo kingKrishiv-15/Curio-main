@@ -31,13 +31,6 @@ class _ScalePageState extends State<ScalePage> {
     'The scale tips to the true side, then shows both amounts written the same way so you can see why.',
     'Eight rounds a day: three warm-ups, three mixed forms, then two close calls.',
   ];
-  static const _cheers = [
-    'Spot on!',
-    'Nicely weighed!',
-    'Sharp thinking!',
-    'Yes, well judged!',
-  ];
-
   final _scroll = ScrollController();
   final _nextKey = GlobalKey();
   late ScaleGame _game = _newGame();
@@ -127,29 +120,25 @@ class _ScalePageState extends State<ScalePage> {
     final side = answer == ScaleSide.left ? 'left' : 'right';
     if (pick == answer) {
       return answer == ScaleSide.equal
-          ? 'Perfectly balanced, they’re equal!'
-          : '${_cheers[_game.current % _cheers.length]} The $side side is more.';
+          ? 'You spotted that they are equal.'
+          : 'You picked the $side side, and it is more.';
     }
     if (answer == ScaleSide.equal) {
-      return 'Not quite, they’re exactly equal. Same amount, different look!';
+      return 'They are exactly equal: the same amount written two ways.';
     }
     if (pick == ScaleSide.equal) {
-      return 'Not quite, they’re not equal. The $side side is more.';
+      return 'They are not equal. The $side side is more.';
     }
     return round.tier == ScaleTier.close
-        ? 'Not quite, the $side side is more. Close calls are tricky!'
-        : 'Not quite, the $side side is more.';
+        ? 'The $side side is more, by a small margin.'
+        : 'The $side side is more.';
   }
 
-  String get _resultTitle => switch (_game.score) {
-    8 => 'Perfectly balanced!',
-    >= 6 => 'Nicely weighed!',
-    >= 4 => 'Good weighing.',
-    _ => 'Every weigh-in teaches something.',
-  };
+  String get _resultTitle =>
+      '${_game.score} of ${_game.rounds.length} weighed correctly';
 
   String get _share =>
-      'Curio · Tip the Scale\n${_game.shareGrid}  ${_game.score}/${_game.rounds.length}';
+      'Curio Tip the Scale\n${_game.shareGrid}  ${_game.score}/${_game.rounds.length}';
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +152,6 @@ class _ScalePageState extends State<ScalePage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice round' : 'Daily number puzzle',
             title: _showResult ? 'All weighed up.' : 'Which side is more?',
             subtitle:
                 'Weigh up two amounts, then tap the side that’s more, or call it equal.',
@@ -273,7 +261,7 @@ class _Board extends StatelessWidget {
             runSpacing: 8,
             children: [
               Text(
-                'ROUND ${index + 1} OF $total',
+                'Round ${index + 1} of $total',
                 style: TextStyle(
                   color: muted,
                   fontSize: 13,
@@ -352,7 +340,7 @@ class _TierTag extends StatelessWidget {
   }
 }
 
-/// "3/4 = 0.750 · 5/8 = 0.625 → left is more", broken only between parts.
+/// "3/4 = 0.750, 5/8 = 0.625 → left is more", broken only between parts.
 class _Working extends StatelessWidget {
   const _Working({required this.round});
   final ScaleRound round;

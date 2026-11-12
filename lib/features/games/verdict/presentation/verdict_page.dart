@@ -31,14 +31,6 @@ class _VerdictPageState extends State<VerdictPage> {
     'Judge only what the evidence shows, not what you already think.',
     'Five claims a day. After each one, see why, and the thinking tool that cracks it.',
   ];
-  static const _praise = [
-    'Spot on!',
-    'Nicely weighed!',
-    'Sharp thinking!',
-    'Exactly right!',
-    'Well judged!',
-  ];
-
   final _scroll = ScrollController();
   final _revealKey = GlobalKey();
   late VerdictGame _game = VerdictGame(verdictDailySet(_day));
@@ -117,7 +109,7 @@ class _VerdictPageState extends State<VerdictPage> {
   }
 
   String get _share =>
-      'Curio · Verdict\n${_game.shareGrid}  ${_game.score}/${_game.rounds.length}';
+      'Curio Verdict\n${_game.shareGrid}  ${_game.score}/${_game.rounds.length}';
 
   String _notice(VerdictRound round) {
     final finding = switch (round.item.verdict) {
@@ -125,9 +117,8 @@ class _VerdictPageState extends State<VerdictPage> {
       Verdict.against => 'the evidence goes against the claim',
       Verdict.cantTell => 'this evidence can’t settle it yet',
     };
-    if (!round.right) return 'Not quite, $finding. Here’s why.';
-    final praise = _praise[_game.current % _praise.length];
-    return '$praise ${finding[0].toUpperCase()}${finding.substring(1)}.';
+    if (!round.right) return 'Here $finding.';
+    return 'You judged it correctly: $finding.';
   }
 
   String get _resultTitle => switch (_game.score) {
@@ -147,7 +138,6 @@ class _VerdictPageState extends State<VerdictPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice round' : 'Daily evidence puzzle',
             title: _showResult ? 'The verdicts are in.' : 'Weigh the evidence',
             subtitle:
                 'Read the claim, then the evidence. Does it back the claim up, knock it down, or leave us guessing?',
@@ -260,7 +250,6 @@ class _ClaimCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blue = CurioTokens.tintLogic;
     final soft = CurioTokens.textSecondary;
     return GlassCard(
       radius: CurioTokens.radiusCard,
@@ -269,27 +258,13 @@ class _ClaimCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ExcludeSemantics(
-            child: Text(
-              '“',
-              textScaler: TextScaler.noScaling,
-              style: TextStyle(
-                fontFamily: 'Fraunces',
-                fontSize: 32,
-                height: 1,
-                fontWeight: FontWeight.w600,
-                color: blue,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
                 Text(
-                  'CLAIM ${index + 1} OF $total',
+                  'Claim ${index + 1} of $total',
                   semanticsLabel: 'Claim ${index + 1} of $total',
                   style: TextStyle(
                     color: soft,
@@ -336,7 +311,7 @@ class _EvidenceCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
-                    'EVIDENCE',
+                    'Evidence',
                     semanticsLabel: 'Evidence',
                     style: TextStyle(
                       color: soft,

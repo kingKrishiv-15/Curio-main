@@ -118,7 +118,7 @@ class _SequencePageState extends State<SequencePage> {
               : '🟨',
         )
         .join();
-    return 'Curio · Sequence\n$marks  $_total/${_roundsPerDay * SequenceRound.startPoints}';
+    return 'Curio Sequence\n$marks  $_total/${_roundsPerDay * SequenceRound.startPoints}';
   }
 
   @override
@@ -131,8 +131,7 @@ class _SequencePageState extends State<SequencePage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice sequences' : 'Daily pattern puzzle',
-            title: showResult ? 'Patterns spotted.' : 'What comes next?',
+            title: showResult ? 'Rules found' : 'What comes next?',
             subtitle:
                 'Commit early for big points, or buy more evidence first. Your call.',
             chips: [
@@ -212,7 +211,7 @@ class _SequencePageState extends State<SequencePage> {
             else
               GameResultCard(
                 gameId: 'sequence',
-                title: _total >= 240 ? 'Pattern master!' : 'Well reasoned.',
+                title: _total >= 240 ? 'Rules found early' : 'Rules found',
                 score: '$_total / ${_roundsPerDay * SequenceRound.startPoints}',
                 shareText: _share,
                 xp: _practice ? null : 80,
@@ -252,7 +251,7 @@ class _SequenceCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'SEQUENCE ${index + 1} OF $total',
+                  'Sequence ${index + 1} of $total',
                   style: TextStyle(
                     color: muted,
                     fontSize: 13,

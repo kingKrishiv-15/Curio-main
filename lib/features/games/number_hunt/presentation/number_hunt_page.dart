@@ -9,7 +9,6 @@ import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
 import '../../game_catalog.dart';
-import '../../presentation/game_banner.dart';
 import '../domain/number_hunt.dart';
 
 class NumberHuntPage extends StatefulWidget {
@@ -114,7 +113,7 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
           },
         )
         .join();
-    return 'Curio · Number Hunt\n$marks  '
+    return 'Curio Number Hunt\n$marks  '
         '${_hunt.found ? '${_hunt.guesses.length}/${NumberHunt.maxGuesses}' : 'X/${NumberHunt.maxGuesses}'}';
   }
 
@@ -131,7 +130,6 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
-            eyebrow: _practice ? 'Practice hunt' : 'Daily number hunt',
             title: _hunt.over
                 ? (_hunt.found ? 'Tracked down.' : 'It got away.')
                 : 'Find the number.',
