@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 import '../../../core/services/family_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/text_prompt_dialog.dart';
 import '../../auth/presentation/auth_layout.dart';
@@ -98,21 +97,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
+    final muted = CurioTokens.textSecondary;
+    final forest = CurioTokens.accent;
+    final danger = CurioTokens.wrong;
     return CurioPage(
       title: 'Privacy and your data',
       child: ListView(
@@ -122,36 +109,36 @@ class _PrivacyPageState extends State<PrivacyPage> {
             'Your family, your choices.',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'What Curio keeps, why it keeps it, and how to take it with you or delete it.',
             style: TextStyle(color: muted),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           const _InfoCard(
             icon: Icons.lock_outline_rounded,
             title: 'What Curio keeps',
             body:
                 'Your parent email, your explorer’s nickname, activity history, learning progress, family preferences and weekly reports. Only your signed-in account can see them. There’s no advertising or analytics SDK in Curio.',
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           const _InfoCard(
             icon: Icons.mark_email_unread_outlined,
             title: 'Emails and reminders',
             body:
                 'Both are optional and can be switched off in Family preferences. Emails are sent through an email provider only when you turn them on. Notifications are kept for 90 days; learning history and weekly reports stay until you delete your account.',
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           const _InfoCard(
             icon: Icons.smartphone_rounded,
             title: 'On this device',
             body:
-                'A copy of learning progress is kept here so nothing is lost if the connection drops. Signing out clears it after a final sync. Please use a parent or guardian’s email — a nickname is all your explorer needs.',
+                'A copy of learning progress is kept here so nothing is lost if the connection drops. Signing out clears it after a final sync. Please use a parent or guardian’s email, a nickname is all your explorer needs.',
           ),
           if (!_service.isDemo) ...[
-            const SizedBox(height: 26),
+            const SizedBox(height: 24),
             const SectionHeading('Your data'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             CurioCard(
               padding: EdgeInsets.zero,
               child: Column(
@@ -159,13 +146,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   ListTile(
                     enabled: !_busy,
                     onTap: _export,
-                    contentPadding: const EdgeInsets.fromLTRB(14, 6, 12, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
                     leading: CurioIconTile(
                       icon: Icons.download_rounded,
                       color: forest,
                       size: 38,
                       iconSize: 19,
-                      radius: 12,
+                      radius: CurioTokens.radiusCard,
                     ),
                     title: const Text(
                       'Export my account data',
@@ -178,13 +165,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   ListTile(
                     enabled: !_busy,
                     onTap: _delete,
-                    contentPadding: const EdgeInsets.fromLTRB(14, 6, 12, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
                     leading: CurioIconTile(
                       icon: Icons.delete_outline_rounded,
                       color: danger,
                       size: 38,
                       iconSize: 19,
-                      radius: 12,
+                      radius: CurioTokens.radiusCard,
                     ),
                     title: Text(
                       'Delete family account',
@@ -227,11 +214,7 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return CurioCard(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -239,16 +222,12 @@ class _InfoCard extends StatelessWidget {
         children: [
           CurioIconTile(
             icon: icon,
-            color: curioColor(
-              context,
-              CurioColors.forest,
-              CurioColorsLight.forest,
-            ),
+            color: CurioTokens.accent,
             size: 38,
             iconSize: 19,
-            radius: 12,
+            radius: CurioTokens.radiusCard,
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

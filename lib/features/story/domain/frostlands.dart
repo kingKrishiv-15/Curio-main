@@ -1,6 +1,6 @@
 /// Frostlands, Night 1: three scenes, three choices each. Every choice is
 /// careful, brave or kind, and the trait chosen most decides how the night
-/// ends — with a fourth ending for a path that used all three.
+/// ends, with a fourth ending for a path that used all three.
 enum StoryTrait { careful, brave, kind }
 
 extension StoryTraitLabel on StoryTrait {
@@ -17,7 +17,7 @@ class StoryChoice {
   final String label;
   final StoryTrait trait;
 
-  /// What happened because of it — shown at the start of the next scene.
+  /// What happened because of it, shown at the start of the next scene.
   final String outcome;
 }
 
@@ -47,7 +47,7 @@ const frostlandsScenes = <StoryScene>[
       StoryChoice(
         'Follow the blue light into the trees',
         StoryTrait.brave,
-        'Ash slipped into the dark trees and followed the flickering light — straight to an old lantern, still glowing.',
+        'Ash slipped into the dark trees and followed the flickering light, straight to an old lantern, still glowing.',
       ),
       StoryChoice(
         'Find the small voice first',
@@ -79,7 +79,7 @@ const frostlandsScenes = <StoryScene>[
   ),
   StoryScene(
     'The warm cave',
-    'In a cave, a traveller shelters beside a crystal that glows with warmth. They offer to guide Ash home — if Ash can spare some food.',
+    'In a cave, a traveller shelters beside a crystal that glows with warmth. They offer to guide Ash home, if Ash can spare some food.',
     [
       StoryChoice(
         'Ask how they know the way',
@@ -103,7 +103,7 @@ const frostlandsScenes = <StoryScene>[
 const frostlandsEndings = <String, StoryEnding>{
   'careful': StoryEnding(
     'The safe path',
-    'Step by careful step, Ash brought everyone home without a single slip. Checking first made the wild Frostlands feel a little less wild — and from the safe path, the aurora shimmered green overhead.',
+    'Step by careful step, Ash brought everyone home without a single slip. Checking first made the wild Frostlands feel a little less wild, and from the safe path, the aurora shimmered green overhead.',
   ),
   'brave': StoryEnding(
     'The bold route',

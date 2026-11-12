@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/game_catalog.dart';
 import '../../games/presentation/game_card.dart';
@@ -26,11 +25,7 @@ class SkillGamesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final color = skillColor(context, skill);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     final mastery = (state.skills[skill] ?? 0).clamp(0, 1).toDouble();
     bool done(GameEntry g) => g.isDaily
         ? state.completedToday(g.id)
@@ -44,7 +39,7 @@ class SkillGamesPage extends StatelessWidget {
       title: skill,
       maxWidth: 1040,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           CurioCard(
             color: color.withValues(alpha: .1),
@@ -58,7 +53,7 @@ class SkillGamesPage extends StatelessWidget {
                   size: 52,
                   iconSize: 26,
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,12 +62,12 @@ class SkillGamesPage extends StatelessWidget {
                         'Level ${SkillQuestPage.levelFor(mastery)}',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         _about[skill] ?? '',
                         style: TextStyle(color: muted, fontSize: 13),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -82,12 +77,12 @@ class SkillGamesPage extends StatelessWidget {
                               height: 7,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Text(
                             '${(mastery * 100).round()}% mastery',
                             style: TextStyle(
                               color: muted,
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

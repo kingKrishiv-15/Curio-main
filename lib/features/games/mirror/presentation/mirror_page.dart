@@ -1,11 +1,10 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
@@ -30,7 +29,7 @@ class _MirrorPageState extends State<MirrorPage> {
     'Tap squares on the other side to paint the pattern’s reflection. Tap a square again to rub it out.',
     'Press Check when it looks right. Right on the first check scores 100, the second 60, the third 30.',
     'After a check, ✕ marks a square that shouldn’t be painted and a dotted outline shows one that’s missing.',
-    'Three mirrors a day: down the middle, across the middle, then corner to corner — the trickiest!',
+    'Three mirrors a day: down the middle, across the middle, then corner to corner, the trickiest!',
   ];
 
   final _introKey = GlobalKey();
@@ -83,7 +82,7 @@ class _MirrorPageState extends State<MirrorPage> {
         _tone = GameNoticeTone.good;
       } else if (round.revealed) {
         _message =
-            'Here’s the true reflection: dotted squares were missing and ✕ squares weren’t needed. Mirrors are tricky — well tried!';
+            'Here’s the true reflection: dotted squares were missing and ✕ squares weren’t needed. Mirrors are tricky, well tried!';
         _tone = GameNoticeTone.bad;
       } else {
         final extra = result.extra.length;
@@ -91,7 +90,7 @@ class _MirrorPageState extends State<MirrorPage> {
         _message =
             '${result.right} of ${result.total} squares right'
             '${extra == 0 ? '' : ', plus $extra that shouldn’t be painted'}. '
-            'Fix the marked squares and check again — '
+            'Fix the marked squares and check again, '
             '$left ${left == 1 ? 'check' : 'checks'} left.';
         _tone = extra + result.missing.length <= 2
             ? GameNoticeTone.close
@@ -136,8 +135,8 @@ class _MirrorPageState extends State<MirrorPage> {
           intro,
           duration: MediaQuery.disableAnimationsOf(context)
               ? Duration.zero
-              : const Duration(milliseconds: 350),
-          curve: Curves.easeOutCubic,
+              : CurioTokens.slow,
+          curve: CurioTokens.curve,
         ),
       );
     });
@@ -151,7 +150,7 @@ class _MirrorPageState extends State<MirrorPage> {
     if (_total == _maxTotal) return 'Mirror master!';
     if (_total >= 200) return 'Sharp eyes!';
     if (_total >= 100) return 'Nicely reflected!';
-    return 'Well tried — mirrors are tricky!';
+    return 'Well tried, mirrors are tricky!';
   }
 
   @override
@@ -164,7 +163,7 @@ class _MirrorPageState extends State<MirrorPage> {
       title: 'Mirror',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice round' : 'Daily pattern puzzle',
@@ -172,7 +171,7 @@ class _MirrorPageState extends State<MirrorPage> {
             subtitle:
                 'Flip the pattern across the dashed mirror line, square by square.',
             chips: const [
-              GameMetaChip(icon: Icons.schedule_rounded, label: '3–4 min'),
+              GameMetaChip(icon: Icons.schedule_rounded, label: '3 to 4 min'),
               GameMetaChip(icon: Icons.blur_on_rounded, label: 'Patterns'),
             ],
             trailing: _PuzzlePips(rounds: _rounds, current: _current),
@@ -197,12 +196,12 @@ class _MirrorPageState extends State<MirrorPage> {
             const SizedBox(height: 12),
             _Legend(revealed: round.revealed),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           GameNotice(
             message: _message ?? _tip(round.puzzle.axis),
             tone: _message == null ? GameNoticeTone.info : _tone,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (!round.over) ...[
             PrimaryButton(
               key: const Key('mirror_check'),
@@ -264,21 +263,9 @@ class _PuzzleIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final accent = curioColor(
-      context,
-      CurioColors.coralStrong,
-      CurioColorsLight.coralStrong,
-    );
+    final muted = CurioTokens.textSecondary;
+    final soft = CurioTokens.textSecondary;
+    final accent = CurioTokens.wrong;
     final (title, how) = switch (round.puzzle.axis) {
       MirrorAxis.vertical => (
         'Mirror down the middle',
@@ -304,9 +291,8 @@ class _PuzzleIntro extends StatelessWidget {
                 'PUZZLE ${index + 1} OF $total',
                 style: TextStyle(
                   color: muted,
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
                 ),
               ),
             ),
@@ -319,9 +305,9 @@ class _PuzzleIntro extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(title, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 3),
+        const SizedBox(height: 4),
         Text(how, style: TextStyle(color: soft, height: 1.4)),
       ],
     );
@@ -414,7 +400,7 @@ class _MirrorBoardState extends State<_MirrorBoard>
     _syncGlint();
   }
 
-  /// The mirror glints while there's painting to do — and only when motion
+  /// The mirror glints while there's painting to do, and only when motion
   /// is allowed.
   void _syncGlint() {
     if (widget.round.over) {
@@ -472,11 +458,7 @@ class _MirrorBoardState extends State<_MirrorBoard>
     // turned sideways.
     final side = (MediaQuery.sizeOf(context).height - 140).clamp(260.0, 430.0);
     final extra = round.markedExtra, missing = round.markedMissing;
-    final success = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.success,
-    );
+    final success = CurioTokens.correct;
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: side),
@@ -488,13 +470,11 @@ class _MirrorBoardState extends State<_MirrorBoard>
             tween: ColorTween(
               end: round.solved ? success : success.withValues(alpha: 0),
             ),
-            duration: reduceMotion
-                ? Duration.zero
-                : const Duration(milliseconds: 300),
+            duration: reduceMotion ? Duration.zero : CurioTokens.slow,
             builder: (context, ring, child) => CurioClay(
-              radius: CurioRadius.large,
+              radius: CurioTokens.radiusCard,
               outline: ring,
-              padding: const EdgeInsets.all(2),
+              padding: const EdgeInsets.all(4),
               child: child!,
             ),
             child: LayoutBuilder(
@@ -531,17 +511,9 @@ class _MirrorBoardState extends State<_MirrorBoard>
                               axis: puzzle.axis,
                               glint: _glint,
                               showGlint: !reduceMotion && !round.over,
-                              line: curioColor(
-                                context,
-                                CurioColors.ink,
-                                CurioColorsLight.ink,
-                              ),
+                              line: CurioTokens.textPrimary,
                               halo: clayBase(context),
-                              shine: curioColor(
-                                context,
-                                CurioColors.spark,
-                                CurioColorsLight.spark,
-                              ),
+                              shine: CurioTokens.tintMaths,
                             ),
                           ),
                         ),
@@ -584,7 +556,7 @@ class _Cell extends StatelessWidget {
         child: InkWell(
           key: Key('mirror_cell_$index'),
           onTap: onTap,
-          borderRadius: BorderRadius.circular(_cellRadius(extent)),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           child: _CellFace(look: look, extent: extent, index: index),
         ),
       ),
@@ -607,27 +579,11 @@ class _CellFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
+    final coral = CurioTokens.wrong;
     // Coral is a bright accent in both modes, so marks on it are dark (§7).
-    final onCoral = curioColor(
-      context,
-      CurioColors.night,
-      CurioColorsLight.ink,
-    );
-    final faint = curioColor(
-      context,
-      CurioColors.outlineSoft,
-      CurioColorsLight.outlineSoft,
-    );
-    final hint = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
+    final onCoral = CurioTokens.base;
+    final faint = CurioTokens.border;
+    final hint = CurioTokens.tintMaths;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final radius = _cellRadius(extent);
 
@@ -658,10 +614,8 @@ class _CellFace extends StatelessWidget {
               // A new mark pops in; with reduced motion it's simply there.
               key: ValueKey(look),
               tween: Tween(begin: reduceMotion ? 1 : .55, end: 1),
-              duration: reduceMotion
-                  ? Duration.zero
-                  : const Duration(milliseconds: 220),
-              curve: Curves.easeOutBack,
+              duration: reduceMotion ? Duration.zero : CurioTokens.slow,
+              curve: CurioTokens.curve,
               builder: (context, scale, child) =>
                   Transform.scale(scale: scale, child: child),
               child: glyph,
@@ -672,17 +626,15 @@ class _CellFace extends StatelessWidget {
     Widget face = look == _Look.patternEmpty
         ? DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(radius),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               border: Border.all(color: faint, width: 1.2),
             ),
             child: body,
           )
         : TweenAnimationBuilder<Color?>(
             tween: ColorTween(end: filled ? coral : clayBase(context)),
-            duration: reduceMotion
-                ? Duration.zero
-                : const Duration(milliseconds: 140),
-            curve: Curves.easeOut,
+            duration: reduceMotion ? Duration.zero : CurioTokens.fast,
+            curve: CurioTokens.curve,
             builder: (context, colour, child) => CurioClay(
               radius: radius,
               color: colour,
@@ -807,15 +759,14 @@ class _MirrorLinePainter extends CustomPainter {
     // The glint crosses in the first part of each loop, then rests.
     final t = glint.value / .4;
     if (t >= 1) return;
-    final centre = start + along * Curves.easeInOut.transform(t);
+    final centre = start + along * CurioTokens.curve.transform(t);
     canvas.drawLine(
       centre - step * 14,
       centre + step * 14,
       Paint()
         ..color = shine.withValues(alpha: .9 * math.sin(math.pi * t))
         ..strokeWidth = 7
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+        ..strokeCap = StrokeCap.round,
     );
   }
 
@@ -837,11 +788,7 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final soft = CurioTokens.textSecondary;
     Widget item(_Look look, String text) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -857,7 +804,7 @@ class _Legend extends StatelessWidget {
             text,
             style: TextStyle(
               color: soft,
-              fontSize: 12.5,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -866,12 +813,12 @@ class _Legend extends StatelessWidget {
     );
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: 18,
+      spacing: 16,
       runSpacing: 8,
       children: [
         item(_Look.wrong, 'Shouldn’t be painted'),
         if (revealed)
-          item(_Look.missed, 'Missed — part of the reflection')
+          item(_Look.missed, 'Missed, part of the reflection')
         else
           item(_Look.missing, 'Missing'),
       ],
@@ -898,32 +845,16 @@ class _PuzzlePips extends StatelessWidget {
               // The current puzzle is a longer pill, not just another colour.
               width: i == current && !rounds[i].over ? 20 : 10,
               height: 10,
-              margin: const EdgeInsets.only(left: 5),
+              margin: const EdgeInsets.only(left: 4),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(99),
+                borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
                 color: rounds[i].solved
-                    ? curioColor(
-                        context,
-                        CurioColors.success,
-                        CurioColorsLight.success,
-                      )
+                    ? CurioTokens.correct
                     : rounds[i].revealed
-                    ? curioColor(
-                        context,
-                        CurioColors.danger,
-                        CurioColorsLight.danger,
-                      )
+                    ? CurioTokens.wrong
                     : i == current
-                    ? curioColor(
-                        context,
-                        CurioColors.coral,
-                        CurioColorsLight.coral,
-                      )
-                    : curioColor(
-                        context,
-                        CurioColors.outline,
-                        CurioColorsLight.outline,
-                      ),
+                    ? CurioTokens.wrong
+                    : CurioTokens.border,
               ),
             ),
         ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A one-field dialog that returns the entered text, or null if cancelled.
 /// The dialog owns its controller, so it's disposed only after the closing
-/// animation — disposing it right after `showDialog` returns (while the
+/// animation, disposing it right after `showDialog` returns (while the
 /// field is still on screen) throws "used after being disposed".
 Future<String?> showTextPrompt(
   BuildContext context, {
@@ -84,7 +84,7 @@ class _TextPromptDialogState extends State<_TextPromptDialog> {
       children: [
         if (widget.message != null) ...[
           Text(widget.message!),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
         ],
         TextField(
           controller: _controller,

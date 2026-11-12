@@ -1,11 +1,10 @@
 import 'package:flutter/gestures.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/config/supabase_config.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
@@ -103,7 +102,7 @@ class _AuthPageState extends State<AuthPage> {
             _switchMode(
               AuthMode.signIn,
               message:
-                  'There’s already a Curio account for ${_email.text.trim()}. Sign in below — or reset your password if you’ve forgotten it.',
+                  'There’s already a Curio account for ${_email.text.trim()}. Sign in below, or reset your password if you’ve forgotten it.',
               error: false,
             );
           case SignUpOutcome.signedIn:
@@ -167,11 +166,7 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return AuthFrame(
       child: AutofillGroup(
         child: Form(
@@ -201,7 +196,7 @@ class _AuthPageState extends State<AuthPage> {
                     : 'Sign in to pick up right where your explorer left off.',
                 style: TextStyle(color: muted, height: 1.55),
               ),
-              const SizedBox(height: 26),
+              const SizedBox(height: 24),
               EmailField(controller: _email, enabled: !_loading),
               const SizedBox(height: 16),
               PasswordField(
@@ -223,7 +218,7 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                 ),
               if (_signUp) ...[
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 _ConsentRow(
                   value: _consent,
                   missing: _consentMissing,
@@ -238,7 +233,7 @@ class _AuthPageState extends State<AuthPage> {
                 const SizedBox(height: 16),
                 AuthNotice(_message!, error: _messageIsError),
               ],
-              const SizedBox(height: 22),
+              const SizedBox(height: 24),
               FilledButton(
                 key: const Key('auth_submit'),
                 onPressed: _loading ? null : _submit,
@@ -251,9 +246,9 @@ class _AuthPageState extends State<AuthPage> {
                     : Text(_signUp ? 'Create account' : 'Sign in'),
               ),
               if (!_signUp) ...[
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 const _OrDivider(),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 OutlinedButton.icon(
                   onPressed: _loading
                       ? null
@@ -262,7 +257,7 @@ class _AuthPageState extends State<AuthPage> {
                   label: const Text('Email me a sign-in code'),
                 ),
                 if (SupabaseConfig.enableGoogleAuth) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: _loading ? null : _google,
                     icon: const Icon(Icons.account_circle_outlined, size: 20),
@@ -325,17 +320,9 @@ class _ConsentRowState extends State<_ConsentRow> {
 
   @override
   Widget build(BuildContext context) {
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final danger = CurioTokens.wrong;
+    final coral = CurioTokens.wrong;
+    final ink = CurioTokens.textPrimary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -358,7 +345,7 @@ class _ConsentRowState extends State<_ConsentRow> {
                 padding: const EdgeInsets.only(top: 12),
                 child: Text.rich(
                   TextSpan(
-                    style: TextStyle(color: ink, height: 1.45, fontSize: 13.5),
+                    style: TextStyle(color: ink, height: 1.45, fontSize: 14),
                     children: [
                       const TextSpan(
                         text:
@@ -383,12 +370,12 @@ class _ConsentRowState extends State<_ConsentRow> {
         ),
         if (widget.missing)
           Padding(
-            padding: const EdgeInsets.only(left: 48, top: 2),
+            padding: const EdgeInsets.only(left: 48, top: 4),
             child: Text(
               'Please confirm you’re a parent or guardian to continue.',
               style: TextStyle(
                 color: danger,
-                fontSize: 12.5,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -406,7 +393,7 @@ class _OrDivider extends StatelessWidget {
     children: [
       const Expanded(child: Divider()),
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Text('or', style: Theme.of(context).textTheme.bodySmall),
       ),
       const Expanded(child: Divider()),

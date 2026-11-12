@@ -5,11 +5,11 @@ import 'dart:math';
 /// shared, and a handful of true clues pin down who has what.
 ///
 /// Puzzles are generated, not authored. A random answer is picked, every true
-/// clue about it is listed, and clues are added — negative and linked ones
-/// first — until a solver that tries every way of handing things out
+/// clue about it is listed, and clues are added, negative and linked ones
+/// first, until a solver that tries every way of handing things out
 /// (3!×3! = 36 for three children, 4!×4! = 576 for four) finds exactly one
 /// that fits. Then each clue is dropped in turn if the answer stays unique
-/// without it, so every clue left is needed — and the puzzle is kept only if
+/// without it, so every clue left is needed, and the puzzle is kept only if
 /// ordinary logic-grid reasoning solves it, so it never needs guessing.
 /// Tests run this over hundreds of seeds.
 enum WhoCategory {
@@ -366,7 +366,7 @@ class WhoPuzzle {
       size <= 3 ? (min: 4, max: 6) : (min: 5, max: 8);
 
   /// A head start for each kind in the seeded order clues are tried in (on
-  /// top of a random 0–99): linked clues and negatives make the player
+  /// top of a random 0 to 99): linked clues and negatives make the player
   /// combine facts, while a plain positive gives a cell away. Four children
   /// still need their one positive to stay within eight clues, so it isn't
   /// pushed right to the back.
@@ -710,8 +710,8 @@ class WhoRound {
     return WhoCheck(right: total - mistakes.length, total: total);
   }
 
-  /// Fills one cell with its answer — a ✕ cell first, then a blank one, then
-  /// any other mistake — and locks it. Returns that cell, or null when every
+  /// Fills one cell with its answer, a ✕ cell first, then a blank one, then
+  /// any other mistake, and locks it. Returns that cell, or null when every
   /// cell was already right. Solves the puzzle once the table is all right.
   WhoCell? hint() {
     if (solved) return null;

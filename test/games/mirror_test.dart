@@ -197,7 +197,7 @@ void main() {
         ],
     };
 
-    test('$seeds seeds: 30–50% filled, at least 5 squares, answers on the '
+    test('$seeds seeds: 30 to 50% filled, at least 5 squares, answers on the '
         'paint side', () {
       for (final MapEntry(key: axis, value: list) in puzzles.entries) {
         for (final (seed, p) in list.indexed) {

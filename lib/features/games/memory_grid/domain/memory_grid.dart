@@ -5,7 +5,7 @@ import 'dart:math';
 typedef GridRound = ({int size, int cells, Duration flash});
 
 /// A gentle climb: from three squares on a 3×3 grid to six on a 5×5, with
-/// a long first look that shortens a little each round. No recall timer —
+/// a long first look that shortens a little each round. No recall timer,
 /// younger players can take their time.
 const gridRounds = <GridRound>[
   (size: 3, cells: 3, flash: Duration(milliseconds: 2200)),

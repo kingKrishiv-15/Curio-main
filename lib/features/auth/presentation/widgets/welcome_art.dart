@@ -1,10 +1,9 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_logo.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
@@ -13,8 +12,8 @@ import '../../../games/game_catalog.dart';
 import '../../../games/presentation/game_banner.dart';
 import '../../../games/presentation/game_emblem.dart';
 
-/// Illustrations for the signed-out journey. Every piece is decorative —
-/// wrapped in [ExcludeSemantics] and fixed text scaling — because the words
+/// Illustrations for the signed-out journey. Every piece is decorative,
+/// wrapped in [ExcludeSemantics] and fixed text scaling, because the words
 /// next to it carry the meaning.
 
 /// A skill as it appears across Curio: the same solid colour its games
@@ -35,7 +34,7 @@ class WelcomeSkill {
   /// The same colour, deepened on light backgrounds so small text reads.
   Color ink(BuildContext context) {
     final solid = of(context);
-    return curioColor(context, solid, Color.lerp(solid, Colors.black, .3)!);
+    return solid;
   }
 
   static const all = [
@@ -88,21 +87,9 @@ class _OrbitHeroState extends State<OrbitHero>
     final s = widget.size;
     final still = MediaQuery.disableAnimationsOf(context);
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final ringColor = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
-    final spark = curioColor(
-      context,
-      CurioColors.spark,
-      CurioColorsLight.spark,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
+    final ringColor = CurioTokens.border;
+    final spark = CurioTokens.tintMaths;
+    final forest = CurioTokens.accent;
     final planet = s * .24;
     final orbit = s * .33;
     return _Decorative(
@@ -191,11 +178,7 @@ class _Planet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = skill.of(context);
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
+    final surface = CurioTokens.surface;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -212,7 +195,7 @@ class _Planet extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: surface.withValues(alpha: .92),
-            borderRadius: BorderRadius.circular(99),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
           ),
           child: Text(
             skill.label,
@@ -220,8 +203,7 @@ class _Planet extends StatelessWidget {
             style: TextStyle(
               fontSize: (size * .21).clamp(9, 12),
               fontWeight: FontWeight.w800,
-              color: curioColor(context, CurioColors.ink, CurioColorsLight.ink),
-              letterSpacing: .2,
+              color: CurioTokens.textPrimary,
             ),
           ),
         ),
@@ -246,14 +228,7 @@ class _OrbitPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final c = size.center(Offset.zero);
     final s = size.shortestSide;
-    canvas.drawCircle(
-      c,
-      s * .36,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [glow, glow.withValues(alpha: 0)],
-        ).createShader(Rect.fromCircle(center: c, radius: s * .36)),
-    );
+    canvas.drawCircle(c, s * .36, Paint()..color = glow.withValues(alpha: .1));
 
     // Outer orbit: a fine dotted ring the skills travel along.
     final dots = Paint()..color = ring;
@@ -273,11 +248,7 @@ class _OrbitPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = s * .018
-      ..shader = SweepGradient(
-        startAngle: CurioMarkGeometry.startAngle,
-        endAngle: CurioMarkGeometry.startAngle + CurioMarkGeometry.sweep,
-        colors: [arc.withValues(alpha: 0), arc],
-      ).createShader(Rect.fromCircle(center: c, radius: r));
+      ..color = arc;
     canvas.drawArc(
       Rect.fromCircle(center: c, radius: r),
       CurioMarkGeometry.startAngle,
@@ -381,44 +352,24 @@ class _GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final surface = CurioTokens.surface;
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
     return Container(
       width: width,
       padding: EdgeInsets.all(width * .07),
       decoration: BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(width * .16),
-        border: Border.all(
-          color: curioColor(
-            context,
-            CurioColors.outlineSoft,
-            CurioColorsLight.outlineSoft,
-          ),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: raised ? .22 : .12),
-            blurRadius: raised ? 28 : 18,
-            offset: Offset(0, raised ? 16 : 10),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+        border: Border.all(color: CurioTokens.border),
+        boxShadow: CurioTokens.shadowNone,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(width * .11),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
             child: Container(
               height: width * .82,
               color: color,
@@ -431,11 +382,15 @@ class _GameCard extends StatelessWidget {
                     child: Icon(
                       icon,
                       size: width * .78,
-                      color: Colors.white.withValues(alpha: .22),
+                      color: CurioTokens.textPrimary.withValues(alpha: .22),
                     ),
                   ),
                   Center(
-                    child: Icon(icon, size: width * .34, color: Colors.white),
+                    child: Icon(
+                      icon,
+                      size: width * .34,
+                      color: CurioTokens.textPrimary,
+                    ),
                   ),
                 ],
               ),
@@ -451,10 +406,9 @@ class _GameCard extends StatelessWidget {
               fontSize: width * .12,
               fontWeight: FontWeight.w600,
               color: ink,
-              letterSpacing: -.3,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             meta,
             maxLines: 1,
@@ -478,16 +432,8 @@ class DiscoveryArt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final w = height * .86;
-    final spark = curioColor(
-      context,
-      CurioColors.spark,
-      CurioColorsLight.spark,
-    );
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
+    final spark = CurioTokens.tintMaths;
+    final coral = CurioTokens.wrong;
     // Sized by the front card (not a fixed height) so it never clips.
     return _Decorative(
       child: SizedBox(
@@ -567,17 +513,9 @@ class _FactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final surface = CurioTokens.surface;
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
     return Opacity(
       opacity: faded ? .7 : 1,
       child: Container(
@@ -585,15 +523,9 @@ class _FactCard extends StatelessWidget {
         padding: EdgeInsets.all(width * .07),
         decoration: BoxDecoration(
           color: surface,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           border: Border.all(color: color.withValues(alpha: .35), width: 1.4),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: .16),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
+          boxShadow: CurioTokens.shadowNone,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,11 +535,11 @@ class _FactCard extends StatelessWidget {
               height: width * .2,
               decoration: BoxDecoration(
                 color: color,
-                borderRadius: BorderRadius.circular(width * .06),
+                borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               ),
               child: Icon(
                 discovery.icon,
-                color: Colors.white,
+                color: CurioTokens.textPrimary,
                 size: width * .11,
               ),
             ),
@@ -621,9 +553,8 @@ class _FactCard extends StatelessWidget {
                     'NEW DISCOVERY',
                     style: TextStyle(
                       color: color,
-                      fontSize: 9,
+                      fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -632,9 +563,8 @@ class _FactCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Fraunces',
                       color: ink,
-                      fontSize: 17,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: -.4,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -642,7 +572,7 @@ class _FactCard extends StatelessWidget {
                     discovery.fact,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: muted, fontSize: 11.5, height: 1.4),
+                    style: TextStyle(color: muted, fontSize: 13, height: 1.4),
                   ),
                 ],
               ),
@@ -662,30 +592,24 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+    padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
     decoration: BoxDecoration(
-      color: curioColor(context, CurioColors.surface, CurioColorsLight.surface),
-      borderRadius: BorderRadius.circular(99),
+      color: CurioTokens.surface,
+      borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
       border: Border.all(color: color.withValues(alpha: .3)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: .14),
-          blurRadius: 16,
-          offset: const Offset(0, 8),
-        ),
-      ],
+      boxShadow: CurioTokens.shadowNone,
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: color, size: 18),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Text(
           label,
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            fontSize: 12.5,
-            color: curioColor(context, CurioColors.ink, CurioColorsLight.ink),
+            fontSize: 13,
+            color: CurioTokens.textPrimary,
           ),
         ),
       ],
@@ -700,22 +624,10 @@ class GrowthArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
+    final surface = CurioTokens.surface;
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
+    final forest = CurioTokens.accent;
     const levels = [.72, .56, .41, .64];
     final w = height * 1.05;
     // Sized by its content (not a fixed height) so large text grows the
@@ -732,17 +644,11 @@ class GrowthArt extends StatelessWidget {
                 distance: 4,
                 child: Container(
                   width: w,
-                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                   decoration: BoxDecoration(
                     color: surface,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: .16),
-                        blurRadius: 28,
-                        offset: const Offset(0, 14),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+                    boxShadow: CurioTokens.shadowNone,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -758,20 +664,18 @@ class GrowthArt extends StatelessWidget {
                                   'THIS WEEK',
                                   style: TextStyle(
                                     color: muted,
-                                    fontSize: 9,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w800,
-                                    letterSpacing: 1.2,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Alex is growing',
                                   style: TextStyle(
                                     fontFamily: 'Fraunces',
                                     color: ink,
-                                    fontSize: 18,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.w600,
-                                    letterSpacing: -.4,
                                   ),
                                 ),
                               ],
@@ -784,7 +688,7 @@ class GrowthArt extends StatelessWidget {
                             child: Text(
                               '4/5',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: ink,
                               ),
@@ -792,7 +696,7 @@ class GrowthArt extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       for (var i = 0; i < WelcomeSkill.all.length; i++) ...[
                         Row(
                           children: [
@@ -807,7 +711,7 @@ class GrowthArt extends StatelessWidget {
                               child: Text(
                                 WelcomeSkill.all[i].label,
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: ink,
                                 ),
@@ -823,7 +727,7 @@ class GrowthArt extends StatelessWidget {
                           ],
                         ),
                         if (i < WelcomeSkill.all.length - 1)
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
                       ],
                     ],
                   ),
@@ -897,16 +801,8 @@ class InboxArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final spark = curioColor(
-      context,
-      CurioColors.spark,
-      CurioColorsLight.spark,
-    );
+    final forest = CurioTokens.accent;
+    final spark = CurioTokens.tintMaths;
     return _Decorative(
       child: SizedBox.square(
         dimension: size * 1.2,
@@ -920,7 +816,7 @@ class InboxArt extends StatelessWidget {
                 height: size,
                 decoration: BoxDecoration(
                   color: forest.withValues(alpha: .14),
-                  borderRadius: BorderRadius.circular(size * .32),
+                  borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                   border: Border.all(color: forest.withValues(alpha: .28)),
                 ),
                 child: Icon(

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
@@ -10,7 +9,7 @@ import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
 import '../domain/verdict.dart';
 
-/// Verdict: a claim, one piece of evidence, and a decision — does the
+/// Verdict: a claim, one piece of evidence, and a decision, does the
 /// evidence support the claim, go against it, or can't it tell us yet? Five
 /// a day, each followed by why and the thinking tool behind it.
 class VerdictPage extends StatefulWidget {
@@ -26,11 +25,11 @@ class VerdictPage extends StatefulWidget {
 class _VerdictPageState extends State<VerdictPage> {
   static const _id = 'verdict';
   static const _rules = [
-    'Each round shows a claim — something someone says is true — and one piece of evidence.',
+    'Each round shows a claim, something someone says is true, and one piece of evidence.',
     'Decide what the evidence does: supports the claim, goes against it, or can’t tell us yet.',
     '“Can’t tell yet” is a real answer. Pick it when the evidence is missing something, like enough people or a fair comparison.',
     'Judge only what the evidence shows, not what you already think.',
-    'Five claims a day. After each one, see why — and the thinking tool that cracks it.',
+    'Five claims a day. After each one, see why, and the thinking tool that cracks it.',
   ];
   static const _praise = [
     'Spot on!',
@@ -73,7 +72,7 @@ class _VerdictPageState extends State<VerdictPage> {
   }
 
   /// After an answer, scroll just enough to show the explanation and the
-  /// Next button — or, if that's taller than the screen, its top.
+  /// Next button, or, if that's taller than the screen, its top.
   void _bringRevealIntoView() {
     final target = _revealKey.currentContext;
     if (!mounted || target == null || !_scroll.hasClients) return;
@@ -85,8 +84,8 @@ class _VerdictPageState extends State<VerdictPage> {
       target,
       duration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
-          : const Duration(milliseconds: 380),
-      curve: Curves.easeOutCubic,
+          : CurioTokens.slow,
+      curve: CurioTokens.curve,
       alignmentPolicy: fits
           ? ScrollPositionAlignmentPolicy.keepVisibleAtEnd
           : ScrollPositionAlignmentPolicy.explicit,
@@ -126,13 +125,13 @@ class _VerdictPageState extends State<VerdictPage> {
       Verdict.against => 'the evidence goes against the claim',
       Verdict.cantTell => 'this evidence can’t settle it yet',
     };
-    if (!round.right) return 'Not quite — $finding. Here’s why.';
+    if (!round.right) return 'Not quite, $finding. Here’s why.';
     final praise = _praise[_game.current % _praise.length];
     return '$praise ${finding[0].toUpperCase()}${finding.substring(1)}.';
   }
 
   String get _resultTitle => switch (_game.score) {
-    5 => 'Case closed — all five!',
+    5 => 'Case closed, all five!',
     3 || 4 => 'Sharp thinking.',
     _ => 'Every case makes you sharper.',
   };
@@ -145,13 +144,13 @@ class _VerdictPageState extends State<VerdictPage> {
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
         controller: _scroll,
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice round' : 'Daily evidence puzzle',
             title: _showResult ? 'The verdicts are in.' : 'Weigh the evidence',
             subtitle:
-                'Read the claim, then the evidence. Does it back the claim up, knock it down — or leave us guessing?',
+                'Read the claim, then the evidence. Does it back the claim up, knock it down, or leave us guessing?',
             chips: const [
               GameMetaChip(icon: Icons.schedule_rounded, label: '3 min'),
               GameMetaChip(
@@ -180,24 +179,24 @@ class _VerdictPageState extends State<VerdictPage> {
                     index: _game.current,
                     total: _game.rounds.length,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   _EvidenceCard(evidence: round.item.evidence),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               'What does the evidence do?',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (final verdict in Verdict.values) ...[
               _AnswerButton(
                 verdict: verdict,
                 round: round,
                 onPressed: () => _answer(verdict),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
             ],
             if (round.answered)
               Column(
@@ -213,7 +212,7 @@ class _VerdictPageState extends State<VerdictPage> {
                   ),
                   const SizedBox(height: 12),
                   _ExplanationCard(item: round.item),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   PrimaryButton(
                     key: const Key('verdict_next'),
                     label: _game.isLast ? 'See result' : 'Next claim',
@@ -261,20 +260,12 @@ class _ClaimCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final blue = CurioTokens.tintLogic;
+    final soft = CurioTokens.textSecondary;
     return GlassCard(
-      radius: 24,
-      tint: curioColor(
-        context,
-        CurioColors.blueSoft,
-        CurioColorsLight.blueSoft,
-      ),
-      padding: const EdgeInsets.fromLTRB(14, 12, 18, 20),
+      radius: CurioTokens.radiusCard,
+      tint: CurioTokens.surfaceRaised,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -284,7 +275,7 @@ class _ClaimCard extends StatelessWidget {
               textScaler: TextScaler.noScaling,
               style: TextStyle(
                 fontFamily: 'Fraunces',
-                fontSize: 58,
+                fontSize: 32,
                 height: 1,
                 fontWeight: FontWeight.w600,
                 color: blue,
@@ -296,24 +287,22 @@ class _ClaimCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   'CLAIM ${index + 1} OF $total',
                   semanticsLabel: 'Claim ${index + 1} of $total',
                   style: TextStyle(
                     color: soft,
-                    fontSize: 11,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 1.3,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   claim,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontSize: 22,
+                    fontSize: 20,
                     height: 1.22,
-                    letterSpacing: -.4,
                   ),
                 ),
               ],
@@ -331,40 +320,35 @@ class _EvidenceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final blue = CurioTokens.tintLogic;
+    final soft = CurioTokens.textSecondary;
     return Padding(
-      padding: const EdgeInsets.only(left: 18),
+      padding: const EdgeInsets.only(left: 16),
       child: GlassCard(
-        radius: 20,
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+        radius: CurioTokens.radiusCard,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.manage_search_rounded, size: 18, color: blue),
-                const SizedBox(width: 7),
+                const SizedBox(width: 8),
                 Flexible(
                   child: Text(
                     'EVIDENCE',
                     semanticsLabel: 'Evidence',
                     style: TextStyle(
                       color: soft,
-                      fontSize: 11,
+                      fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.3,
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            Text(evidence, style: const TextStyle(fontSize: 15, height: 1.45)),
+            Text(evidence, style: const TextStyle(fontSize: 14, height: 1.45)),
           ],
         ),
       ),
@@ -396,27 +380,11 @@ class _AnswerButton extends StatelessWidget {
     final answered = round.answered;
     final chosen = round.picked == verdict;
     final correct = round.item.verdict == verdict;
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final onBright = curioColor(
-      context,
-      CurioColors.night,
-      CurioColorsLight.ink,
-    );
-    final success = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.success,
-    );
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
+    final onBright = CurioTokens.base;
+    final success = CurioTokens.correct;
+    final danger = CurioTokens.wrong;
 
     // Before judging, the themed clay button. After, it goes flat and a
     // clay body shows how each verdict fared; the ones that weren't in play
@@ -428,35 +396,27 @@ class _AnswerButton extends StatelessWidget {
     if (!answered) {
       fill = null;
       ring = null;
-      tile = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
+      tile = CurioTokens.tintLogic;
       tileIcon = onBright;
       text = ink;
       icon = _verdictIcon(verdict);
       status = null;
     } else if (correct) {
-      fill = curioColor(
-        context,
-        CurioColors.successSoft,
-        CurioColorsLight.successSoft,
-      );
+      fill = CurioTokens.surfaceRaised;
       ring = success;
       tile = success;
       tileIcon = onBright;
       text = ink;
       icon = Icons.check_rounded;
-      status = chosen ? 'Your verdict — right!' : 'The right verdict';
+      status = chosen ? 'Your verdict, right!' : 'The right verdict';
     } else if (chosen) {
-      fill = curioColor(
-        context,
-        CurioColors.dangerSoft,
-        CurioColorsLight.dangerSoft,
-      );
+      fill = CurioTokens.surfaceRaised;
       ring = danger;
       tile = danger;
       tileIcon = onBright;
       text = ink;
       icon = Icons.close_rounded;
-      status = 'Your verdict — not this time';
+      status = 'Your verdict, not this time';
     } else {
       fill = null;
       ring = null;
@@ -477,14 +437,16 @@ class _AnswerButton extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
         alignment: Alignment.centerLeft,
         minimumSize: const Size.fromHeight(62),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+        ),
       ),
       child: Row(
         children: [
           SizedBox.square(
             dimension: 38,
             child: CurioClay(
-              radius: 19,
+              radius: CurioTokens.radiusCard,
               color: tile,
               pressed: tile == null,
               child: Icon(icon, size: 21, color: tileIcon),
@@ -505,7 +467,7 @@ class _AnswerButton extends StatelessWidget {
                   ),
                 ),
                 if (status != null) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     status,
                     style: TextStyle(
@@ -523,7 +485,7 @@ class _AnswerButton extends StatelessWidget {
     );
     if (!answered) return button;
     return CurioClay(
-      radius: 18,
+      radius: CurioTokens.radiusCard,
       color: fill,
       outline: ring,
       pressed: ring == null,
@@ -538,33 +500,25 @@ class _ToolPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
+    final blue = CurioTokens.tintLogic;
     return Semantics(
       label: 'Thinking tool: ${tool.label}',
       excludeSemantics: true,
       child: CurioClay(
-        radius: 99,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        color: curioColor(
-          context,
-          CurioColors.blueSoft,
-          CurioColorsLight.blueSoft,
-        ),
+        radius: CurioTokens.radiusPill,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        color: CurioTokens.surfaceRaised,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.handyman_rounded, size: 14, color: blue),
-            const SizedBox(width: 5),
+            const SizedBox(width: 4),
             Flexible(
               child: Text(
                 tool.label,
                 style: TextStyle(
-                  color: curioColor(
-                    context,
-                    CurioColors.ink,
-                    CurioColorsLight.ink,
-                  ),
-                  fontSize: 12,
+                  color: CurioTokens.textPrimary,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -582,25 +536,21 @@ class _ExplanationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gold = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffron,
-    );
+    final gold = CurioTokens.tintMaths;
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_outline_rounded, color: gold),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Wrap(
-                  spacing: 10,
-                  runSpacing: 6,
+                  spacing: 12,
+                  runSpacing: 8,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
@@ -630,40 +580,30 @@ class _RecapTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final right = round.right;
-    final color = right
-        ? curioColor(context, CurioColors.success, CurioColorsLight.success)
-        : curioColor(context, CurioColors.danger, CurioColorsLight.danger);
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final color = right ? CurioTokens.correct : CurioTokens.wrong;
+    final soft = CurioTokens.textSecondary;
     final verdict = round.item.verdict.label;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 1),
+            padding: const EdgeInsets.only(top: 4),
             child: SizedBox.square(
               dimension: 28,
               child: CurioClay(
-                radius: 14,
+                radius: CurioTokens.radiusCard,
                 color: color,
                 child: Icon(
                   right ? Icons.check_rounded : Icons.close_rounded,
                   size: 17,
-                  color: curioColor(
-                    context,
-                    CurioColors.night,
-                    CurioColorsLight.ink,
-                  ),
+                  color: CurioTokens.base,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -675,14 +615,14 @@ class _RecapTile extends StatelessWidget {
                     height: 1.35,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(
                   right
-                      ? 'Right — $verdict'
-                      : 'Not quite — the verdict was “$verdict”, not “${round.picked?.label}”.',
+                      ? 'Right, $verdict'
+                      : 'Not quite, the verdict was “$verdict”, not “${round.picked?.label}”.',
                   style: TextStyle(color: soft, fontSize: 13, height: 1.4),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 _ToolPill(tool: round.item.tool),
               ],
             ),
@@ -702,11 +642,7 @@ class _RoundPips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = game.rounds.length;
-    final onBright = curioColor(
-      context,
-      CurioColors.night,
-      CurioColorsLight.ink,
-    );
+    final onBright = CurioTokens.base;
     return Semantics(
       label: game.allAnswered
           ? '${game.score} of $total right'
@@ -725,31 +661,15 @@ class _RoundPips extends StatelessWidget {
                 color: !game.rounds[i].answered
                     ? Colors.transparent
                     : game.rounds[i].right
-                    ? curioColor(
-                        context,
-                        CurioColors.success,
-                        CurioColorsLight.success,
-                      )
-                    : curioColor(
-                        context,
-                        CurioColors.danger,
-                        CurioColorsLight.danger,
-                      ),
+                    ? CurioTokens.correct
+                    : CurioTokens.wrong,
                 border: game.rounds[i].answered
                     ? null
                     : Border.all(
                         width: 2,
                         color: i == game.current
-                            ? curioColor(
-                                context,
-                                CurioColors.coral,
-                                CurioColorsLight.coral,
-                              )
-                            : curioColor(
-                                context,
-                                CurioColors.outline,
-                                CurioColorsLight.outline,
-                              ),
+                            ? CurioTokens.wrong
+                            : CurioTokens.border,
                       ),
               ),
               child: game.rounds[i].answered

@@ -122,7 +122,7 @@ class _PasswordDialogState extends State<_PasswordDialog> {
           const Text(
             'Enter your account password to open parent reports and family settings.',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           TextField(
             key: const Key('parent_password'),
             controller: _password,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/models/family_settings.dart';
 import '../../../core/services/family_service.dart';
@@ -70,8 +71,8 @@ class _WeeklyEmailCardState extends State<WeeklyEmailCard> {
 
   @override
   Widget build(BuildContext context) => CurioClay(
-    padding: const EdgeInsets.all(20),
-    radius: 26,
+    padding: const EdgeInsets.all(24),
+    radius: CurioTokens.radiusCard,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -79,9 +80,9 @@ class _WeeklyEmailCardState extends State<WeeklyEmailCard> {
           'Weekly report emails',
           style: Theme.of(context).textTheme.titleLarge,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         const Text(
-          'Every explorer’s completed games, practice days, XP, discoveries and skill progress — together in one weekly email.',
+          'Every explorer’s completed games, practice days, XP, discoveries and skill progress, together in one weekly email.',
         ),
         const SizedBox(height: 8),
         if (_settings != null)

@@ -1,12 +1,10 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
 import '../../../core/config/supabase_config.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
-import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'widgets/otp_code_field.dart';
@@ -33,7 +31,7 @@ class VerifyCodePage extends StatefulWidget {
   final String? notice;
 
   /// Preferred number of boxes, not a restriction on the emailed code.
-  /// Supabase supports 6–10 digits; hosted settings may differ from a build.
+  /// Supabase supports 6 to 10 digits; hosted settings may differ from a build.
   final int? codeLength;
 
   /// Supabase lets each address request one email per minute.
@@ -153,12 +151,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final muted = CurioTokens.textSecondary;
+    final ink = CurioTokens.textPrimary;
     final minutes = _resendIn ~/ 60;
     final seconds = (_resendIn % 60).toString().padLeft(2, '0');
     return AuthFrame(
@@ -166,7 +160,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Align(alignment: Alignment.centerLeft, child: InboxArt()),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Semantics(
             header: true,
             child: Text(
@@ -199,10 +193,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             ],
           ),
           if (_info != null) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             AuthNotice(_info!),
           ],
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           OtpCodeField(
             controller: _code,
             length: _length,
@@ -216,10 +210,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             style: TextStyle(color: muted, fontSize: 13),
           ),
           if (_error != null) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             AuthNotice(_error!, error: true),
           ],
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           ListenableBuilder(
             listenable: _code,
             builder: (context, _) => FilledButton(
@@ -239,7 +233,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                   : Text(_cta),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Center(
             child: _resendIn > 0
                 ? Padding(
@@ -263,7 +257,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     label: const Text('Send a new code'),
                   ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           const _Tip(),
         ],
       ),
@@ -276,30 +270,22 @@ class _Tip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: curioColor(
-          context,
-          CurioColors.surfaceMuted,
-          CurioColorsLight.surfaceMuted,
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: CurioTokens.surface,
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_outline_rounded, size: 18, color: muted),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               'Emails can take a minute to arrive. Check your spam or promotions folder, and use the code from the newest email. Got a link instead of a code? Open it on this phone and it signs you in too.',
-              style: TextStyle(color: muted, fontSize: 12.5, height: 1.5),
+              style: TextStyle(color: muted, fontSize: 13, height: 1.5),
             ),
           ),
         ],

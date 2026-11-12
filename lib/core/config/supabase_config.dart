@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 ///
 /// 1. `--dart-define` / `--dart-define-from-file` values (CI, release builds,
 ///    or pointing a run at a different project).
-/// 2. `config/supabase.json`, bundled as an asset — so a plain `flutter run`
+/// 2. `config/supabase.json`, bundled as an asset, so a plain `flutter run`
 ///    connects to the same project without any extra flags.
 /// 3. Neither → demo mode (an on-device profile, no login).
 ///
@@ -42,13 +42,13 @@ abstract final class SupabaseConfig {
 
   static Future<void> initialize({AssetBundle? bundle}) async {
     if (forceDemo) {
-      debugPrint('Curio: CURIO_DEMO=true — running in demo mode.');
+      debugPrint('Curio: CURIO_DEMO=true, running in demo mode.');
       return;
     }
     final values = await resolve(bundle: bundle);
     if (values == null) {
       debugPrint(
-        'Curio: no Supabase project configured — running in demo mode. '
+        'Curio: no Supabase project configured, running in demo mode. '
         'Copy config/supabase.example.json to config/supabase.json '
         '(see SUPABASE_SETUP.md).',
       );
@@ -122,7 +122,7 @@ abstract final class SupabaseConfig {
       // would give anyone who unzips the app full, RLS-bypassing access.
       throw StateError(
         '$configAsset contains ${leaked.join(', ')}. Secret keys must never '
-        'be in the app — remove them and rotate the key in Supabase → '
+        'be in the app, remove them and rotate the key in Supabase → '
         'Project Settings → API Keys.',
       );
     }

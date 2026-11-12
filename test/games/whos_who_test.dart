@@ -458,7 +458,7 @@ void main() {
       await tester.pumpWidget(play(WhosWhoPage(date: day), CurioState()));
       final p = WhoPuzzle.dailySet(DailyPick.dayNumber(day)).first;
       await fillAnswer(tester, p);
-      // Give child 0 child 1's pet — it moves, leaving child 1 blank.
+      // Give child 0 child 1's pet, it moves, leaving child 1 blank.
       await choose(tester, 0, 0, p.solution[0][1]);
       await tap(tester, find.byKey(const Key('whos_who_check')));
       expect(find.text('One cell still needs a choice.'), findsOneWidget);

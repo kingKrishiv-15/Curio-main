@@ -583,6 +583,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
       final early = hang(tester, 'left');
       await tester.pump(const Duration(seconds: 3));
+      await tester.pump(const Duration(milliseconds: 100));
       final rested = hang(tester, 'left');
       expect(early, isNot(rested), reason: 'it animates');
       expect(

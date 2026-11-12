@@ -296,7 +296,7 @@ void main() {
       check: (i) {
         expect(find.text(items[i].explanation), findsOneWidget);
         expect(find.text(items[i].tool.label), findsOneWidget);
-        expect(find.text('Your verdict — right!'), findsOneWidget);
+        expect(find.text('Your verdict, right!'), findsOneWidget);
         expect(state.completedToday('verdict'), i == items.length - 1);
       },
     );
@@ -333,7 +333,7 @@ void main() {
       wrong: {0},
       check: (i) {
         if (i != 0) return;
-        expect(find.text('Your verdict — not this time'), findsOneWidget);
+        expect(find.text('Your verdict, not this time'), findsOneWidget);
         expect(find.text('The right verdict'), findsOneWidget);
         expect(find.textContaining('Not quite'), findsOneWidget);
         expect(

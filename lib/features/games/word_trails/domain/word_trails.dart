@@ -179,7 +179,7 @@ const trailStories = <TrailStory>[
 typedef TrailSquare = ({String letter, int? word});
 
 /// A story laid out on a 5×5 board. Its words run one after another along
-/// a snaking path — left to right, then right to left — so every letter
+/// a snaking path, left to right, then right to left, so every letter
 /// belongs to exactly one word and neighbouring letters always touch.
 class WordTrail {
   WordTrail(this.story) {

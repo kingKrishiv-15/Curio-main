@@ -155,7 +155,7 @@ int? _triangleIndex(int n) {
 }
 
 /// Whether [terms] follows one of the simple rules a player might read into
-/// it — the same readings Sequence uses to keep guessing fair.
+/// it, the same readings Sequence uses to keep guessing fair.
 bool followsPlausibleRule(List<int> terms) =>
     terms.length >= 4 &&
     plausibleNextTerms(terms.sublist(0, terms.length - 1)).contains(terms.last);
@@ -262,7 +262,7 @@ sealed class ForgeQuestion {
 
   final PatternRule rule;
 
-  /// The pattern, all correct — for the explanation.
+  /// The pattern, all correct, for the explanation.
   final List<int> terms;
 
   ForgeKind get kind;
@@ -313,7 +313,7 @@ class RepairQuestion extends ForgeQuestion {
   ForgeKind get kind => ForgeKind.repair;
 }
 
-/// One day's three questions: next, rule, repair — each from a different
+/// One day's three questions: next, rule, repair, each from a different
 /// rule family.
 class ForgeDay {
   const ForgeDay(this.questions);
@@ -511,5 +511,5 @@ class ForgeDay {
 }
 
 /// Today's practice rounds step back a day at a time, so they're always
-/// a different set from today's — and never tomorrow's.
+/// a different set from today's, and never tomorrow's.
 int forgeDay(int today, {int practice = 0}) => today - max(practice, 0);

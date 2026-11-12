@@ -54,7 +54,7 @@ class VerdictItem {
 
   final String id;
 
-  /// What someone says is true — shown as the big quote.
+  /// What someone says is true, shown as the big quote.
   final String claim;
 
   /// The one piece of evidence to weigh against it.
@@ -80,7 +80,7 @@ int get verdictCycleDays => verdictBank.length ~/ VerdictRules.roundsPerDay;
 ///
 /// The bank is dealt out one shuffled "cycle" at a time, so every claim
 /// appears once before any repeats. Each day gets at least one claim of
-/// each verdict, and no claim is shown two days running — not even where
+/// each verdict, and no claim is shown two days running, not even where
 /// one cycle hands over to the next.
 List<VerdictItem> verdictDailySet(int day) {
   final days = verdictCycleDays;
@@ -91,7 +91,7 @@ List<VerdictItem> verdictDailySet(int day) {
 /// Practice set number [round] (1, 2, 3…) for someone whose daily is [day].
 ///
 /// Practice replays past days' sets, newest first, skipping any that share a
-/// claim with today's or tomorrow's set — so practice never repeats today
+/// claim with today's or tomorrow's set, so practice never repeats today
 /// and never spoils tomorrow. Within a cycle that is simply yesterday, then
 /// the day before, and so on. It never awards XP; that's the page's job.
 List<VerdictItem> verdictPracticeSet(int day, int round) {
@@ -116,7 +116,7 @@ class VerdictRound {
   bool get answered => picked != null;
   bool get right => picked == item.verdict;
 
-  /// One verdict per claim — no second guesses.
+  /// One verdict per claim, no second guesses.
   bool pick(Verdict verdict) {
     if (answered) throw StateError('This claim already has a verdict.');
     picked = verdict;
@@ -213,9 +213,9 @@ List<List<VerdictItem>> _deal(List<VerdictItem> items, _Dealer dealer) {
   return out;
 }
 
-/// Park–Miller "minimal standard" generator. Tiny, and identical on every
+/// Park, Miller "minimal standard" generator. Tiny, and identical on every
 /// platform and Dart version (products stay below 2^53, so it is exact on
-/// the web too) — a date always deals the same claims, for everyone.
+/// the web too), a date always deals the same claims, for everyone.
 class _Dealer {
   _Dealer(int seed) : _state = seed % _modulus {
     if (_state == 0) _state = 1;
@@ -252,7 +252,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.supports,
     tool: ThinkingTool.fairTest,
     explanation:
-        'Same thrower, same spot, same day and ten throws each — a fair test. Going further nine times out of ten is a clear pattern, not a fluke.',
+        'Same thrower, same spot, same day and ten throws each, a fair test. Going further nine times out of ten is a clear pattern, not a fluke.',
   ),
   VerdictItem(
     id: 'cress_windowsill',
@@ -263,7 +263,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.supports,
     tool: ThinkingTool.fairTest,
     explanation:
-        'Only one thing was different: where each tray sat. In a fair test like that, the place is the best reason for the gap — and 6 cm against 2 cm is clear.',
+        'Only one thing was different: where each tray sat. In a fair test like that, the place is the best reason for the gap, and 6 cm against 2 cm is clear.',
   ),
   VerdictItem(
     id: 'trip_vote',
@@ -296,7 +296,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.supports,
     tool: ThinkingTool.fairTest,
     explanation:
-        'Same car, same ramp, five goes on each floor — only the floor changed. Every wooden run beat every carpet run, so the evidence backs the claim.',
+        'Same car, same ramp, five goes on each floor, only the floor changed. Every wooden run beat every carpet run, so the evidence backs the claim.',
   ),
   VerdictItem(
     id: 'library_loans',
@@ -317,7 +317,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.supports,
     tool: ThinkingTool.fairTest,
     explanation:
-        'Same recipe, same oven, same time — only the beating changed. When every long-beaten cake rises higher, the beating is the best explanation.',
+        'Same recipe, same oven, same time, only the beating changed. When every long-beaten cake rises higher, the beating is the best explanation.',
   ),
   VerdictItem(
     id: 'playground_shade',
@@ -400,7 +400,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.supports,
     tool: ThinkingTool.fairTest,
     explanation:
-        'Five of each, same table, same time — only the sock changed. It may sound surprising, but the fair test shows the socks slowed the melting.',
+        'Five of each, same table, same time, only the sock changed. It may sound surprising, but the fair test shows the socks slowed the melting.',
   ),
 
   // Goes against it: a counter-example to "always", "never" or "every", or
@@ -424,7 +424,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.against,
     tool: ThinkingTool.counterExample,
     explanation:
-        '“Always” means every single year. One dry, sunny sports day is a counter-example, so the claim can’t be right — even if it often rains.',
+        '“Always” means every single year. One dry, sunny sports day is a counter-example, so the claim can’t be right, even if it often rains.',
   ),
   VerdictItem(
     id: 'cartwheels',
@@ -444,7 +444,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.against,
     tool: ThinkingTool.measured,
     explanation:
-        'Ten days of careful measuring found the afternoons warmer every time — the opposite of what the claim says.',
+        'Ten days of careful measuring found the afternoons warmer every time, the opposite of what the claim says.',
   ),
   VerdictItem(
     id: 'tomato_music',
@@ -484,7 +484,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.against,
     tool: ThinkingTool.counterExample,
     explanation:
-        '“Every” means all 24. Even one cake without chocolate would prove the claim wrong — and there were two.',
+        '“Every” means all 24. Even one cake without chocolate would prove the claim wrong, and there were two.',
   ),
   VerdictItem(
     id: 'heavy_parachute',
@@ -495,7 +495,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.against,
     tool: ThinkingTool.fairTest,
     explanation:
-        'Same size, same height, ten drops each — a fair test. The heavier parachute was quicker every time, which is the opposite of the claim.',
+        'Same size, same height, ten drops each, a fair test. The heavier parachute was quicker every time, which is the opposite of the claim.',
   ),
   VerdictItem(
     id: 'tortoise_greens',
@@ -660,7 +660,7 @@ const verdictBank = <VerdictItem>[
     verdict: Verdict.cantTell,
     tool: ThinkingTool.opinion,
     explanation:
-        'That’s one person’s opinion — and he’s her brother! Counting how many shots each goalkeeper saves would tell us far more.',
+        'That’s one person’s opinion, and he’s her brother! Counting how many shots each goalkeeper saves would tell us far more.',
   ),
   VerdictItem(
     id: 'garden_tomatoes',

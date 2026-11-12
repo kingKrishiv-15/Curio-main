@@ -1,10 +1,9 @@
 import 'dart:math';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -43,7 +42,7 @@ class _SqueezePageState extends State<SqueezePage> {
       _message = _engine.guess(value);
       _controller.clear();
     });
-    // The day counts once it's finished, found or not — otherwise losing,
+    // The day counts once it's finished, found or not, otherwise losing,
     // reopening and typing the revealed number would farm the XP.
     if (_engine.finished && !_practice && !_awarded) {
       _awarded = true;
@@ -63,48 +62,20 @@ class _SqueezePageState extends State<SqueezePage> {
   @override
   Widget build(BuildContext context) {
     final progress = _engine.guesses.length / SqueezeEngine.maxGuesses;
-    final navy = curioColor(context, CurioColors.navy, CurioColorsLight.navy);
+    final navy = CurioTokens.surfaceRaised;
     // `navy` is coral in light mode: gold text and a coral bar vanish on it.
-    final cardLabel = curioColor(
-      context,
-      CurioColors.gold,
-      Colors.white.withValues(alpha: .85),
-    );
-    final cardBar = curioColor(context, CurioColors.coral, Colors.white);
-    final onDark = curioColor(
-      context,
-      CurioColors.onDark,
-      CurioColorsLight.onDark,
-    );
-    final greenSoft = curioColor(
-      context,
-      CurioColors.greenSoft,
-      CurioColorsLight.greenSoft,
-    );
-    final tealSoft = curioColor(
-      context,
-      CurioColors.tealSoft,
-      CurioColorsLight.tealSoft,
-    );
-    final green = curioColor(
-      context,
-      CurioColors.green,
-      CurioColorsLight.green,
-    );
-    final tealDark = curioColor(
-      context,
-      CurioColors.tealDark,
-      CurioColorsLight.tealDark,
-    );
-    final goldSoft = curioColor(
-      context,
-      CurioColors.goldSoft,
-      CurioColorsLight.goldSoft,
-    );
+    final cardLabel = CurioTokens.tintMaths;
+    final cardBar = CurioTokens.wrong;
+    final onDark = CurioTokens.textPrimary;
+    final greenSoft = CurioTokens.surfaceRaised;
+    final tealSoft = CurioTokens.surfaceRaised;
+    final green = CurioTokens.correct;
+    final tealDark = CurioTokens.accent;
+    final goldSoft = CurioTokens.surfaceRaised;
     return CurioPage(
       title: 'Daily Squeeze',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           CurioCard(
             color: navy,
@@ -115,22 +86,21 @@ class _SqueezePageState extends State<SqueezePage> {
                   style: TextStyle(
                     color: cardLabel,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 1.4,
-                    fontSize: 11,
+                    fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${_engine.minimum}  —  ${_engine.maximum}',
+                  '${_engine.minimum} ,  ${_engine.maximum}',
                   style: TextStyle(
                     color: onDark,
-                    fontSize: 34,
+                    fontSize: 32,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 13),
+                const SizedBox(height: 12),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
+                  borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 9,
@@ -163,14 +133,14 @@ class _SqueezePageState extends State<SqueezePage> {
                       : Icons.tips_and_updates_rounded,
                   color: _engine.solved ? green : tealDark,
                 ),
-                const SizedBox(width: 11),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(_message),
                       if (_engine.guesses.length >= 3 && !_engine.finished) ...[
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         Text(
                           _engine.numberFact,
                           style: const TextStyle(fontWeight: FontWeight.w700),
@@ -192,10 +162,10 @@ class _SqueezePageState extends State<SqueezePage> {
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _submit(),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900),
               decoration: const InputDecoration(hintText: 'Your guess'),
             ),
-            const SizedBox(height: 11),
+            const SizedBox(height: 12),
             PrimaryButton(
               label: 'Squeeze the range',
               icon: Icons.compress_rounded,
@@ -212,17 +182,17 @@ class _SqueezePageState extends State<SqueezePage> {
                         : 'The number was ${_engine.target}',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   Text(
                     _practice
-                        ? 'Practice round — no XP, just sharper guessing.'
+                        ? 'Practice round, no XP, just sharper guessing.'
                         : _alreadyDone
-                        ? 'Today’s XP was already earned — this one was for fun.'
+                        ? 'Today’s XP was already earned, this one was for fun.'
                         : '+${gameRewards['squeeze']!.xp} XP for today’s hunt.',
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   Text(_engine.numberFact, textAlign: TextAlign.center),
                 ],
               ),
@@ -237,18 +207,18 @@ class _SqueezePageState extends State<SqueezePage> {
           if (_engine.guesses.isNotEmpty) ...[
             const SizedBox(height: 24),
             const SectionHeading('Your trail'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: _engine.guesses
                   .map(
                     (guess) => CurioClay(
-                      radius: 12,
+                      radius: CurioTokens.radiusCard,
                       color: guess == _engine.target ? greenSoft : null,
                       outline: guess == _engine.target ? green : null,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
+                        horizontal: 16,
                         vertical: 8,
                       ),
                       child: Text(

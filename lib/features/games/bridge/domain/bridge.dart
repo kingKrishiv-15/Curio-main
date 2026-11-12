@@ -2,7 +2,7 @@ import 'dart:math';
 
 /// Bridge: a start number, a target, and a handful of operation tiles.
 /// Arrange every tile so the start becomes the target. Order is the whole
-/// game — squaring then doubling is not doubling then squaring.
+/// game, squaring then doubling is not doubling then squaring.
 ///
 /// Puzzles are built backwards from a solution (pick a start, apply random
 /// operations, whatever you land on is the target), so every puzzle is
@@ -98,7 +98,7 @@ class BridgePuzzle {
   /// The tiles in their starting (scrambled) order.
   final List<BridgeOp> tiles;
 
-  /// One ordering that works — the one the puzzle was built from.
+  /// One ordering that works, the one the puzzle was built from.
   final List<BridgeOp> solution;
 
   /// How many orderings work in total. 1 means a single-solution day.
@@ -148,12 +148,18 @@ class BridgePuzzle {
   static BridgeOp? _pickOp(Random random, int value, List<BridgeOp> used) {
     final options = <BridgeOp>[
       BridgeOp(BridgeOpKind.add, 2 + random.nextInt(18)),
-      if (value > 3) BridgeOp(BridgeOpKind.subtract, 1 + random.nextInt(min(value - 2, 15))),
+      if (value > 3)
+        BridgeOp(BridgeOpKind.subtract, 1 + random.nextInt(min(value - 2, 15))),
       if (value * 2 <= maxValue)
-        BridgeOp(BridgeOpKind.multiply, 2 + random.nextInt(value * 5 <= maxValue ? 4 : 1)),
+        BridgeOp(
+          BridgeOpKind.multiply,
+          2 + random.nextInt(value * 5 <= maxValue ? 4 : 1),
+        ),
       for (final d in const [2, 3, 4, 5])
         if (value % d == 0 && value > d) BridgeOp(BridgeOpKind.divide, d),
-      if (value >= 2 && value <= 25 && !used.any((o) => o.kind == BridgeOpKind.square))
+      if (value >= 2 &&
+          value <= 25 &&
+          !used.any((o) => o.kind == BridgeOpKind.square))
         const BridgeOp(BridgeOpKind.square),
     ];
     // Favour the tiles that make order matter: × ÷ and x².

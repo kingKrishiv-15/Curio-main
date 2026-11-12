@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/game_catalog.dart';
@@ -21,7 +20,7 @@ class AboutCurioPage extends StatelessWidget {
         final wide = constraints.maxWidth >= 900;
         final gutter = wide ? 40.0 : 24.0;
         return SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 20, bottom: 24),
+          padding: const EdgeInsets.only(top: 24, bottom: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -29,19 +28,19 @@ class AboutCurioPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: gutter),
                 child: _HowItWorks(wide: wide),
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: gutter),
                 child: const _GameShelfHeading(),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               _GameShelf(wide: wide, gutter: gutter),
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: gutter),
                 child: _ForGrownUps(wide: wide),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Center(
                 child: TextButton(
                   onPressed: () => Navigator.of(context).maybePop(),
@@ -71,7 +70,7 @@ class _SectionTitle extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       CurioEyebrow(eyebrow),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       Semantics(
         header: true,
         child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
@@ -82,14 +81,7 @@ class _SectionTitle extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 560),
           child: Text(
             subtitle!,
-            style: TextStyle(
-              color: curioColor(
-                context,
-                CurioColors.inkSoft,
-                CurioColorsLight.inkSoft,
-              ),
-              height: 1.55,
-            ),
+            style: TextStyle(color: CurioTokens.textSecondary, height: 1.55),
           ),
         ),
       ],
@@ -183,14 +175,10 @@ class _StepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return CurioClay(
-      radius: 22,
-      padding: const EdgeInsets.all(20),
+      radius: CurioTokens.radiusCard,
+      padding: const EdgeInsets.all(24),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -199,9 +187,9 @@ class _StepCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
             ),
-            child: Icon(icon, color: Colors.white, size: 24),
+            child: Icon(icon, color: CurioTokens.textPrimary, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -213,13 +201,12 @@ class _StepCard extends StatelessWidget {
                   style: TextStyle(
                     color: color,
                     fontWeight: FontWeight.w800,
-                    fontSize: 11,
-                    letterSpacing: 1.2,
+                    fontSize: 13,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(body, style: TextStyle(color: muted, height: 1.5)),
               ],
             ),
@@ -246,7 +233,7 @@ class _GameShelf extends StatelessWidget {
   final bool wide;
   final double gutter;
 
-  /// A taste of the catalog — two games from every daily section — drawn
+  /// A taste of the catalog, two games from every daily section, drawn
   /// with the same art as inside the app.
   static const _ids = [
     'scale',
@@ -307,15 +294,11 @@ class _ShelfCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     final skill = skillColor(context, game.skill);
     return CurioClay(
-      radius: 22,
-      padding: const EdgeInsets.all(10),
+      radius: CurioTokens.radiusCard,
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -324,31 +307,26 @@ class _ShelfCard extends StatelessWidget {
             child: GameArt(game: game, height: 104, badges: false),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(6, 12, 6, 6),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   game.skill.toUpperCase(),
                   style: TextStyle(
-                    color: curioColor(
-                      context,
-                      skill,
-                      Color.lerp(skill, Colors.black, .3)!,
-                    ),
-                    fontSize: 9.5,
+                    color: skill,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(game.title, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 4),
                 Text(
                   game.tagline,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: muted, fontSize: 12.5, height: 1.4),
+                  style: TextStyle(color: muted, fontSize: 13, height: 1.4),
                 ),
               ],
             ),
@@ -387,23 +365,15 @@ class _ForGrownUps extends StatelessWidget {
         'Daily goals are an invitation, never a screen-time limit.',
       ),
     ];
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final forest = CurioTokens.accent;
+    final muted = CurioTokens.textSecondary;
     final tiles = [
       for (final (icon, title, body) in points)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CurioIconTile(icon: icon, color: forest, size: 42, iconSize: 21),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,8 +388,8 @@ class _ForGrownUps extends StatelessWidget {
         ),
     ];
     return CurioClay(
-      radius: 28,
-      padding: EdgeInsets.all(wide ? 36 : 22),
+      radius: CurioTokens.radiusCard,
+      padding: EdgeInsets.all(wide ? 32 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -431,7 +401,7 @@ class _ForGrownUps extends StatelessWidget {
           if (wide)
             LayoutBuilder(
               builder: (context, constraints) => Wrap(
-                spacing: 28,
+                spacing: 32,
                 runSpacing: 24,
                 children: [
                   for (final tile in tiles)
@@ -444,7 +414,7 @@ class _ForGrownUps extends StatelessWidget {
             )
           else
             for (var i = 0; i < tiles.length; i++) ...[
-              if (i > 0) const SizedBox(height: 20),
+              if (i > 0) const SizedBox(height: 24),
               tiles[i],
             ],
         ],

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../discoveries/domain/discovery.dart';
@@ -17,7 +16,7 @@ import 'daily_game_session.dart';
 abstract final class DailyPick {
   static final _epoch = DateTime.utc(2026, 1, 1);
 
-  /// Days since Curio's epoch, by local calendar date — everyone on the same
+  /// Days since Curio's epoch, by local calendar date, everyone on the same
   /// date gets the same puzzle, whatever the time of day.
   static int dayNumber([DateTime? date]) {
     final d = date ?? DateTime.now();
@@ -35,12 +34,12 @@ abstract final class DailyPick {
 }
 
 /// Records completion of [game] (today's, for daily games) using its entry in
-/// [gameRewards], and returns whether it had *already* been completed — so
+/// [gameRewards], and returns whether it had *already* been completed, so
 /// the result card can say "no new XP" instead of claiming it again. Safe
 /// without a [CurioScope] (e.g. a page pumped alone in a test).
 bool awardDaily(BuildContext context, String game) {
   final reward = gameRewards[game];
-  assert(reward != null, 'No reward for $game — add it to gameRewards');
+  assert(reward != null, 'No reward for $game, add it to gameRewards');
   final state = context.getInheritedWidgetOfExactType<CurioScope>()?.notifier;
   if (state == null || reward == null) return false;
   final id = reward.dated
@@ -59,7 +58,7 @@ bool awardDaily(BuildContext context, String game) {
   return already;
 }
 
-/// Whether [game] already counts for today — for result cards that are
+/// Whether [game] already counts for today, for result cards that are
 /// shown again on a replay.
 bool completedAlready(BuildContext context, String game) {
   final reward = gameRewards[game];
@@ -94,27 +93,20 @@ class GameHeader extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       CurioEyebrow(eyebrow),
-      const SizedBox(height: 6),
+      const SizedBox(height: 8),
       Semantics(
         header: true,
         child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
       ),
-      const SizedBox(height: 7),
+      const SizedBox(height: 8),
       Text(
         subtitle,
-        style: TextStyle(
-          color: curioColor(
-            context,
-            CurioColors.inkSoft,
-            CurioColorsLight.inkSoft,
-          ),
-          height: 1.45,
-        ),
+        style: TextStyle(color: CurioTokens.textSecondary, height: 1.45),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: 16),
       Row(
         children: [
-          Expanded(child: Wrap(spacing: 14, runSpacing: 6, children: chips)),
+          Expanded(child: Wrap(spacing: 16, runSpacing: 8, children: chips)),
           ?trailing,
         ],
       ),
@@ -136,13 +128,13 @@ class HowToPlayButton extends StatelessWidget {
 }
 
 Future<void> showHowToPlay(BuildContext context, List<String> rules) {
-  final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
+  final coral = CurioTokens.wrong;
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     builder: (context) => SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(22, 0, 22, 26),
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,15 +143,15 @@ Future<void> showHowToPlay(BuildContext context, List<String> rules) {
               'How to play',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             for (final line in rules)
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 8, right: 10),
+                      margin: const EdgeInsets.only(top: 8, right: 12),
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
@@ -173,7 +165,7 @@ Future<void> showHowToPlay(BuildContext context, List<String> rules) {
                   ],
                 ),
               ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
@@ -203,33 +195,24 @@ class GameNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     final (color, icon) = switch (tone) {
       GameNoticeTone.info => (
-        curioColor(context, CurioColors.blue, CurioColorsLight.blue),
+        CurioTokens.tintLogic,
         Icons.tips_and_updates_rounded,
       ),
-      GameNoticeTone.good => (
-        curioColor(context, CurioColors.success, CurioColorsLight.success),
-        Icons.check_circle_rounded,
-      ),
-      GameNoticeTone.close => (
-        curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-        Icons.adjust_rounded,
-      ),
-      GameNoticeTone.bad => (
-        curioColor(context, CurioColors.danger, CurioColorsLight.danger),
-        Icons.close_rounded,
-      ),
+      GameNoticeTone.good => (CurioTokens.correct, Icons.check_circle_rounded),
+      GameNoticeTone.close => (CurioTokens.tintMaths, Icons.adjust_rounded),
+      GameNoticeTone.bad => (CurioTokens.wrong, Icons.close_rounded),
     };
     return Semantics(
       liveRegion: true,
       child: CurioClay(
-        radius: 18,
+        radius: CurioTokens.radiusCard,
         color: color.withValues(alpha: .14),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 20),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(child: Text(message, style: const TextStyle(height: 1.4))),
           ],
         ),
@@ -270,13 +253,9 @@ class GameResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final gold = curioColor(context, CurioColors.gold, CurioColorsLight.gold);
-    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
+    final muted = CurioTokens.textSecondary;
+    final gold = CurioTokens.tintMaths;
+    final plum = CurioTokens.tintThinking;
     final state = context
         .dependOnInheritedWidgetOfExactType<CurioScope>()
         ?.notifier;
@@ -296,12 +275,12 @@ class GameResultCard extends StatelessWidget {
     final doneToday = state?.sectionsCompleted().length ?? 0;
 
     return GlassCard(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(score, style: Theme.of(context).textTheme.displayLarge),
           const SizedBox(height: 8),
           if (xp != null && !alreadyDone)
@@ -319,7 +298,7 @@ class GameResultCard extends StatelessWidget {
             )
           else if (alreadyDone)
             Text(
-              'Today’s XP was already earned — this one was for fun.',
+              'Today’s XP was already earned, this one was for fun.',
               style: TextStyle(color: muted),
             ),
           if (unlocked != null) ...[
@@ -332,14 +311,14 @@ class GameResultCard extends StatelessWidget {
               color: plum,
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           // The share line sits in a well pressed into the card.
           SizedBox(
             width: double.infinity,
             child: CurioClay(
-              radius: 18,
+              radius: CurioTokens.radiusCard,
               pressed: true,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Text(shareText, style: const TextStyle(height: 1.6)),
             ),
           ),
@@ -358,7 +337,7 @@ class GameResultCard extends StatelessWidget {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Result copied — no spoilers in it'),
+                  content: Text('Result copied, no spoilers in it'),
                 ),
               );
             },
@@ -376,7 +355,7 @@ class GameResultCard extends StatelessWidget {
               value: doneToday / LearningSection.values.length,
               height: 6,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             OutlinedButton.icon(
               key: const Key('result_more_games'),
               onPressed: () => Navigator.of(context).maybePop(),
@@ -384,10 +363,10 @@ class GameResultCard extends StatelessWidget {
               label: const Text('Back to today’s games'),
             ),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             'New games arrive in Maths, Memory, English and Logic tomorrow.',
-            style: TextStyle(color: muted, fontSize: 12.5),
+            style: TextStyle(color: muted, fontSize: 13),
           ),
         ],
       ),
@@ -401,18 +380,17 @@ class PracticeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
+    final plum = CurioTokens.tintThinking;
     return CurioClay(
-      radius: 99,
+      radius: CurioTokens.radiusPill,
       color: plum.withValues(alpha: .16),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Text(
         'PRACTICE',
         style: TextStyle(
           color: plum,
-          fontSize: 10.5,
+          fontSize: 13,
           fontWeight: FontWeight.w800,
-          letterSpacing: 1,
         ),
       ),
     );

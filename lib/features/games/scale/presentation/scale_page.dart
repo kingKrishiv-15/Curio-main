@@ -1,17 +1,16 @@
 import 'dart:math' as math;
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_motion.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
 import '../domain/scale.dart';
 
-/// Tip the Scale: two amounts on a balance — which is more, or are they
+/// Tip the Scale: two amounts on a balance, which is more, or are they
 /// equal? Eight rounds a day; the beam tips to the true side after each
 /// answer and both amounts are written the same way to show why.
 class ScalePage extends StatefulWidget {
@@ -28,7 +27,7 @@ class _ScalePageState extends State<ScalePage> {
   static const _gameId = 'scale';
   static const _rules = [
     'Two amounts sit on the scale: fractions, decimals, percentages, quick sums or whole numbers.',
-    'Tap the side that’s more — or “They’re equal” if they balance.',
+    'Tap the side that’s more, or “They’re equal” if they balance.',
     'The scale tips to the true side, then shows both amounts written the same way so you can see why.',
     'Eight rounds a day: three warm-ups, three mixed forms, then two close calls.',
   ];
@@ -36,7 +35,7 @@ class _ScalePageState extends State<ScalePage> {
     'Spot on!',
     'Nicely weighed!',
     'Sharp thinking!',
-    'Yes — well judged!',
+    'Yes, well judged!',
   ];
 
   final _scroll = ScrollController();
@@ -85,7 +84,7 @@ class _ScalePageState extends State<ScalePage> {
         target,
         alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
         duration: _motion(320),
-        curve: Curves.easeOutCubic,
+        curve: CurioTokens.curve,
       );
     });
   }
@@ -118,7 +117,7 @@ class _ScalePageState extends State<ScalePage> {
       if (duration == Duration.zero) {
         _scroll.jumpTo(0);
       } else {
-        _scroll.animateTo(0, duration: duration, curve: Curves.easeOutCubic);
+        _scroll.animateTo(0, duration: duration, curve: CurioTokens.curve);
       }
     });
   }
@@ -128,18 +127,18 @@ class _ScalePageState extends State<ScalePage> {
     final side = answer == ScaleSide.left ? 'left' : 'right';
     if (pick == answer) {
       return answer == ScaleSide.equal
-          ? 'Perfectly balanced — they’re equal!'
+          ? 'Perfectly balanced, they’re equal!'
           : '${_cheers[_game.current % _cheers.length]} The $side side is more.';
     }
     if (answer == ScaleSide.equal) {
-      return 'Not quite — they’re exactly equal. Same amount, different look!';
+      return 'Not quite, they’re exactly equal. Same amount, different look!';
     }
     if (pick == ScaleSide.equal) {
-      return 'Not quite — they’re not equal. The $side side is more.';
+      return 'Not quite, they’re not equal. The $side side is more.';
     }
     return round.tier == ScaleTier.close
-        ? 'Not quite — the $side side is more. Close calls are tricky!'
-        : 'Not quite — the $side side is more.';
+        ? 'Not quite, the $side side is more. Close calls are tricky!'
+        : 'Not quite, the $side side is more.';
   }
 
   String get _resultTitle => switch (_game.score) {
@@ -161,13 +160,13 @@ class _ScalePageState extends State<ScalePage> {
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
         controller: _scroll,
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice round' : 'Daily number puzzle',
             title: _showResult ? 'All weighed up.' : 'Which side is more?',
             subtitle:
-                'Weigh up two amounts, then tap the side that’s more — or call it equal.',
+                'Weigh up two amounts, then tap the side that’s more, or call it equal.',
             chips: const [
               GameMetaChip(icon: Icons.schedule_rounded, label: '3 min'),
               GameMetaChip(
@@ -196,14 +195,14 @@ class _ScalePageState extends State<ScalePage> {
               onPick: _answer,
             ),
             if (pick != null) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               GameNotice(
                 message: _verdict(round, pick),
                 tone: pick == round.answer
                     ? GameNoticeTone.good
                     : GameNoticeTone.bad,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               KeyedSubtree(
                 key: _nextKey,
                 child: PrimaryButton(
@@ -224,11 +223,11 @@ class _ScalePageState extends State<ScalePage> {
               gameId: _gameId,
               onPractice: _practiceRound,
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             SectionHeading(
               _practice ? 'Your practice weigh-ins' : 'Today’s weigh-ins',
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (var i = 0; i < _game.rounds.length; i++)
               _RecapRow(
                 index: i,
@@ -261,29 +260,24 @@ class _Board extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 10,
-            runSpacing: 6,
+            spacing: 12,
+            runSpacing: 8,
             children: [
               Text(
                 'ROUND ${index + 1} OF $total',
                 style: TextStyle(
                   color: muted,
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
                 ),
               ),
               _TierTag(tier: round.tier),
@@ -297,14 +291,14 @@ class _Board extends StatelessWidget {
               onPick: pick == null ? onPick : null,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (pick == null)
             OutlinedButton.icon(
               key: const Key('scale_equal'),
               onPressed: () => onPick(ScaleSide.equal),
               icon: const Icon(Icons.balance_rounded, size: 20),
               label: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
+                padding: EdgeInsets.symmetric(vertical: 12),
                 child: Text('They’re equal'),
               ),
             )
@@ -322,22 +316,14 @@ class _TierTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final saffron = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffron,
-    );
-    final strong = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final saffron = CurioTokens.tintMaths;
+    final strong = CurioTokens.tintMaths;
+    final ink = CurioTokens.textPrimary;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: saffron.withValues(alpha: .16),
-        borderRadius: BorderRadius.circular(99),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
       ),
       child: Text.rich(
         TextSpan(
@@ -345,7 +331,7 @@ class _TierTag extends StatelessWidget {
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Padding(
-                padding: const EdgeInsets.only(right: 5),
+                padding: const EdgeInsets.only(right: 4),
                 child: Icon(
                   switch (tier) {
                     ScaleTier.warmUp => Icons.directions_walk_rounded,
@@ -360,11 +346,7 @@ class _TierTag extends StatelessWidget {
             TextSpan(text: tier.label),
           ],
         ),
-        style: TextStyle(
-          color: ink,
-          fontSize: 11.5,
-          fontWeight: FontWeight.w800,
-        ),
+        style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800),
       ),
     );
   }
@@ -377,24 +359,12 @@ class _Working extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fill = curioColor(
-      context,
-      CurioColors.surfaceMuted,
-      CurioColorsLight.surfaceMuted,
-    );
-    final strong = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final fill = CurioTokens.surface;
+    final strong = CurioTokens.tintMaths;
+    final muted = CurioTokens.textSecondary;
     const style = TextStyle(
       fontWeight: FontWeight.w700,
-      fontSize: 15,
+      fontSize: 14,
       height: 1.35,
       fontFeatures: [FontFeature.tabularFigures()],
     );
@@ -403,23 +373,23 @@ class _Working extends StatelessWidget {
       excludeSemantics: true,
       child: Container(
         key: const Key('scale_explanation'),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: fill,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 1),
+              padding: const EdgeInsets.only(top: 4),
               child: Icon(Icons.calculate_rounded, size: 19, color: strong),
             ),
-            const SizedBox(width: 9),
+            const SizedBox(width: 8),
             Expanded(
               child: Wrap(
-                spacing: 7,
-                runSpacing: 2,
+                spacing: 8,
+                runSpacing: 4,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(round.leftWorking, style: style),
@@ -568,7 +538,7 @@ class _BalanceScaleState extends State<_BalanceScale>
     };
     final t = _tip.value;
     if (t >= 1) return target;
-    // A quick drop, one overshoot, then rest — like a real balance.
+    // A quick drop, one overshoot, then rest, like a real balance.
     final settle = 1 - math.exp(-5 * t) * math.cos(2.5 * math.pi * t);
     final wobble = answer == ScaleSide.equal
         ? _wobbleShare * math.exp(-4 * t) * math.sin(3 * math.pi * t)
@@ -579,23 +549,11 @@ class _BalanceScaleState extends State<_BalanceScale>
   @override
   Widget build(BuildContext context) {
     final colours = (
-      frame: curioColor(
-        context,
-        CurioColors.inkMuted,
-        CurioColorsLight.inkMuted,
-      ),
-      string: curioColor(
-        context,
-        CurioColors.inkMuted,
-        CurioColorsLight.inkMuted,
-      ).withValues(alpha: .8),
-      beam: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-      pivot: curioColor(
-        context,
-        CurioColors.saffronStrong,
-        CurioColorsLight.saffronStrong,
-      ),
-      dish: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
+      frame: CurioTokens.textSecondary,
+      string: CurioTokens.textSecondary.withValues(alpha: .8),
+      beam: CurioTokens.tintMaths,
+      pivot: CurioTokens.tintMaths,
+      dish: CurioTokens.tintMaths,
     );
     final (leftShared, rightShared) = widget.round.shared;
     // Built once per build, so animation frames only move them.
@@ -701,7 +659,7 @@ class _ScalePainter extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(cx - 46, baseY, 92, _ScaleGeometry.baseHeight),
-        const Radius.circular(4),
+        const Radius.circular(CurioTokens.radiusPill),
       ),
       frame,
     );
@@ -796,41 +754,25 @@ class _Pan extends StatelessWidget {
         : answer == side
         ? _Outcome.more
         : _Outcome.less;
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
     final accent = !picked
         ? null
         : right
-        ? curioColor(context, CurioColors.success, CurioColorsLight.success)
-        : curioColor(context, CurioColors.danger, CurioColorsLight.danger);
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
+        ? CurioTokens.correct
+        : CurioTokens.wrong;
+    final soft = CurioTokens.textSecondary;
+    final coral = CurioTokens.wrong;
     final outcomeWord = switch (outcome) {
       _Outcome.more => 'More',
       _Outcome.less => 'Less',
       _Outcome.equal => 'Equal',
     };
     final tap = answered || onPick == null ? null : () => onPick!(side);
-    final radius = BorderRadius.circular(18);
+    final radius = BorderRadius.circular(CurioTokens.radiusCard);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Semantics(
         button: true,
         enabled: tap != null,
@@ -871,7 +813,7 @@ class _Pan extends StatelessWidget {
             ),
             IgnorePointer(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
+                padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -901,7 +843,7 @@ class _Pan extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: soft,
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
                       )
@@ -917,7 +859,7 @@ class _Pan extends StatelessWidget {
                             fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                       ],
                       _OutcomeTag(outcome: outcome, word: outcomeWord),
                     ],
@@ -947,25 +889,16 @@ class _OutcomeTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (fill, icon) = switch (outcome) {
-      _Outcome.more => (
-        curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-        Icons.arrow_downward_rounded,
-      ),
-      _Outcome.less => (
-        curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
-        Icons.arrow_upward_rounded,
-      ),
-      _Outcome.equal => (
-        curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-        Icons.balance_rounded,
-      ),
+      _Outcome.more => (CurioTokens.tintMaths, Icons.arrow_downward_rounded),
+      _Outcome.less => (CurioTokens.textSecondary, Icons.arrow_upward_rounded),
+      _Outcome.equal => (CurioTokens.tintLogic, Icons.balance_rounded),
     };
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: fill.withValues(alpha: .18),
-        borderRadius: BorderRadius.circular(99),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
       ),
       child: Text.rich(
         TextSpan(
@@ -973,7 +906,7 @@ class _OutcomeTag extends StatelessWidget {
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Padding(
-                padding: const EdgeInsets.only(right: 3),
+                padding: const EdgeInsets.only(right: 4),
                 child: Icon(icon, size: 14, color: ink),
               ),
             ),
@@ -981,7 +914,7 @@ class _OutcomeTag extends StatelessWidget {
           ],
         ),
         textAlign: TextAlign.center,
-        style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800),
+        style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800),
       ),
     );
   }
@@ -995,11 +928,7 @@ class _PickBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
+    final surface = CurioTokens.surface;
     return Container(
       width: 22,
       height: 22,
@@ -1028,10 +957,10 @@ class _ValueText extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontFamily: 'Fraunces',
-      fontSize: 30,
+      fontSize: 32,
       height: 1.1,
       fontWeight: FontWeight.w600,
-      color: curioColor(context, CurioColors.ink, CurioColorsLight.ink),
+      color: CurioTokens.textPrimary,
     );
     final parts = <Widget>[];
     var at = 0;
@@ -1040,7 +969,7 @@ class _ValueText extends StatelessWidget {
         parts.add(Text(label.substring(at, m.start), style: style));
       }
       parts.add(
-        _StackedFraction(m[1]!, m[2]!, style: style.copyWith(fontSize: 21)),
+        _StackedFraction(m[1]!, m[2]!, style: style.copyWith(fontSize: 20)),
       );
       at = m.end;
     }
@@ -1067,10 +996,10 @@ class _StackedFraction extends StatelessWidget {
         Text(numerator, textAlign: TextAlign.center, style: style),
         Container(
           height: 2.4,
-          margin: const EdgeInsets.symmetric(vertical: 2),
+          margin: const EdgeInsets.symmetric(vertical: 4),
           decoration: BoxDecoration(
             color: style.color,
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
           ),
         ),
         Text(denominator, textAlign: TextAlign.center, style: style),
@@ -1092,7 +1021,7 @@ class _RoundPips extends StatelessWidget {
         ? '${game.score} of $total right'
         : 'Round ${game.current + 1} of $total, ${game.score} right so far';
     Widget pip(int i) => Padding(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(4),
       child: _Pip(
         correct: game.correctAt(i),
         current: i == game.current && !game.finished,
@@ -1133,26 +1062,14 @@ class _Pip extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: curioColor(
-            context,
-            CurioColors.success,
-            CurioColorsLight.success,
-          ),
+          color: CurioTokens.correct,
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          Icons.check_rounded,
-          size: 11,
-          color: curioColor(context, CurioColors.night, CurioColorsLight.ink),
-        ),
+        child: Icon(Icons.check_rounded, size: 11, color: CurioTokens.base),
       );
     }
     if (correct == false) {
-      final danger = curioColor(
-        context,
-        CurioColors.danger,
-        CurioColorsLight.danger,
-      );
+      final danger = CurioTokens.wrong;
       return Container(
         width: size,
         height: size,
@@ -1163,16 +1080,8 @@ class _Pip extends StatelessWidget {
         child: Icon(Icons.close_rounded, size: 10, color: danger),
       );
     }
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final coral = CurioTokens.wrong;
+    final outline = CurioTokens.border;
     return SizedBox(
       width: size,
       height: size,
@@ -1222,16 +1131,10 @@ class _RecapRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colour = correct
-        ? curioColor(context, CurioColors.success, CurioColorsLight.success)
-        : curioColor(context, CurioColors.danger, CurioColorsLight.danger);
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final colour = correct ? CurioTokens.correct : CurioTokens.wrong;
+    final muted = CurioTokens.textSecondary;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 12),
       child: MergeSemantics(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1239,7 +1142,7 @@ class _RecapRow extends StatelessWidget {
             Container(
               width: 24,
               height: 24,
-              margin: const EdgeInsets.only(top: 1),
+              margin: const EdgeInsets.only(top: 4),
               decoration: BoxDecoration(
                 color: colour.withValues(alpha: .14),
                 shape: BoxShape.circle,
@@ -1252,7 +1155,7 @@ class _RecapRow extends StatelessWidget {
                 semanticLabel: correct ? 'Right' : 'Not quite',
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1261,10 +1164,10 @@ class _RecapRow extends StatelessWidget {
                     '${index + 1}.  ${round.leftLabel}  vs  ${round.rightLabel}',
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     round.explanation,
-                    style: TextStyle(color: muted, fontSize: 12.5, height: 1.4),
+                    style: TextStyle(color: muted, fontSize: 13, height: 1.4),
                   ),
                 ],
               ),

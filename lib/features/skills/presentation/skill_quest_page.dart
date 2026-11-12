@@ -1,10 +1,9 @@
 import 'dart:math';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_rewards.dart';
 import '../../games/game_catalog.dart';
@@ -13,10 +12,10 @@ import '../../games/presentation/game_card.dart';
 class SkillQuestPage extends StatelessWidget {
   const SkillQuestPage({super.key});
 
-  /// Levels 1–5 across 0–100% mastery (100% is level 5, not a phantom 6).
+  /// Levels 1 to 5 across 0 to 100% mastery (100% is level 5, not a phantom 6).
   static int levelFor(double mastery) => min(5, (mastery * 5).floor() + 1);
 
-  /// The skill with the least mastery, and a game for it — preferring one
+  /// The skill with the least mastery, and a game for it, preferring one
   /// not yet played today.
   static (String, GameEntry) recommendation(CurioState state) {
     final todays = todaysPicks(date: state.today);
@@ -33,24 +32,20 @@ class SkillQuestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final inkMuted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final inkMuted = CurioTokens.textSecondary;
     final (weakest, next) = recommendation(state);
     return CurioPage(
       title: 'Skill Quest',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           const CurioEyebrow('Your learning map'),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'Every game moves a skill forward.',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           for (final skill in learningSkills) ...[
             _SkillCard(
               skill: skill,
@@ -61,14 +56,14 @@ class SkillQuestPage extends StatelessWidget {
               ],
               mutedColor: inkMuted,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           SectionHeading(
             'Recommended next',
             subtitle: '$weakest has the most room to grow',
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           GameCard(
             game: next,
             style: GameCardStyle.row,
@@ -102,12 +97,12 @@ class _SkillCard extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 23,
+            radius: CurioTokens.radiusCard,
             backgroundColor: color.withValues(alpha: .13),
             foregroundColor: color,
             child: Icon(skillIcon(skill), size: 23),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,14 +124,14 @@ class _SkillCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 9),
+                const SizedBox(height: 8),
                 CurioProgressBar(value: mastery, color: color, height: 8),
-                const SizedBox(height: 5),
+                const SizedBox(height: 4),
                 Text(
                   '${(mastery * 100).round()}% mastery · ${games.join(', ')}',
                   style: TextStyle(
                     color: mutedColor,
-                    fontSize: 11.5,
+                    fontSize: 13,
                     height: 1.35,
                   ),
                 ),

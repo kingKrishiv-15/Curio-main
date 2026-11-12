@@ -10,7 +10,6 @@ cp config/supabase.example.json config/supabase.json   # then add your URL + pub
 flutter run                                            # landing → sign-up with an emailed code → Home
 flutter run --dart-define=CURIO_DEMO=true              # demo mode: no login, on-device profile
 flutter test                                           # includes the auth-flow suite
-flutter test tool/generate_brand_assets.dart           # regenerate app icons from the logo code
 ```
 
 Curio is a polished Flutter learning-and-puzzle platform for curious young

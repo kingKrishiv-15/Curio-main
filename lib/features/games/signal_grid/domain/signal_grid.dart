@@ -5,7 +5,7 @@ import 'dart:math';
 ///
 /// Every valid board is enumerated up front (there are only a few dozen), so
 /// each day's puzzle is one of them with just enough cells revealed that it
-/// is the *only* board fitting the clues — solvable by deduction, never
+/// is the *only* board fitting the clues, solvable by deduction, never
 /// guessing. Answers are then checked against the rules rather than one
 /// stored grid.
 class SignalPuzzle {

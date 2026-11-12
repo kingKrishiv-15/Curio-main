@@ -11,7 +11,7 @@ class LearnHubPage extends StatelessWidget {
     extendBehindBottom: true,
     maxWidth: 760,
     child: ListView(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 104),
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 96),
       children: const [
         PageIntro(
           eyebrow: 'Your daily playroom',
@@ -19,9 +19,9 @@ class LearnHubPage extends StatelessWidget {
           subtitle:
               'One game each in Maths, Memory, English and Logic. A new set arrives at midnight on this device. Take your time and enjoy learning.',
         ),
-        SizedBox(height: 20),
+        SizedBox(height: 24),
         DailyPointsCard(),
-        SizedBox(height: 28),
+        SizedBox(height: 32),
         DailyPlan(),
       ],
     ),

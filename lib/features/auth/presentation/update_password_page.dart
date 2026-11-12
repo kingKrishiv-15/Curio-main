@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
@@ -58,11 +57,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return AuthFrame(
       child: AutofillGroup(
         child: Form(
@@ -83,10 +78,10 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Your code checked out. Pick something memorable — you’ll use it next time you sign in.',
+                'Your code checked out. Pick something memorable, you’ll use it next time you sign in.',
                 style: TextStyle(color: muted, height: 1.55),
               ),
-              const SizedBox(height: 26),
+              const SizedBox(height: 24),
               PasswordField(
                 controller: _password,
                 label: 'New password',

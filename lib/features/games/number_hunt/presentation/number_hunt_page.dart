@@ -1,10 +1,9 @@
 import 'dart:math';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -60,12 +59,12 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
         GameNoticeTone.good,
       ),
       Clue.outside => (
-        'Your clues already rule $value out — it’s between '
+        'Your clues already rule $value out, it’s between '
             '${_fmt(_hunt.floor)} and ${_fmt(_hunt.ceiling)}.',
         GameNoticeTone.close,
       ),
       Clue.higher || Clue.lower when _hunt.over => (
-        'Out of guesses — it was ${_fmt(_hunt.target)}.',
+        'Out of guesses, it was ${_fmt(_hunt.target)}.',
         GameNoticeTone.bad,
       ),
       Clue.higher => ('Go higher than $value. You’re $heat.', _toneOf(heat)),
@@ -129,7 +128,7 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
       title: 'Number Hunt',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice hunt' : 'Daily number hunt',
@@ -138,11 +137,11 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
                 : 'Find the number.',
             subtitle:
                 'It’s hiding somewhere from 1 to 1,000. Every guess tells you '
-                'higher or lower — and how close you are.',
+                'higher or lower, and how close you are.',
             chips: [
               const GameMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '3–4 min',
+                label: '3 to 4 min',
               ),
               GameMetaChip(
                 icon: Icons.ads_click_rounded,
@@ -161,9 +160,9 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
           ],
           const SizedBox(height: 16),
           _RangeCard(hunt: _hunt, accent: accent),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           GameNotice(message: _message, tone: _tone),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (!_hunt.over) ...[
             _Display(typed: _typed),
             const SizedBox(height: 12),
@@ -179,7 +178,7 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
                   'Halving trick: guess the middle of what’s left every time. '
                   'Ten halvings shrink 1,000 numbers to one.',
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             GameResultCard(
               gameId: _game,
               title: _hunt.found
@@ -196,7 +195,7 @@ class _NumberHuntPageState extends State<NumberHuntPage> {
           if (_hunt.guesses.isNotEmpty) ...[
             const SizedBox(height: 24),
             const SectionHeading('Your trail'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             _Trail(hunt: _hunt),
           ],
         ],
@@ -217,16 +216,12 @@ class _RangeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     const span = NumberHunt.high - NumberHunt.low + 1;
     final from = (hunt.floor - NumberHunt.low) / span;
     final to = (hunt.ceiling - NumberHunt.low + 1) / span;
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Semantics(
         label:
             'The number is between ${hunt.floor} and ${hunt.ceiling}. '
@@ -239,22 +234,21 @@ class _RangeCard extends StatelessWidget {
               hunt.found ? 'FOUND' : 'SOMEWHERE BETWEEN',
               style: TextStyle(
                 color: muted,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1.3,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
                 hunt.found
                     ? _fmt(hunt.target)
-                    : '${_fmt(hunt.floor)} – ${_fmt(hunt.ceiling)}',
+                    : '${_fmt(hunt.floor)}, ${_fmt(hunt.ceiling)}',
                 style: Theme.of(
                   context,
-                ).textTheme.headlineLarge?.copyWith(fontSize: 42),
+                ).textTheme.headlineLarge?.copyWith(fontSize: 32),
               ),
             ),
             const SizedBox(height: 16),
@@ -264,8 +258,8 @@ class _RangeCard extends StatelessWidget {
               tween: Tween(end: Offset(from, to)),
               duration: MediaQuery.disableAnimationsOf(context)
                   ? Duration.zero
-                  : const Duration(milliseconds: 500),
-              curve: Curves.easeOutCubic,
+                  : CurioTokens.slow,
+              curve: CurioTokens.curve,
               builder: (context, window, _) => SizedBox(
                 height: 22,
                 width: double.infinity,
@@ -280,25 +274,25 @@ class _RangeCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Text('1', style: TextStyle(color: muted, fontSize: 11)),
+                Text('1', style: TextStyle(color: muted, fontSize: 13)),
                 const Spacer(),
-                Text('1,000', style: TextStyle(color: muted, fontSize: 11)),
+                Text('1,000', style: TextStyle(color: muted, fontSize: 13)),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             // Guesses still in hand puff up; spent ones are dents.
             Row(
               children: [
                 for (var i = 0; i < NumberHunt.maxGuesses; i++) ...[
-                  if (i > 0) const SizedBox(width: 6),
+                  if (i > 0) const SizedBox(width: 8),
                   Expanded(
                     child: SizedBox(
                       height: 14,
                       child: CurioClay(
-                        radius: 7,
+                        radius: CurioTokens.radiusCard,
                         pressed: i < hunt.guesses.length,
                         color: i < hunt.guesses.length
                             ? null
@@ -373,11 +367,7 @@ class _Display extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     return Semantics(
       liveRegion: true,
       label: typed.isEmpty ? 'No guess typed yet' : 'Your guess: $typed',
@@ -386,7 +376,7 @@ class _Display extends StatelessWidget {
         key: const Key('hunt_display'),
         height: 72,
         child: CurioClay(
-          radius: 22,
+          radius: CurioTokens.radiusCard,
           pressed: true,
           child: Center(
             child: Text(
@@ -417,18 +407,10 @@ class _Keypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     // Coral is bright in both modes, so the Guess key's label stays dark.
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final onCoral = curioColor(
-      context,
-      CurioColors.night,
-      CurioColorsLight.ink,
-    );
+    final coral = CurioTokens.wrong;
+    final onCoral = CurioTokens.base;
     Widget digit(String d) => _ClayKey(
       key: Key('hunt_key_$d'),
       label: d,
@@ -437,7 +419,7 @@ class _Keypad extends StatelessWidget {
         d,
         style: Theme.of(
           context,
-        ).textTheme.headlineSmall?.copyWith(fontSize: 26, color: ink),
+        ).textTheme.headlineSmall?.copyWith(fontSize: 32, color: ink),
       ),
     );
     final rows = [
@@ -470,7 +452,7 @@ class _Keypad extends StatelessWidget {
                   style: TextStyle(
                     color: onCoral,
                     fontWeight: FontWeight.w800,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -482,11 +464,11 @@ class _Keypad extends StatelessWidget {
     return Column(
       children: [
         for (var r = 0; r < rows.length; r++) ...[
-          if (r > 0) const SizedBox(height: 10),
+          if (r > 0) const SizedBox(height: 12),
           Row(
             children: [
               for (var c = 0; c < rows[r].length; c++) ...[
-                if (c > 0) const SizedBox(width: 10),
+                if (c > 0) const SizedBox(width: 12),
                 Expanded(child: rows[r][c]),
               ],
             ],
@@ -548,10 +530,10 @@ class _ClayKeyState extends State<_ClayKey> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 58),
             child: CurioClay(
-              radius: 20,
+              radius: CurioTokens.radiusCard,
               pressed: _down,
               color: widget.color,
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               child: Center(child: widget.child),
             ),
           ),
@@ -568,7 +550,7 @@ class _Trail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -583,7 +565,7 @@ class _Trail extends StatelessWidget {
                     '$g, ${heat == Heat.found ? 'found' : '${g < hunt.target ? 'go higher' : 'go lower'}, ${heat.label}'}',
                 excludeSemantics: true,
                 child: CurioClay(
-                  radius: 16,
+                  radius: CurioTokens.radiusCard,
                   color: color.withValues(alpha: .2),
                   outline: heat == Heat.found ? color : null,
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -595,10 +577,10 @@ class _Trail extends StatelessWidget {
                         style: TextStyle(
                           color: ink,
                           fontWeight: FontWeight.w900,
-                          fontSize: 15,
+                          fontSize: 14,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Icon(
                         heat == Heat.found
                             ? Icons.check_circle_rounded
@@ -614,7 +596,7 @@ class _Trail extends StatelessWidget {
                         style: TextStyle(
                           color: ink,
                           fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -629,26 +611,10 @@ class _Trail extends StatelessWidget {
 }
 
 Color _heatColor(BuildContext context, Heat heat) => switch (heat) {
-  Heat.found => curioColor(
-    context,
-    CurioColors.success,
-    CurioColorsLight.forestStrong,
-  ),
-  Heat.sizzling => curioColor(
-    context,
-    CurioColors.danger,
-    CurioColorsLight.danger,
-  ),
-  Heat.hot => curioColor(
-    context,
-    CurioColors.coral,
-    CurioColorsLight.coralStrong,
-  ),
-  Heat.warm => curioColor(
-    context,
-    CurioColors.saffron,
-    CurioColorsLight.saffronStrong,
-  ),
-  Heat.cool => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-  Heat.cold => curioColor(context, CurioColors.plum, CurioColorsLight.plum),
+  Heat.found => CurioTokens.correct,
+  Heat.sizzling => CurioTokens.wrong,
+  Heat.hot => CurioTokens.wrong,
+  Heat.warm => CurioTokens.tintMaths,
+  Heat.cool => CurioTokens.tintLogic,
+  Heat.cold => CurioTokens.tintThinking,
 };

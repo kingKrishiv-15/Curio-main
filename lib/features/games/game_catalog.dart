@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
-import '../../core/theme/curio_colors.dart';
-import '../../core/theme/curio_colors_light.dart';
-import '../../core/widgets/curio_ui.dart';
 import '../story/presentation/frostlands_story_page.dart';
 import 'bridge/presentation/bridge_page.dart';
 import 'cascade/presentation/cascade_page.dart';
@@ -117,25 +115,25 @@ final gameCatalog = <GameEntry>[
     title: 'Word Trails',
     tagline: 'Trace the story’s missing words, then say what they mean.',
     icon: Icons.gesture_rounded,
-    duration: '3–4 min',
+    duration: '3 to 4 min',
     builder: (date) => WordTrailsPage(date: date),
     isNew: true,
   ),
   GameEntry(
     id: 'crowns',
     title: 'Crowns',
-    tagline: 'One crown in every row, column and colour — and none touching.',
+    tagline: 'One crown in every row, column and colour, and none touching.',
     icon: Icons.workspace_premium_rounded,
-    duration: '3–5 min',
+    duration: '3 to 5 min',
     builder: (date) => CrownsPage(date: date),
     isNew: true,
   ),
   GameEntry(
     id: 'odd_cluster',
     title: 'Odd Cluster',
-    tagline: 'Sixteen tiles, four hidden groups — and one of them is a trap.',
+    tagline: 'Sixteen tiles, four hidden groups, and one of them is a trap.',
     icon: Icons.workspaces_rounded,
-    duration: '3–5 min',
+    duration: '3 to 5 min',
     builder: (date) => OddClusterPage(date: date),
     isNew: true,
   ),
@@ -153,14 +151,14 @@ final gameCatalog = <GameEntry>[
     title: 'Bridge',
     tagline: 'Order every tile to turn one number into another.',
     icon: Icons.linear_scale_rounded,
-    duration: '3–5 min',
+    duration: '3 to 5 min',
     builder: (date) => BridgePage(date: date),
     isNew: true,
   ),
   GameEntry(
     id: 'cascade',
     title: 'Cascade',
-    tagline: 'Chain five consequences — evidence over hunches.',
+    tagline: 'Chain five consequences, evidence over hunches.',
     icon: Icons.waterfall_chart_rounded,
     duration: '4 min',
     builder: (date) => CascadePage(date: date),
@@ -178,7 +176,7 @@ final gameCatalog = <GameEntry>[
   GameEntry(
     id: 'verdict',
     title: 'Verdict',
-    tagline: 'Does the evidence back the claim — or can’t it tell yet?',
+    tagline: 'Does the evidence back the claim, or can’t it tell yet?',
     icon: Icons.gavel_rounded,
     duration: '3 min',
     builder: (date) => VerdictPage(date: date),
@@ -189,7 +187,7 @@ final gameCatalog = <GameEntry>[
     title: 'Mirror',
     tagline: 'Paint the other half so the pattern reflects perfectly.',
     icon: Icons.flip_rounded,
-    duration: '3–4 min',
+    duration: '3 to 4 min',
     builder: (date) => MirrorPage(date: date),
     isNew: true,
   ),
@@ -199,7 +197,7 @@ final gameCatalog = <GameEntry>[
     tagline:
         'Match every child to their pet and favourite, using only the clues.',
     icon: Icons.groups_rounded,
-    duration: '4–6 min',
+    duration: '4 to 6 min',
     builder: (date) => WhosWhoPage(date: date),
     isNew: true,
   ),
@@ -216,7 +214,7 @@ final gameCatalog = <GameEntry>[
     title: 'Squeeze',
     tagline: 'Find the secret number before the range closes in.',
     icon: Icons.calculate_rounded,
-    duration: '2–4 min',
+    duration: '2 to 4 min',
     builder: (date) => SqueezePage(date: date),
   ),
   GameEntry(
@@ -224,7 +222,7 @@ final gameCatalog = <GameEntry>[
     title: 'Number Hunt',
     tagline: 'One number from 1 to 1,000. Ten guesses. Follow the clues.',
     icon: Icons.travel_explore_rounded,
-    duration: '3–4 min',
+    duration: '3 to 4 min',
     builder: (date) => NumberHuntPage(date: date),
     isNew: true,
   ),
@@ -233,7 +231,7 @@ final gameCatalog = <GameEntry>[
     title: 'Link Lab',
     tagline: 'Sort sixteen clues into four knowledge groups.',
     icon: Icons.hub_outlined,
-    duration: '3–5 min',
+    duration: '3 to 5 min',
     builder: (date) => LinkLabPage(date: date),
   ),
   GameEntry(
@@ -241,7 +239,7 @@ final gameCatalog = <GameEntry>[
     title: 'Signal Grid',
     tagline: 'Balance the grid by deduction alone.',
     icon: Icons.grid_view_rounded,
-    duration: '4–6 min',
+    duration: '4 to 6 min',
     builder: (date) => SignalGridPage(date: date),
   ),
   GameEntry(
@@ -249,7 +247,7 @@ final gameCatalog = <GameEntry>[
     title: 'Pattern Forge',
     tagline: 'Pick the next number, name the rule, fix the broken pattern.',
     icon: Icons.blur_on_rounded,
-    duration: '3–5 min',
+    duration: '3 to 5 min',
     builder: (date) => PatternForgePage(date: date),
   ),
   GameEntry(
@@ -258,13 +256,13 @@ final gameCatalog = <GameEntry>[
     tagline:
         'A new case each day: rank the clues before you jump to conclusions.',
     icon: Icons.manage_search_rounded,
-    duration: '4–6 min',
+    duration: '4 to 6 min',
     builder: (date) => EvidenceDetectivePage(date: date),
   ),
   GameEntry(
     id: 'frostlands_night_1',
     title: 'Frostlands Story',
-    tagline: 'Help Ash home — careful, brave or kind? Four endings to find.',
+    tagline: 'Help Ash home, careful, brave or kind? Four endings to find.',
     icon: Icons.ac_unit_rounded,
     duration: '5 min',
     builder: (_) => const FrostlandsStoryPage(),
@@ -317,16 +315,10 @@ Color sectionColor(BuildContext context, LearningSection section) =>
 /// The skill colours from design.md §3: number sense gold, patterns coral,
 /// evidence blue, reasoning plum.
 Color skillColor(BuildContext context, String skill) => switch (skill) {
-  'Number sense' => curioColor(
-    context,
-    CurioColors.saffron,
-    CurioColorsLight.saffron,
-  ),
-  'Memory' ||
-  'Patterns' => curioColor(context, CurioColors.coral, CurioColorsLight.coral),
-  'English' ||
-  'Evidence' => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-  _ => curioColor(context, CurioColors.plum, CurioColorsLight.plum),
+  'Number sense' => CurioTokens.tintMaths,
+  'Memory' || 'Patterns' => CurioTokens.wrong,
+  'English' || 'Evidence' => CurioTokens.tintLogic,
+  _ => CurioTokens.tintThinking,
 };
 
 IconData skillIcon(String skill) => switch (skill) {

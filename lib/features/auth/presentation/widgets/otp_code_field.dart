@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_motion.dart';
-import '../../../../core/widgets/curio_ui.dart';
 
-/// A row of digit boxes backed by one real, invisible text field — so
+/// A row of digit boxes backed by one real, invisible text field, so
 /// paste, iOS one-time-code autofill, hardware keyboards and screen
 /// readers all behave exactly like a normal input.
 class OtpCodeField extends StatefulWidget {
@@ -170,27 +168,11 @@ class _DigitBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
+    final coral = CurioTokens.wrong;
+    final danger = CurioTokens.wrong;
+    final ink = CurioTokens.textPrimary;
+    final outline = CurioTokens.border;
+    final surface = CurioTokens.surface;
     final border = hasError
         ? danger
         : active
@@ -201,23 +183,14 @@ class _DigitBox extends StatelessWidget {
     return AnimatedContainer(
       duration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
-          : const Duration(milliseconds: 160),
+          : CurioTokens.fast,
       width: width,
       height: height,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: enabled ? surface : surface.withValues(alpha: .6),
-        borderRadius: BorderRadius.circular(width * .28),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         border: Border.all(color: border, width: active || hasError ? 2 : 1.3),
-        boxShadow: active
-            ? [
-                BoxShadow(
-                  color: coral.withValues(alpha: .22),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
       ),
       child: digit != null
           ? Text(
@@ -271,7 +244,7 @@ class _CaretState extends State<_Caret> with SingleTickerProviderStateMixin {
       height: widget.height,
       decoration: BoxDecoration(
         color: widget.color,
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
       ),
     );
     if (MediaQuery.disableAnimationsOf(context)) return bar;

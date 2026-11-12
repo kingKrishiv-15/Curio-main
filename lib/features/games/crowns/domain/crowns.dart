@@ -16,7 +16,7 @@ class CrownsBoard {
   int regionAt(int row, int column) => regions[row * size + column];
 
   /// The same puzzle turned [turns] quarter-turns clockwise, mirrored first
-  /// when [mirror] — every one still has exactly one solution.
+  /// when [mirror], every one still has exactly one solution.
   CrownsBoard transformed({required int turns, required bool mirror}) {
     (int, int) move(int row, int column) {
       var (r, c) = (row, mirror ? size - 1 - column : column);
@@ -117,7 +117,7 @@ class CrownsGame {
       if (crowns.any((b) => clash(a, b))) a,
   };
 
-  /// Squares a placed crown already rules out — shown faded, to help.
+  /// Squares a placed crown already rules out, shown faded, to help.
   bool blocked(Square square) =>
       !crowns.contains(square) && crowns.any((c) => clash(c, square));
 

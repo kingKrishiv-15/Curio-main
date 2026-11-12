@@ -2,7 +2,7 @@ import 'crowns.dart';
 
 /// Kingdom maps with exactly one solution each, generated offline (a test
 /// re-checks every one, and every rotation and reflection of it). Kept small
-/// — 5×5 and 6×6 — so they suit younger players.
+///, 5×5 and 6×6, so they suit younger players.
 const crownsBoards = <CrownsBoard>[
   CrownsBoard(
     size: 5,

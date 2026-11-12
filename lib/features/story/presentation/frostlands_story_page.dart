@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_kit.dart';
 import '../../games/common/game_rewards.dart';
@@ -11,7 +10,7 @@ import '../domain/frostlands.dart';
 class FrostlandsStoryPage extends StatefulWidget {
   const FrostlandsStoryPage({super.key, this.date});
 
-  /// Unused — the story is the same every night — but every activity page
+  /// Unused, the story is the same every night, but every activity page
   /// takes the same arguments.
   final DateTime? date;
 
@@ -23,7 +22,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
   static const _story = 'frostlands_night_1';
   static const _rules = [
     'Read each scene and choose what Ash does next.',
-    'Every choice is careful, brave or kind — and nudges how the night ends.',
+    'Every choice is careful, brave or kind, and nudges how the night ends.',
     'There are four endings. Finishing earns XP once; replay to find the others.',
   ];
 
@@ -47,7 +46,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
       title: 'Frostlands · Night 1',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           _SceneArt(
             icon: _complete
@@ -58,7 +57,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                     Icons.diamond_rounded,
                   ][_path.length],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           if (!_complete) ..._scene(context) else ..._ending(context),
         ],
       ),
@@ -71,9 +70,9 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
     return [
       CurioEyebrow(
         'Scene ${_path.length + 1} of ${frostlandsScenes.length}',
-        color: curioColor(context, CurioColors.blue, CurioColorsLight.blue),
+        color: CurioTokens.tintLogic,
       ),
-      const SizedBox(height: 6),
+      const SizedBox(height: 8),
       Semantics(
         header: true,
         child: Text(
@@ -91,27 +90,27 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
       ],
       if (_path.isNotEmpty) ...[
         _Recap(choice: _path.last),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
       ],
       Text(
         scene.body,
         style: Theme.of(
           context,
-        ).textTheme.bodyLarge?.copyWith(fontSize: 18, height: 1.45),
+        ).textTheme.bodyLarge?.copyWith(fontSize: 20, height: 1.45),
       ),
-      const SizedBox(height: 18),
+      const SizedBox(height: 16),
       Text(
         'What should Ash do?',
         style: Theme.of(context).textTheme.titleMedium,
       ),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       for (var i = 0; i < scene.choices.length; i++) ...[
         _ChoiceButton(
           key: Key('story_choice_$i'),
           label: scene.choices[i].label,
           onTap: () => _choose(scene.choices[i]),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
       ],
     ];
   }
@@ -120,23 +119,12 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
     final traits = [for (final c in _path) c.trait];
     final ending = frostlandsEnding(traits);
     final tally = traitTally(traits);
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final gold = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
+    final muted = CurioTokens.textSecondary;
+    final gold = CurioTokens.tintMaths;
     final xp = gameRewards[_story]!.xp;
     return [
-      CurioEyebrow(
-        'The end of night 1',
-        color: curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-      ),
-      const SizedBox(height: 6),
+      CurioEyebrow('The end of night 1', color: CurioTokens.tintLogic),
+      const SizedBox(height: 8),
       Semantics(
         header: true,
         child: Text(
@@ -144,25 +132,25 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       if (_path.isNotEmpty) ...[
         _Recap(choice: _path.last),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
       ],
       Text(
         ending.body,
         style: Theme.of(
           context,
-        ).textTheme.bodyLarge?.copyWith(fontSize: 18, height: 1.45),
+        ).textTheme.bodyLarge?.copyWith(fontSize: 20, height: 1.45),
       ),
-      const SizedBox(height: 18),
+      const SizedBox(height: 16),
       GlassCard(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Your path', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (var i = 0; i < _path.length; i++) ...[
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +180,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
           ],
         ),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: 16),
       GlassCard(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -203,11 +191,11 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
                   : Icons.bolt_rounded,
               color: gold,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 _alreadyDone
-                    ? 'You’ve already earned this story’s XP — this path was for fun.'
+                    ? 'You’ve already earned this story’s XP, this path was for fun.'
                     : '+$xp XP · Aurora discovery unlocked',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
@@ -218,14 +206,14 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
           ],
         ),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: 16),
       OutlinedButton.icon(
         key: const Key('story_replay'),
         onPressed: _replay,
         icon: const Icon(Icons.replay_rounded, size: 18),
         label: const Text('Try a different path'),
       ),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       PrimaryButton(
         label: 'Return from Frostlands',
         icon: Icons.home_rounded,
@@ -243,27 +231,16 @@ class _SceneArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final ice = curioColor(context, CurioColors.ice, CurioColorsLight.ice);
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final gold = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffronStrong,
-    );
-    final snow = curioColor(context, CurioColors.ink, CurioColorsLight.blue);
+    final ice = CurioTokens.accent;
+    final coral = CurioTokens.wrong;
+    final gold = CurioTokens.tintMaths;
+    final snow = CurioTokens.textPrimary;
     return ExcludeSemantics(
       child: Container(
         height: 170,
         decoration: BoxDecoration(
-          gradient: dark
-              ? CurioColors.heroGradient
-              : CurioColorsLight.heroGradient,
-          borderRadius: BorderRadius.circular(28),
+          color: CurioTokens.surfaceRaised,
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -317,19 +294,15 @@ class _Recap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return GlassCard(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(
             spacing: 8,
-            runSpacing: 6,
+            runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
@@ -339,7 +312,7 @@ class _Recap extends StatelessWidget {
               _TraitChip(trait: choice.trait),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(choice.outcome, style: TextStyle(color: muted, height: 1.45)),
         ],
       ),
@@ -354,25 +327,16 @@ class _TraitChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, icon) = switch (trait) {
-      StoryTrait.careful => (
-        curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-        Icons.search_rounded,
-      ),
-      StoryTrait.brave => (
-        curioColor(context, CurioColors.coral, CurioColorsLight.coral),
-        Icons.bolt_rounded,
-      ),
-      StoryTrait.kind => (
-        curioColor(context, CurioColors.plum, CurioColorsLight.plum),
-        Icons.favorite_rounded,
-      ),
+      StoryTrait.careful => (CurioTokens.tintLogic, Icons.search_rounded),
+      StoryTrait.brave => (CurioTokens.wrong, Icons.bolt_rounded),
+      StoryTrait.kind => (CurioTokens.tintThinking, Icons.favorite_rounded),
     };
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: .16),
-        borderRadius: BorderRadius.circular(99),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
         border: Border.all(color: color.withValues(alpha: .55)),
       ),
       child: Row(
@@ -384,7 +348,7 @@ class _TraitChip extends StatelessWidget {
             trait.label,
             style: TextStyle(
               color: ink,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -401,36 +365,24 @@ class _ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final coral = curioColor(
-      context,
-      CurioColors.coralStrong,
-      CurioColorsLight.coralStrong,
-    );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final ink = CurioTokens.textPrimary;
+    final coral = CurioTokens.wrong;
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
     return Semantics(
       button: true,
       label: label,
       excludeSemantics: true,
       child: Material(
         color: surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               border: Border.all(color: outline, width: 1.3),
             ),
             child: Row(
@@ -445,7 +397,7 @@ class _ChoiceButton extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Icon(Icons.arrow_forward_rounded, color: coral),
               ],
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_ui.dart';
 
@@ -13,21 +12,9 @@ class AccessibilityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = CurioThemeScope.of(context);
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final sunken = curioColor(
-      context,
-      CurioColors.surfaceMuted,
-      CurioColorsLight.surfaceMuted,
-    );
+    final muted = CurioTokens.textSecondary;
+    final forest = CurioTokens.accent;
+    final sunken = CurioTokens.surface;
     final percent = (controller.readingScale * 100).round();
     return CurioPage(
       title: 'Reading and motion',
@@ -38,14 +25,14 @@ class AccessibilityPage extends StatelessWidget {
             'Make yourself comfortable.',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'These work on top of your phone’s own accessibility settings.',
             style: TextStyle(color: muted),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           CurioCard(
-            padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
+            padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
             child: Row(
               children: [
                 CurioIconTile(
@@ -53,9 +40,9 @@ class AccessibilityPage extends StatelessWidget {
                   color: forest,
                   size: 38,
                   iconSize: 19,
-                  radius: 12,
+                  radius: CurioTokens.radiusCard,
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +51,7 @@ class AccessibilityPage extends StatelessWidget {
                         'Reduce motion',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         'Keep navigation and decorations still. Your device’s reduced-motion setting is always respected.',
                         style: TextStyle(color: muted, height: 1.45),
@@ -79,7 +66,7 @@ class AccessibilityPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           CurioCard(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -92,9 +79,9 @@ class AccessibilityPage extends StatelessWidget {
                       color: forest,
                       size: 38,
                       iconSize: 19,
-                      radius: 12,
+                      radius: CurioTokens.radiusCard,
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         'Reading size',
@@ -116,10 +103,10 @@ class AccessibilityPage extends StatelessWidget {
                   onChanged: (v) => controller.setReading(scale: v),
                 ),
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: sunken,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                   ),
                   child: const Text(
                     'Every little question can lead to a big discovery.',
@@ -129,12 +116,12 @@ class AccessibilityPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Adds to your device’s text size. The line above is a preview.',
-                  style: TextStyle(color: muted, fontSize: 12.5),
+                  style: TextStyle(color: muted, fontSize: 13),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           CurioStatusStrip(
             icon: Icons.record_voice_over_outlined,
             title: 'Screen readers',

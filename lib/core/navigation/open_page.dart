@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../state/curio_state.dart';
 
@@ -10,15 +11,15 @@ Future<T?> openPage<T>(BuildContext context, Widget page) {
           CurioScope(notifier: state, child: page),
       transitionDuration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
-          : const Duration(milliseconds: 320),
+          : CurioTokens.slow,
       reverseTransitionDuration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
-          : const Duration(milliseconds: 240),
+          : CurioTokens.slow,
       transitionsBuilder: (_, animation, secondaryAnimation, child) {
         final curve = CurvedAnimation(
           parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
+          curve: CurioTokens.curve,
+          reverseCurve: CurioTokens.curve,
         );
         return FadeTransition(
           opacity: curve,

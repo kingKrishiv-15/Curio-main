@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/config/supabase_config.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/parental_gate.dart';
@@ -48,36 +47,20 @@ class ProfilePage extends StatelessWidget {
       totalXp: state.totalXp,
       longestStreak: state.longestStreak,
     );
-    final inkMuted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final forestSoft = curioColor(
-      context,
-      CurioColors.forestSoft,
-      CurioColorsLight.forestSoft,
-    );
+    final inkMuted = CurioTokens.textSecondary;
+    final forest = CurioTokens.accent;
+    final forestSoft = CurioTokens.surfaceRaised;
     // Text colour: the bright forest in dark mode, the deep one on light.
-    final forestStrong = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forestStrong,
-    );
+    final forestStrong = CurioTokens.accent;
 
     return CurioPage(
       extendBehindBottom: true,
       maxWidth: 760,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 25, 16, 104),
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 96),
         children: [
           Center(child: ExplorerAvatar(name: state.childName, size: 84)),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Center(
             child: Text(
               state.childName,
@@ -85,14 +68,14 @@ class ProfilePage extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Center(
             child: Text(
               'Curious Explorer · Stage ${state.companionStage}',
               style: TextStyle(color: inkMuted),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Center(
             child: TextButton.icon(
               onPressed: () => _rename(context, state),
@@ -131,25 +114,25 @@ class ProfilePage extends StatelessWidget {
                   'Companion growth',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(
                   '${state.xpIntoStage} / 250 XP',
                   style: TextStyle(
                     color: forestStrong,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 11),
+                const SizedBox(height: 12),
                 CurioProgressBar(
                   value: state.xpIntoStage / 250,
                   color: forest,
                   height: 10,
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 8),
                 Text(
                   '${250 - state.xpIntoStage} XP until stage ${state.companionStage + 1}',
-                  style: TextStyle(color: inkMuted, fontSize: 11),
+                  style: TextStyle(color: inkMuted, fontSize: 13),
                 ),
               ],
             ),
@@ -159,9 +142,9 @@ class ProfilePage extends StatelessWidget {
             badges: badges,
             onOpen: () => showBadgesSheet(context, badges),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           const SectionHeading('Your space'),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           CurioCard(
             padding: EdgeInsets.zero,
             child: Column(
@@ -272,11 +255,11 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Center(
             child: Text(
               'Curio · Learning should feel like discovery',
-              style: TextStyle(color: inkMuted, fontSize: 10),
+              style: TextStyle(color: inkMuted, fontSize: 13),
             ),
           ),
         ],
@@ -293,21 +276,9 @@ class _ThemeToggleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = CurioThemeScope.of(context);
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final forestSoft = curioColor(
-      context,
-      CurioColors.forestSoft,
-      CurioColorsLight.forestSoft,
-    );
-    final inkMuted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final forest = CurioTokens.accent;
+    final forestSoft = CurioTokens.surfaceRaised;
+    final inkMuted = CurioTokens.textSecondary;
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -315,8 +286,8 @@ class _ThemeToggleTile extends StatelessWidget {
         return ListTile(
           onTap: controller.toggle,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 5,
+            horizontal: 16,
+            vertical: 4,
           ),
           leading: CurioIconTile(
             icon: isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
@@ -324,7 +295,7 @@ class _ThemeToggleTile extends StatelessWidget {
             background: forestSoft,
             size: 40,
             iconSize: 21,
-            radius: 13,
+            radius: CurioTokens.radiusCard,
           ),
           title: const Text(
             'Dark mode',
@@ -332,9 +303,9 @@ class _ThemeToggleTile extends StatelessWidget {
           ),
           subtitle: Text(
             isDark
-                ? 'On — easier on the eyes at night'
-                : 'Off — bright and light',
-            style: TextStyle(color: inkMuted, fontSize: 11),
+                ? 'On, easier on the eyes at night'
+                : 'Off, bright and light',
+            style: TextStyle(color: inkMuted, fontSize: 13),
           ),
           trailing: Switch(
             value: isDark,
@@ -361,34 +332,22 @@ class _ProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
-    final forestSoft = curioColor(
-      context,
-      CurioColors.forestSoft,
-      CurioColorsLight.forestSoft,
-    );
-    final inkMuted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final forest = CurioTokens.accent;
+    final forestSoft = CurioTokens.surfaceRaised;
+    final inkMuted = CurioTokens.textSecondary;
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: CurioIconTile(
         icon: icon,
         color: forest,
         background: forestSoft,
         size: 40,
         iconSize: 21,
-        radius: 13,
+        radius: CurioTokens.radiusCard,
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-      subtitle: Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 11)),
+      subtitle: Text(subtitle, style: TextStyle(color: inkMuted, fontSize: 13)),
       trailing: Icon(Icons.chevron_right_rounded, color: inkMuted),
     );
   }

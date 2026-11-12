@@ -1,10 +1,9 @@
 import 'dart:math' as math;
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_motion.dart';
@@ -75,9 +74,9 @@ class _LandingPageState extends State<LandingPage> {
             child: IntrinsicHeight(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
-                  wide ? 40 : 24,
+                  wide ? 48 : 24,
                   12,
-                  wide ? 40 : 24,
+                  wide ? 48 : 24,
                   12,
                 ),
                 child: Column(
@@ -172,18 +171,10 @@ class _WelcomeMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final coral = CurioTokens.wrong;
+    final muted = CurioTokens.textSecondary;
     return CurioFadeSlideIn(
-      delay: const Duration(milliseconds: 90),
+      delay: CurioTokens.fast,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -204,7 +195,6 @@ class _WelcomeMessage extends StatelessWidget {
               style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 fontSize: wide ? 54 : 36,
                 height: 1.08,
-                letterSpacing: -1.3,
               ),
             ),
           ),
@@ -212,7 +202,7 @@ class _WelcomeMessage extends StatelessWidget {
           Text(
             'Maths, Memory & English. A little every day.',
             textAlign: wide ? TextAlign.start : TextAlign.center,
-            style: TextStyle(color: muted, height: 1.5, fontSize: 15),
+            style: TextStyle(color: muted, height: 1.5, fontSize: 14),
           ),
         ],
       ),
@@ -240,7 +230,7 @@ class _WelcomeActions extends StatelessWidget {
           ],
         ),
       ),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       OutlinedButton(
         key: const Key('landing_sign_in'),
         onPressed: onSignIn,

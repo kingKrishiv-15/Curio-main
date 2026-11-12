@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import '../../../core/models/family_settings.dart';
 import '../../../core/services/family_service.dart';
 import '../../../core/state/curio_state.dart';
@@ -16,7 +17,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
   final _service = FamilyService();
   bool _loading = true, _saving = false, _reminders = false, _email = false;
 
-  /// Only true once real settings arrived — saving defaults over settings we
+  /// Only true once real settings arrived, saving defaults over settings we
   /// failed to load would wipe the family's choices (and consent).
   bool _loaded = false;
   int _goal = 3, _hour = 18;
@@ -106,8 +107,8 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
               ),
               const SizedBox(height: 24),
               CurioClay(
-                padding: const EdgeInsets.all(20),
-                radius: 26,
+                padding: const EdgeInsets.all(24),
+                radius: CurioTokens.radiusCard,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -135,10 +136,10 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               CurioClay(
-                padding: const EdgeInsets.all(20),
-                radius: 26,
+                padding: const EdgeInsets.all(24),
+                radius: CurioTokens.radiusCard,
                 child: Column(
                   children: [
                     SwitchListTile.adaptive(
@@ -220,17 +221,17 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                 ),
               ),
               if (_service.isDemo) ...[
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 const AuthNotice(
-                  'Your daily goal is saved on this device. Reminders and the weekly email need a family account — create one from Profile.',
+                  'Your daily goal is saved on this device. Reminders and the weekly email need a family account, create one from Profile.',
                 ),
               ],
               if (_error != null) ...[
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 AuthNotice(_error!, error: true),
               ],
               if (_saved != null) ...[
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 AuthNotice(_saved!),
               ],
               const SizedBox(height: 24),
@@ -240,7 +241,7 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                   icon: const Icon(Icons.refresh_rounded),
                   label: const Text('Reload settings'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
               ],
               FilledButton(
                 onPressed: _saving || !_loaded ? null : _save,

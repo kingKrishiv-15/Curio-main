@@ -44,7 +44,7 @@ bool onPatternSide(
   };
 }
 
-/// Whether the mirror runs straight through [cell] — only ever true on the
+/// Whether the mirror runs straight through [cell], only ever true on the
 /// diagonal. Those squares are their own reflection.
 bool onMirrorLine(
   int cell,
@@ -62,7 +62,7 @@ bool onMirrorLine(
 /// Puzzles come from a seed, so a day's set is the same for everyone, and a
 /// pattern is only kept when it's worth solving ([isWorthSolving]): a fair
 /// amount to paint, no row or column that's all-or-nothing, and no shortcut
-/// — sliding the pattern across, or spinning it round, must never give the
+///, sliding the pattern across, or spinning it round, must never give the
 /// same answer as flipping it.
 class MirrorPuzzle {
   MirrorPuzzle({
@@ -83,7 +83,7 @@ class MirrorPuzzle {
   final MirrorAxis axis;
   final int size;
 
-  /// The filled squares on the pattern side — shown and locked.
+  /// The filled squares on the pattern side, shown and locked.
   final Set<int> given;
 
   /// Every square on the pattern side, filled or not.
@@ -290,7 +290,7 @@ class MirrorRound {
   }
 
   /// Squares the last check said shouldn't be painted, and still are. Empty
-  /// before the first check — the board never hints for free.
+  /// before the first check, the board never hints for free.
   Set<int> get markedExtra =>
       lastCheck?.extra.intersection(painted) ?? const <int>{};
 

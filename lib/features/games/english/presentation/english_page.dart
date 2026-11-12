@@ -136,7 +136,7 @@ class _EnglishPageState extends State<EnglishPage> {
               child: PracticeBadge(),
             ),
           ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
         if (_result)
           GameResultCard(
             title: _score == 5
@@ -155,9 +155,9 @@ class _EnglishPageState extends State<EnglishPage> {
             '${widget.builder ? 'Word' : 'Question'} ${_round + 1} of 5',
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           CurioProgressBar(value: _round / 5),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           if (widget.builder) ..._builderBoard() else ..._questionBoard(),
           if (_answered) ...[
             const SizedBox(height: 16),
@@ -193,7 +193,7 @@ class _EnglishPageState extends State<EnglishPage> {
       const SizedBox(height: 16),
       for (var i = 0; i < options.length; i++)
         Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.only(bottom: 12),
           child: OutlinedButton(
             key: Key('english_option_$i'),
             onPressed: _answered
@@ -242,8 +242,8 @@ class _EnglishPageState extends State<EnglishPage> {
     ),
     const SizedBox(height: 16),
     Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 12,
+      runSpacing: 12,
       alignment: WrapAlignment.center,
       children: [
         for (var i = 0; i < _letters.length; i++)
@@ -261,7 +261,7 @@ class _EnglishPageState extends State<EnglishPage> {
       ],
     ),
     if (!_answered) ...[
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       Wrap(
         spacing: 12,
         alignment: WrapAlignment.center,

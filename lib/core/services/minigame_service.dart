@@ -131,10 +131,7 @@ class MinigameService {
     final rows =
         await _db.rpc(
               'get_daily_puzzle',
-              params: {
-                'p_puzzle_type': type,
-                'p_puzzle_date': _dateOnly(date),
-              },
+              params: {'p_puzzle_type': type, 'p_puzzle_date': _dateOnly(date)},
             )
             as List<dynamic>;
 

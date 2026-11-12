@@ -1,11 +1,10 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
@@ -16,42 +15,40 @@ import '../../games/presentation/daily_plan.dart';
 /// Home's dark mode: a deep, textured evergreen backdrop with slate clay
 /// cards (deliberately not another shade of green) and gold flames.
 abstract final class _HomeDark {
-  static const bgTop = Color(0xFF0E211B);
-  static const bgBottom = Color(0xFF05100D);
+  static const bgBottom = CurioTokens.base;
 
-  static const surfaceRaised = Color(0xFF3C4346);
+  static const surfaceRaised = CurioTokens.surfaceRaised;
 
-  static const line = Color(0x26FFFFFF);
-  static const ink = Color(0xFFF4FAF6);
-  static const inkMuted = Color(0xFFC4CDC9);
-  static const inkFaint = Color(0xFF8D948F);
+  static const line = CurioTokens.border;
+  static const ink = CurioTokens.accent;
+  static const inkMuted = CurioTokens.textPrimary;
+  static const inkFaint = CurioTokens.textSecondary;
 
-  static const gold = Color(0xFFE7BE6B);
-  static const sky = Color(0xFF8FC3D9);
+  static const gold = CurioTokens.tintMaths;
+  static const sky = CurioTokens.tintLogic;
 }
 
 /// Home's light mode: a bright, warm cream backdrop with warm-white clay
-/// cards and a saturated coral "this is live right now" accent — kid-friendly and
+/// cards and a saturated coral "this is live right now" accent, kid-friendly and
 /// vibrant rather than moody.
 abstract final class _HomeLight {
-  static const bgTop = Color(0xFFFFF8EE);
-  static const bgBottom = Color(0xFFFDF1E2);
+  static const bgBottom = CurioTokens.tintMaths;
 
-  static const line = Color(0xFFF0E4D0);
-  static const ink = Color(0xFF2E2417);
-  static const inkMuted = Color(0xFF8C7C63);
-  static const inkFaint = Color(0xFFB8AB92);
+  static const line = CurioTokens.tintMaths;
+  static const ink = CurioTokens.surface;
+  static const inkMuted = CurioTokens.textSecondary;
+  static const inkFaint = CurioTokens.textSecondary;
 
-  static const accent = Color(0xFFF2564A);
-  static const gold = Color(0xFFDB9A2C);
-  static const sky = Color(0xFF2E9FD6);
+  static const accent = CurioTokens.wrong;
+  static const gold = CurioTokens.tintMaths;
+  static const sky = CurioTokens.tintLogic;
 
-  static const yellowTile = Color(0xFFFFEEBE);
-  static const yellowInk = Color(0xFFAD7A0C);
+  static const yellowTile = CurioTokens.tintMaths;
+  static const yellowInk = CurioTokens.tintMaths;
 }
 
 /// Picks between [_HomeDark] and [_HomeLight] for the current theme
-/// brightness — every colour decision in this file goes through this so
+/// brightness, every colour decision in this file goes through this so
 /// the whole page adapts to the global light/dark toggle automatically.
 Color _hc(BuildContext context, Color darkColor, Color lightColor) {
   return Theme.of(context).brightness == Brightness.dark
@@ -59,7 +56,7 @@ Color _hc(BuildContext context, Color darkColor, Color lightColor) {
       : lightColor;
 }
 
-/// A gentle looping scale pulse — used on "live" streak flames so they read
+/// A gentle looping scale pulse, used on "live" streak flames so they read
 /// as active rather than static icons.
 class _Pulse extends StatefulWidget {
   const _Pulse({required this.child});
@@ -97,7 +94,7 @@ class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
       scale: Tween(
         begin: 0.92,
         end: 1.1,
-      ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut)),
+      ).animate(CurvedAnimation(parent: _controller, curve: CurioTokens.curve)),
       child: widget.child,
     );
   }
@@ -117,7 +114,7 @@ class _FadeSlideInState extends State<_FadeSlideIn>
     with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 420),
+    duration: CurioTokens.slow,
   );
 
   Timer? _start;
@@ -140,7 +137,7 @@ class _FadeSlideInState extends State<_FadeSlideIn>
     if (MediaQuery.disableAnimationsOf(context)) return widget.child;
     final curved = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutCubic,
+      curve: CurioTokens.curve,
     );
     return AnimatedBuilder(
       animation: curved,
@@ -191,10 +188,10 @@ class HomePage extends StatelessWidget {
                   ),
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(
-                      20,
-                      18,
-                      20,
-                      104 + MediaQuery.viewPaddingOf(context).bottom,
+                      24,
+                      16,
+                      24,
+                      96 + MediaQuery.viewPaddingOf(context).bottom,
                     ),
                     children: [
                       _Header(
@@ -202,16 +199,16 @@ class HomePage extends StatelessWidget {
                         goalDone: state.dailyGoalCompleted >= state.dailyGoal,
                         onProfile: onProfile,
                       ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 24),
                       _FadeSlideIn(child: _WeekCard(state: state)),
                       const SizedBox(height: _sectionGap),
                       const _FadeSlideIn(
-                        delay: Duration(milliseconds: 80),
+                        delay: CurioTokens.fast,
                         child: _SectionHeader(title: 'Weekly growth'),
                       ),
                       const SizedBox(height: 12),
                       _FadeSlideIn(
-                        delay: const Duration(milliseconds: 100),
+                        delay: CurioTokens.fast,
                         child: _WeeklyGrowth(state: state),
                       ),
                       const SizedBox(height: _sectionGap),
@@ -236,7 +233,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-/// Space between Home's sections — one value, so the rhythm is even.
+/// Space between Home's sections, one value, so the rhythm is even.
 const _sectionGap = 30.0;
 
 String _dateKey(DateTime date) =>
@@ -278,7 +275,7 @@ const _months = [
 ];
 
 /// The page backdrop: a textured evergreen gradient in dark mode, a clean
-/// warm cream wash in light mode — both with just a hint of grain/glow,
+/// warm cream wash in light mode, both with just a hint of grain/glow,
 /// never a flat single-colour fill.
 class _HomeBackdrop extends StatelessWidget {
   const _HomeBackdrop();
@@ -287,15 +284,7 @@ class _HomeBackdrop extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: dark
-              ? const [_HomeDark.bgTop, _HomeDark.bgBottom]
-              : const [_HomeLight.bgTop, _HomeLight.bgBottom],
-        ),
-      ),
+      decoration: BoxDecoration(color: CurioTokens.base),
       child: CustomPaint(
         painter: _HomeTexturePainter(dark: dark),
         child: const SizedBox.expand(),
@@ -325,7 +314,7 @@ class _HomeTexturePainter extends CustomPainter {
       cool,
     );
 
-    final grainColor = dark ? Colors.white : const Color(0xFF2E2417);
+    final grainColor = dark ? CurioTokens.textPrimary : CurioTokens.surface;
     final grain = Paint()
       ..color = grainColor.withValues(alpha: dark ? .022 : .014);
     for (var y = 20.0; y < size.height; y += 30) {
@@ -375,11 +364,11 @@ class _Header extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: ink,
-                  fontSize: 28,
+                  fontSize: 32,
                   height: 1.1,
                 ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               Text(
                 goalDone
                     ? 'Goal complete! Come back for new games tomorrow.'
@@ -390,8 +379,8 @@ class _Header extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        CurioClay(radius: 22, child: bell),
-        const SizedBox(width: 10),
+        CurioClay(radius: CurioTokens.radiusCard, child: bell),
+        const SizedBox(width: 12),
         ExplorerAvatar(name: name, onTap: onProfile),
       ],
     );
@@ -408,11 +397,7 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ink = _hc(context, _HomeDark.ink, _HomeLight.ink);
-    final link = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forestStrong,
-    );
+    final link = CurioTokens.accent;
     return Row(
       children: [
         Expanded(
@@ -422,7 +407,7 @@ class _SectionHeader extends StatelessWidget {
               title,
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 22),
+              ).textTheme.titleLarge?.copyWith(color: ink, fontSize: 20),
             ),
           ),
         ),
@@ -437,7 +422,7 @@ class _SectionHeader extends StatelessWidget {
                   action!,
                   style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
-                const SizedBox(width: 2),
+                const SizedBox(width: 4),
                 const Icon(Icons.chevron_right_rounded, size: 20),
               ],
             ),
@@ -479,9 +464,9 @@ class _StreakChip extends StatelessWidget {
       label: '$streak day streak',
       excludeSemantics: true,
       child: CurioClay(
-        radius: 99,
+        radius: CurioTokens.radiusPill,
         color: dark ? _HomeDark.surfaceRaised : _HomeLight.yellowTile,
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: count,
       ),
     );
@@ -507,11 +492,7 @@ class _WeekCard extends StatelessWidget {
     final flameFill = dark
         ? _HomeDark.gold.withValues(alpha: .2)
         : _HomeLight.yellowTile;
-    final success = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.forest,
-    );
+    final success = CurioTokens.correct;
 
     final now = state.today;
     final week = _thisWeek();
@@ -525,8 +506,8 @@ class _WeekCard extends StatelessWidget {
     final goalMet = doneToday >= goal;
 
     return CurioClay(
-      radius: 24,
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+      radius: CurioTokens.radiusCard,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -537,7 +518,7 @@ class _WeekCard extends StatelessWidget {
                   '${_weekdays[now.weekday - 1]}, ${now.day} ${_months[now.month - 1]}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: ink,
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -564,12 +545,12 @@ class _WeekCard extends StatelessWidget {
                           fill: flameFill,
                           accent: accent,
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         Text(
                           _labels[i],
                           style: TextStyle(
                             color: i == todayIndex ? ink : inkFaint,
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: i == todayIndex
                                 ? FontWeight.w800
                                 : FontWeight.w600,
@@ -583,7 +564,7 @@ class _WeekCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Divider(height: 1, color: line),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Column(
             key: const Key('daily_goal_banner'),
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -602,22 +583,22 @@ class _WeekCard extends StatelessWidget {
                       style: TextStyle(
                         color: ink,
                         fontWeight: FontWeight.w800,
-                        fontSize: 13.5,
+                        fontSize: 14,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 '$doneToday of $goal games',
                 style: TextStyle(
                   color: inkMuted,
                   fontWeight: FontWeight.w700,
-                  fontSize: 12.5,
+                  fontSize: 13,
                 ),
               ),
-              const SizedBox(height: 9),
+              const SizedBox(height: 8),
               CurioProgressBar(
                 value: goal == 0 ? 1 : doneToday / goal,
                 color: goalMet ? success : accent,
@@ -650,7 +631,7 @@ class _DayBubble extends StatelessWidget {
     return SizedBox.square(
       dimension: 36,
       child: CurioClay(
-        radius: 18,
+        radius: CurioTokens.radiusCard,
         pressed: !played,
         color: played ? fill : null,
         outline: today ? accent : null,

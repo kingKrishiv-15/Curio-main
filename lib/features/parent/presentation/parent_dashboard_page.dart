@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_ui.dart';
@@ -51,19 +52,19 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
         padding: const EdgeInsets.all(24),
         children: [
           CurioClay(
-            padding: const EdgeInsets.all(20),
-            radius: 26,
+            padding: const EdgeInsets.all(24),
+            radius: CurioTokens.radiusCard,
             color: Theme.of(context).colorScheme.secondaryContainer,
             child: Row(
               children: [
                 const MascotBadge(size: 68),
-                const SizedBox(width: 20),
+                const SizedBox(width: 24),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const CurioEyebrow('Your explorer'),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Text(
                         state.childName,
                         style: Theme.of(context).textTheme.headlineMedium,
@@ -82,13 +83,13 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             'The last 7 days',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           CurioClay(
-            padding: const EdgeInsets.all(20),
-            radius: 26,
+            padding: const EdgeInsets.all(24),
+            radius: CurioTokens.radiusCard,
             child: Wrap(
               spacing: 32,
-              runSpacing: 20,
+              runSpacing: 24,
               children: [
                 _Stat('${recent.length}', 'activities'),
                 _Stat('$practiceDays', 'practice days'),
@@ -101,10 +102,10 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             'Skill snapshot',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           CurioClay(
-            padding: const EdgeInsets.all(20),
-            radius: 26,
+            padding: const EdgeInsets.all(24),
+            radius: CurioTokens.radiusCard,
             child: Column(
               children: [
                 for (final skill in skills)
@@ -125,10 +126,10 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           CurioClay(
-            padding: const EdgeInsets.all(20),
-            radius: 26,
+            padding: const EdgeInsets.all(24),
+            radius: CurioTokens.radiusCard,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -136,7 +137,7 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
                   'A little encouragement',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Text(
                   _encouragement(state, skills),
                   style: const TextStyle(height: 1.6),
@@ -149,11 +150,11 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
             'Your family space',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           WeeklyEmailCard(key: ValueKey(_emailRevision)),
           const SizedBox(height: 16),
           CurioClay(
-            radius: 26,
+            radius: CurioTokens.radiusCard,
             padding: EdgeInsets.zero,
             child: Column(
               children: [
@@ -187,10 +188,10 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           const Text(
             'Mastery reflects completed practice, not a formal assessment.',
-            style: TextStyle(fontSize: 12),
+            style: TextStyle(fontSize: 13),
           ),
         ],
       ),
@@ -218,7 +219,7 @@ class _Link extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
     leading: Icon(icon),
     title: Text(title),
     subtitle: Text(subtitle),
@@ -236,5 +237,5 @@ String _encouragement(CurioState state, List<MapEntry<String, double>> skills) {
   final lead = even
       ? '${state.childName} has been practising evenly across their learning skills.'
       : '${skills.first.key} is currently ${state.childName}’s strongest area.';
-  return '$lead To grow ${weakest.toLowerCase()}, try ${next.title} together — and ask them to explain their thinking out loud.';
+  return '$lead To grow ${weakest.toLowerCase()}, try ${next.title} together, and ask them to explain their thinking out loud.';
 }

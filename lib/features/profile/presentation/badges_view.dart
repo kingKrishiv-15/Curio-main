@@ -1,9 +1,8 @@
 import 'dart:math' as math;
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../domain/badges.dart';
@@ -11,31 +10,11 @@ import '../domain/badges.dart';
 /// Each badge family's colour: first steps forest, streaks coral, exploring
 /// blue, discoveries plum, XP gold.
 Color badgeColor(BuildContext context, BadgeTone tone) => switch (tone) {
-  BadgeTone.start => curioColor(
-    context,
-    CurioColors.forest,
-    CurioColorsLight.forest,
-  ),
-  BadgeTone.streak => curioColor(
-    context,
-    CurioColors.coral,
-    CurioColorsLight.coral,
-  ),
-  BadgeTone.explore => curioColor(
-    context,
-    CurioColors.blue,
-    CurioColorsLight.blue,
-  ),
-  BadgeTone.discovery => curioColor(
-    context,
-    CurioColors.plum,
-    CurioColorsLight.plum,
-  ),
-  BadgeTone.xp => curioColor(
-    context,
-    CurioColors.saffron,
-    CurioColorsLight.saffron,
-  ),
+  BadgeTone.start => CurioTokens.accent,
+  BadgeTone.streak => CurioTokens.wrong,
+  BadgeTone.explore => CurioTokens.tintLogic,
+  BadgeTone.discovery => CurioTokens.tintThinking,
+  BadgeTone.xp => CurioTokens.tintMaths,
 };
 
 String _badgeSemantics(CurioBadge badge) => badge.earned
@@ -54,21 +33,9 @@ class BadgeMedal extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = badgeColor(context, badge.tone);
     // Bright fills take dark glyphs (design.md §3).
-    final onColor = curioColor(
-      context,
-      CurioColors.night,
-      CurioColorsLight.ink,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final track = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final onColor = CurioTokens.base;
+    final muted = CurioTokens.textSecondary;
+    final track = CurioTokens.border;
 
     final Widget disc;
     if (badge.earned) {
@@ -157,21 +124,9 @@ class BadgeShelf extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final link = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forestStrong,
-    );
-    final gold = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffronStrong,
-    );
+    final muted = CurioTokens.textSecondary;
+    final link = CurioTokens.accent;
+    final gold = CurioTokens.tintMaths;
     final earned = badges.where((b) => b.earned).length;
     final next = nextBadge(badges);
     // Earned medals first, so the shelf fills up from the left.
@@ -204,7 +159,7 @@ class BadgeShelf extends StatelessWidget {
                   color: gold,
                   size: 40,
                   iconSize: 22,
-                  radius: 12,
+                  radius: CurioTokens.radiusCard,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -215,12 +170,12 @@ class BadgeShelf extends StatelessWidget {
                         'Badges',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         '$earned of ${badges.length} earned',
                         style: TextStyle(
                           color: muted,
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -231,14 +186,14 @@ class BadgeShelf extends StatelessWidget {
                   'See all',
                   style: TextStyle(
                     color: link,
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 Icon(Icons.chevron_right_rounded, color: link, size: 20),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -247,7 +202,7 @@ class BadgeShelf extends StatelessWidget {
               ],
             ),
             if (next != null) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               _NextUp(badge: next),
             ],
           ],
@@ -265,16 +220,12 @@ class _NextUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = badgeColor(context, badge.tone);
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
     return CurioClay(
-      radius: 14,
+      radius: CurioTokens.radiusCard,
       color: color.withValues(alpha: .08),
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -285,9 +236,8 @@ class _NextUp extends StatelessWidget {
                   text: 'NEXT UP  ',
                   style: TextStyle(
                     color: muted,
-                    fontSize: 9.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
                   ),
                 ),
                 TextSpan(
@@ -300,7 +250,7 @@ class _NextUp extends StatelessWidget {
                 ),
               ],
             ),
-            style: const TextStyle(fontSize: 12.5),
+            style: const TextStyle(fontSize: 13),
           ),
           const SizedBox(height: 8),
           _ProgressLine(badge: badge, color: color),
@@ -319,11 +269,7 @@ class _ProgressLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     return Row(
       children: [
         Expanded(
@@ -333,12 +279,12 @@ class _ProgressLine extends StatelessWidget {
             height: 7,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Text(
           badge.progressLabel,
           style: TextStyle(
             color: muted,
-            fontSize: 11.5,
+            fontSize: 13,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -372,11 +318,7 @@ class _BadgesSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     final earned = [
       for (final b in badges)
         if (b.earned) b,
@@ -390,7 +332,7 @@ class _BadgesSheet extends StatelessWidget {
       top: false,
       child: ListView(
         controller: controller,
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
         children: [
           const CurioEyebrow('Badges'),
           const SizedBox(height: 8),
@@ -398,7 +340,7 @@ class _BadgesSheet extends StatelessWidget {
             'A trail of brave thinking',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             earned.isEmpty
                 ? 'Finish your first game to earn your first badge.'
@@ -408,21 +350,21 @@ class _BadgesSheet extends StatelessWidget {
           const SizedBox(height: 12),
           CurioProgressBar(value: earned.length / badges.length, height: 10),
           if (earned.isNotEmpty) ...[
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             SectionHeading('Earned', subtitle: '${earned.length} so far'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (final b in earned) ...[
               _BadgeRow(badge: b),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
             ],
           ],
           if (toEarn.isNotEmpty) ...[
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             const SectionHeading('Still to earn', subtitle: 'Closest first'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (final b in toEarn) ...[
               _BadgeRow(badge: b),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
             ],
           ],
         ],
@@ -439,16 +381,8 @@ class _BadgeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = badgeColor(context, badge.tone);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final earnedInk = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forestStrong,
-    );
+    final muted = CurioTokens.textSecondary;
+    final earnedInk = CurioTokens.accent;
     return Semantics(
       container: true,
       label:
@@ -462,7 +396,7 @@ class _BadgeRow extends StatelessWidget {
         child: Row(
           children: [
             BadgeMedal(badge: badge, size: 54),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,10 +407,10 @@ class _BadgeRow extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     badge.description,
-                    style: TextStyle(color: muted, fontSize: 12.5),
+                    style: TextStyle(color: muted, fontSize: 13),
                   ),
                   const SizedBox(height: 8),
                   if (badge.earned)
@@ -487,12 +421,12 @@ class _BadgeRow extends StatelessWidget {
                           size: 16,
                           color: earnedInk,
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 4),
                         Text(
                           'Earned',
                           style: TextStyle(
                             color: earnedInk,
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
                           ),
                         ),

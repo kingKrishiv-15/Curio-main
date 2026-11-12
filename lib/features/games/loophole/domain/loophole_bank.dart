@@ -1,7 +1,7 @@
 // Offline copy of the Loophole statements in supabase/seed_loophole.sql, so
 // guests (and anyone the server can't reach) still get a daily puzzle.
 // Online players are validated server-side and never see this table's
-// answers over the network. Keep in sync with the seed — a test compares
+// answers over the network. Keep in sync with the seed, a test compares
 // the two.
 
 class LoopholeRound {

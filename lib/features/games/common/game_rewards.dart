@@ -1,5 +1,5 @@
 /// What finishing each activity earns. This mirrors `public.activity_rewards`
-/// (supabase/migrations/202610080001_launch_hardening.sql) exactly — the
+/// (supabase/migrations/202610080001_launch_hardening.sql) exactly, the
 /// server recomputes XP from its own table, so a mismatch would make XP jump
 /// after a reload. A test parses the migration and compares.
 class GameReward {

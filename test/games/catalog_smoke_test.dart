@@ -7,8 +7,8 @@ import 'package:curio/features/games/signal_grid/presentation/signal_grid_page.d
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Every game in the catalog opens the way the app opens it — inside its
-/// daily session — and scrolls end to end without an error, in both themes,
+/// Every game in the catalog opens the way the app opens it, inside its
+/// daily session, and scrolls end to end without an error, in both themes,
 /// on a roomy phone and on a small one at large text.
 void main() {
   final day = DateTime(2026, 10, 27);

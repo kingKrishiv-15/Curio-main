@@ -68,7 +68,7 @@ class DailyPointsCard extends StatelessWidget {
       date: state.today,
     ).fold(0, (sum, g) => sum + g.xp);
     return GlassCard(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -79,7 +79,7 @@ class DailyPointsCard extends StatelessWidget {
             excludeSemantics: true,
             child: Wrap(
               alignment: WrapAlignment.spaceBetween,
-              spacing: 20,
+              spacing: 24,
               runSpacing: 12,
               children: [
                 Column(
@@ -119,7 +119,7 @@ class DailyPointsCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           CurioProgressBar(value: completed / sections),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           const Text('Earn XP once per daily game. Replays are for practice.'),
         ],
       ),

@@ -47,7 +47,7 @@ class OddClusterGame {
   final List<ClusterGroup> revealed = [];
   final Set<String> _tried = {};
 
-  /// One row per guess, each the tiers of the four chosen tiles — enough
+  /// One row per guess, each the tiers of the four chosen tiles, enough
   /// for a spoiler-free share grid.
   final List<List<int>> history = [];
   int mistakes = 0;
@@ -59,8 +59,13 @@ class OddClusterGame {
 
   /// Tiles still in play, in board order.
   List<String> get board {
-    final done = {for (final g in [...found, ...revealed]) ...g.words};
-    return [for (final w in _order) if (!done.contains(w)) w];
+    final done = {
+      for (final g in [...found, ...revealed]) ...g.words,
+    };
+    return [
+      for (final w in _order)
+        if (!done.contains(w)) w,
+    ];
   }
 
   ClusterGroup groupOf(String word) =>
@@ -115,7 +120,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       words: ['PENGUIN', 'OSTRICH', 'EMU', 'KIWI'],
       tier: 0,
       explanation:
-          'Penguins swim, ostriches and emus run, and kiwis forage at night — none of them can fly.',
+          'Penguins swim, ostriches and emus run, and kiwis forage at night, none of them can fly.',
     ),
     ClusterGroup(
       title: 'Exactly 1,000 of something',
@@ -129,7 +134,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       words: ['SYDNEY', 'TORONTO', 'ISTANBUL', 'MUMBAI'],
       tier: 2,
       explanation:
-          'Famous and busy — but the national capitals are Canberra, Ottawa, Ankara and New Delhi.',
+          'Famous and busy, but the national capitals are Canberra, Ottawa, Ankara and New Delhi.',
     ),
     ClusterGroup(
       title: 'Capitals that aren’t the biggest city',
@@ -164,7 +169,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       words: ['15', '21', '33', '45'],
       tier: 3,
       explanation:
-          'Written in binary they read the same both ways: 1111, 10101, 100001 and 101101. They look like the 3 times table — but so do 36 and 216.',
+          'Written in binary they read the same both ways: 1111, 10101, 100001 and 101101. They look like the 3 times table, but so do 36 and 216.',
     ),
   ]),
   ClusterPuzzle([
@@ -194,7 +199,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       words: ['SATURN', 'JUPITER', 'URANUS', 'NEPTUNE'],
       tier: 3,
       explanation:
-          'All four giant planets have rings — Saturn’s are just the brightest. They looked like they belonged with the rocky planets.',
+          'All four giant planets have rings, Saturn’s are just the brightest. They looked like they belonged with the rocky planets.',
     ),
   ]),
   ClusterPuzzle([
@@ -216,7 +221,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       words: ['SHARK', 'SALMON', 'TUNA', 'SEAHORSE'],
       tier: 2,
       explanation:
-          'A seahorse is a fish, and so is a shark — they breathe through gills and have backbones.',
+          'A seahorse is a fish, and so is a shark, they breathe through gills and have backbones.',
     ),
     ClusterGroup(
       title: 'Not fish at all',
@@ -231,7 +236,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       title: 'Metals',
       words: ['IRON', 'COPPER', 'GOLD', 'ZINC'],
       tier: 0,
-      explanation: 'Pure metal elements — each is a single kind of atom.',
+      explanation: 'Pure metal elements, each is a single kind of atom.',
     ),
     ClusterGroup(
       title: 'Gemstones',
@@ -245,7 +250,7 @@ const oddClusterPuzzles = <ClusterPuzzle>[
       words: ['HELIUM', 'NEON', 'ARGON', 'XENON'],
       tier: 2,
       explanation:
-          'Gases that barely react with anything — which is why party balloons use helium instead of flammable hydrogen.',
+          'Gases that barely react with anything, which is why party balloons use helium instead of flammable hydrogen.',
     ),
     ClusterGroup(
       title: 'Alloys (mixtures, not elements)',

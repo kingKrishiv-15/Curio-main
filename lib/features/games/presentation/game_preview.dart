@@ -1,8 +1,9 @@
 import 'dart:math' as math;
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
-/// A tiny, glanceable picture of how each game plays — drawn on the vivid
+/// A tiny, glanceable picture of how each game plays, drawn on the vivid
 /// card art so a child can tell games apart before reading a word ("4 · 11 ·
 /// 18 · ?" is Sequence; a closing range bar is Squeeze).
 ///
@@ -58,12 +59,16 @@ class GamePreview extends StatelessWidget {
     'mirror' => _mirror(),
     'verdict' => _verdict(ink),
     'whos_who' => _whosWho(ink),
-    _ => const Icon(Icons.extension_rounded, color: Colors.white, size: 48),
+    _ => const Icon(
+      Icons.extension_rounded,
+      color: CurioTokens.textPrimary,
+      size: 48,
+    ),
   };
 
   Widget _memoryMatch(_Ink ink) => Wrap(
-    spacing: 6,
-    runSpacing: 6,
+    spacing: 8,
+    runSpacing: 8,
     alignment: WrapAlignment.center,
     children: [
       for (final icon in [
@@ -74,18 +79,26 @@ class GamePreview extends StatelessWidget {
         Icons.star_rounded,
         Icons.question_mark_rounded,
       ])
-        _cell(36, child: Icon(icon, size: 23, color: Colors.white)),
+        _cell(36, child: Icon(icon, size: 23, color: CurioTokens.textPrimary)),
     ],
   );
 
   Widget _memoryTrail(_Ink ink) => Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      const Icon(Icons.local_florist_rounded, color: Colors.white, size: 32),
+      const Icon(
+        Icons.local_florist_rounded,
+        color: CurioTokens.textPrimary,
+        size: 32,
+      ),
       _arrow(),
-      const Icon(Icons.star_rounded, color: Colors.white, size: 32),
+      const Icon(Icons.star_rounded, color: CurioTokens.textPrimary, size: 32),
       _arrow(),
-      const Icon(Icons.bedtime_rounded, color: Colors.white, size: 32),
+      const Icon(
+        Icons.bedtime_rounded,
+        color: CurioTokens.textPrimary,
+        size: 32,
+      ),
     ],
   );
 
@@ -97,7 +110,7 @@ class GamePreview extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: Colors.white,
+          color: CurioTokens.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w800,
         ),
@@ -107,7 +120,7 @@ class GamePreview extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _chip('glad', ink, width: 60),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           _chip('cold', ink, width: 60, solid: false),
         ],
       ),
@@ -119,7 +132,7 @@ class GamePreview extends StatelessWidget {
     children: [
       for (final letter in ['W', 'O', 'R', 'D'])
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: _chip(letter, ink, width: 28, height: 38),
         ),
     ],
@@ -140,11 +153,16 @@ class GamePreview extends StatelessWidget {
     height: height,
     alignment: Alignment.center,
     decoration: BoxDecoration(
-      color: solid ? Colors.white : Colors.white.withValues(alpha: .2),
-      borderRadius: BorderRadius.circular(height * .32),
+      color: solid
+          ? CurioTokens.textPrimary
+          : CurioTokens.textPrimary.withValues(alpha: .2),
+      borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
       border: solid
           ? null
-          : Border.all(color: Colors.white.withValues(alpha: .85), width: 1.4),
+          : Border.all(
+              color: CurioTokens.textPrimary.withValues(alpha: .85),
+              width: 1.4,
+            ),
     ),
     child: Text(
       text,
@@ -154,15 +172,19 @@ class GamePreview extends StatelessWidget {
         fontSize: size,
         fontWeight: FontWeight.w700,
         height: 1,
-        color: solid ? ink.deep : Colors.white,
+        color: solid ? ink.deep : CurioTokens.textPrimary,
       ),
     ),
   );
 
   static Widget _arrow({IconData icon = Icons.arrow_forward_rounded}) =>
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 1),
-        child: Icon(icon, size: 11, color: Colors.white.withValues(alpha: .85)),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Icon(
+          icon,
+          size: 11,
+          color: CurioTokens.textPrimary.withValues(alpha: .85),
+        ),
       );
 
   static Widget _cell(double size, {double alpha = .28, Widget? child}) =>
@@ -171,8 +193,8 @@ class GamePreview extends StatelessWidget {
         height: size,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: alpha),
-          borderRadius: BorderRadius.circular(size * .28),
+          color: CurioTokens.textPrimary.withValues(alpha: alpha),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         ),
         child: child,
       );
@@ -222,11 +244,11 @@ class GamePreview extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       _chip('4', ink),
-      const SizedBox(width: 6),
+      const SizedBox(width: 8),
       _chip('11', ink),
-      const SizedBox(width: 6),
+      const SizedBox(width: 8),
       _chip('18', ink),
-      const SizedBox(width: 6),
+      const SizedBox(width: 8),
       _chip('?', ink, solid: false),
     ],
   );
@@ -249,8 +271,8 @@ class GamePreview extends StatelessWidget {
       width: w,
       height: 15,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: alpha),
-        borderRadius: BorderRadius.circular(8),
+        color: CurioTokens.textPrimary.withValues(alpha: alpha),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
       ),
     );
     return Column(
@@ -271,7 +293,7 @@ class GamePreview extends StatelessWidget {
       Icon(
         Icons.format_quote_rounded,
         size: 34,
-        color: Colors.white.withValues(alpha: .9),
+        color: CurioTokens.textPrimary.withValues(alpha: .9),
       ),
       const SizedBox(width: 4),
       Column(
@@ -302,11 +324,13 @@ class GamePreview extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 4),
           Container(
-            padding: const EdgeInsets.only(bottom: 2),
+            padding: const EdgeInsets.only(bottom: 4),
             decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.white, width: 2)),
+              border: Border(
+                bottom: BorderSide(color: CurioTokens.textPrimary, width: 2),
+              ),
             ),
             child: _chip(
               'surveyed',
@@ -356,7 +380,11 @@ class GamePreview extends StatelessWidget {
     (r, c) => _cell(
       18,
       child: const [1, 3, 0, 2][r] == c
-          ? const Icon(Icons.star_rounded, color: Colors.white, size: 14)
+          ? const Icon(
+              Icons.star_rounded,
+              color: CurioTokens.textPrimary,
+              size: 14,
+            )
           : null,
     ),
   );
@@ -369,13 +397,17 @@ class GamePreview extends StatelessWidget {
         children: [
           _chip('500', ink, width: 40, height: 24, size: 12),
           const SizedBox(width: 4),
-          const Icon(Icons.arrow_upward_rounded, color: Colors.white, size: 16),
+          const Icon(
+            Icons.arrow_upward_rounded,
+            color: CurioTokens.textPrimary,
+            size: 16,
+          ),
           const SizedBox(width: 8),
           _chip('750', ink, width: 40, height: 24, size: 12),
           const SizedBox(width: 4),
           const Icon(
             Icons.arrow_downward_rounded,
-            color: Colors.white,
+            color: CurioTokens.textPrimary,
             size: 16,
           ),
         ],
@@ -387,15 +419,15 @@ class GamePreview extends StatelessWidget {
 
   Widget _squeeze(_Ink ink) {
     TextStyle label = const TextStyle(
-      color: Colors.white,
-      fontSize: 10,
+      color: CurioTokens.textPrimary,
+      fontSize: 13,
       fontWeight: FontWeight.w800,
     );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _chip('?', ink, width: 26, height: 22, size: 13),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         SizedBox(
           width: 132,
           height: 12,
@@ -403,8 +435,8 @@ class GamePreview extends StatelessWidget {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: .26),
-                  borderRadius: BorderRadius.circular(6),
+                  color: CurioTokens.textPrimary.withValues(alpha: .26),
+                  borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                 ),
               ),
               Positioned(
@@ -414,8 +446,8 @@ class GamePreview extends StatelessWidget {
                 bottom: 0,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
+                    color: CurioTokens.textPrimary,
+                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                   ),
                 ),
               ),
@@ -457,7 +489,7 @@ class GamePreview extends StatelessWidget {
             : Icon(
                 v == 1 ? Icons.auto_awesome_rounded : Icons.waves_rounded,
                 size: 10,
-                color: Colors.white,
+                color: CurioTokens.textPrimary,
               ),
       );
     });
@@ -473,12 +505,12 @@ class GamePreview extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (var j = 0; j <= i; j++) ...[
-                if (j > 0) const SizedBox(width: 3),
+                if (j > 0) const SizedBox(width: 4),
                 Container(
                   width: 9,
                   height: 9,
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: CurioTokens.textPrimary,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -526,7 +558,11 @@ class GamePreview extends StatelessWidget {
         const Positioned(
           right: 6,
           top: 2,
-          child: Icon(Icons.search_rounded, size: 40, color: Colors.white),
+          child: Icon(
+            Icons.search_rounded,
+            size: 40,
+            color: CurioTokens.textPrimary,
+          ),
         ),
       ],
     ),
@@ -535,10 +571,10 @@ class GamePreview extends StatelessWidget {
   static Widget _card(double alpha) => Container(
     width: 58,
     height: 42,
-    padding: const EdgeInsets.all(7),
+    padding: const EdgeInsets.all(8),
     decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: alpha),
-      borderRadius: BorderRadius.circular(9),
+      color: CurioTokens.textPrimary.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -548,8 +584,8 @@ class GamePreview extends StatelessWidget {
             width: w,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .9),
-              borderRadius: BorderRadius.circular(2),
+              color: CurioTokens.textPrimary.withValues(alpha: .9),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
             ),
           ),
           const SizedBox(height: 4),
@@ -569,7 +605,11 @@ class GamePreview extends StatelessWidget {
         const Positioned(
           left: 42,
           top: 0,
-          child: Icon(Icons.balance_rounded, size: 56, color: Colors.white),
+          child: Icon(
+            Icons.balance_rounded,
+            size: 56,
+            color: CurioTokens.textPrimary,
+          ),
         ),
         Positioned(
           left: 4,
@@ -605,8 +645,8 @@ class GamePreview extends StatelessWidget {
         Container(
           width: 2,
           height: 60,
-          margin: const EdgeInsets.symmetric(horizontal: 6),
-          color: Colors.white.withValues(alpha: .9),
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          color: CurioTokens.textPrimary.withValues(alpha: .9),
         ),
         _grid(4, 3, 12, 3, (r, c) {
           final filled = pattern[r][2 - c] == 1;
@@ -614,12 +654,12 @@ class GamePreview extends StatelessWidget {
             width: 12,
             height: 12,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(
+              color: CurioTokens.textPrimary.withValues(
                 alpha: filled && c == 0 ? .7 : .12,
               ),
-              borderRadius: BorderRadius.circular(3.4),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
               border: filled
-                  ? Border.all(color: Colors.white, width: 1.2)
+                  ? Border.all(color: CurioTokens.textPrimary, width: 1.2)
                   : null,
             ),
           );
@@ -633,10 +673,16 @@ class GamePreview extends StatelessWidget {
       width: 26,
       height: 26,
       decoration: BoxDecoration(
-        color: picked ? Colors.white : Colors.white.withValues(alpha: .22),
+        color: picked
+            ? CurioTokens.textPrimary
+            : CurioTokens.textPrimary.withValues(alpha: .22),
         shape: BoxShape.circle,
       ),
-      child: Icon(icon, size: 14, color: picked ? ink.deep : Colors.white),
+      child: Icon(
+        icon,
+        size: 14,
+        color: picked ? ink.deep : CurioTokens.textPrimary,
+      ),
     );
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -647,9 +693,9 @@ class GamePreview extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             button(Icons.thumb_up_rounded, false),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             button(Icons.thumb_down_rounded, true),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             button(Icons.question_mark_rounded, false),
           ],
         ),
@@ -667,7 +713,7 @@ class GamePreview extends StatelessWidget {
         child: Icon(
           yes ? Icons.check_rounded : Icons.close_rounded,
           size: 12,
-          color: yes ? ink.deep : Colors.white.withValues(alpha: .8),
+          color: yes ? ink.deep : CurioTokens.textPrimary.withValues(alpha: .8),
         ),
       );
     });
@@ -675,7 +721,7 @@ class GamePreview extends StatelessWidget {
 }
 
 class _Ink {
-  _Ink(Color color) : deep = Color.lerp(color, Colors.black, .62)!;
+  _Ink(Color color) : deep = Color.lerp(color, CurioTokens.base, .62)!;
 
   /// Readable text colour on white chips: a deep shade of the skill colour.
   final Color deep;
@@ -692,7 +738,7 @@ class _NetworkPainter extends CustomPainter {
       Offset(size.width * .7, size.height * .82),
     ];
     final line = Paint()
-      ..color = Colors.white.withValues(alpha: .7)
+      ..color = CurioTokens.textPrimary.withValues(alpha: .7)
       ..strokeWidth = 2.4
       ..strokeCap = StrokeCap.round;
     for (final (a, b) in [(0, 1), (1, 2), (0, 3), (3, 4), (1, 4), (2, 4)]) {
@@ -702,7 +748,7 @@ class _NetworkPainter extends CustomPainter {
       canvas.drawCircle(
         nodes[i],
         i == 1 ? 9 : 6.5,
-        Paint()..color = Colors.white,
+        Paint()..color = CurioTokens.textPrimary,
       );
     }
   }
@@ -723,7 +769,7 @@ class _MountainPainter extends CustomPainter {
     canvas.drawPath(
       aurora,
       Paint()
-        ..color = Colors.white.withValues(alpha: .55)
+        ..color = CurioTokens.textPrimary.withValues(alpha: .55)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 5
         ..strokeCap = StrokeCap.round,
@@ -735,7 +781,7 @@ class _MountainPainter extends CustomPainter {
         ..lineTo(w * .3, h * .42)
         ..lineTo(w * .55, h)
         ..close(),
-      Paint()..color = Colors.white.withValues(alpha: .55),
+      Paint()..color = CurioTokens.textPrimary.withValues(alpha: .55),
     );
     canvas.drawPath(
       Path()
@@ -743,13 +789,13 @@ class _MountainPainter extends CustomPainter {
         ..lineTo(w * .62, h * .3)
         ..lineTo(w, h)
         ..close(),
-      Paint()..color = Colors.white,
+      Paint()..color = CurioTokens.textPrimary,
     );
     // A star.
     canvas.drawCircle(
       Offset(w * .86, h * .12),
       3,
-      Paint()..color = Colors.white,
+      Paint()..color = CurioTokens.textPrimary,
     );
   }
 

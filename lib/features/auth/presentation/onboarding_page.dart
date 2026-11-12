@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/models/family_settings.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
@@ -118,7 +117,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       if (mounted) {
         setState(
           () => _error =
-              'We couldn’t save your setup just yet. Everything you chose is still here — please try again.',
+              'We couldn’t save your setup just yet. Everything you chose is still here, please try again.',
         );
       }
     } finally {
@@ -128,16 +127,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     final (eyebrow, title, subtitle) = switch (_step) {
       0 => (
         'Meet your explorer',
         'Who’s exploring with Curio?',
-        'What should Nova call them? A nickname is perfect — there’s no need for a real name.',
+        'What should Nova call them? A nickname is perfect, there’s no need for a real name.',
       ),
       1 => (
         'A gentle rhythm',
@@ -157,7 +152,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       _ => (
         'All set',
         'Welcome, $_learner!',
-        'Their first quest is waiting. Here’s what we’ve set up — it’s all editable later in Profile.',
+        'Their first quest is waiting. Here’s what we’ve set up, it’s all editable later in Profile.',
       ),
     };
     return PopScope(
@@ -171,7 +166,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _StepBar(step: _step, count: _steps),
-            const SizedBox(height: 26),
+            const SizedBox(height: 24),
             CurioFadeSlideIn(
               key: ValueKey(_step),
               offset: 12,
@@ -191,7 +186,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(subtitle, style: TextStyle(color: muted, height: 1.55)),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 24),
                   switch (_step) {
                     0 => _nameStep(),
                     1 => _goalStep(),
@@ -203,10 +198,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
             if (_error != null) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               AuthNotice(_error!, error: true),
             ],
-            const SizedBox(height: 26),
+            const SizedBox(height: 24),
             FilledButton(
               key: const Key('onboarding_continue'),
               onPressed: _saving ? null : _continue,
@@ -238,7 +233,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget _nameStep() => Column(
     children: [
       const CurioFloat(distance: 4, child: MascotBadge(size: 104)),
-      const SizedBox(height: 26),
+      const SizedBox(height: 24),
       Form(
         key: _nameForm,
         child: TextFormField(
@@ -290,8 +285,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       CurioClay(
-        radius: 26,
-        padding: const EdgeInsets.all(20),
+        radius: CurioTokens.radiusCard,
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -306,7 +301,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ],
         ),
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 24),
       for (final (scale, title, detail) in const [
         (1.0, 'Standard', 'The usual reading size'),
         (1.2, 'Larger', 'A little more room for every word'),
@@ -337,8 +332,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _loopStep() {
     return CurioClay(
-      radius: 22,
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
+      radius: CurioTokens.radiusCard,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
         children: [
           SwitchListTile.adaptive(
@@ -402,11 +397,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   Widget _readyStep() {
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
+    final forest = CurioTokens.accent;
     final summary = [
       (
         Icons.flag_rounded,
@@ -438,22 +429,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.all(22),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: curioColor(
-              context,
-              CurioColors.forestSoft,
-              CurioColorsLight.forestSoft,
-            ),
-            borderRadius: BorderRadius.circular(22),
+            color: CurioTokens.surfaceRaised,
+            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           ),
           child: Column(
             children: [
               const CurioFloat(distance: 4, child: MascotBadge(size: 92)),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               for (final (icon, label, value) in summary)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     children: [
                       Icon(icon, size: 20, color: forest),
@@ -472,15 +459,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
         Text(
           'Four little adventures, refreshed daily.',
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
         Wrap(
-          spacing: 10,
-          runSpacing: 10,
+          spacing: 12,
+          runSpacing: 12,
           children: [
             for (final section in WelcomeSkill.all)
               Chip(
@@ -498,7 +485,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           'One game per section each day. Replay for practice; points are awarded once.',
         ),
         if (_needsConsent) ...[
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           CheckboxListTile(
             key: const Key('onboarding_consent'),
             contentPadding: EdgeInsets.zero,
@@ -515,13 +502,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             subtitle: _consentMissing
                 ? Text(
                     'Please confirm to finish setting up.',
-                    style: TextStyle(
-                      color: curioColor(
-                        context,
-                        CurioColors.danger,
-                        CurioColorsLight.danger,
-                      ),
-                    ),
+                    style: TextStyle(color: CurioTokens.wrong),
                   )
                 : null,
           ),
@@ -544,16 +525,8 @@ class _StepBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final idle = curioColor(
-      context,
-      CurioColors.outlineSoft,
-      CurioColorsLight.outline,
-    );
+    final coral = CurioTokens.wrong;
+    final idle = CurioTokens.border;
     return Semantics(
       label: 'Setup step ${step + 1} of $count',
       excludeSemantics: true,
@@ -562,25 +535,26 @@ class _StepBar extends StatelessWidget {
         children: [
           Text(
             'STEP ${step + 1} OF $count',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              letterSpacing: 1.3,
-              fontWeight: FontWeight.w800,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             children: [
               for (var i = 0; i < count; i++) ...[
-                if (i > 0) const SizedBox(width: 6),
+                if (i > 0) const SizedBox(width: 8),
                 Expanded(
                   child: AnimatedContainer(
                     duration: MediaQuery.disableAnimationsOf(context)
                         ? Duration.zero
-                        : const Duration(milliseconds: 280),
+                        : CurioTokens.slow,
                     height: 5,
                     decoration: BoxDecoration(
                       color: i <= step ? coral : idle,
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(
+                        CurioTokens.radiusCard,
+                      ),
                     ),
                   ),
                 ),
@@ -611,31 +585,11 @@ class _ChoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
+    final coral = CurioTokens.wrong;
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
+    final muted = CurioTokens.textSecondary;
+    final forest = CurioTokens.accent;
     return Semantics(
       selected: selected,
       button: true,
@@ -644,17 +598,17 @@ class _ChoiceCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           child: AnimatedContainer(
             duration: MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
-                : const Duration(milliseconds: 180),
+                : CurioTokens.slow,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: selected
                   ? Color.alphaBlend(coral.withValues(alpha: .1), surface)
                   : surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               border: Border.all(
                 color: selected ? coral : outline,
                 width: selected ? 2 : 1.2,
@@ -668,7 +622,7 @@ class _ChoiceCard extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: selected ? coral : coral.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                   ),
                   child: Text(
                     leading,
@@ -677,17 +631,11 @@ class _ChoiceCard extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       // Coral is bright in both modes: dark ink on it (§7).
-                      color: selected
-                          ? curioColor(
-                              context,
-                              CurioColors.night,
-                              CurioColorsLight.ink,
-                            )
-                          : coral,
+                      color: selected ? CurioTokens.base : coral,
                     ),
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -705,24 +653,26 @@ class _ChoiceCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
-                                vertical: 3,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: forest.withValues(alpha: .14),
-                                borderRadius: BorderRadius.circular(99),
+                                borderRadius: BorderRadius.circular(
+                                  CurioTokens.radiusPill,
+                                ),
                               ),
                               child: Text(
                                 badge!,
                                 style: TextStyle(
                                   color: forest,
-                                  fontSize: 10.5,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         detail,
                         style: TextStyle(color: muted, fontSize: 13),

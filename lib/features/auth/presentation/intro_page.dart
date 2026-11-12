@@ -1,11 +1,10 @@
 import 'dart:math' as math;
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
@@ -76,7 +75,7 @@ final _slides = [
     eyebrow: 'Grow',
     title: 'You’ll see the growth, too.',
     body:
-        'A calm parent view shows which skills are growing — with gentle reminders and an optional weekly email, all on your terms.',
+        'A calm parent view shows which skills are growing, with gentle reminders and an optional weekly email, all on your terms.',
     skill: WelcomeSkill.all[2],
     art: (h) => GrowthArt(height: h),
   ),
@@ -110,10 +109,7 @@ class _IntroPageState extends State<IntroPage> {
     if (MediaQuery.disableAnimationsOf(context)) {
       _pages.jumpToPage(_index + 1);
     } else {
-      _pages.nextPage(
-        duration: const Duration(milliseconds: 420),
-        curve: Curves.easeOutCubic,
-      );
+      _pages.nextPage(duration: CurioTokens.slow, curve: CurioTokens.curve);
     }
   }
 
@@ -140,7 +136,7 @@ class _IntroPageState extends State<IntroPage> {
                     ),
                     AnimatedOpacity(
                       opacity: _last ? 0 : 1,
-                      duration: const Duration(milliseconds: 200),
+                      duration: CurioTokens.slow,
                       child: TextButton(
                         onPressed: _last ? null : _finish,
                         child: const Text('Skip'),
@@ -159,7 +155,7 @@ class _IntroPageState extends State<IntroPage> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(24, 8, 24, wide ? 32 : 20),
+                padding: EdgeInsets.fromLTRB(24, 8, 24, wide ? 32 : 24),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 520),
                   child: Column(
@@ -184,7 +180,7 @@ class _IntroPageState extends State<IntroPage> {
                         onPressed: _next,
                         child: Text(_last ? 'Create a family account' : 'Next'),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       TextButton(
                         onPressed: () => _finish(mode: AuthMode.signIn),
                         child: const Text('I already have an account'),
@@ -214,11 +210,7 @@ class _SlideView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     final text = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -235,7 +227,7 @@ class _SlideView extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         Text(
           slide.body,
           style: TextStyle(color: muted, height: 1.6, fontSize: wide ? 17 : 15),
@@ -258,11 +250,11 @@ class _SlideView extends StatelessWidget {
     );
     if (wide) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 48),
         child: Row(
           children: [
             Expanded(child: art),
-            const SizedBox(width: 40),
+            const SizedBox(width: 48),
             Expanded(
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -318,30 +310,22 @@ class _Dots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final idle = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final coral = CurioTokens.wrong;
+    final idle = CurioTokens.border;
     return ExcludeSemantics(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < count; i++)
             AnimatedContainer(
-              duration: const Duration(milliseconds: 260),
-              curve: Curves.easeOutCubic,
-              margin: const EdgeInsets.only(right: 6),
+              duration: CurioTokens.slow,
+              curve: CurioTokens.curve,
+              margin: const EdgeInsets.only(right: 8),
               width: i == index ? 26 : 8,
               height: 8,
               decoration: BoxDecoration(
                 color: i == index ? coral : idle,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               ),
             ),
         ],

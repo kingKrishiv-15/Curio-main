@@ -1,7 +1,7 @@
 import 'dart:math';
 
 /// Link Lab: the gentle grouping game. Sixteen tiles hide four groups of four,
-/// each with a clear, kid-friendly link — no trick groups (Odd Cluster is the
+/// each with a clear, kid-friendly link, no trick groups (Odd Cluster is the
 /// tricky one). Hints are free and mistakes never end the game; they're
 /// counted honestly and show up in the share grid.
 ///
@@ -31,8 +31,8 @@ class LinkPuzzle {
 
 enum LinkVerdict { found, oneAway, wrong, repeat }
 
-/// A nudge: first the name of a hidden group, then — once every hidden group
-/// has been named — one of its tiles.
+/// A nudge: first the name of a hidden group, then, once every hidden group
+/// has been named, one of its tiles.
 class LinkHint {
   const LinkHint(this.group, [this.word]);
   final LinkGroup group;
@@ -40,7 +40,7 @@ class LinkHint {
 }
 
 /// Which day's puzzle to play: today's, or for practice round [practice]
-/// (1, 2, 3…) a step back through earlier days — cycling through every puzzle
+/// (1, 2, 3…) a step back through earlier days, cycling through every puzzle
 /// except today's and tomorrow's, so practice never spoils a daily.
 int linkLabDay(int today, {int practice = 0}) => practice <= 0
     ? today
@@ -66,7 +66,7 @@ class LinkLabGame {
   final Set<LinkGroup> named = {};
   final Set<String> pointedAt = {};
 
-  /// One row per guess: the group number (0–3) of each chosen tile.
+  /// One row per guess: the group number (0 to 3) of each chosen tile.
   final List<List<int>> history = [];
   int mistakes = 0;
   int hints = 0;
@@ -82,7 +82,7 @@ class LinkLabGame {
     ];
   }
 
-  /// 0–3: the group's colour and share square.
+  /// 0 to 3: the group's colour and share square.
   int colourOf(LinkGroup group) => puzzle.groups.indexOf(group);
 
   LinkGroup groupOf(String word) =>
@@ -147,7 +147,7 @@ class LinkLabGame {
       .join('\n');
 }
 
-/// The bank: clear categories a curious 8–12-year-old can reason about.
+/// The bank: clear categories a curious 8 to 12-year-old can reason about.
 /// Each tile fits exactly one group's link.
 const linkLabPuzzles = <LinkPuzzle>[
   LinkPuzzle([
@@ -438,7 +438,7 @@ const linkLabPuzzles = <LinkPuzzle>[
     LinkGroup(
       title: 'Clothes',
       words: ['SCARF', 'JUMPER', 'GLOVES', 'SOCKS'],
-      why: 'Things you wear — handy when it’s cold outside.',
+      why: 'Things you wear, handy when it’s cold outside.',
     ),
   ]),
 ];

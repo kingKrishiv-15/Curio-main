@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../discoveries/presentation/discoveries_page.dart';
@@ -24,7 +23,7 @@ class _MainShellState extends State<MainShell>
   double _direction = 1;
   late final AnimationController _tabTransition = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 260),
+    duration: CurioTokens.slow,
     value: 1,
   );
 
@@ -35,7 +34,7 @@ class _MainShellState extends State<MainShell>
   }
 
   Widget _content() {
-    final curve = _tabTransition.drive(CurveTween(curve: Curves.easeOutCubic));
+    final curve = _tabTransition.drive(CurveTween(curve: CurioTokens.curve));
     return FadeTransition(
       key: const Key('tab_transition'),
       opacity: Tween<double>(begin: .65, end: 1).animate(curve),
@@ -156,13 +155,11 @@ class _MainShellState extends State<MainShell>
         // kept reading as a bar behind the pill. Instead the nav is just a
         // `Positioned` overlay inside the same Stack as the page content,
         // so the page's own background is *literally* the layer behind it
-        // — nothing else can ever paint there.
+        //, nothing else can ever paint there.
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlayStyle,
           child: Scaffold(
-            backgroundColor: light
-                ? const Color(0xFFFDF1E2)
-                : const Color(0xFF05100D),
+            backgroundColor: light ? CurioTokens.tintMaths : CurioTokens.base,
             body: Stack(
               children: [
                 Positioned.fill(child: _content()),
@@ -172,7 +169,7 @@ class _MainShellState extends State<MainShell>
                   bottom: 0,
                   child: SafeArea(
                     top: false,
-                    minimum: const EdgeInsets.only(bottom: 10),
+                    minimum: const EdgeInsets.only(bottom: 12),
                     child: Center(
                       child: _FloatingNav(
                         index: _index,
@@ -199,27 +196,15 @@ class _NavGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final forest = dark ? CurioColors.forest : CurioColorsLight.forest;
+    final forest = CurioTokens.accent;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
+      duration: CurioTokens.slow,
+      curve: CurioTokens.curve,
       width: selected ? 35 : 31,
       height: selected ? 35 : 31,
       decoration: BoxDecoration(
-        gradient: selected
-            ? (dark
-                  ? CurioColors.brandGradient
-                  : CurioColorsLight.brandGradient)
-            : LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  dark ? CurioColors.surface : CurioColorsLight.surface,
-                  dark ? CurioColors.forestMist : CurioColorsLight.forestMist,
-                ],
-              ),
-        borderRadius: BorderRadius.circular(selected ? 13 : 11),
+        color: selected ? CurioTokens.accent : CurioTokens.surfaceRaised,
+        borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
         border: Border.all(
           color: selected ? forest : forest.withValues(alpha: .11),
         ),
@@ -227,9 +212,7 @@ class _NavGlyph extends StatelessWidget {
       child: Icon(
         icon,
         size: selected ? 19 : 17,
-        color: selected
-            ? (dark ? CurioColors.onDark : CurioColorsLight.onDark)
-            : (dark ? CurioColors.forestStrong : CurioColorsLight.forestStrong),
+        color: selected ? CurioTokens.textPrimary : CurioTokens.accent,
       ),
     );
   }
@@ -255,19 +238,19 @@ class _FloatingNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = light ? CurioColorsLight.coralStrong : CurioColors.forest;
-    final ink = light ? CurioColorsLight.inkSoft : CurioColors.inkSoft;
+    final accent = light ? CurioTokens.wrong : CurioTokens.accent;
+    final ink = CurioTokens.textSecondary;
     final duration = MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
-        : const Duration(milliseconds: 280);
+        : CurioTokens.slow;
     final textScale = MediaQuery.textScalerOf(context).scale(10) / 10;
     final itemHeight = 52.0 + (textScale > 1.3 ? (textScale - 1.3) * 12 : 0);
     return ConstrainedBox(
       key: const Key('bottom_capsule'),
       constraints: const BoxConstraints(maxWidth: 304),
       child: CurioClay(
-        radius: 32,
-        padding: const EdgeInsets.all(5),
+        radius: CurioTokens.radiusCard,
+        padding: const EdgeInsets.all(4),
         child: SizedBox(
           height: itemHeight,
           child: Stack(
@@ -277,15 +260,15 @@ class _FloatingNav extends StatelessWidget {
                   child: AnimatedAlign(
                     key: const Key('capsule_selection'),
                     duration: duration,
-                    curve: Curves.easeOutCubic,
+                    curve: CurioTokens.curve,
                     alignment: Alignment(-1 + index * 2 / 3, 0),
                     child: FractionallySizedBox(
                       widthFactor: .25,
                       heightFactor: 1,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: CurioClay(
-                          radius: 26,
+                          radius: CurioTokens.radiusCard,
                           color: accent.withValues(alpha: light ? .16 : .2),
                           child: const SizedBox.expand(),
                         ),
@@ -308,7 +291,9 @@ class _FloatingNav extends StatelessWidget {
                             color: Colors.transparent,
                             child: InkWell(
                               key: Key('nav_${_items[i].$3}'),
-                              borderRadius: BorderRadius.circular(26),
+                              borderRadius: BorderRadius.circular(
+                                CurioTokens.radiusCard,
+                              ),
                               onTap: () {
                                 HapticFeedback.selectionClick();
                                 onSelected(i);
@@ -322,7 +307,7 @@ class _FloatingNav extends StatelessWidget {
                                       AnimatedScale(
                                         scale: i == index ? 1.06 : 1,
                                         duration: duration,
-                                        curve: Curves.easeOutCubic,
+                                        curve: CurioTokens.curve,
                                         child: AnimatedSwitcher(
                                           duration: duration,
                                           child: Icon(
@@ -335,12 +320,12 @@ class _FloatingNav extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 3),
+                                      const SizedBox(height: 4),
                                       AnimatedDefaultTextStyle(
                                         duration: duration,
                                         style: TextStyle(
                                           fontFamily: 'DM Sans',
-                                          fontSize: 9.5,
+                                          fontSize: 13,
                                           fontWeight: i == index
                                               ? FontWeight.w800
                                               : FontWeight.w600,
@@ -380,30 +365,27 @@ class _CurioRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final coral = dark ? CurioColors.coral : CurioColorsLight.coral;
-    final coralSoft = dark ? CurioColors.coralSoft : CurioColorsLight.coralSoft;
-    final inkMuted = dark ? CurioColors.inkMuted : CurioColorsLight.inkMuted;
-    final surfaceMuted = dark
-        ? CurioColors.surfaceMuted
-        : CurioColorsLight.surfaceMuted;
-    final orange = dark ? CurioColors.orange : CurioColorsLight.orange;
+    final coral = CurioTokens.wrong;
+    final coralSoft = CurioTokens.surfaceRaised;
+    final inkMuted = CurioTokens.textSecondary;
+    final surfaceMuted = CurioTokens.surface;
+    final orange = CurioTokens.wrong;
     return Container(
       width: 244,
       color: clayBase(context),
-      padding: const EdgeInsets.fromLTRB(16, 25, 16, 20),
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
       child: Column(
         children: [
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 9),
+            padding: EdgeInsets.symmetric(horizontal: 8),
             child: Align(alignment: Alignment.centerLeft, child: CurioBrand()),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 32),
           ...List.generate(_MainShellState._destinations.length, (itemIndex) {
             final item = _MainShellState._destinations[itemIndex];
             final selected = itemIndex == index;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 7),
+              padding: const EdgeInsets.only(bottom: 8),
               child: Material(
                 color: Colors.transparent,
                 child: ListTile(
@@ -420,7 +402,7 @@ class _CurioRail extends StatelessWidget {
                   iconColor: inkMuted,
                   textColor: inkMuted,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                   ),
                   selectedTileColor: coralSoft,
                   titleTextStyle: const TextStyle(
@@ -435,7 +417,7 @@ class _CurioRail extends StatelessWidget {
           CurioCard(
             elevation: false,
             color: surfaceMuted,
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -446,28 +428,28 @@ class _CurioRail extends StatelessWidget {
                       color: orange,
                       size: 20,
                     ),
-                    const SizedBox(width: 7),
+                    const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
                         'Daily momentum',
                         maxLines: 2,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 CurioProgressBar(
                   value: state.dailyGoalCompleted / state.dailyGoal,
                   height: 7,
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 8),
                 Text(
                   '${state.dailyGoalCompleted} of ${state.dailyGoal} challenges',
-                  style: TextStyle(color: inkMuted, fontSize: 10),
+                  style: TextStyle(color: inkMuted, fontSize: 13),
                 ),
               ],
             ),

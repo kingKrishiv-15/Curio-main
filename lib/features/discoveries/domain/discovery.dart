@@ -98,7 +98,7 @@ const discoveries = <Discovery>[
     id: 'halving_search',
     title: 'Halve and conquer',
     fact:
-        'Guess the middle and every clue cuts what’s left in half. Ten halvings shrink 1,000 numbers to just one — it’s how computers search huge lists fast.',
+        'Guess the middle and every clue cuts what’s left in half. Ten halvings shrink 1,000 numbers to just one, it’s how computers search huge lists fast.',
     category: 'Maths',
     icon: Icons.travel_explore_rounded,
   ),
@@ -170,7 +170,7 @@ const discoveries = <Discovery>[
     id: 'triangular_numbers',
     title: 'Numbers with corners',
     fact:
-        'Ten-pin bowling pins stand in rows of 1, 2, 3 and 4. Numbers you can arrange as a triangle like that — 1, 3, 6, 10, 15 — are called triangular numbers.',
+        'Ten-pin bowling pins stand in rows of 1, 2, 3 and 4. Numbers you can arrange as a triangle like that, 1, 3, 6, 10, 15, are called triangular numbers.',
     category: 'Maths',
     icon: Icons.change_history_rounded,
   ),
@@ -178,7 +178,7 @@ const discoveries = <Discovery>[
     id: 'traffic_evaporation',
     title: 'Vanishing traffic',
     fact:
-        'When streets close to cars, not all the traffic moves elsewhere. Some trips disappear as people walk, cycle, take the bus or travel at other times — planners call it traffic evaporation.',
+        'When streets close to cars, not all the traffic moves elsewhere. Some trips disappear as people walk, cycle, take the bus or travel at other times, planners call it traffic evaporation.',
     category: 'Cities',
     icon: Icons.directions_bike_rounded,
   ),
@@ -194,7 +194,7 @@ const discoveries = <Discovery>[
     id: 'equal_fractions',
     title: 'Same amount, new name',
     fact:
-        '1/2, 2/4, 0.5 and 50% are four ways of writing exactly the same amount — like eating half a pizza whether it was cut into 2 slices or 4.',
+        '1/2, 2/4, 0.5 and 50% are four ways of writing exactly the same amount, like eating half a pizza whether it was cut into 2 slices or 4.',
     category: 'Maths',
     icon: Icons.pie_chart_rounded,
   ),
@@ -202,7 +202,7 @@ const discoveries = <Discovery>[
     id: 'mirror_symmetry',
     title: 'Mirrors in nature',
     fact:
-        'A butterfly’s two wings are mirror images of each other. Scientists call this bilateral symmetry, and most animals — people included — are built this way.',
+        'A butterfly’s two wings are mirror images of each other. Scientists call this bilateral symmetry, and most animals, people included, are built this way.',
     category: 'Nature',
     icon: Icons.flip_rounded,
   ),
@@ -210,7 +210,7 @@ const discoveries = <Discovery>[
     id: 'correlation',
     title: 'Together isn’t because',
     fact:
-        'Ice-cream sales and sunburns both rise in summer. They go together, but ice cream doesn’t cause sunburn — hot, sunny weather causes both.',
+        'Ice-cream sales and sunburns both rise in summer. They go together, but ice cream doesn’t cause sunburn, hot, sunny weather causes both.',
     category: 'Thinking',
     icon: Icons.icecream_rounded,
   ),

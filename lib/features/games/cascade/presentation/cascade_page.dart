@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../domain/cascade.dart';
@@ -77,7 +76,7 @@ class _CascadePageState extends State<CascadePage> {
       title: 'Cascade',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice chain' : 'Daily cause-and-effect',
@@ -86,16 +85,22 @@ class _CascadePageState extends State<CascadePage> {
                 'Pick five consequences that each lead to the next. Evidence beats what merely sounds right.',
             chips: const [
               GameMetaChip(icon: Icons.schedule_rounded, label: '4 min'),
-              GameMetaChip(icon: Icons.manage_search_rounded, label: 'Evidence'),
+              GameMetaChip(
+                icon: Icons.manage_search_rounded,
+                label: 'Evidence',
+              ),
             ],
           ),
           if (_practice) ...[
             const SizedBox(height: 12),
-            const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: PracticeBadge(),
+            ),
           ],
           const SizedBox(height: 16),
           _ClaimCard(claim: _puzzle.claim.claim),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           const _Therefore(),
           _Chain(
             puzzle: _puzzle,
@@ -106,9 +111,10 @@ class _CascadePageState extends State<CascadePage> {
           if (!submitted) ...[
             SectionHeading(
               'Possible consequences',
-              subtitle: '${_puzzle.picked.length} of ${CascadeGame.chainLength} chosen',
+              subtitle:
+                  '${_puzzle.picked.length} of ${CascadeGame.chainLength} chosen',
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (final tile in _puzzle.pool)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -131,23 +137,20 @@ class _CascadePageState extends State<CascadePage> {
             ),
           ] else ...[
             const SectionHeading('The real chain'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (var i = 0; i < _puzzle.claim.chain.length; i++)
-              _ExplainTile(
-                index: i + 1,
-                tile: _puzzle.claim.chain[i],
-              ),
+              _ExplainTile(index: i + 1, tile: _puzzle.claim.chain[i]),
             const SizedBox(height: 12),
             const SectionHeading(
               'Sounded right, but…',
               subtitle: 'The evidence behind the tempting tiles',
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             for (final tile in _puzzle.claim.extras.where(
               (t) => t.kind == CascadeKind.myth,
             ))
               _ExplainTile(tile: tile),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             GameResultCard(
               gameId: 'cascade',
               title: _puzzle.score == 100
@@ -174,13 +177,12 @@ class _ClaimCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: dark ? CurioColors.heroGradient : CurioColorsLight.heroGradient,
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+        color: CurioTokens.surfaceRaised,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,12 +191,11 @@ class _ClaimCard extends StatelessWidget {
             'THE CLAIM',
             style: TextStyle(
               color: ink,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.4,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             claim,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(color: ink),
@@ -210,10 +211,10 @@ class _Therefore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final muted = CurioTokens.textSecondary;
     return ExcludeSemantics(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -221,7 +222,11 @@ class _Therefore extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               'therefore',
-              style: TextStyle(color: muted, fontSize: 11.5, fontStyle: FontStyle.italic),
+              style: TextStyle(
+                color: muted,
+                fontSize: 13,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ],
         ),
@@ -231,7 +236,11 @@ class _Therefore extends StatelessWidget {
 }
 
 class _Chain extends StatelessWidget {
-  const _Chain({required this.puzzle, required this.onMove, required this.onRemove});
+  const _Chain({
+    required this.puzzle,
+    required this.onMove,
+    required this.onRemove,
+  });
 
   final CascadeGame puzzle;
   final void Function(int from, int to) onMove;
@@ -259,10 +268,13 @@ class _Chain extends StatelessWidget {
                   tile: puzzle.picked[i],
                   verdict: verdicts?[i],
                   canMoveUp: !puzzle.submitted && i > 0,
-                  canMoveDown: !puzzle.submitted && i < puzzle.picked.length - 1,
+                  canMoveDown:
+                      !puzzle.submitted && i < puzzle.picked.length - 1,
                   onUp: () => onMove(i, i - 1),
                   onDown: () => onMove(i, i + 1),
-                  onRemove: puzzle.submitted ? null : () => onRemove(puzzle.picked[i]),
+                  onRemove: puzzle.submitted
+                      ? null
+                      : () => onRemove(puzzle.picked[i]),
                 ),
                 if (i < CascadeGame.chainLength - 1) const _Therefore(),
               ],
@@ -271,20 +283,22 @@ class _Chain extends StatelessWidget {
         ),
         for (var i = 0; i < empty; i++) ...[
           _EmptySlot(index: puzzle.picked.length + i),
-          if (puzzle.picked.length + i < CascadeGame.chainLength - 1) const _Therefore(),
+          if (puzzle.picked.length + i < CascadeGame.chainLength - 1)
+            const _Therefore(),
         ],
       ],
     );
   }
 }
 
-Color _verdictColor(BuildContext context, SlotVerdict? verdict) => switch (verdict) {
-  SlotVerdict.exact => curioColor(context, CurioColors.success, CurioColorsLight.success),
-  SlotVerdict.misplaced => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-  SlotVerdict.sideEffect => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-  SlotVerdict.myth => curioColor(context, CurioColors.danger, CurioColorsLight.danger),
-  null => curioColor(context, CurioColors.coral, CurioColorsLight.coral),
-};
+Color _verdictColor(BuildContext context, SlotVerdict? verdict) =>
+    switch (verdict) {
+      SlotVerdict.exact => CurioTokens.correct,
+      SlotVerdict.misplaced => CurioTokens.tintMaths,
+      SlotVerdict.sideEffect => CurioTokens.tintLogic,
+      SlotVerdict.myth => CurioTokens.wrong,
+      null => CurioTokens.wrong,
+    };
 
 class _ChainSlot extends StatelessWidget {
   const _ChainSlot({
@@ -308,19 +322,20 @@ class _ChainSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _verdictColor(context, verdict);
-    final muted = curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft);
+    final muted = CurioTokens.textSecondary;
     final verdictText = switch (verdict) {
       SlotVerdict.exact => 'Right link, right place.',
-      SlotVerdict.misplaced => 'A real link — but it belongs at step ${_stepOf(tile)}.',
+      SlotVerdict.misplaced =>
+        'A real link, but it belongs at step ${_stepOf(tile)}.',
       SlotVerdict.sideEffect => tile.note,
       SlotVerdict.myth => tile.note,
       null => null,
     };
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+      padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
       decoration: BoxDecoration(
         color: color.withValues(alpha: .1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         border: Border.all(color: color.withValues(alpha: .6), width: 1.4),
       ),
       child: Row(
@@ -334,21 +349,30 @@ class _ChainSlot extends StatelessWidget {
             child: Text(
               '${index + 1}',
               style: TextStyle(
-                color: curioColor(context, CurioColors.night, CurioColorsLight.ink),
+                color: CurioTokens.base,
                 fontWeight: FontWeight.w900,
-                fontSize: 12.5,
+                fontSize: 13,
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(tile.text, style: const TextStyle(fontWeight: FontWeight.w700, height: 1.35)),
+                Text(
+                  tile.text,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    height: 1.35,
+                  ),
+                ),
                 if (verdictText != null) ...[
                   const SizedBox(height: 4),
-                  Text(verdictText, style: TextStyle(color: muted, fontSize: 12.5, height: 1.4)),
+                  Text(
+                    verdictText,
+                    style: TextStyle(color: muted, fontSize: 13, height: 1.4),
+                  ),
                 ],
               ],
             ),
@@ -393,17 +417,17 @@ class _EmptySlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final outline = curioColor(context, CurioColors.outline, CurioColorsLight.outline);
-    final muted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final outline = CurioTokens.border;
+    final muted = CurioTokens.textSecondary;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         border: Border.all(color: outline, width: 1.2),
       ),
       child: Text(
-        'Step ${index + 1} — tap a consequence below',
+        'Step ${index + 1}, tap a consequence below',
         style: TextStyle(color: muted, fontSize: 13),
       ),
     );
@@ -424,9 +448,9 @@ class _PoolTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
-    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
-    final outline = curioColor(context, CurioColors.outline, CurioColorsLight.outline);
+    final coral = CurioTokens.wrong;
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
     return Semantics(
       button: true,
       selected: chosen,
@@ -436,24 +460,31 @@ class _PoolTile extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: enabled ? onTap : null,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: chosen ? coral.withValues(alpha: .12) : surface,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                 border: Border.all(color: chosen ? coral : outline, width: 1.2),
               ),
               child: Row(
                 children: [
                   Icon(
-                    chosen ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
+                    chosen
+                        ? Icons.check_circle_rounded
+                        : Icons.add_circle_outline_rounded,
                     size: 20,
                     color: chosen ? coral : outline,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(child: Text(tile.text, style: const TextStyle(height: 1.35))),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      tile.text,
+                      style: const TextStyle(height: 1.35),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -472,10 +503,8 @@ class _ExplainTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final link = tile.kind == CascadeKind.link;
-    final color = link
-        ? curioColor(context, CurioColors.success, CurioColorsLight.success)
-        : curioColor(context, CurioColors.danger, CurioColorsLight.danger);
-    final muted = curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft);
+    final color = link ? CurioTokens.correct : CurioTokens.wrong;
+    final muted = CurioTokens.textSecondary;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -484,21 +513,33 @@ class _ExplainTile extends StatelessWidget {
           Container(
             width: 26,
             height: 26,
-            margin: const EdgeInsets.only(top: 1),
+            margin: const EdgeInsets.only(top: 4),
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: color.withValues(alpha: .16), shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: .16),
+              shape: BoxShape.circle,
+            ),
             child: index != null
-                ? Text('$index', style: TextStyle(color: color, fontWeight: FontWeight.w900))
+                ? Text(
+                    '$index',
+                    style: TextStyle(color: color, fontWeight: FontWeight.w900),
+                  )
                 : Icon(Icons.close_rounded, size: 15, color: color),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(tile.text, style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 2),
-                Text(tile.note, style: TextStyle(color: muted, fontSize: 12.5, height: 1.4)),
+                Text(
+                  tile.text,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  tile.note,
+                  style: TextStyle(color: muted, fontSize: 13, height: 1.4),
+                ),
               ],
             ),
           ),

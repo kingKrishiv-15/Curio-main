@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Holds the app's current [ThemeMode] and persists the user's choice.
-/// Defaults to dark — Curio's current baseline look — until the person
+/// Defaults to dark, Curio's current baseline look, until the person
 /// explicitly switches to light.
 class ThemeController extends ChangeNotifier {
   ThemeController() {
@@ -45,7 +45,7 @@ class ThemeController extends ChangeNotifier {
         notifyListeners();
       }
     } catch (_) {
-      // No local storage available (e.g. some web/test contexts) — keep
+      // No local storage available (e.g. some web/test contexts), keep
       // the in-memory default and simply don't persist.
     }
   }

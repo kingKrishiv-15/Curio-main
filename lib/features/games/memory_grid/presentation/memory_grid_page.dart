@@ -1,10 +1,9 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -28,7 +27,7 @@ enum _Phase { ready, watching, recall, feedback, done }
 class _MemoryGridPageState extends State<MemoryGridPage> {
   static const _game = 'memory_grid';
   static const _rules = [
-    'Some squares glow for a moment. Don’t tap yet — just watch.',
+    'Some squares glow for a moment. Don’t tap yet, just watch.',
     'When they go dark, tap the same squares. Tap one again to take it back.',
     'The board checks itself when you’ve marked the right number of squares.',
     'Six rounds, each a little trickier. A wrong pattern costs a heart and shows you the answer.',
@@ -117,7 +116,7 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
         GameNoticeTone.info,
       ),
       _Phase.watching => (
-        'Watch closely — remember every glowing square.',
+        'Watch closely, remember every glowing square.',
         GameNoticeTone.info,
       ),
       _Phase.recall => (
@@ -130,7 +129,7 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
         GameNoticeTone.good,
       ),
       _Phase.feedback => (
-        'Not quite — green shows the squares that glowed.',
+        'Not quite, green shows the squares that glowed.',
         GameNoticeTone.bad,
       ),
       _Phase.done when _grid.won => (
@@ -138,7 +137,7 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
         GameNoticeTone.good,
       ),
       _Phase.done => (
-        'Out of hearts — you remembered ${_grid.cleared} '
+        'Out of hearts, you remembered ${_grid.cleared} '
             '${_grid.cleared == 1 ? 'pattern' : 'patterns'}.',
         GameNoticeTone.close,
       ),
@@ -147,7 +146,7 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
       title: 'Memory Grid',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice > 0
@@ -179,9 +178,9 @@ class _MemoryGridPageState extends State<MemoryGridPage> {
           ],
           const SizedBox(height: 16),
           _Board(grid: _grid, phase: _phase, accent: accent, onTap: _tap),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           GameNotice(message: message, tone: tone),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (_phase == _Phase.ready)
             PrimaryButton(
               key: const Key('grid_start'),
@@ -220,16 +219,8 @@ class _Hearts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final coral = CurioTokens.wrong;
+    final muted = CurioTokens.textSecondary;
     return Semantics(
       label: '$left of ${MemoryGrid.lives} hearts left',
       excludeSemantics: true,
@@ -264,23 +255,15 @@ class _Board extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final n = grid.settings.size;
-    final green = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.forest,
-    );
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
+    final green = CurioTokens.correct;
+    final danger = CurioTokens.wrong;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
         child: AspectRatio(
           aspectRatio: 1,
           child: GlassCard(
-            radius: 28,
+            radius: CurioTokens.radiusCard,
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
@@ -291,7 +274,7 @@ class _Board extends StatelessWidget {
                         for (var c = 0; c < n; c++)
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.all(n > 4 ? 4 : 5),
+                              padding: EdgeInsets.all(n > 4 ? 4 : 4),
                               child: _square(context, r * n + c, green, danger),
                             ),
                           ),
@@ -373,16 +356,18 @@ class _Board extends StatelessWidget {
           scale: raised ? 1 : .94,
           duration: MediaQuery.disableAnimationsOf(context)
               ? Duration.zero
-              : const Duration(milliseconds: 180),
-          curve: Curves.easeOutBack,
+              : CurioTokens.slow,
+          curve: CurioTokens.curve,
           child: CurioClay(
-            radius: 16,
+            radius: CurioTokens.radiusCard,
             pressed: !raised,
             color: color,
             outline: ring,
             child: icon == null
                 ? const SizedBox.expand()
-                : Center(child: Icon(icon, color: Colors.white, size: 26)),
+                : Center(
+                    child: Icon(icon, color: CurioTokens.textPrimary, size: 26),
+                  ),
           ),
         ),
       ),

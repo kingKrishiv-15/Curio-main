@@ -3,8 +3,8 @@ import 'loophole_bank.dart';
 
 /// Plays Loophole on the device, for guests and whenever the server can't be
 /// reached. It mirrors the server validator (`validate_loophole_move`) move
-/// for move — two guesses per statement, 2 points for a first-guess catch,
-/// 1 for a second — and answers in the same shape, so the page renders both
+/// for move, two guesses per statement, 2 points for a first-guess catch,
+/// 1 for a second, and answers in the same shape, so the page renders both
 /// identically.
 class LoopholeLocalGame {
   LoopholeLocalGame(this.rounds);
@@ -12,7 +12,11 @@ class LoopholeLocalGame {
   /// Today's three statements (or another day's, for practice).
   factory LoopholeLocalGame.forDay({DateTime? date, int shift = 0}) =>
       LoopholeLocalGame(
-        loopholeDays[DailyPick.index(loopholeDays.length, date: date, shift: shift)],
+        loopholeDays[DailyPick.index(
+          loopholeDays.length,
+          date: date,
+          shift: shift,
+        )],
       );
 
   final List<LoopholeRound> rounds;

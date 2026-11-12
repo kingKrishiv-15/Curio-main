@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/services/auth_service.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'verify_code_page.dart';
 import 'widgets/auth_fields.dart';
 
-/// Asks for an email, then sends a 6-digit code — to reset a forgotten
+/// Asks for an email, then sends a 6-digit code, to reset a forgotten
 /// password ([CodePurpose.recovery]) or to sign in without one
 /// ([CodePurpose.signIn]).
 class EmailCodeRequestPage extends StatefulWidget {
@@ -70,11 +69,7 @@ class _EmailCodeRequestPageState extends State<EmailCodeRequestPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return AuthFrame(
       child: Form(
         key: _form,
@@ -99,7 +94,7 @@ class _EmailCodeRequestPageState extends State<EmailCodeRequestPage> {
                   : 'Enter your account email and we’ll send a 6-digit code that signs you straight in.',
               style: TextStyle(color: muted, height: 1.55),
             ),
-            const SizedBox(height: 26),
+            const SizedBox(height: 24),
             EmailField(
               controller: _email,
               enabled: !_loading,
@@ -111,7 +106,7 @@ class _EmailCodeRequestPageState extends State<EmailCodeRequestPage> {
               const SizedBox(height: 16),
               AuthNotice(_error!, error: true),
             ],
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             FilledButton(
               key: const Key('code_request_send'),
               onPressed: _loading ? null : _send,

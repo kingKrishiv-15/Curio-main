@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import '../../../core/services/family_service.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/curio_clay.dart';
@@ -58,8 +59,8 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
             children: [
               if (items.isEmpty)
                 CurioClay(
-                  padding: const EdgeInsets.all(20),
-                  radius: 26,
+                  padding: const EdgeInsets.all(24),
+                  radius: CurioTokens.radiusCard,
                   child: Column(
                     children: [
                       Icon(
@@ -68,7 +69,7 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                             : Icons.notifications_none_rounded,
                         size: 42,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       Text(
                         widget.reportsOnly
                             ? 'Your story is just beginning.'
@@ -93,8 +94,8 @@ class _FamilyInboxPageState extends State<FamilyInboxPage> {
                   child: widget.reportsOnly
                       ? WeeklyReportCard(report: item)
                       : CurioClay(
-                          padding: const EdgeInsets.all(20),
-                          radius: 26,
+                          padding: const EdgeInsets.all(24),
+                          radius: CurioTokens.radiusCard,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -180,19 +181,19 @@ class WeeklyReportCard extends StatelessWidget {
     final summary = (report['summary'] as Map?)?.cast<String, dynamic>() ?? {};
     final learners = summary['learners'] as List? ?? const [];
     return CurioClay(
-      padding: const EdgeInsets.all(20),
-      radius: 26,
+      padding: const EdgeInsets.all(24),
+      radius: CurioTokens.radiusCard,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const CurioEyebrow('A week of little discoveries'),
           const SizedBox(height: 12),
           Text(
-            '${summary['week_start']} – ${summary['week_end']}',
+            '${summary['week_start']}, ${summary['week_end']}',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           for (final learner in learners) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               learner['name'] as String,
               style: Theme.of(context).textTheme.headlineSmall,

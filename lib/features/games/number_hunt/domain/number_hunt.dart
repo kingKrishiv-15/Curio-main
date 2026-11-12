@@ -49,7 +49,7 @@ class NumberHunt {
   bool get over => found || guesses.length >= maxGuesses;
   int get left => maxGuesses - guesses.length;
 
-  /// A guess outside what the clues allow isn't counted — the clue says so
+  /// A guess outside what the clues allow isn't counted, the clue says so
   /// instead, which is the lesson.
   Clue guess(int value) {
     if (over) return Clue.finished;

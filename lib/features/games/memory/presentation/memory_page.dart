@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -122,7 +121,7 @@ class _MemoryPageState extends State<MemoryPage> {
               child: PracticeBadge(),
             ),
           ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
         if (_result)
           GameResultCard(
             title: widget.trail ? 'Trail complete!' : 'Every pair found!',
@@ -213,7 +212,7 @@ class _MemoryPageState extends State<MemoryPage> {
       FilledButton(
         key: const Key('trail_ready'),
         onPressed: () => setState(_trail.startRecall),
-        child: const Text('I’m ready — hide the trail'),
+        child: const Text('I’m ready, hide the trail'),
       )
     else if (_trail.answered) ...[
       GameNotice(
@@ -253,8 +252,8 @@ class _MemoryPageState extends State<MemoryPage> {
       final columns = constraints.maxWidth > 600 ? 4 : 3;
       final width = (constraints.maxWidth - (columns - 1) * 10) / columns;
       return Wrap(
-        spacing: 10,
-        runSpacing: 10,
+        spacing: 12,
+        runSpacing: 12,
         children: [
           for (final child in children) SizedBox(width: width, child: child),
         ],
@@ -271,7 +270,7 @@ class _MemoryPageState extends State<MemoryPage> {
     required VoidCallback? onTap,
     _Face state = _Face.up,
   }) {
-    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
+    final plum = CurioTokens.tintThinking;
     return Semantics(
       label: label,
       button: true,
@@ -279,14 +278,10 @@ class _MemoryPageState extends State<MemoryPage> {
       excludeSemantics: true,
       onTap: onTap,
       child: CurioClay(
-        radius: 18,
+        radius: CurioTokens.radiusCard,
         color: switch (state) {
           _Face.down => plum.withValues(alpha: .16),
-          _Face.matched => curioColor(
-            context,
-            CurioColors.successSoft,
-            CurioColorsLight.successSoft,
-          ),
+          _Face.matched => CurioTokens.surfaceRaised,
           _ => null,
         },
         outline: state == _Face.turned ? plum : null,
@@ -299,7 +294,7 @@ class _MemoryPageState extends State<MemoryPage> {
               constraints: const BoxConstraints(minHeight: 80),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 18,
+                  vertical: 16,
                   horizontal: 4,
                 ),
                 child: Column(

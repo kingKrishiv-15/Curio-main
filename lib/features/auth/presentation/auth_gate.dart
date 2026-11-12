@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,8 +11,6 @@ import '../../../core/services/progress_store.dart';
 import '../../../core/services/cached_progress_store.dart';
 import '../../../core/services/supabase_progress_store.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../shell/presentation/main_shell.dart';
 import 'auth_layout.dart';
@@ -28,7 +27,7 @@ import 'update_password_page.dart';
 /// * signed in → learner setup the first time, then Home
 ///
 /// Signed-out screens are pushed on the root navigator, so whenever the
-/// signed-in state flips the gate pops back to itself — a correct code
+/// signed-in state flips the gate pops back to itself, a correct code
 /// lands the parent in learner setup without each page navigating itself.
 class AuthGate extends StatefulWidget {
   const AuthGate({this.authService, super.key});
@@ -131,7 +130,7 @@ class _LearnerGateState extends State<_LearnerGate> {
                   'We couldn’t load your learner profile. Check your connection and try again.',
                   error: true,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 FilledButton(
                   onPressed: () => setState(
                     () => _needsOnboarding = widget.auth.needsOnboarding(),
@@ -241,17 +240,13 @@ class _CurioExperienceState extends State<_CurioExperience> {
         builder: (context, _) {
           if (_state.isLoading) {
             return Scaffold(
-              backgroundColor: curioColor(
-                context,
-                CurioColors.canvas,
-                CurioColorsLight.canvas,
-              ),
+              backgroundColor: CurioTokens.base,
               body: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const CurioBrand(),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 24),
                     const SizedBox(
                       width: 26,
                       height: 26,
@@ -260,13 +255,7 @@ class _CurioExperienceState extends State<_CurioExperience> {
                     const SizedBox(height: 12),
                     Text(
                       'Loading your learning trail…',
-                      style: TextStyle(
-                        color: curioColor(
-                          context,
-                          CurioColors.inkMuted,
-                          CurioColorsLight.inkMuted,
-                        ),
-                      ),
+                      style: TextStyle(color: CurioTokens.textSecondary),
                     ),
                   ],
                 ),
@@ -281,7 +270,7 @@ class _CurioExperienceState extends State<_CurioExperience> {
                     'Your learning trail could not be loaded. Please reconnect and try again.',
                     error: true,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   FilledButton(
                     onPressed: _state.hydrate,
                     child: const Text('Retry loading'),

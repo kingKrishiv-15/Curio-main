@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
@@ -97,7 +96,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
       title: 'Pattern Forge',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice forge' : 'Daily pattern forge',
@@ -107,7 +106,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
             chips: [
               const GameMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '3–5 min',
+                label: '3 to 5 min',
               ),
               const GameMetaChip(
                 icon: Icons.blur_on_rounded,
@@ -140,7 +139,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
             pick: _picks[_current],
             onTapNumber: q is RepairQuestion ? _pick : null,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (q is NextQuestion)
             _Options(
               labels: [for (final o in q.options) '$o'],
@@ -167,7 +166,7 @@ class _PatternForgePageState extends State<PatternForgePage> {
             ),
             const SizedBox(height: 12),
             _Working(question: q),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             if (!_finished)
               PrimaryButton(
                 key: const Key('forge_next'),
@@ -200,13 +199,13 @@ class _PatternForgePageState extends State<PatternForgePage> {
 
   String _verdict(ForgeQuestion q, bool right) => switch (q) {
     NextQuestion(:final answer) =>
-      right ? 'Right — $answer comes next.' : 'Not quite — $answer comes next.',
+      right ? 'Right, $answer comes next.' : 'Not quite, $answer comes next.',
     RuleQuestion(:final rule) =>
-      right ? 'Right rule!' : 'Not quite — the rule is “${rule.description}”.',
+      right ? 'Right rule!' : 'Not quite, the rule is “${rule.description}”.',
     RepairQuestion(:final shown, :final wrongIndex, :final correctValue) =>
       right
           ? 'Found it! ${shown[wrongIndex]} should be $correctValue.'
-          : 'Not that one — ${shown[wrongIndex]} should be $correctValue.',
+          : 'Not that one, ${shown[wrongIndex]} should be $correctValue.',
   };
 }
 
@@ -231,11 +230,7 @@ class _QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final muted = CurioTokens.textSecondary;
     final q = question;
     final List<int> numbers = switch (q) {
       NextQuestion(:final shown) => shown,
@@ -243,7 +238,7 @@ class _QuestionCard extends StatelessWidget {
       RepairQuestion(:final shown) => shown,
     };
     return GlassCard(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -251,12 +246,11 @@ class _QuestionCard extends StatelessWidget {
             'QUESTION ${index + 1} OF 3',
             style: TextStyle(
               color: muted,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Semantics(
             header: true,
             child: Text(
@@ -264,7 +258,7 @@ class _QuestionCard extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (q is RepairQuestion)
             Wrap(
               spacing: 8,
@@ -338,31 +332,11 @@ class _NumberChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final success = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.success,
-    );
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
-    final sunk = curioColor(
-      context,
-      CurioColors.surfaceMuted,
-      CurioColorsLight.surfaceMuted,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final coral = CurioTokens.wrong;
+    final success = CurioTokens.correct;
+    final danger = CurioTokens.wrong;
+    final sunk = CurioTokens.surface;
+    final outline = CurioTokens.border;
     final accent = switch (mark) {
       true => success,
       false => danger,
@@ -370,16 +344,16 @@ class _NumberChip extends StatelessWidget {
     };
     final style = TextStyle(
       fontFamily: 'Fraunces',
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: FontWeight.w600,
-      color: curioColor(context, CurioColors.ink, CurioColorsLight.ink),
+      color: CurioTokens.textPrimary,
     );
     final chip = Container(
       constraints: const BoxConstraints(minWidth: 52),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: accent?.withValues(alpha: .14) ?? sunk,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         border: Border.all(
           color: accent ?? (onTap != null ? outline : Colors.transparent),
           width: 1.6,
@@ -394,7 +368,7 @@ class _NumberChip extends StatelessWidget {
               size: 18,
               color: accent,
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
           ],
           Text(
             value,
@@ -403,11 +377,11 @@ class _NumberChip extends StatelessWidget {
                 ? style
                 : style.copyWith(
                     decoration: TextDecoration.lineThrough,
-                    fontSize: 17,
+                    fontSize: 16,
                   ),
           ),
           if (fixed != null) ...[
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Text('→ $fixed', style: style),
           ],
         ],
@@ -426,7 +400,7 @@ class _NumberChip extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           child: chip,
         ),
       ),
@@ -505,27 +479,11 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final success = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.success,
-    );
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final success = CurioTokens.correct;
+    final danger = CurioTokens.wrong;
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
+    final ink = CurioTokens.textPrimary;
     final accent = switch (state) {
       _OptionState.right => success,
       _OptionState.wrong => danger,
@@ -546,15 +504,15 @@ class _OptionTile extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
             child: Container(
               padding: EdgeInsets.symmetric(
                 horizontal: 16,
-                vertical: big ? 14 : 13,
+                vertical: big ? 16 : 12,
               ),
               decoration: BoxDecoration(
                 color: accent?.withValues(alpha: .14) ?? surface,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                 border: Border.all(color: accent ?? outline, width: 1.4),
               ),
               child: Row(
@@ -566,7 +524,7 @@ class _OptionTile extends StatelessWidget {
                           ? TextStyle(
                               color: ink,
                               fontFamily: 'Fraunces',
-                              fontSize: 24,
+                              fontSize: 20,
                               fontWeight: FontWeight.w600,
                             )
                           : TextStyle(
@@ -603,23 +561,15 @@ class _Working extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gold = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final gold = CurioTokens.tintMaths;
+    final muted = CurioTokens.textSecondary;
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_outline_rounded, color: gold),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -628,7 +578,7 @@ class _Working extends StatelessWidget {
                   'The rule: ${question.rule.description}',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   question.steps.join('\n'),
                   style: TextStyle(color: muted, height: 1.5),
@@ -660,30 +610,14 @@ class _Pips extends StatelessWidget {
             Container(
               width: 10,
               height: 10,
-              margin: const EdgeInsets.only(left: 5),
+              margin: const EdgeInsets.only(left: 4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: switch (results[i]) {
-                  true => curioColor(
-                    context,
-                    CurioColors.success,
-                    CurioColorsLight.success,
-                  ),
-                  false => curioColor(
-                    context,
-                    CurioColors.danger,
-                    CurioColorsLight.danger,
-                  ),
-                  null when i == current => curioColor(
-                    context,
-                    CurioColors.coral,
-                    CurioColorsLight.coral,
-                  ),
-                  null => curioColor(
-                    context,
-                    CurioColors.outline,
-                    CurioColorsLight.outline,
-                  ),
+                  true => CurioTokens.correct,
+                  false => CurioTokens.wrong,
+                  null when i == current => CurioTokens.wrong,
+                  null => CurioTokens.border,
                 },
               ),
             ),

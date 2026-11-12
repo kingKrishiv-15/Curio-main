@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 
 final _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
@@ -137,7 +136,7 @@ class _PasswordFieldState extends State<PasswordField> {
         onFieldSubmitted: widget.onSubmitted,
       ),
       if (widget.isNew) ...[
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         _PasswordChecklist(value: widget.controller.text),
       ],
     ],
@@ -153,7 +152,7 @@ class _PasswordChecklist extends StatelessWidget {
     final checks = passwordChecks(value);
     return Wrap(
       spacing: 16,
-      runSpacing: 6,
+      runSpacing: 8,
       children: [
         _Check(done: checks.length, label: '8+ characters'),
         _Check(done: checks.mix, label: 'A letter and a number'),
@@ -169,9 +168,7 @@ class _Check extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = done
-        ? curioColor(context, CurioColors.success, CurioColorsLight.success)
-        : curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final color = done ? CurioTokens.correct : CurioTokens.textSecondary;
     return Semantics(
       label: '$label${done ? ', done' : ', not yet'}',
       excludeSemantics: true,
@@ -179,7 +176,7 @@ class _Check extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
+            duration: CurioTokens.slow,
             child: Icon(
               done ? Icons.check_circle_rounded : Icons.circle_outlined,
               key: ValueKey(done),
@@ -187,13 +184,13 @@ class _Check extends StatelessWidget {
               color: color,
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           Flexible(
             child: Text(
               label,
               style: TextStyle(
                 color: color,
-                fontSize: 12.5,
+                fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -217,11 +214,7 @@ class _PrivacySummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     const items = [
       (
         Icons.alternate_email_rounded,
@@ -259,7 +252,7 @@ class _PrivacySummary extends StatelessWidget {
               'Only what’s needed to run your family’s account.',
               style: TextStyle(color: muted, height: 1.5),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             for (final (icon, title, body) in items)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -268,16 +261,12 @@ class _PrivacySummary extends StatelessWidget {
                   children: [
                     CurioIconTile(
                       icon: icon,
-                      color: curioColor(
-                        context,
-                        CurioColors.forest,
-                        CurioColorsLight.forest,
-                      ),
+                      color: CurioTokens.accent,
                       size: 40,
                       iconSize: 20,
-                      radius: 13,
+                      radius: CurioTokens.radiusCard,
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +275,7 @@ class _PrivacySummary extends StatelessWidget {
                             title,
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
                           Text(body, style: TextStyle(color: muted)),
                         ],
                       ),
@@ -298,7 +287,7 @@ class _PrivacySummary extends StatelessWidget {
               'It’s all private to your account. You can export or permanently delete it anytime from Profile → Privacy.',
               style: TextStyle(color: muted, height: 1.5),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: FilledButton(

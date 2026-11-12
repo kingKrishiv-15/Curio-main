@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
@@ -22,15 +23,12 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     _dayTimer?.cancel();
     final now = today;
     final midnight = DateTime(now.year, now.month, now.day + 1);
-    _dayTimer = Timer(
-      midnight.difference(now) + const Duration(milliseconds: 100),
-      () {
-        if (_disposed) return;
-        streak = calculateStreak(completedActivities, today);
-        notifyListeners();
-        startDailyClock();
-      },
-    );
+    _dayTimer = Timer(midnight.difference(now) + CurioTokens.fast, () {
+      if (_disposed) return;
+      streak = calculateStreak(completedActivities, today);
+      notifyListeners();
+      startDailyClock();
+    });
   }
 
   bool _disposed = false;
@@ -85,7 +83,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
 
   int get companionStage => (totalXp ~/ 250) + 1;
 
-  /// The best run of consecutive practice days ever — milestones use this,
+  /// The best run of consecutive practice days ever, milestones use this,
   /// so a badge isn't taken away when a streak later breaks.
   int get longestStreak => calculateLongestStreak(completedActivities);
   int get xpIntoStage => totalXp % 250;
@@ -126,7 +124,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
       }
       if (store is CachedProgressStore &&
           (store as CachedProgressStore).offline) {
-        syncError = 'Offline — showing progress saved on this device.';
+        syncError = 'Offline, showing progress saved on this device.';
       }
       childName = snapshot.childName;
       totalXp = snapshot.totalXp;
@@ -247,7 +245,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     if (syncError == null) await hydrate();
   }
 
-  /// Resolves once every queued save has finished — e.g. before erasing
+  /// Resolves once every queued save has finished, e.g. before erasing
   /// guest progress, so a late save can't bring it back.
   Future<void> flush() => _saveQueue;
 

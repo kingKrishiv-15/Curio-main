@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../game_catalog.dart';
@@ -13,22 +12,22 @@ import 'game_preview.dart';
 
 /// How a [GameCard] is laid out.
 enum GameCardStyle {
-  /// Art on top, details below — for grids and the Home shelf.
+  /// Art on top, details below, for grids and the Home shelf.
   tile,
 
-  /// Art on the left, details on the right — for lists.
+  /// Art on the left, details on the right, for lists.
   row,
 
-  /// Big art and a play button — for today's featured quest.
+  /// Big art and a play button, for today's featured quest.
   hero,
 
-  /// Big art with a round play button on its lower edge — Home's carousel.
+  /// Big art with a round play button on its lower edge, Home's carousel.
   spotlight,
 }
 
 /// The one card every screen uses to show a game: vivid art with a preview
 /// of how it plays, then the title, a one-line promise, and the facts a
-/// parent or child wants before tapping — skill, time, XP — plus whether
+/// parent or child wants before tapping, skill, time, XP, plus whether
 /// it's new, today's quest, or already done today.
 class GameCard extends StatelessWidget {
   const GameCard({
@@ -95,7 +94,7 @@ class GameCard extends StatelessWidget {
           child: InkWell(
             key: Key('game_card_${game.id}'),
             onTap: () => _open(context),
-            borderRadius: BorderRadius.circular(radius),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
             splashColor: color.withValues(alpha: .12),
             highlightColor: color.withValues(alpha: .05),
             child: content,
@@ -119,13 +118,13 @@ class GameCard extends StatelessWidget {
           children: [
             GameArt(game: game, height: 104, done: done, featured: featured),
             Padding(
-              padding: const EdgeInsets.fromLTRB(6, 12, 6, 0),
+              padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
               child: _Details(game: game, done: done, taglineLines: 2),
             ),
           ],
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(6, 12, 6, 4),
+          padding: const EdgeInsets.fromLTRB(8, 12, 8, 4),
           child: _PlayPill(done: done, color: color),
         ),
       ],
@@ -153,14 +152,14 @@ class GameCard extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
               child: _Details(game: game, done: done, taglineLines: 3),
             ),
           ),
           Center(
             child: _ArrowButton(color: color, done: done),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
         ],
       ),
     ),
@@ -169,11 +168,7 @@ class GameCard extends StatelessWidget {
   // The play button hangs half over the art; the card itself is the tap
   // target, so the button is only a signpost.
   Widget _spotlight(BuildContext context, Color color) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Column(
@@ -201,16 +196,16 @@ class GameCard extends StatelessWidget {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 14, 56, 0),
+                padding: const EdgeInsets.fromLTRB(8, 16, 48, 0),
                 child: Text(
                   game.title,
                   style: Theme.of(
                     context,
-                  ).textTheme.titleLarge?.copyWith(fontSize: 18),
+                  ).textTheme.titleLarge?.copyWith(fontSize: 20),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: Text(
                   game.tagline,
                   maxLines: 2,
@@ -221,7 +216,7 @@ class GameCard extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 12, 8, 6),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
             child: _Meta(game: game, done: done),
           ),
         ],
@@ -230,36 +225,28 @@ class GameCard extends StatelessWidget {
   }
 
   Widget _hero(BuildContext context, Color color) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           GameArt(game: game, height: 156, done: done, featured: featured),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 16, 8, 6),
+            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CurioEyebrow(
                   featured ? 'Today’s featured quest' : game.section.title,
-                  color: curioColor(
-                    context,
-                    color,
-                    Color.lerp(color, Colors.black, .3)!,
-                  ),
+                  color: color,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   game.title,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   game.tagline,
                   style: TextStyle(color: muted, height: 1.45, fontSize: 14),
@@ -314,20 +301,10 @@ class GameArt extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = gameColor(game.id, skillColor(context, game.skill));
     return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
       child: Container(
         height: height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.lerp(color, Colors.white, .24)!,
-              bannerFill(context, color),
-              Color.lerp(color, Colors.black, .3)!,
-            ],
-          ),
-        ),
+        decoration: BoxDecoration(color: CurioTokens.wash(color)),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -336,7 +313,7 @@ class GameArt extends StatelessWidget {
               child: CustomPaint(
                 painter: ClayPainter(
                   color: color,
-                  radius: 18,
+                  radius: CurioTokens.radiusCard,
                   dark: Theme.of(context).brightness == Brightness.dark,
                   fill: false,
                   lift: false,
@@ -352,7 +329,7 @@ class GameArt extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: .12),
+                    color: CurioTokens.textPrimary.withValues(alpha: .12),
                     width: height * .18,
                   ),
                 ),
@@ -360,7 +337,7 @@ class GameArt extends StatelessWidget {
             ),
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(8, badges ? 22 : 4, 8, 4),
+                padding: EdgeInsets.fromLTRB(8, badges ? 24 : 4, 8, 4),
                 child: LayoutBuilder(
                   builder: (context, box) {
                     final emblem = GameEmblem(
@@ -375,7 +352,7 @@ class GameArt extends StatelessWidget {
                         Expanded(
                           flex: 5,
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(4, 6, 12, 6),
+                            padding: const EdgeInsets.fromLTRB(4, 8, 12, 8),
                             child: GamePreview(gameId: game.id, color: color),
                           ),
                         ),
@@ -396,24 +373,20 @@ class GameArt extends StatelessWidget {
                       _Badge(
                         icon: Icons.check_rounded,
                         label: compactBadges ? null : 'DONE',
-                        foreground: curioColor(
-                          context,
-                          CurioColors.forestStrong,
-                          CurioColorsLight.forestStrong,
-                        ),
+                        foreground: CurioTokens.accent,
                       ),
                     const Spacer(),
                     if (featured)
                       _Badge(
                         icon: Icons.star_rounded,
                         label: compactBadges ? null : 'QUEST',
-                        background: CurioColors.spark,
-                        foreground: CurioColorsLight.ink,
+                        background: CurioTokens.tintMaths,
+                        foreground: CurioTokens.textPrimary,
                       )
                     else if (game.isNew && !done)
                       _Badge(
                         label: 'NEW',
-                        foreground: Color.lerp(color, Colors.black, .5)!,
+                        foreground: Color.lerp(color, CurioTokens.base, .5)!,
                       ),
                   ],
                 ),
@@ -430,7 +403,7 @@ class _Badge extends StatelessWidget {
     required this.foreground,
     this.label,
     this.icon,
-    this.background = Colors.white,
+    this.background = CurioTokens.textPrimary,
   });
 
   final String? label;
@@ -441,33 +414,26 @@ class _Badge extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.symmetric(
       horizontal: label == null ? 4 : 8,
-      vertical: 3,
+      vertical: 4,
     ),
     decoration: BoxDecoration(
       color: background,
-      borderRadius: BorderRadius.circular(99),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x33000000),
-          blurRadius: 6,
-          offset: Offset(0, 2),
-        ),
-      ],
+      borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
+      boxShadow: CurioTokens.shadowNone,
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) Icon(icon, size: 13, color: foreground),
-        if (icon != null && label != null) const SizedBox(width: 3),
+        if (icon != null && label != null) const SizedBox(width: 4),
         if (label != null)
           Text(
             label!,
             textScaler: TextScaler.noScaling,
             style: TextStyle(
               color: foreground,
-              fontSize: 9.5,
+              fontSize: 13,
               fontWeight: FontWeight.w900,
-              letterSpacing: .6,
             ),
           ),
       ],
@@ -488,27 +454,23 @@ class _Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final muted = CurioTokens.textSecondary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           game.title,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 19),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
         ),
         const SizedBox(height: 4),
         Text(
           game.tagline,
           maxLines: taglineLines,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: muted, fontSize: 12.5, height: 1.4),
+          style: TextStyle(color: muted, fontSize: 13, height: 1.4),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         _Meta(game: game, done: done),
       ],
     );
@@ -524,31 +486,19 @@ class _Meta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = skillColor(context, game.skill);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final success = curioColor(
-      context,
-      CurioColors.success,
-      CurioColorsLight.forestStrong,
-    );
-    final gold = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffronStrong,
-    );
+    final muted = CurioTokens.textSecondary;
+    final success = CurioTokens.correct;
+    final gold = CurioTokens.tintMaths;
     return Wrap(
-      spacing: 10,
-      runSpacing: 6,
+      spacing: 12,
+      runSpacing: 8,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: color.withValues(alpha: .14),
-            borderRadius: BorderRadius.circular(99),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -562,12 +512,8 @@ class _Meta extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     // Skill hues are bright: darken them for text on light cards.
-                    color: curioColor(
-                      context,
-                      color,
-                      Color.lerp(color, Colors.black, .35)!,
-                    ),
-                    fontSize: 11,
+                    color: color,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -611,7 +557,7 @@ class _MetaItem extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(icon, size: 14, color: color),
-      const SizedBox(width: 3),
+      const SizedBox(width: 4),
       Flexible(
         child: Text(
           label,
@@ -619,7 +565,7 @@ class _MetaItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: color,
-            fontSize: 11.5,
+            fontSize: 13,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -635,7 +581,7 @@ class _PlayPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     final label = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -658,8 +604,8 @@ class _PlayPill extends StatelessWidget {
       ],
     );
     return CurioClay(
-      radius: 16,
-      padding: const EdgeInsets.symmetric(vertical: 9),
+      radius: CurioTokens.radiusCard,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       color: color.withValues(alpha: done ? .1 : .24),
       child: label,
     );
@@ -675,11 +621,11 @@ class _PlayCircle extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox.square(
     dimension: 46,
     child: CurioClay(
-      radius: 23,
+      radius: CurioTokens.radiusCard,
       outline: color,
       child: Icon(
         done ? Icons.replay_rounded : Icons.play_arrow_rounded,
-        color: curioColor(context, color, Color.lerp(color, Colors.black, .3)!),
+        color: color,
         size: 25,
       ),
     ),
@@ -695,15 +641,11 @@ class _ArrowButton extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox.square(
     dimension: 38,
     child: CurioClay(
-      radius: 19,
+      radius: CurioTokens.radiusCard,
       color: color.withValues(alpha: done ? .1 : .18),
       child: Icon(
         done ? Icons.replay_rounded : Icons.play_arrow_rounded,
-        color: curioColor(
-          context,
-          color,
-          Color.lerp(color, Colors.black, .35)!,
-        ),
+        color: color,
         size: 20,
       ),
     ),

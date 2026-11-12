@@ -1,13 +1,13 @@
 import 'dart:math';
 
 /// Cascade: a claim at the top, twelve consequence tiles below. Build a chain
-/// of five where each tile follows *because of* the one above — "this,
+/// of five where each tile follows *because of* the one above, "this,
 /// therefore this, therefore this".
 ///
 /// Tiles come in three kinds. [CascadeKind.link]s form the one true chain.
 /// [CascadeKind.sideEffect]s are genuinely true but lead nowhere in this
 /// chain. [CascadeKind.myth]s sound obvious but are contradicted by
-/// evidence — picking one means reasoning from intuition rather than
+/// evidence, picking one means reasoning from intuition rather than
 /// evidence, and its note says why.
 enum CascadeKind { link, sideEffect, myth }
 
@@ -93,7 +93,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Far fewer cars drive through the centre',
         _link,
-        'The ban takes most traffic out of the centre — everything else follows from this.',
+        'The ban takes most traffic out of the centre, everything else follows from this.',
       ),
       CascadeTile(
         'Less exhaust pollution in the air',
@@ -120,12 +120,12 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Streets become quieter',
         _side,
-        'True — less engine noise. But quiet streets don’t cause the next step in this chain.',
+        'True, less engine noise. But quiet streets don’t cause the next step in this chain.',
       ),
       CascadeTile(
         'More people walk and cycle in the centre',
         _side,
-        'True, and good for health — but it branches off this chain rather than continuing it.',
+        'True, and good for health, but it branches off this chain rather than continuing it.',
       ),
       CascadeTile(
         'Buses move faster through the centre',
@@ -135,7 +135,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Shops in the centre lose most of their customers',
         _myth,
-        'Sounds obvious, but in many cities that tried it, shops kept their customers or gained more — people on foot pass far more shop windows than drivers do.',
+        'Sounds obvious, but in many cities that tried it, shops kept their customers or gained more, people on foot pass far more shop windows than drivers do.',
       ),
       CascadeTile(
         'Traffic jams just move and get as bad elsewhere',
@@ -187,12 +187,12 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'More birds and insects live in the town',
         _side,
-        'True — trees are homes and food. But wildlife doesn’t lead to the next step here.',
+        'True, trees are homes and food. But wildlife doesn’t lead to the next step here.',
       ),
       CascadeTile(
         'Rain soaks into the ground instead of flooding drains',
         _side,
-        'True, and useful — but it’s a different chain about water, not heat.',
+        'True, and useful, but it’s a different chain about water, not heat.',
       ),
       CascadeTile(
         'Streets look greener and calmer',
@@ -254,7 +254,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'School finishes later in the afternoon',
         _side,
-        'True — the whole day shifts. But it doesn’t cause the next step in this chain.',
+        'True, the whole day shifts. But it doesn’t cause the next step in this chain.',
       ),
       CascadeTile(
         'Buses run on a new timetable',
@@ -284,7 +284,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Students get more tired because the day ends later',
         _myth,
-        'Tiredness depends most on how much you sleep — and the later start adds sleep.',
+        'Tiredness depends most on how much you sleep, and the later start adds sleep.',
       ),
     ],
   ),
@@ -321,7 +321,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Shops sell more reusable bags',
         _side,
-        'True — but it’s a side effect, not the next link in the chain.',
+        'True, but it’s a side effect, not the next link in the chain.',
       ),
       CascadeTile(
         'Shops spend less buying bags',
@@ -346,7 +346,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Shoppers stop going to the shops',
         _myth,
-        'People kept shopping — they just brought bags.',
+        'People kept shopping, they just brought bags.',
       ),
       CascadeTile(
         'The sea is quickly free of plastic',
@@ -371,7 +371,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'More young fish drift beyond the edges',
         _link,
-        'Eggs and young fish don’t stop at invisible lines — they spill outward.',
+        'Eggs and young fish don’t stop at invisible lines, they spill outward.',
       ),
       CascadeTile(
         'Catches rise near the protected area',
@@ -388,7 +388,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'Divers come to see the wildlife',
         _side,
-        'True, and good for tourism — but it’s a different chain.',
+        'True, and good for tourism, but it’s a different chain.',
       ),
       CascadeTile(
         'Coral and seaweed have a chance to recover',
@@ -403,7 +403,7 @@ const cascadeClaims = <CascadeClaim>[
       CascadeTile(
         'All the fishing families lose their jobs',
         _myth,
-        'Fishers keep working outside the protected area — and often catch more there over time.',
+        'Fishers keep working outside the protected area, and often catch more there over time.',
       ),
       CascadeTile(
         'The fish get too crowded and die out',

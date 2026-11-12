@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
@@ -80,7 +79,7 @@ class _SignalGridPageState extends State<SignalGridPage> {
       );
       return;
     }
-    // Any board that follows the rules is right — not just the stored one.
+    // Any board that follows the rules is right, not just the stored one.
     final errors = SignalPuzzle.violations([
       for (final cell in _cells) cell == _Signal.spark,
     ])..removeAll(_givens);
@@ -105,7 +104,8 @@ class _SignalGridPageState extends State<SignalGridPage> {
   void _hint() {
     if (_hintsLeft == 0 || _complete) return;
     final index = List.generate(16, (index) => index).firstWhere(
-      (index) => !_givens.contains(index) && _cells[index] != _solutionAt(index),
+      (index) =>
+          !_givens.contains(index) && _cells[index] != _solutionAt(index),
       orElse: () => -1,
     );
     if (index < 0) return;
@@ -167,37 +167,41 @@ class _SignalGridPageState extends State<SignalGridPage> {
         ),
       ],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           if (_practice) ...[
-            const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
-            const SizedBox(height: 10),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: PracticeBadge(),
+            ),
+            const SizedBox(height: 12),
           ],
           CurioEyebrow(
             _practice ? 'Practice logic puzzle' : 'Daily logic puzzle',
-            color: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
+            color: CurioTokens.accent,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             _complete ? 'Grid harmonised.' : 'Balance the signals',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 8),
           Text(
             'Place two sparks and two waves in every row and column. No two lines may match.',
-            style: TextStyle(
-              color: curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted),
-            ),
+            style: TextStyle(color: CurioTokens.textSecondary),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               const Expanded(
                 child: Wrap(
-                  spacing: 15,
-                  runSpacing: 6,
+                  spacing: 16,
+                  runSpacing: 8,
                   children: [
-                    GameMetaChip(icon: Icons.schedule_rounded, label: '4–6 min'),
+                    GameMetaChip(
+                      icon: Icons.schedule_rounded,
+                      label: '4 to 6 min',
+                    ),
                     GameMetaChip(
                       icon: Icons.grid_view_rounded,
                       label: 'Reasoning',
@@ -212,45 +216,28 @@ class _SignalGridPageState extends State<SignalGridPage> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
               child: AspectRatio(
                 aspectRatio: 1,
                 child: Container(
-                  padding: const EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     // Light mode's `navy` is bright coral, which fights the
                     // green clue tiles; a calm sunken tone frames them instead.
-                    color: curioColor(
-                      context,
-                      CurioColors.navy,
-                      CurioColorsLight.surfaceMuted,
-                    ),
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [
-                      BoxShadow(
-                        // Dark mode: translucent near-black-green overlay.
-                        // Light mode counterpart: translucent dark ink tone
-                        // at the same alpha (0x30).
-                        color: curioColor(
-                          context,
-                          const Color(0x30102C26),
-                          const Color(0x302E2417),
-                        ),
-                        blurRadius: 30,
-                        offset: const Offset(0, 14),
-                      ),
-                    ],
+                    color: CurioTokens.surfaceRaised,
+                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+                    boxShadow: CurioTokens.shadowNone,
                   ),
                   child: GridView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
-                          crossAxisSpacing: 6,
-                          mainAxisSpacing: 6,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
                         ),
                     itemCount: 16,
                     itemBuilder: (context, index) {
@@ -264,21 +251,25 @@ class _SignalGridPageState extends State<SignalGridPage> {
                         child: Material(
                           key: Key('signal_$index'),
                           color: error
-                              ? curioColor(context, CurioColors.orangeSoft, CurioColorsLight.orangeSoft)
+                              ? CurioTokens.surfaceRaised
                               : given
-                              ? curioColor(context, CurioColors.forestStrong, CurioColorsLight.forestStrong)
-                              : curioColor(context, CurioColors.surface, CurioColorsLight.surface),
-                          borderRadius: BorderRadius.circular(15),
+                              ? CurioTokens.accent
+                              : CurioTokens.surface,
+                          borderRadius: BorderRadius.circular(
+                            CurioTokens.radiusCard,
+                          ),
                           child: InkWell(
                             onTap: given ? null : () => _cycle(index),
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(
+                              CurioTokens.radiusCard,
+                            ),
                             child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 180),
+                              duration: CurioTokens.slow,
                               child: signal == null
                                   ? Icon(
                                       Icons.add_rounded,
                                       key: ValueKey('empty_$index'),
-                                      color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
+                                      color: CurioTokens.textSecondary,
                                       size: 22,
                                     )
                                   : Icon(
@@ -287,10 +278,10 @@ class _SignalGridPageState extends State<SignalGridPage> {
                                           : Icons.waves_rounded,
                                       key: ValueKey('${signal.name}_$index'),
                                       color: signal == _Signal.spark
-                                          ? curioColor(context, CurioColors.gold, CurioColorsLight.gold)
+                                          ? CurioTokens.tintMaths
                                           : given
-                                          ? curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)
-                                          : curioColor(context, CurioColors.teal, CurioColorsLight.teal),
+                                          ? CurioTokens.tintMaths
+                                          : CurioTokens.accent,
                                       size: 31,
                                     ),
                             ),
@@ -305,17 +296,17 @@ class _SignalGridPageState extends State<SignalGridPage> {
           ),
           const SizedBox(height: 16),
           AnimatedContainer(
-            duration: const Duration(milliseconds: 240),
-            padding: const EdgeInsets.all(14),
+            duration: CurioTokens.slow,
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: _complete
-                  ? curioColor(context, CurioColors.greenSoft, CurioColorsLight.greenSoft)
-                  : curioColor(context, CurioColors.surface, CurioColorsLight.surface),
-              borderRadius: BorderRadius.circular(16),
+                  ? CurioTokens.surfaceRaised
+                  : CurioTokens.surface,
+              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               border: Border.all(
                 color: _complete
-                    ? curioColor(context, CurioColors.green, CurioColorsLight.green).withValues(alpha: .3)
-                    : curioColor(context, CurioColors.creamDeep, CurioColorsLight.creamDeep),
+                    ? CurioTokens.correct.withValues(alpha: .3)
+                    : CurioTokens.border,
               ),
             ),
             child: Row(
@@ -324,29 +315,27 @@ class _SignalGridPageState extends State<SignalGridPage> {
                   _complete
                       ? Icons.check_circle_rounded
                       : Icons.tips_and_updates_outlined,
-                  color: _complete
-                      ? curioColor(context, CurioColors.green, CurioColorsLight.green)
-                      : curioColor(context, CurioColors.coral, CurioColorsLight.coral),
+                  color: _complete ? CurioTokens.correct : CurioTokens.wrong,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(child: Text(_message)),
                 Text(
                   '$filled/16',
                   style: TextStyle(
-                    color: curioColor(context, CurioColors.navyMuted, CurioColorsLight.navyMuted),
+                    color: CurioTokens.textSecondary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 13),
+          const SizedBox(height: 12),
           if (!_complete)
             PrimaryButton(
               label: 'Check my grid',
               icon: Icons.task_alt_rounded,
               onPressed: _check,
-              color: curioColor(context, CurioColors.teal, CurioColorsLight.teal),
+              color: CurioTokens.accent,
             )
           else
             GameResultCard(
@@ -375,13 +364,13 @@ class _Rule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundColor: curioColor(context, CurioColors.tealSoft, CurioColorsLight.tealSoft),
-            foregroundColor: curioColor(context, CurioColors.tealDark, CurioColorsLight.tealDark),
+            backgroundColor: CurioTokens.surfaceRaised,
+            foregroundColor: CurioTokens.accent,
             child: Icon(icon, size: 20),
           ),
           const SizedBox(width: 12),

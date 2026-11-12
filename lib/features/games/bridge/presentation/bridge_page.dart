@@ -1,10 +1,9 @@
 import 'dart:math';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -26,7 +25,7 @@ class _BridgePageState extends State<BridgePage> {
   static const _rules = [
     'Turn the start number into the target using every tile exactly once.',
     'Long-press and drag tiles to reorder them, or use the arrows.',
-    'The number after each tile updates as you move them — watch it travel.',
+    'The number after each tile updates as you move them, watch it travel.',
     'Every step must stay a whole number. A hint locks the next tile in place but costs points.',
   ];
 
@@ -45,7 +44,10 @@ class _BridgePageState extends State<BridgePage> {
     return [
       for (var i = 0; i < _tileCounts.length; i++)
         BridgeRound(
-          BridgePuzzle.generate(Random(day * 10 + i), tileCount: _tileCounts[i]),
+          BridgePuzzle.generate(
+            Random(day * 10 + i),
+            tileCount: _tileCounts[i],
+          ),
         ),
     ];
   }
@@ -91,14 +93,19 @@ class _BridgePageState extends State<BridgePage> {
       title: 'Bridge',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice bridges' : 'Daily number puzzle',
-            title: _allSolved && last ? 'Every bridge built.' : 'Build the bridge',
+            title: _allSolved && last
+                ? 'Every bridge built.'
+                : 'Build the bridge',
             subtitle: 'Use every tile once. The order is the puzzle.',
             chips: [
-              const GameMetaChip(icon: Icons.schedule_rounded, label: '3–5 min'),
+              const GameMetaChip(
+                icon: Icons.schedule_rounded,
+                label: '3 to 5 min',
+              ),
               GameMetaChip(
                 icon: Icons.layers_rounded,
                 label: 'Bridge ${_current + 1} of ${_rounds.length}',
@@ -107,7 +114,10 @@ class _BridgePageState extends State<BridgePage> {
           ),
           if (_practice) ...[
             const SizedBox(height: 12),
-            const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: PracticeBadge(),
+            ),
           ],
           const SizedBox(height: 16),
           _EndPoint(label: 'START', value: round.puzzle.start),
@@ -120,12 +130,12 @@ class _BridgePageState extends State<BridgePage> {
             reached: round.solved,
             current: round.values.last,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (!round.solved) ...[
             GameNotice(
               message: round.puzzle.solutions == 1
                   ? 'Only one order works today. Hunt for it!'
-                  : '${round.puzzle.solutions} different orders work — find any of them.',
+                  : '${round.puzzle.solutions} different orders work, find any of them.',
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -148,7 +158,9 @@ class _BridgePageState extends State<BridgePage> {
           ] else
             GameResultCard(
               gameId: 'bridge',
-              title: _total == _rounds.length * 100 ? 'Master builder!' : 'All bridges built.',
+              title: _total == _rounds.length * 100
+                  ? 'Master builder!'
+                  : 'All bridges built.',
               score: '$_total / ${_rounds.length * 100}',
               shareText: _share,
               xp: _practice ? null : 80,
@@ -176,24 +188,21 @@ class _EndPoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navy = curioColor(context, CurioColors.navy, CurioColorsLight.navy);
-    final success = curioColor(context, CurioColors.success, CurioColorsLight.success);
+    final navy = CurioTokens.surfaceRaised;
+    final success = CurioTokens.correct;
     // `navy` is coral in light mode, where gold text wouldn't read (§7).
-    final labelColor = curioColor(
-      context,
-      CurioColors.gold,
-      Colors.white.withValues(alpha: .85),
-    );
+    final labelColor = CurioTokens.tintMaths;
     final isTarget = current != null || label == 'TARGET';
     return Semantics(
-      label: '$label $value${isTarget && !reached ? ', currently ${current ?? 'not a whole number'}' : ''}',
+      label:
+          '$label $value${isTarget && !reached ? ', currently ${current ?? 'not a whole number'}' : ''}',
       excludeSemantics: true,
       // Label and live value stack on the left so a big number never runs
       // out of room on a small phone at large text.
       child: CurioClay(
-        radius: 20,
+        radius: CurioTokens.radiusCard,
         color: reached ? success : navy,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
             Expanded(
@@ -203,17 +212,16 @@ class _EndPoint extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      color: reached ? Colors.black87 : labelColor,
+                      color: reached ? CurioTokens.onAccent : labelColor,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 1.4,
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                   ),
                   if (isTarget && !reached)
                     Text(
-                      'now ${current ?? '—'}',
+                      'now ${current ?? ', '}',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: .7),
+                        color: CurioTokens.textPrimary.withValues(alpha: .7),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -221,9 +229,12 @@ class _EndPoint extends StatelessWidget {
               ),
             ),
             if (reached)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(right: 8),
-                child: Icon(Icons.check_circle_rounded, color: Colors.black87),
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: CurioTokens.base.withValues(alpha: .87),
+                ),
               ),
             Flexible(
               child: FittedBox(
@@ -233,9 +244,11 @@ class _EndPoint extends StatelessWidget {
                   '$value',
                   style: TextStyle(
                     fontFamily: 'Fraunces',
-                    fontSize: 30,
+                    fontSize: 32,
                     fontWeight: FontWeight.w600,
-                    color: reached ? Colors.black87 : Colors.white,
+                    color: reached
+                        ? CurioTokens.base.withValues(alpha: .87)
+                        : CurioTokens.textPrimary,
                   ),
                 ),
               ),
@@ -298,18 +311,18 @@ class _OpRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = curioColor(context, CurioColors.surface, CurioColorsLight.surface);
-    final outline = curioColor(context, CurioColors.outline, CurioColorsLight.outline);
-    final gold = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
-    final danger = curioColor(context, CurioColors.danger, CurioColorsLight.danger);
-    final muted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
+    final gold = CurioTokens.tintMaths;
+    final danger = CurioTokens.wrong;
+    final muted = CurioTokens.textSecondary;
     return Semantics(
       label: '${op.spoken}, giving ${value ?? 'not a whole number'}',
       child: Container(
-        padding: const EdgeInsets.fromLTRB(10, 8, 4, 8),
+        padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
         decoration: BoxDecoration(
           color: surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           border: Border.all(color: outline, width: 1.2),
         ),
         child: Row(
@@ -320,7 +333,7 @@ class _OpRow extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: gold.withValues(alpha: .16),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
                 border: Border.all(color: gold.withValues(alpha: .6)),
               ),
               child: Text(

@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'package:curio/theme/curio_tokens.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// Fades and slides a child in once, staggered by [delay] — the public
+/// Fades and slides a child in once, staggered by [delay], the public
 /// sibling of Home's `_FadeSlideIn`, for screens outside Home.
 class CurioFadeSlideIn extends StatefulWidget {
   const CurioFadeSlideIn({
@@ -25,7 +26,7 @@ class _CurioFadeSlideInState extends State<CurioFadeSlideIn>
     with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 460),
+    duration: CurioTokens.slow,
   );
   Timer? _start;
 
@@ -51,7 +52,7 @@ class _CurioFadeSlideInState extends State<CurioFadeSlideIn>
     if (MediaQuery.disableAnimationsOf(context)) return widget.child;
     final curved = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutCubic,
+      curve: CurioTokens.curve,
     );
     return AnimatedBuilder(
       animation: curved,
@@ -67,7 +68,7 @@ class _CurioFadeSlideInState extends State<CurioFadeSlideIn>
   }
 }
 
-/// A slow, endless bob — for illustration pieces that should feel alive
+/// A slow, endless bob, for illustration pieces that should feel alive
 /// without asking for attention.
 class CurioFloat extends StatefulWidget {
   const CurioFloat({
@@ -82,7 +83,7 @@ class CurioFloat extends StatefulWidget {
   final double distance;
   final Duration period;
 
-  /// 0–1, so several floating pieces don't move in lockstep.
+  /// 0 to 1, so several floating pieces don't move in lockstep.
   final double phase;
 
   @override
@@ -126,7 +127,7 @@ class _CurioFloatState extends State<CurioFloat>
 }
 
 /// Runs [controller] on a loop only while the platform (or Curio's own
-/// Accessibility setting) allows motion — a stopped ticker also saves the
+/// Accessibility setting) allows motion, a stopped ticker also saves the
 /// battery for people who asked for less movement.
 void syncLoop(
   AnimationController controller,

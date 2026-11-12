@@ -1,10 +1,9 @@
 import 'dart:math';
+import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
@@ -26,7 +25,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
     'Sixteen tiles hide four groups of four. Each group shares one clear link.',
     'Pick four tiles and check them. A right group locks in and shows why its tiles belong together.',
     '“So close” means three of your four belong together.',
-    'Stuck? Hints are free, and mistakes never end the game — they’re just counted.',
+    'Stuck? Hints are free, and mistakes never end the game, they’re just counted.',
   ];
 
   late LinkLabGame _puzzle = _newGame();
@@ -68,7 +67,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
         case LinkVerdict.wrong:
           HapticFeedback.heavyImpact();
           _message =
-              'Not a group yet. Swap a tile or take a hint — mistakes never end the game.';
+              'Not a group yet. Swap a tile or take a hint, mistakes never end the game.';
           _tone = GameNoticeTone.bad;
         case LinkVerdict.repeat:
           _message = 'You’ve already tried those four.';
@@ -120,7 +119,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
       title: 'Link Lab',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice puzzle' : 'Daily knowledge puzzle',
@@ -132,7 +131,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
             chips: [
               const GameMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '3–5 min',
+                label: '3 to 5 min',
               ),
               const GameMetaChip(
                 icon: Icons.psychology_alt_rounded,
@@ -167,7 +166,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
               hinted: puzzle.pointedAt,
               onTap: _toggle,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             if (_message != null) ...[
               GameNotice(message: _message!, tone: _tone),
               const SizedBox(height: 12),
@@ -204,7 +203,7 @@ class _LinkLabPageState extends State<LinkLabPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             PrimaryButton(
               key: const Key('link_submit'),
               label: _selected.length == 4
@@ -237,10 +236,10 @@ class _LinkLabPageState extends State<LinkLabPage> {
 
 /// Group colours follow the share squares: 🟨 🟩 🟦 🟪.
 Color _groupColour(BuildContext context, int index) => switch (index) {
-  0 => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-  1 => curioColor(context, CurioColors.forest, CurioColorsLight.forest),
-  2 => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-  _ => curioColor(context, CurioColors.plum, CurioColorsLight.plum),
+  0 => CurioTokens.tintMaths,
+  1 => CurioTokens.accent,
+  2 => CurioTokens.tintLogic,
+  _ => CurioTokens.tintThinking,
 };
 
 class _Board extends StatelessWidget {
@@ -297,33 +296,13 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final surface = curioColor(
-      context,
-      CurioColors.surface,
-      CurioColorsLight.surface,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final coral = CurioTokens.wrong;
+    final surface = CurioTokens.surface;
+    final outline = CurioTokens.border;
+    final ink = CurioTokens.textPrimary;
     // Coral is bright in both modes: dark ink on it (design §7).
-    final onCoral = curioColor(
-      context,
-      CurioColors.night,
-      CurioColorsLight.ink,
-    );
-    final saffron = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
+    final onCoral = CurioTokens.base;
+    final saffron = CurioTokens.tintMaths;
     return Semantics(
       button: true,
       selected: selected,
@@ -334,16 +313,16 @@ class _Tile extends StatelessWidget {
         child: InkWell(
           key: Key('link_$word'),
           onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           child: AnimatedContainer(
             duration: MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
-                : const Duration(milliseconds: 150),
+                : CurioTokens.fast,
             constraints: const BoxConstraints(minHeight: 58),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
             decoration: BoxDecoration(
               color: selected ? coral : surface,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
               border: Border.all(
                 color: selected ? coral : outline,
                 width: selected ? 2 : 1.3,
@@ -362,7 +341,6 @@ class _Tile extends StatelessWidget {
                       color: selected ? onCoral : ink,
                       fontWeight: FontWeight.w800,
                       fontSize: 13,
-                      letterSpacing: .3,
                     ),
                   ),
                 ),
@@ -397,18 +375,14 @@ class _GroupBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _groupColour(context, colour);
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: .16),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         border: Border.all(color: color.withValues(alpha: .55), width: 1.3),
       ),
       child: Column(
@@ -425,8 +399,7 @@ class _GroupBar extends StatelessWidget {
                   style: TextStyle(
                     color: ink,
                     fontWeight: FontWeight.w900,
-                    fontSize: 12.5,
-                    letterSpacing: .6,
+                    fontSize: 13,
                   ),
                 ),
               ),
@@ -437,10 +410,10 @@ class _GroupBar extends StatelessWidget {
             group.words.join(' · '),
             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             group.why,
-            style: TextStyle(color: muted, fontSize: 12.5, height: 1.4),
+            style: TextStyle(color: muted, fontSize: 13, height: 1.4),
           ),
         ],
       ),
@@ -456,27 +429,19 @@ class _HintPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final saffron = curioColor(
-      context,
-      CurioColors.saffronStrong,
-      CurioColorsLight.saffronStrong,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final saffron = CurioTokens.tintMaths;
+    final muted = CurioTokens.textSecondary;
     final open = [
       for (final g in puzzle.named)
         if (!puzzle.found.contains(g)) g,
     ];
     return GlassCard(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_rounded, color: saffron, size: 20),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

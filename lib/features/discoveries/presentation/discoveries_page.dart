@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/game_rewards.dart';
@@ -19,36 +18,16 @@ class DiscoveriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final progress = state.collectedFacts.length / discoveries.length;
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final forestStrong = curioColor(
-      context,
-      CurioColors.forestStrong,
-      CurioColorsLight.forestStrong,
-    );
-    final saffron = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffron,
-    );
-    final onDark = curioColor(
-      context,
-      CurioColors.onDark,
-      CurioColorsLight.onDark,
-    );
-    final navyMuted = curioColor(
-      context,
-      CurioColors.navyMuted,
-      CurioColorsLight.navyMuted,
-    );
+    final coral = CurioTokens.wrong;
+    final forestStrong = CurioTokens.accent;
+    final saffron = CurioTokens.tintMaths;
+    final onDark = CurioTokens.textPrimary;
+    final navyMuted = CurioTokens.textSecondary;
     return CurioPage(
       extendBehindBottom: true,
       maxWidth: 820,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 104),
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 96),
         children: [
           PageIntro(
             eyebrow: 'Curiosity archive',
@@ -61,7 +40,7 @@ class DiscoveriesPage extends StatelessWidget {
               child: Text(
                 '${(progress * 100).round()}%',
                 style: const TextStyle(
-                  fontSize: 10,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -78,9 +57,9 @@ class DiscoveriesPage extends StatelessWidget {
                   background: saffron,
                   size: 56,
                   iconSize: 24,
-                  radius: 18,
+                  radius: CurioTokens.radiusCard,
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +68,7 @@ class DiscoveriesPage extends StatelessWidget {
                         'A cabinet of curious things',
                         style: TextStyle(
                           color: onDark,
-                          fontSize: 17,
+                          fontSize: 16,
                           fontFamily: 'Fraunces',
                           fontWeight: FontWeight.w500,
                         ),
@@ -99,7 +78,7 @@ class DiscoveriesPage extends StatelessWidget {
                         'Every completed challenge can reveal a new idea worth remembering.',
                         style: TextStyle(
                           color: onDark.withValues(alpha: .65),
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -108,7 +87,7 @@ class DiscoveriesPage extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 24),
           const SectionHeading(
             'Collected cards',
             subtitle:
@@ -131,8 +110,8 @@ class DiscoveriesPage extends StatelessWidget {
                   mainAxisExtent:
                       (columns == 1 ? 172 : 210) *
                       MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8),
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
                 ),
                 itemCount: discoveries.length,
                 itemBuilder: (context, index) {
@@ -142,7 +121,7 @@ class DiscoveriesPage extends StatelessWidget {
                   // Collected cards puff up; locked ones are dents still
                   // waiting to be filled.
                   return CurioClay(
-                    radius: CurioRadius.large,
+                    radius: CurioTokens.radiusCard,
                     pressed: !collected,
                     child: Material(
                       color: Colors.transparent,
@@ -150,7 +129,7 @@ class DiscoveriesPage extends StatelessWidget {
                         onTap: () =>
                             _showDiscovery(context, discovery, collected),
                         child: Padding(
-                          padding: const EdgeInsets.all(13),
+                          padding: const EdgeInsets.all(12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -160,11 +139,13 @@ class DiscoveriesPage extends StatelessWidget {
                                     icon: collected
                                         ? discovery.icon
                                         : Icons.lock_outline,
-                                    color: collected ? Colors.white : navyMuted,
+                                    color: collected
+                                        ? CurioTokens.textPrimary
+                                        : navyMuted,
                                     background: collected ? tint : null,
                                     size: 46,
                                     iconSize: 22,
-                                    radius: 14,
+                                    radius: CurioTokens.radiusCard,
                                   ),
                                   const Spacer(),
                                   if (collected)
@@ -180,12 +161,12 @@ class DiscoveriesPage extends StatelessWidget {
                                 collected ? discovery.category : 'Locked',
                                 color: collected ? coral : navyMuted,
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 4),
                               Text(
                                 collected ? discovery.title : 'Keep exploring',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 4),
                               Text(
                                 collected
                                     ? discovery.fact
@@ -194,7 +175,7 @@ class DiscoveriesPage extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: navyMuted,
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   height: 1.35,
                                 ),
                               ),
@@ -245,7 +226,7 @@ Color discoveryColor(BuildContext context, String discoveryId) {
   return bannerFill(
     context,
     game == null
-        ? CurioColorsLight.forest
+        ? CurioTokens.accent
         : gameColor(game.id, skillColor(context, game.skill)),
   );
 }
@@ -264,11 +245,11 @@ void _showDiscovery(BuildContext context, Discovery discovery, bool collected) {
           children: [
             CurioIconTile(
               icon: collected ? discovery.icon : Icons.lock_outline,
-              color: collected ? Colors.white : accent,
+              color: collected ? CurioTokens.textPrimary : accent,
               background: collected ? accent : accent.withValues(alpha: .14),
               size: 56,
               iconSize: 28,
-              radius: 18,
+              radius: CurioTokens.radiusCard,
             ),
             const SizedBox(height: 16),
             CurioEyebrow(collected ? discovery.category : 'Locked'),
@@ -277,12 +258,12 @@ void _showDiscovery(BuildContext context, Discovery discovery, bool collected) {
               collected ? discovery.title : 'Still a mystery',
               style: Theme.of(sheetContext).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               collected ? discovery.fact : _unlockHint(discovery.id),
               style: const TextStyle(fontSize: 16, height: 1.55),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: game == null

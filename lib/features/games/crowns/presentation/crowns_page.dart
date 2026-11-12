@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -26,7 +25,7 @@ class _CrownsPageState extends State<CrownsPage> {
   static const _rules = [
     'Put one crown in every row and every column.',
     'Each colour is a kingdom, and every kingdom gets exactly one crown too.',
-    'Crowns can’t touch each other — not even corner to corner.',
+    'Crowns can’t touch each other, not even corner to corner.',
     'Squares a crown rules out sink into the board, so you can see where not to look.',
     'Use Mark × to note squares you’re sure about. Stuck? A hint places one crown.',
   ];
@@ -104,7 +103,7 @@ class _CrownsPageState extends State<CrownsPage> {
       title: 'Crowns',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice > 0 ? 'Practice kingdoms' : 'Daily logic puzzle',
@@ -113,11 +112,11 @@ class _CrownsPageState extends State<CrownsPage> {
                 : 'Crown every kingdom.',
             subtitle:
                 'One crown in each row, each column and each colour. Crowns '
-                'can’t touch — not even at the corners.',
+                'can’t touch, not even at the corners.',
             chips: [
               const GameMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '3–5 min',
+                label: '3 to 5 min',
               ),
               GameMetaChip(
                 icon: Icons.grid_on_rounded,
@@ -134,11 +133,11 @@ class _CrownsPageState extends State<CrownsPage> {
               child: PracticeBadge(),
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           _RuleTracker(game: _puzzle),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           _Board(game: _puzzle, onTap: _tap),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (!solved) ...[
             Row(
               children: [
@@ -151,7 +150,7 @@ class _CrownsPageState extends State<CrownsPage> {
                     onTap: () => setState(() => _tool = _Tool.crown),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _ToolButton(
                     key: const Key('crowns_tool_mark'),
@@ -163,7 +162,7 @@ class _CrownsPageState extends State<CrownsPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -174,7 +173,7 @@ class _CrownsPageState extends State<CrownsPage> {
                     label: const Text('Hint'),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton.icon(
                     key: const Key('crowns_clear'),
@@ -191,7 +190,7 @@ class _CrownsPageState extends State<CrownsPage> {
               const SizedBox(height: 12),
               const GameNotice(
                 message:
-                    'Two crowns clash — they share a row, column or kingdom, '
+                    'Two crowns clash, they share a row, column or kingdom, '
                     'or they touch. The ringed ones need to move.',
                 tone: GameNoticeTone.bad,
               ),
@@ -268,23 +267,15 @@ class _RuleChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final complete = done == of;
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forestStrong,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final forest = CurioTokens.accent;
+    final muted = CurioTokens.textSecondary;
     return Semantics(
       label: '$label: $done of $of',
       excludeSemantics: true,
       child: CurioClay(
-        radius: 16,
+        radius: CurioTokens.radiusCard,
         color: complete ? forest.withValues(alpha: .18) : null,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           children: [
             Text(
@@ -301,7 +292,7 @@ class _RuleChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: muted,
-                fontSize: 11.5,
+                fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -315,12 +306,12 @@ class _RuleChip extends StatelessWidget {
 const _kingdomNames = ['green', 'coral', 'gold', 'blue', 'purple', 'pink'];
 
 Color _kingdomColor(BuildContext context, int kingdom) => switch (kingdom) {
-  0 => curioColor(context, CurioColors.forest, CurioColorsLight.forest),
-  1 => curioColor(context, CurioColors.coral, CurioColorsLight.coral),
-  2 => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-  3 => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-  4 => curioColor(context, CurioColors.plum, CurioColorsLight.plum),
-  _ => curioColor(context, CurioColors.rose, CurioColorsLight.rose),
+  0 => CurioTokens.accent,
+  1 => CurioTokens.wrong,
+  2 => CurioTokens.tintMaths,
+  3 => CurioTokens.tintLogic,
+  4 => CurioTokens.tintThinking,
+  _ => CurioTokens.tintThinking,
 };
 
 class _Board extends StatelessWidget {
@@ -332,25 +323,17 @@ class _Board extends StatelessWidget {
   Widget build(BuildContext context) {
     final n = game.size;
     final conflicts = game.conflicts;
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final danger = CurioTokens.wrong;
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
         child: AspectRatio(
           aspectRatio: 1,
           child: GlassCard(
-            radius: 26,
-            padding: const EdgeInsets.all(10),
+            radius: CurioTokens.radiusCard,
+            padding: const EdgeInsets.all(12),
             child: Column(
               children: [
                 for (var r = 0; r < n; r++)
@@ -360,7 +343,7 @@ class _Board extends StatelessWidget {
                         for (var c = 0; c < n; c++)
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.all(3),
+                              padding: const EdgeInsets.all(4),
                               child: _square(
                                 context,
                                 (r, c),
@@ -413,7 +396,7 @@ class _Board extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: () => onTap(square),
         child: CurioClay(
-          radius: 10,
+          radius: CurioTokens.radiusCard,
           // Kingdoms keep their colour either way; squares a crown rules
           // out sink into the board and carry a small dot.
           pressed: blocked || mark,
@@ -470,11 +453,7 @@ class _ToolButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
+    final coral = CurioTokens.wrong;
     return Semantics(
       button: true,
       selected: selected,
@@ -485,15 +464,15 @@ class _ToolButton extends StatelessWidget {
         onTap: onTap,
         // The tool in hand is pushed in, like a held-down key.
         child: CurioClay(
-          radius: 18,
+          radius: CurioTokens.radiusCard,
           pressed: selected,
           color: selected ? coral.withValues(alpha: .22) : null,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               icon,
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               Flexible(
                 child: Text(
                   label,

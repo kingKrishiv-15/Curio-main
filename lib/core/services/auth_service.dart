@@ -9,13 +9,13 @@ import 'family_service.dart';
 /// Why a verification code was emailed. Each maps to a Supabase email
 /// template and verification type.
 enum CodePurpose {
-  /// "Confirm signup" template — proves a new parent owns the address.
+  /// "Confirm signup" template, proves a new parent owns the address.
   signUp,
 
-  /// "Magic Link" template — password-free sign-in for an existing account.
+  /// "Magic Link" template, password-free sign-in for an existing account.
   signIn,
 
-  /// "Reset Password" template — leads to choosing a new password.
+  /// "Reset Password" template, leads to choosing a new password.
   recovery,
 }
 
@@ -129,7 +129,7 @@ class AuthService {
   }
 
   /// Checks an emailed code. On success Supabase signs the parent in and
-  /// the [AuthGate] moves on by itself — `signedIn` for sign-up/sign-in,
+  /// the [AuthGate] moves on by itself, `signedIn` for sign-up/sign-in,
   /// `passwordRecovery` for a reset.
   Future<void> verifyCode(
     CodePurpose purpose, {
@@ -177,7 +177,7 @@ class AuthService {
     if (user == null) throw StateError('Sign in to continue.');
     final cleaned = name.trim();
     if (cleaned.isEmpty || cleaned.length > 18) {
-      throw ArgumentError('Use a nickname of 1–18 characters.');
+      throw ArgumentError('Use a nickname of 1 to 18 characters.');
     }
     if (settings != null) {
       await FamilyService(client: _client).saveSettings(settings);

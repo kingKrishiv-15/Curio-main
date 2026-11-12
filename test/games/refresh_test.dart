@@ -505,6 +505,7 @@ void main() {
       await tester.pumpWidget(play(const FrostlandsStoryPage(), state));
       await playStory(tester, 0);
       final careful = frostlandsEndings['careful']!;
+      await reveal(tester, find.text(careful.title));
       expect(find.text(careful.title), findsOneWidget);
       await reveal(tester, find.text('Your path'));
       expect(find.text('Careful 3 · Brave 0 · Kind 0'), findsOneWidget);
@@ -515,6 +516,7 @@ void main() {
       await tap(tester, find.byKey(const Key('story_replay')));
       expect(find.textContaining('finished this story before'), findsOneWidget);
       await playStory(tester, 1);
+      await reveal(tester, find.text(frostlandsEndings['brave']!.title));
       expect(find.text(frostlandsEndings['brave']!.title), findsOneWidget);
       await reveal(tester, find.textContaining('already earned'));
       expect(find.textContaining('already earned'), findsOneWidget);

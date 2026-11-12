@@ -1,11 +1,11 @@
-/// Evidence Detective: a short mystery, three clues, and one job — decide how
+/// Evidence Detective: a short mystery, three clues, and one job, decide how
 /// much each clue is worth before jumping to a conclusion.
 ///
 /// - **Strong**: specific and checkable (measured, written down at the time,
 ///   or physical) and it points one way.
 /// - **Weak**: probably true, but it fits lots of explanations, so it can't
 ///   settle the case on its own.
-/// - **Misleading**: sounds convincing but points the wrong way — a rumour,
+/// - **Misleading**: sounds convincing but points the wrong way, a rumour,
 ///   a guess about a person, a superstition.
 ///
 /// Cases don't always hold one of each, so ranking can't be done by
@@ -65,7 +65,7 @@ class EvidenceCase {
 }
 
 /// Today's case, or for practice round [practice] (1, 2, 3…) a step back
-/// through earlier days' cases — skipping today's and tomorrow's, so practice
+/// through earlier days' cases, skipping today's and tomorrow's, so practice
 /// never spoils a daily.
 EvidenceCase evidenceCaseFor(int day, {int practice = 0}) {
   final d = practice <= 0
@@ -90,7 +90,7 @@ const evidenceCases = <EvidenceCase>[
         detail: 'Heavy rain and strong wind were recorded between 1 and 3 a.m.',
         rank: _strong,
         why:
-            'Measured by an instrument, timestamped and independent — and wind and rain can flatten plants.',
+            'Measured by an instrument, timestamped and independent, and wind and rain can flatten plants.',
       ),
       EvidenceClue(
         title: 'A muddy footprint',
@@ -130,7 +130,7 @@ const evidenceCases = <EvidenceCase>[
             'At 8:50, a blue lunchbox with a star sticker was handed in, found on the bench by the school gate.',
         rank: _strong,
         why:
-            'It matches Priya’s lunchbox exactly — colour, sticker and time — and it was written down when it happened.',
+            'It matches Priya’s lunchbox exactly, colour, sticker and time, and it was written down when it happened.',
       ),
       EvidenceClue(
         title: 'Sam’s memory',
@@ -141,7 +141,7 @@ const evidenceCases = <EvidenceCase>[
       ),
     ],
     summary:
-        'The office log matches Priya’s lunchbox exactly, so it was most likely left by the gate on the way in. The rumour about Max was only a guess — and guesses about people can hurt.',
+        'The office log matches Priya’s lunchbox exactly, so it was most likely left by the gate on the way in. The rumour about Max was only a guess, and guesses about people can hurt.',
   ),
   EvidenceCase(
     number: 3,
@@ -169,7 +169,7 @@ const evidenceCases = <EvidenceCase>[
         detail: 'Someone says broken pots always come in threes.',
         rank: _misleading,
         why:
-            'That’s a superstition — a made-up rule. It says nothing about how this pot fell.',
+            'That’s a superstition, a made-up rule. It says nothing about how this pot fell.',
       ),
     ],
     summary:
@@ -186,7 +186,7 @@ const evidenceCases = <EvidenceCase>[
         detail: 'There’s an empty space where the science books go.',
         rank: _weak,
         why:
-            'It shows a book is missing — which we already knew — but not who has it.',
+            'It shows a book is missing, which we already knew, but not who has it.',
       ),
       EvidenceClue(
         title: 'A red cover',
@@ -212,21 +212,21 @@ const evidenceCases = <EvidenceCase>[
     number: 5,
     name: 'THE MUDDY PAWPRINTS',
     question:
-        'Muddy pawprints cross the kitchen floor. The family cat, Biscuit, was home — but so was the neighbour’s dog, out in the garden. Who came in?',
+        'Muddy pawprints cross the kitchen floor. The family cat, Biscuit, was home, but so was the neighbour’s dog, out in the garden. Who came in?',
     clues: [
       EvidenceClue(
         title: 'The open door',
         detail: 'The back door was left open for a few minutes this morning.',
         rank: _weak,
         why:
-            'It shows how an animal could have got in, but not which animal — or whether one did.',
+            'It shows how an animal could have got in, but not which animal, or whether one did.',
       ),
       EvidenceClue(
         title: 'A guilty look',
         detail: 'Biscuit is hiding under the table, looking guilty.',
         rank: _misleading,
         why:
-            'We can’t read guilt on a cat’s face — that’s us imagining. Cats hide for all sorts of reasons.',
+            'We can’t read guilt on a cat’s face, that’s us imagining. Cats hide for all sorts of reasons.',
       ),
       EvidenceClue(
         title: 'Claw marks',
@@ -234,7 +234,7 @@ const evidenceCases = <EvidenceCase>[
             'Each print is as wide as your palm, with a claw mark in front of every toe.',
         rank: _strong,
         why:
-            'Cats usually keep their claws tucked in as they walk, so their prints rarely show claws. Dog prints usually do — and these are big.',
+            'Cats usually keep their claws tucked in as they walk, so their prints rarely show claws. Dog prints usually do, and these are big.',
       ),
     ],
     summary:
@@ -258,7 +258,7 @@ const evidenceCases = <EvidenceCase>[
         detail: 'Some older children were playing near the snowman at break.',
         rank: _misleading,
         why:
-            'Being nearby isn’t the same as doing something — and the weather explains it all.',
+            'Being nearby isn’t the same as doing something, and the weather explains it all.',
       ),
       EvidenceClue(
         title: 'Melting everywhere',
@@ -280,7 +280,7 @@ const evidenceCases = <EvidenceCase>[
       EvidenceClue(
         title: 'Right on time',
         detail:
-            'The tapping starts at 6 a.m. every day — exactly when the heating switches on.',
+            'The tapping starts at 6 a.m. every day, exactly when the heating switches on.',
         rank: _strong,
         why:
             'It happens at the same moment each day, and you can test it again tomorrow. Metal pipes tick as they warm up and stretch a tiny bit.',
@@ -357,10 +357,10 @@ const evidenceCases = <EvidenceCase>[
         detail: 'A half-eaten apple was found by the shed door.',
         rank: _weak,
         why:
-            'Many animals nibble fallen apples — and so do people. It can’t point to a fox on its own.',
+            'Many animals nibble fallen apples, and so do people. It can’t point to a fox on its own.',
       ),
     ],
     summary:
-        'No clue here is strong, so the honest answer is “we don’t know yet”. A good detective would look for tracks in soft mud or set up a camera — and wait for better evidence.',
+        'No clue here is strong, so the honest answer is “we don’t know yet”. A good detective would look for tracks in soft mud or set up a camera, and wait for better evidence.',
   ),
 ];

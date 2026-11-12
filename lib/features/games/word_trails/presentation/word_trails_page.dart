@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -24,7 +23,7 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
   static const _hints = 3;
   static const _rules = [
     'The story has missing words, and they’re all hiding in the letters.',
-    'Tap letters that touch — sideways, up, down or corner to corner — to spell a word.',
+    'Tap letters that touch, sideways, up, down or corner to corner, to spell a word.',
     'Every letter belongs to exactly one word, and the words follow the story’s order.',
     'Found one? Pick what it means to fill its gap in the story.',
     'Stuck? A hint lights up where the next word starts. Tap the last letter again to undo it.',
@@ -83,8 +82,7 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
       setState(() {
         _wrongChoices.add(choice);
         _mistakes++;
-        _message =
-            'Not that one — read the story around the gap and try again.';
+        _message = 'Not that one, read the story around the gap and try again.';
         _tone = GameNoticeTone.bad;
       });
       return;
@@ -145,7 +143,7 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
       title: 'Word Trails',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice > 0 ? 'Practice story' : 'Daily word trail',
@@ -156,7 +154,7 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
             chips: [
               const GameMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '3–4 min',
+                label: '3 to 4 min',
               ),
               GameMetaChip(
                 icon: Icons.auto_stories_rounded,
@@ -171,13 +169,13 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
               child: PracticeBadge(),
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           _StoryRibbon(trail: _trail),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           _Board(trail: _trail, traced: _traced, hinted: _hinted, onTap: _tap),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           GameNotice(message: _message, tone: _tone),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (_asking != null)
             _MeaningGate(
               word: words[_asking!].answer,
@@ -196,7 +194,7 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
                     label: Text('Hint ($_hintsLeft)'),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton.icon(
                     key: const Key('trail_clear'),
@@ -225,9 +223,8 @@ class _WordTrailsPageState extends State<WordTrailsPage> {
   }
 }
 
-Color _wordColor(BuildContext context, TrailWord word) => word.key
-    ? curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)
-    : curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+Color _wordColor(BuildContext context, TrailWord word) =>
+    word.key ? CurioTokens.tintMaths : CurioTokens.accent;
 
 /// The story, with a gap for every word still hidden.
 class _StoryRibbon extends StatelessWidget {
@@ -236,21 +233,9 @@ class _StoryRibbon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final strong = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forestStrong,
-    );
-    final gold = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffronStrong,
-    );
+    final muted = CurioTokens.textSecondary;
+    final strong = CurioTokens.accent;
+    final gold = CurioTokens.tintMaths;
     final spans = <InlineSpan>[];
     final parts = trail.story.story.split(RegExp(r'\{(\d+)\}'));
     final blanks = RegExp(
@@ -270,14 +255,14 @@ class _StoryRibbon extends StatelessWidget {
                 )
               : TextSpan(
                   text: '_' * word.answer.length,
-                  style: TextStyle(color: muted, letterSpacing: 1.5),
+                  style: TextStyle(color: muted),
                 ),
         );
       }
       spans.add(TextSpan(text: parts[i]));
     }
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -285,9 +270,8 @@ class _StoryRibbon extends StatelessWidget {
             'STORY',
             style: TextStyle(
               color: muted,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.3,
             ),
           ),
           const SizedBox(height: 8),
@@ -295,7 +279,7 @@ class _StoryRibbon extends StatelessWidget {
             TextSpan(children: spans),
             style: Theme.of(
               context,
-            ).textTheme.titleLarge?.copyWith(fontSize: 19, height: 1.45),
+            ).textTheme.titleLarge?.copyWith(fontSize: 20, height: 1.45),
           ),
         ],
       ),
@@ -319,25 +303,17 @@ class _Board extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const n = WordTrail.size;
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
-    final gold = curioColor(
-      context,
-      CurioColors.saffron,
-      CurioColorsLight.saffronStrong,
-    );
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final coral = CurioTokens.wrong;
+    final gold = CurioTokens.tintMaths;
+    final ink = CurioTokens.textPrimary;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
         child: AspectRatio(
           aspectRatio: 1,
           child: GlassCard(
-            radius: 28,
-            padding: const EdgeInsets.all(10),
+            radius: CurioTokens.radiusCard,
+            padding: const EdgeInsets.all(12),
             child: Column(
               children: [
                 for (var r = 0; r < n; r++)
@@ -379,7 +355,7 @@ class _Board extends StatelessWidget {
     // Blank squares are dents in the board.
     if (square.word == null) {
       return const CurioClay(
-        radius: 14,
+        radius: CurioTokens.radiusCard,
         pressed: true,
         child: SizedBox.expand(),
       );
@@ -404,7 +380,7 @@ class _Board extends StatelessWidget {
         // Found words settle into the board in their colour; the letters
         // you're tracing are pushed in.
         child: CurioClay(
-          radius: 14,
+          radius: CurioTokens.radiusCard,
           pressed: solved || active,
           color: solved
               ? _wordColor(context, word).withValues(alpha: .3)
@@ -421,7 +397,7 @@ class _Board extends StatelessWidget {
               square.letter,
               textScaler: TextScaler.noScaling,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: ink,
               ),
@@ -433,7 +409,7 @@ class _Board extends StatelessWidget {
   }
 }
 
-/// "What does it mean?" — three clay answers, wrong picks sinking in.
+/// "What does it mean?", three clay answers, wrong picks sinking in.
 class _MeaningGate extends StatelessWidget {
   const _MeaningGate({
     required this.word,
@@ -449,16 +425,8 @@ class _MeaningGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final danger = curioColor(
-      context,
-      CurioColors.danger,
-      CurioColorsLight.danger,
-    );
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
+    final danger = CurioTokens.wrong;
+    final muted = CurioTokens.textSecondary;
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -468,14 +436,13 @@ class _MeaningGate extends StatelessWidget {
             'WHAT DOES ${word.toUpperCase()} MEAN?',
             style: TextStyle(
               color: muted,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 12),
           for (final (i, choice) in choices.indexed) ...[
-            if (i > 0) const SizedBox(height: 10),
+            if (i > 0) const SizedBox(height: 12),
             Semantics(
               button: true,
               enabled: !wrong.contains(choice),
@@ -486,14 +453,14 @@ class _MeaningGate extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 onTap: wrong.contains(choice) ? null : () => onChoose(choice),
                 child: CurioClay(
-                  radius: 18,
+                  radius: CurioTokens.radiusCard,
                   pressed: wrong.contains(choice),
                   color: wrong.contains(choice)
                       ? danger.withValues(alpha: .14)
                       : null,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 14,
+                    vertical: 16,
                   ),
                   child: Row(
                     children: [

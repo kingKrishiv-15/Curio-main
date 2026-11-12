@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
@@ -23,9 +22,9 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
   static const _game = 'evidence_garden';
   static const _rules = [
     'Read the case, then rank each clue before deciding what happened.',
-    'Strong: specific and checkable — measured, written down at the time, or something you can see — and it points one way.',
+    'Strong: specific and checkable, measured, written down at the time, or something you can see, and it points one way.',
     'Weak: probably true, but it fits lots of explanations, so it can’t settle the case alone.',
-    'Misleading: sounds convincing but points the wrong way — a rumour, a guess about a person, or a superstition.',
+    'Misleading: sounds convincing but points the wrong way, a rumour, a guess about a person, or a superstition.',
     'A case doesn’t always have one of each. Close the case to see how you did.',
   ];
 
@@ -82,7 +81,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
       title: 'Evidence Detective',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice case' : 'Daily evidence case',
@@ -92,7 +91,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
             chips: [
               const GameMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '4–6 min',
+                label: '4 to 6 min',
               ),
               const GameMetaChip(
                 icon: Icons.manage_search_rounded,
@@ -135,7 +134,7 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
             )
           else ...[
             _SummaryCard(summary: _case.summary),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             GameResultCard(
               title: _score == _case.clues.length
                   ? 'Case cracked!'
@@ -157,21 +156,9 @@ class _EvidenceDetectivePageState extends State<EvidenceDetectivePage> {
 }
 
 Color _rankColour(BuildContext context, EvidenceRank rank) => switch (rank) {
-  EvidenceRank.strong => curioColor(
-    context,
-    CurioColors.success,
-    CurioColorsLight.success,
-  ),
-  EvidenceRank.weak => curioColor(
-    context,
-    CurioColors.saffron,
-    CurioColorsLight.saffron,
-  ),
-  EvidenceRank.misleading => curioColor(
-    context,
-    CurioColors.danger,
-    CurioColorsLight.danger,
-  ),
+  EvidenceRank.strong => CurioTokens.correct,
+  EvidenceRank.weak => CurioTokens.tintMaths,
+  EvidenceRank.misleading => CurioTokens.wrong,
 };
 
 IconData _rankIcon(EvidenceRank rank) => switch (rank) {
@@ -186,16 +173,13 @@ class _CaseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: dark
-            ? CurioColors.heroGradient
-            : CurioColorsLight.heroGradient,
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+        color: CurioTokens.surfaceRaised,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,11 +189,10 @@ class _CaseCard extends StatelessWidget {
             style: TextStyle(
               color: ink,
               fontWeight: FontWeight.w900,
-              fontSize: 11.5,
-              letterSpacing: 1.3,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Semantics(
             header: true,
             child: Text(
@@ -242,13 +225,9 @@ class _ClueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final muted = CurioTokens.textSecondary;
+    final blue = CurioTokens.tintLogic;
+    final ink = CurioTokens.textPrimary;
     final right = rank == clue.rank;
     return GlassCard(
       padding: const EdgeInsets.all(16),
@@ -271,7 +250,7 @@ class _ClueCard extends StatelessWidget {
                   style: TextStyle(color: ink, fontWeight: FontWeight.w900),
                 ),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   clue.title,
@@ -304,17 +283,7 @@ class _ClueCard extends StatelessWidget {
                 Icon(
                   right ? Icons.check_circle_rounded : Icons.cancel_rounded,
                   size: 20,
-                  color: right
-                      ? curioColor(
-                          context,
-                          CurioColors.success,
-                          CurioColorsLight.success,
-                        )
-                      : curioColor(
-                          context,
-                          CurioColors.danger,
-                          CurioColorsLight.danger,
-                        ),
+                  color: right ? CurioTokens.correct : CurioTokens.wrong,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -323,11 +292,11 @@ class _ClueCard extends StatelessWidget {
                     children: [
                       Text(
                         right
-                            ? 'Good call — ${clue.rank.label.toLowerCase()}.'
-                            : 'You said ${rank!.label.toLowerCase()} — it’s ${clue.rank.label.toLowerCase()}.',
+                            ? 'Good call, ${clue.rank.label.toLowerCase()}.'
+                            : 'You said ${rank!.label.toLowerCase()}, it’s ${clue.rank.label.toLowerCase()}.',
                         style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         clue.why,
                         style: TextStyle(color: muted, height: 1.4),
@@ -359,7 +328,7 @@ class _RankPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _rankColour(context, rank);
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
+    final ink = CurioTokens.textPrimary;
     return Semantics(
       button: true,
       selected: selected,
@@ -368,17 +337,17 @@ class _RankPill extends StatelessWidget {
       excludeSemantics: true,
       // The chosen rank is tinted and ringed, and keeps its tick.
       child: CurioClay(
-        radius: 99,
+        radius: CurioTokens.radiusPill,
         color: selected ? color.withValues(alpha: .2) : null,
         outline: selected ? color : null,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(99),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
             child: Container(
               constraints: const BoxConstraints(minHeight: 44),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -388,7 +357,7 @@ class _RankPill extends StatelessWidget {
                     size: 18,
                     color: selected ? ink : color,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   // Wraps rather than overflowing at large text sizes.
                   Flexible(
                     child: Text(
@@ -417,14 +386,14 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blue = curioColor(context, CurioColors.blue, CurioColorsLight.blue);
+    final blue = CurioTokens.tintLogic;
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.manage_search_rounded, color: blue),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

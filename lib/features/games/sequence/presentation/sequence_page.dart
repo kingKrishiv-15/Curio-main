@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../domain/sequence.dart';
@@ -22,7 +21,7 @@ class _SequencePageState extends State<SequencePage> {
   static const _roundsPerDay = 3;
   static const _rules = [
     'Numbers appear one at a time, linked by a hidden rule.',
-    'Guess the next number now — or reveal one more for 30 points.',
+    'Guess the next number now, or reveal one more for 30 points.',
     'A wrong guess costs 20. Each sequence starts at 100 points.',
     'You only guess once the numbers shown are enough to pin the rule down, so a fair guess is never marked wrong.',
   ];
@@ -38,13 +37,16 @@ class _SequencePageState extends State<SequencePage> {
   bool get _practice => _practiceShift > 0;
   SequenceRound get _round => _rounds[_current];
   bool get _dayOver => _rounds.every((r) => r.over);
-  int get _total => _rounds.fold(0, (sum, r) => sum + (r.solved ? r.points : 0));
+  int get _total =>
+      _rounds.fold(0, (sum, r) => sum + (r.solved ? r.points : 0));
 
   List<SequenceRound> _newRounds() {
     final day = DailyPick.dayNumber(widget.date) + _practiceShift;
     return [
       for (var i = 0; i < _roundsPerDay; i++)
-        SequenceRound(sequenceBank[(day * _roundsPerDay + i) % sequenceBank.length]),
+        SequenceRound(
+          sequenceBank[(day * _roundsPerDay + i) % sequenceBank.length],
+        ),
     ];
   }
 
@@ -66,7 +68,7 @@ class _SequencePageState extends State<SequencePage> {
         _tone = GameNoticeTone.good;
       } else if (_round.failed) {
         HapticFeedback.heavyImpact();
-        _message = 'Out of points — the next number was ${_round.target}.';
+        _message = 'Out of points, the next number was ${_round.target}.';
         _tone = GameNoticeTone.bad;
       } else {
         HapticFeedback.heavyImpact();
@@ -108,7 +110,13 @@ class _SequencePageState extends State<SequencePage> {
 
   String get _share {
     final marks = _rounds
-        .map((r) => !r.solved ? '⬛' : r.points >= 70 ? '🟩' : '🟨')
+        .map(
+          (r) => !r.solved
+              ? '⬛'
+              : r.points >= 70
+              ? '🟩'
+              : '🟨',
+        )
         .join();
     return 'Curio · Sequence\n$marks  $_total/${_roundsPerDay * SequenceRound.startPoints}';
   }
@@ -120,7 +128,7 @@ class _SequencePageState extends State<SequencePage> {
       title: 'Sequence',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice sequences' : 'Daily pattern puzzle',
@@ -135,14 +143,17 @@ class _SequencePageState extends State<SequencePage> {
           ),
           if (_practice) ...[
             const SizedBox(height: 12),
-            const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: PracticeBadge(),
+            ),
           ],
           const SizedBox(height: 16),
           _SequenceCard(round: _round, index: _current, total: _rounds.length),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (_message != null) ...[
             GameNotice(message: _message!, tone: _tone),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
           ],
           if (!_round.over) ...[
             Row(
@@ -151,18 +162,23 @@ class _SequencePageState extends State<SequencePage> {
                   child: TextField(
                     key: const Key('sequence_input'),
                     controller: _input,
-                    keyboardType: const TextInputType.numberWithOptions(signed: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      signed: true,
+                    ),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'^-?\d{0,7}')),
                     ],
                     textAlign: TextAlign.center,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _guess(),
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
                     decoration: const InputDecoration(hintText: 'Next number'),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 SizedBox(
                   height: 56,
                   child: FilledButton(
@@ -173,7 +189,7 @@ class _SequencePageState extends State<SequencePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             OutlinedButton.icon(
               key: const Key('sequence_reveal'),
               onPressed: _round.canReveal ? _reveal : null,
@@ -186,7 +202,7 @@ class _SequencePageState extends State<SequencePage> {
             ),
           ] else ...[
             _RuleCard(round: _round),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             if (!showResult)
               PrimaryButton(
                 label: 'Next sequence',
@@ -211,18 +227,24 @@ class _SequencePageState extends State<SequencePage> {
 }
 
 class _SequenceCard extends StatelessWidget {
-  const _SequenceCard({required this.round, required this.index, required this.total});
+  const _SequenceCard({
+    required this.round,
+    required this.index,
+    required this.total,
+  });
 
   final SequenceRound round;
   final int index, total;
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted);
-    final rose = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
-    final numbers = round.over ? round.rule.terms.sublist(0, round.shown + 1) : round.visible;
+    final muted = CurioTokens.textSecondary;
+    final rose = CurioTokens.wrong;
+    final numbers = round.over
+        ? round.rule.terms.sublist(0, round.shown + 1)
+        : round.visible;
     return GlassCard(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -233,9 +255,8 @@ class _SequenceCard extends StatelessWidget {
                   'SEQUENCE ${index + 1} OF $total',
                   style: TextStyle(
                     color: muted,
-                    fontSize: 11,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
                   ),
                 ),
               ),
@@ -248,9 +269,10 @@ class _SequenceCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Semantics(
-            label: 'Sequence so far: ${numbers.join(', ')}${round.over ? '' : ', then a hidden number'}',
+            label:
+                'Sequence so far: ${numbers.join(', ')}${round.over ? '' : ', then a hidden number'}',
             excludeSemantics: true,
             child: Wrap(
               spacing: 8,
@@ -270,7 +292,11 @@ class _SequenceCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'Not: ${round.wrongGuesses.join(', ')}',
-              style: TextStyle(color: muted, fontSize: 12.5, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                color: muted,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ],
@@ -292,17 +318,17 @@ class _NumberChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = curioColor(context, CurioColors.coral, CurioColorsLight.coral);
-    final success = curioColor(context, CurioColors.success, CurioColorsLight.success);
-    final danger = curioColor(context, CurioColors.danger, CurioColorsLight.danger);
-    final surface = curioColor(context, CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted);
+    final coral = CurioTokens.wrong;
+    final success = CurioTokens.correct;
+    final danger = CurioTokens.wrong;
+    final surface = CurioTokens.surface;
     final accent = highlight ? (solved ? success : danger) : coral;
     return Container(
       constraints: const BoxConstraints(minWidth: 52),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: highlight || mystery ? accent.withValues(alpha: .14) : surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         border: Border.all(
           color: highlight || mystery ? accent : Colors.transparent,
           width: 1.6,
@@ -313,7 +339,7 @@ class _NumberChip extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'Fraunces',
-          fontSize: 22,
+          fontSize: 20,
           fontWeight: FontWeight.w600,
           color: mystery ? coral : null,
         ),
@@ -328,21 +354,27 @@ class _RuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gold = curioColor(context, CurioColors.saffron, CurioColorsLight.saffron);
+    final gold = CurioTokens.tintMaths;
     return GlassCard(
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_outline_rounded, color: gold),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('The rule: ${round.rule.name}', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'The rule: ${round.rule.name}',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 4),
-                Text(round.rule.explanation, style: const TextStyle(height: 1.45)),
+                Text(
+                  round.rule.explanation,
+                  style: const TextStyle(height: 1.45),
+                ),
               ],
             ),
           ),
@@ -369,16 +401,16 @@ class _RoundPips extends StatelessWidget {
             Container(
               width: 10,
               height: 10,
-              margin: const EdgeInsets.only(left: 5),
+              margin: const EdgeInsets.only(left: 4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: rounds[i].solved
-                    ? curioColor(context, CurioColors.success, CurioColorsLight.success)
+                    ? CurioTokens.correct
                     : rounds[i].failed
-                    ? curioColor(context, CurioColors.danger, CurioColorsLight.danger)
+                    ? CurioTokens.wrong
                     : i == current
-                    ? curioColor(context, CurioColors.coral, CurioColorsLight.coral)
-                    : curioColor(context, CurioColors.outline, CurioColorsLight.outline),
+                    ? CurioTokens.wrong
+                    : CurioTokens.border,
               ),
             ),
         ],

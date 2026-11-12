@@ -315,7 +315,7 @@ class ScaleRound {
     _ => ScaleSide.equal,
   };
 
-  /// Both values in one shared form — see [sharedForms].
+  /// Both values in one shared form, see [sharedForms].
   (String, String) get shared => sharedForms(left.value, right.value);
 
   /// "3/4 = 0.750", or just "0.35" when the label is already in that form.
@@ -349,7 +349,7 @@ class ScaleGame {
     : rounds = List.unmodifiable(rounds),
       _picks = List<ScaleSide?>.filled(rounds.length, null);
 
-  /// The set for [day] (DailyPick.dayNumber) — or, with [practice] above 0,
+  /// The set for [day] (DailyPick.dayNumber), or, with [practice] above 0,
   /// a practice set that never repeats a daily one.
   factory ScaleGame.forDay(int day, {int practice = 0}) => ScaleGame(
     generateScaleRounds(Random(scaleSeed(day, practice: practice))),
@@ -393,7 +393,7 @@ class ScaleGame {
     _current++;
   }
 
-  /// 🟩 for each right answer, 🟥 for each miss — no numbers, no spoilers.
+  /// 🟩 for each right answer, 🟥 for each miss, no numbers, no spoilers.
   String get shareGrid => [
     for (var i = 0; i < rounds.length; i++)
       switch (correctAt(i)) {
@@ -551,7 +551,7 @@ List<_Entry> _options(QuantityKind kind, Rational target, _Relation relation) {
 }
 
 /// Builds a day's eight rounds from [random]: three warm-ups, three mixed
-/// forms, two close calls; one or two equal rounds among rounds 4–8; no
+/// forms, two close calls; one or two equal rounds among rounds 4 to 8; no
 /// amount used twice; the bigger side split evenly between left and right.
 List<ScaleRound> generateScaleRounds(Random random) {
   while (true) {

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
 import '../domain/whos_who.dart';
 
-/// Who's Who: two small logic-grid puzzles a day — three children, then four
-/// — each worked out from a handful of true clues.
+/// Who's Who: two small logic-grid puzzles a day, three children, then four
+///, each worked out from a handful of true clues.
 class WhosWhoPage extends StatefulWidget {
   const WhosWhoPage({super.key, this.date});
 
@@ -24,7 +23,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
   static const _game = 'whos_who';
   static const _rules = [
     'Every child has exactly one of each thing, and no two children share.',
-    'Read the clues — every one is true — then tap a cell in the table to choose.',
+    'Read the clues, every one is true, then tap a cell in the table to choose.',
     'Tap a clue to cross it off once you’ve used it.',
     'Check answers says how many are right and marks wrong cells with ✕, without giving the answers away.',
     'Each puzzle is worth 100 points. A hint fills in one cell for 25; a wrong check costs 15.',
@@ -98,7 +97,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
         _celebrate(
           round,
           round.points == WhoRound.startPoints
-              ? 'Spot on — no help needed!'
+              ? 'Spot on, no help needed!'
               : 'Solved!',
         );
       } else if (result.empty > 0) {
@@ -157,7 +156,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
       _current++;
       final size = _round.puzzle.size;
       _message =
-          '${_numberWords[size] ?? '$size'} children this time — you’ve got this!';
+          '${_numberWords[size] ?? '$size'} children this time, you’ve got this!';
       _tone = GameNoticeTone.info;
     });
   }
@@ -168,7 +167,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
       _practiceShift++;
       _rounds = _newRounds();
       _current = 0;
-      _message = 'A fresh pair to practise on — just for fun, no XP.';
+      _message = 'A fresh pair to practise on, just for fun, no XP.';
       _tone = GameNoticeTone.info;
     });
   }
@@ -190,7 +189,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
         controller: _scroll,
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           GameHeader(
             eyebrow: _practice ? 'Practice round' : 'Daily logic puzzle',
@@ -198,7 +197,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
             subtitle:
                 'Read the clues, then fill in the table. Every clue is true!',
             chips: const [
-              GameMetaChip(icon: Icons.schedule_rounded, label: '4–6 min'),
+              GameMetaChip(icon: Icons.schedule_rounded, label: '4 to 6 min'),
               GameMetaChip(icon: Icons.psychology_rounded, label: 'Reasoning'),
             ],
             trailing: _PuzzlePips(rounds: _rounds, current: _current),
@@ -217,12 +216,12 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
             total: _rounds.length,
             onToggle: _toggleClue,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           _AnswerTable(round: round, onPick: _pick),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (_message != null) ...[
             GameNotice(message: _message!, tone: _tone),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
           ],
           if (!round.solved) ...[
             PrimaryButton(
@@ -231,7 +230,7 @@ class _WhosWhoPageState extends State<WhosWhoPage> {
               icon: Icons.task_alt_rounded,
               onPressed: _check,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             OutlinedButton.icon(
               key: const Key('whos_who_hint'),
               onPressed: _hint,
@@ -272,10 +271,10 @@ IconData _categoryIcon(WhoCategory category) => switch (category) {
 
 /// Each child's initial gets its own bright colour (with dark ink on top).
 Color _childColour(BuildContext context, int index) => switch (index % 4) {
-  0 => curioColor(context, CurioColors.coral, CurioColorsLight.coral),
-  1 => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-  2 => curioColor(context, CurioColors.blue, CurioColorsLight.blue),
-  _ => curioColor(context, CurioColors.forest, CurioColorsLight.forest),
+  0 => CurioTokens.wrong,
+  1 => CurioTokens.tintMaths,
+  2 => CurioTokens.tintLogic,
+  _ => CurioTokens.accent,
 };
 
 String _capitalised(String item) =>
@@ -295,19 +294,11 @@ class _ClueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
+    final muted = CurioTokens.textSecondary;
+    final coral = CurioTokens.wrong;
     final texts = round.puzzle.clueTexts;
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(14, 16, 14, 10),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -320,9 +311,8 @@ class _ClueCard extends StatelessWidget {
                     'PUZZLE $number OF $total · CLUES',
                     style: TextStyle(
                       color: muted,
-                      fontSize: 11,
+                      fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
                     ),
                   ),
                 ),
@@ -366,13 +356,9 @@ class _ClueRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final muted = curioColor(
-      context,
-      CurioColors.inkMuted,
-      CurioColorsLight.inkMuted,
-    );
-    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
+    final ink = CurioTokens.textPrimary;
+    final muted = CurioTokens.textSecondary;
+    final plum = CurioTokens.tintThinking;
     return Semantics(
       button: true,
       label: 'Clue ${index + 1}: $text${used ? ' Crossed off.' : ''}',
@@ -382,29 +368,19 @@ class _ClueRow extends StatelessWidget {
       child: InkWell(
         key: Key('whos_who_clue_$index'),
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: used
-                      ? curioColor(
-                          context,
-                          CurioColors.surfaceMuted,
-                          CurioColorsLight.surfaceMuted,
-                        )
-                      : curioColor(
-                          context,
-                          CurioColors.plumSoft,
-                          CurioColorsLight.plumSoft,
-                        ),
-                  borderRadius: BorderRadius.circular(99),
+                  color: used ? CurioTokens.surface : CurioTokens.surfaceRaised,
+                  borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
                   border: Border.all(
                     color: used
                         ? Colors.transparent
@@ -429,7 +405,7 @@ class _ClueRow extends StatelessWidget {
                   child: Text(
                     text,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 14,
                       height: 1.4,
                       fontWeight: FontWeight.w600,
                       color: used ? muted : ink,
@@ -459,12 +435,12 @@ class _AnswerTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final puzzle = round.puzzle;
     return GlassCard(
-      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('Your answers', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
               final scale = MediaQuery.textScalerOf(context).scale(16) / 16;
@@ -501,7 +477,7 @@ class _AnswerTable extends StatelessWidget {
             const SizedBox.shrink(),
             for (final category in puzzle.categories)
               Padding(
-                padding: const EdgeInsets.fromLTRB(6, 0, 6, 4),
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
                 child: _CategoryHeading(category),
               ),
           ],
@@ -510,7 +486,7 @@ class _AnswerTable extends StatelessWidget {
           TableRow(
             children: [
               Padding(
-                padding: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.only(right: 8),
                 child: _ChildLabel(name: puzzle.names[child], index: child),
               ),
               for (var c = 0; c < puzzle.categories.length; c++)
@@ -556,7 +532,7 @@ class _ChildBlock extends StatelessWidget {
         ),
     ];
     return Padding(
-      padding: EdgeInsets.only(bottom: last ? 0 : 14),
+      padding: EdgeInsets.only(bottom: last ? 0 : 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -603,17 +579,13 @@ class _ChildLabel extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: _childColour(context, index),
-              borderRadius: BorderRadius.circular(99),
+              borderRadius: BorderRadius.circular(CurioTokens.radiusPill),
             ),
             child: Text(
               name[0],
               style: TextStyle(
                 // A bright accent takes dark ink (design §7).
-                color: curioColor(
-                  context,
-                  CurioColors.night,
-                  CurioColorsLight.ink,
-                ),
+                color: CurioTokens.base,
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
               ),
@@ -624,7 +596,7 @@ class _ChildLabel extends StatelessWidget {
         Flexible(
           child: Text(
             name,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
           ),
         ),
       ],
@@ -639,15 +611,11 @@ class _CategoryHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final soft = CurioTokens.textSecondary;
     return Row(
       children: [
         Icon(_categoryIcon(category), size: 16, color: soft),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Flexible(
           child: Text(
             category.label,
@@ -691,68 +659,35 @@ class _AnswerCell extends StatelessWidget {
     final solved = round.solved;
     final locked = solved || hinted;
 
-    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final outline = curioColor(
-      context,
-      CurioColors.outline,
-      CurioColorsLight.outline,
-    );
+    final ink = CurioTokens.textPrimary;
+    final soft = CurioTokens.textSecondary;
+    final outline = CurioTokens.border;
     final (fill, border, icon, iconColor) = switch (null) {
       _ when wrong => (
-        curioColor(
-          context,
-          CurioColors.dangerSoft,
-          CurioColorsLight.dangerSoft,
-        ),
-        curioColor(context, CurioColors.danger, CurioColorsLight.danger),
+        CurioTokens.surfaceRaised,
+        CurioTokens.wrong,
         Icons.close_rounded,
-        curioColor(context, CurioColors.danger, CurioColorsLight.danger),
+        CurioTokens.wrong,
       ),
       _ when hinted => (
-        curioColor(
-          context,
-          CurioColors.saffronSoft,
-          CurioColorsLight.saffronSoft,
-        ),
-        curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
+        CurioTokens.surfaceRaised,
+        CurioTokens.tintMaths,
         Icons.lightbulb_rounded,
-        curioColor(
-          context,
-          CurioColors.saffronStrong,
-          CurioColorsLight.saffronStrong,
-        ),
+        CurioTokens.tintMaths,
       ),
       _ when solved => (
-        curioColor(
-          context,
-          CurioColors.successSoft,
-          CurioColorsLight.successSoft,
-        ),
-        curioColor(context, CurioColors.success, CurioColorsLight.success),
+        CurioTokens.surfaceRaised,
+        CurioTokens.correct,
         Icons.check_rounded,
-        curioColor(context, CurioColors.success, CurioColorsLight.success),
+        CurioTokens.correct,
       ),
       _ when value == null => (
-        curioColor(
-          context,
-          CurioColors.surfaceMuted,
-          CurioColorsLight.surfaceMuted,
-        ),
+        CurioTokens.surface,
         outline,
         Icons.expand_more_rounded,
         soft,
       ),
-      _ => (
-        curioColor(context, CurioColors.surface, CurioColorsLight.surface),
-        outline,
-        Icons.expand_more_rounded,
-        soft,
-      ),
+      _ => (CurioTokens.surface, outline, Icons.expand_more_rounded, soft),
     };
     final status = [
       if (wrong) 'marked wrong',
@@ -774,7 +709,7 @@ class _AnswerCell extends StatelessWidget {
         color: fill,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           side: BorderSide(color: border, width: wrong ? 2 : 1.3),
         ),
         child: InkWell(
@@ -783,7 +718,7 @@ class _AnswerCell extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 48),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
                   Expanded(
@@ -796,16 +731,15 @@ class _AnswerCell extends StatelessWidget {
                             category.label.toUpperCase(),
                             style: TextStyle(
                               color: soft,
-                              fontSize: 10.5,
+                              fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              letterSpacing: .8,
                             ),
                           ),
                         Text(
                           value == null ? 'Choose…' : _capitalised(value),
                           style: TextStyle(
                             color: value == null ? soft : ink,
-                            fontSize: 14.5,
+                            fontSize: 14,
                             fontWeight: value == null
                                 ? FontWeight.w600
                                 : FontWeight.w800,
@@ -814,7 +748,7 @@ class _AnswerCell extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Icon(
                     icon,
                     key: wrong ? Key('whos_who_wrong_$key') : null,
@@ -843,14 +777,10 @@ class _PickerSheet extends StatelessWidget {
     final puzzle = round.puzzle;
     final category = puzzle.categories[cell.category];
     final items = puzzle.items[cell.category];
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final soft = CurioTokens.textSecondary;
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -859,12 +789,12 @@ class _PickerSheet extends StatelessWidget {
               '${puzzle.names[cell.child]}’s ${category.noun}',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               'Already chosen for someone else? Picking it moves it here.',
               style: TextStyle(color: soft, height: 1.4),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             for (var i = 0; i < items.length; i++) ...[
               _OptionRow(round: round, cell: cell, item: i),
               const SizedBox(height: 8),
@@ -903,12 +833,8 @@ class _OptionRow extends StatelessWidget {
     final otherOwner = owner != null && !mine ? puzzle.names[owner] : null;
     final allowed = mine || round.canChoose(cell, item);
 
-    final plum = curioColor(context, CurioColors.plum, CurioColorsLight.plum);
-    final soft = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
+    final plum = CurioTokens.tintThinking;
+    final soft = CurioTokens.textSecondary;
     final label = [
       name,
       if (mine) 'current choice',
@@ -925,28 +851,12 @@ class _OptionRow extends StatelessWidget {
       onTap: allowed ? choose : null,
       excludeSemantics: true,
       child: Material(
-        color: mine
-            ? curioColor(
-                context,
-                CurioColors.plumSoft,
-                CurioColorsLight.plumSoft,
-              )
-            : curioColor(
-                context,
-                CurioColors.surfaceMuted,
-                CurioColorsLight.surfaceMuted,
-              ),
+        color: mine ? CurioTokens.surfaceRaised : CurioTokens.surface,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
           side: BorderSide(
-            color: mine
-                ? plum
-                : curioColor(
-                    context,
-                    CurioColors.outline,
-                    CurioColorsLight.outline,
-                  ),
+            color: mine ? plum : CurioTokens.border,
             width: mine ? 1.8 : 1.2,
           ),
         ),
@@ -956,7 +866,7 @@ class _OptionRow extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 52),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   Icon(
@@ -985,7 +895,7 @@ class _OptionRow extends StatelessWidget {
                             ),
                         ],
                       ),
-                      style: const TextStyle(fontSize: 15),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
                 ],
@@ -1008,11 +918,7 @@ class _PuzzlePips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final solved = rounds.where((r) => r.solved).length;
-    final coral = curioColor(
-      context,
-      CurioColors.coral,
-      CurioColorsLight.coral,
-    );
+    final coral = CurioTokens.wrong;
     return Semantics(
       label: 'Puzzle ${current + 1} of ${rounds.length}, $solved solved',
       excludeSemantics: true,
@@ -1023,40 +929,20 @@ class _PuzzlePips extends StatelessWidget {
             Container(
               width: 18,
               height: 18,
-              margin: const EdgeInsets.only(left: 6),
+              margin: const EdgeInsets.only(left: 8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: rounds[i].solved
-                    ? curioColor(
-                        context,
-                        CurioColors.success,
-                        CurioColorsLight.success,
-                      )
+                    ? CurioTokens.correct
                     : i == current
-                    ? curioColor(
-                        context,
-                        CurioColors.coralSoft,
-                        CurioColorsLight.coralSoft,
-                      )
-                    : curioColor(
-                        context,
-                        CurioColors.outline,
-                        CurioColorsLight.outline,
-                      ),
+                    ? CurioTokens.surfaceRaised
+                    : CurioTokens.border,
                 border: !rounds[i].solved && i == current
                     ? Border.all(color: coral, width: 2)
                     : null,
               ),
               child: rounds[i].solved
-                  ? Icon(
-                      Icons.check_rounded,
-                      size: 13,
-                      color: curioColor(
-                        context,
-                        CurioColors.night,
-                        CurioColorsLight.ink,
-                      ),
-                    )
+                  ? Icon(Icons.check_rounded, size: 13, color: CurioTokens.base)
                   : null,
             ),
         ],

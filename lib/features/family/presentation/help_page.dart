@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/config/supabase_config.dart';
-import '../../../core/theme/curio_colors.dart';
-import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../auth/presentation/auth_layout.dart';
 
@@ -51,7 +50,7 @@ class _HelpPageState extends State<HelpPage> {
         setState(() {
           _error = true;
           _notice =
-              'We couldn’t send this. Your message is still here — please retry.';
+              'We couldn’t send this. Your message is still here, please retry.';
         });
       }
     } finally {
@@ -84,16 +83,8 @@ class _HelpPageState extends State<HelpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = curioColor(
-      context,
-      CurioColors.inkSoft,
-      CurioColorsLight.inkSoft,
-    );
-    final forest = curioColor(
-      context,
-      CurioColors.forest,
-      CurioColorsLight.forest,
-    );
+    final muted = CurioTokens.textSecondary;
+    final forest = CurioTokens.accent;
     final signedIn =
         SupabaseConfig.isConfigured &&
         Supabase.instance.client.auth.currentUser != null;
@@ -106,14 +97,14 @@ class _HelpPageState extends State<HelpPage> {
             'How can we help?',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'Quick answers first, and a direct line to the Curio team.',
             style: TextStyle(color: muted),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           const SectionHeading('Common questions'),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           CurioCard(
             padding: EdgeInsets.zero,
             child: Column(
@@ -123,15 +114,15 @@ class _HelpPageState extends State<HelpPage> {
                   ExpansionTile(
                     shape: const Border(),
                     collapsedShape: const Border(),
-                    tilePadding: const EdgeInsets.fromLTRB(14, 4, 12, 4),
-                    childrenPadding: const EdgeInsets.fromLTRB(64, 0, 18, 16),
+                    tilePadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
+                    childrenPadding: const EdgeInsets.fromLTRB(48, 0, 16, 16),
                     expandedCrossAxisAlignment: CrossAxisAlignment.start,
                     leading: CurioIconTile(
                       icon: _faqs[i].$1,
                       color: forest,
                       size: 38,
                       iconSize: 19,
-                      radius: 12,
+                      radius: CurioTokens.radiusCard,
                     ),
                     title: Text(
                       _faqs[i].$2,
@@ -148,9 +139,9 @@ class _HelpPageState extends State<HelpPage> {
               ],
             ),
           ),
-          const SizedBox(height: 26),
+          const SizedBox(height: 24),
           const SectionHeading('Send feedback'),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           CurioCard(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -163,12 +154,12 @@ class _HelpPageState extends State<HelpPage> {
                 const SizedBox(height: 4),
                 Text(
                   signedIn
-                      ? 'Ideas, bugs, a game your explorer loved — it all helps.'
+                      ? 'Ideas, bugs, a game your explorer loved, it all helps.'
                       : 'Sign in with a family account to send feedback to the Curio team.',
                   style: TextStyle(color: muted, height: 1.45),
                 ),
                 if (signedIn) ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: _message,
                     enabled: !_sending,
@@ -186,13 +177,13 @@ class _HelpPageState extends State<HelpPage> {
                   ),
                 ],
                 if (_notice != null) ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   AuthNotice(_notice!, error: _error),
                 ],
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Center(
             child: TextButton(
               onPressed: () =>

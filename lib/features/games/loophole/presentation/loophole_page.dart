@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/services/minigame_service.dart';
 import '../../../../core/state/curio_state.dart';
-import '../../../../core/theme/curio_colors.dart';
-import '../../../../core/theme/curio_colors_light.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../common/game_kit.dart';
 import '../domain/loophole_local.dart';
@@ -132,7 +131,10 @@ class _LoopholePageState extends State<LoopholePage> {
   void _startLocal({bool practice = false}) {
     if (practice) _practiceShift++;
     // Practice replays *past* days, so it never spoils tomorrow's puzzle.
-    final game = LoopholeLocalGame.forDay(date: widget.date, shift: -_practiceShift);
+    final game = LoopholeLocalGame.forDay(
+      date: widget.date,
+      shift: -_practiceShift,
+    );
     setState(() {
       _local = game;
       _practice = practice;
@@ -165,7 +167,10 @@ class _LoopholePageState extends State<LoopholePage> {
   /// honest number to show.
   int _shownStreak(BuildContext context) => _local == null
       ? _streak
-      : context.dependOnInheritedWidgetOfExactType<CurioScope>()?.notifier?.streak ??
+      : context
+                .dependOnInheritedWidgetOfExactType<CurioScope>()
+                ?.notifier
+                ?.streak ??
             0;
 
   void _award() {
@@ -199,7 +204,8 @@ class _LoopholePageState extends State<LoopholePage> {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _guessesUsed = (verdict.data['guesses_used'] as int?) ?? _guessesUsed + 1;
+        _guessesUsed =
+            (verdict.data['guesses_used'] as int?) ?? _guessesUsed + 1;
         _marks = verdict.marks;
         if (verdict.isRoundOver) {
           _revealedTarget = verdict.target;
@@ -244,8 +250,18 @@ class _LoopholePageState extends State<LoopholePage> {
   String get _shareText {
     final date = _puzzle?.date ?? DateTime.now();
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final squares = _marks
         .map((m) => m == 2 ? '🟩' : (m == 1 ? '🟨' : '⬛'))
@@ -277,17 +293,22 @@ class _LoopholePageState extends State<LoopholePage> {
   void _showHowToPlay() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: curioColor(context, CurioColors.surface, CurioColorsLight.surface),
+      backgroundColor: CurioTokens.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(CurioTokens.radiusCard),
+        ),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('How to play', style: Theme.of(context).textTheme.headlineSmall),
+            Text(
+              'How to play',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: 12),
             ...[
               'Every statement is technically true - and still misleading.',
@@ -296,16 +317,16 @@ class _LoopholePageState extends State<LoopholePage> {
               'Everyone gets the same three. Compare without spoiling.',
             ].map(
               (line) => Padding(
-                padding: const EdgeInsets.only(bottom: 9),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 7, right: 10),
+                      margin: const EdgeInsets.only(top: 8, right: 12),
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: curioColor(context, CurioColors.coral, CurioColorsLight.coral),
+                        color: CurioTokens.wrong,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -322,21 +343,22 @@ class _LoopholePageState extends State<LoopholePage> {
 
   Widget _buildBoard(BuildContext context) {
     final rounds = _rounds;
-    final showingResult = _finished && _round >= rounds.length - 1 && _revealedTarget == null;
+    final showingResult =
+        _finished && _round >= rounds.length - 1 && _revealedTarget == null;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: [
         const CurioEyebrow('Daily reasoning puzzle'),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(
           _finished ? 'Nicely spotted.' : 'Find the catch',
           style: Theme.of(context).textTheme.headlineMedium,
         ),
-        const SizedBox(height: 7),
+        const SizedBox(height: 8),
         Text(
           'Each statement is true. One word is doing something sneaky.',
-          style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft)),
+          style: TextStyle(color: CurioTokens.textSecondary),
         ),
         const SizedBox(height: 16),
         Row(
@@ -344,9 +366,12 @@ class _LoopholePageState extends State<LoopholePage> {
             Expanded(
               child: Wrap(
                 spacing: 12,
-                runSpacing: 6,
+                runSpacing: 8,
                 children: [
-                  const GameMetaChip(icon: Icons.schedule_rounded, label: '2 min'),
+                  const GameMetaChip(
+                    icon: Icons.schedule_rounded,
+                    label: '2 min',
+                  ),
                   GameMetaChip(
                     icon: Icons.local_fire_department_rounded,
                     label: '${_shownStreak(context)} day streak',
@@ -357,7 +382,7 @@ class _LoopholePageState extends State<LoopholePage> {
             _RoundPips(total: rounds.length, marks: _marks, current: _round),
           ],
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         if (_practice) ...[
           const Align(alignment: Alignment.centerLeft, child: PracticeBadge()),
           const SizedBox(height: 12),
@@ -375,12 +400,14 @@ class _LoopholePageState extends State<LoopholePage> {
             onPractice: () => _startLocal(practice: true),
           ),
           if (_explanation != null) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             _ExplanationCard(text: _explanation!),
           ],
         ] else ...[
           _StatementCard(
-            statement: rounds.isEmpty ? '' : rounds[_round]['statement'] as String,
+            statement: rounds.isEmpty
+                ? ''
+                : rounds[_round]['statement'] as String,
             tokens: _tokens,
             revealedTarget: _revealedTarget,
             lastTapped: _lastTapped,
@@ -389,11 +416,13 @@ class _LoopholePageState extends State<LoopholePage> {
             onTap: _tap,
           ),
           if (_explanation != null) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             _ExplanationCard(text: _explanation!),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             PrimaryButton(
-              label: _round + 1 >= rounds.length ? 'See result' : 'Next statement',
+              label: _round + 1 >= rounds.length
+                  ? 'See result'
+                  : 'Next statement',
               onPressed: _round + 1 >= rounds.length ? _load : _nextRound,
             ),
           ],
@@ -435,28 +464,32 @@ class _StatementCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.format_quote_rounded, size: 18, color: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
-              const SizedBox(width: 6),
+              Icon(
+                Icons.format_quote_rounded,
+                size: 18,
+                color: CurioTokens.tintMaths,
+              ),
+              const SizedBox(width: 8),
               Flexible(
                 child: Text(
                   guessesUsed == 0
                       ? 'Two guesses'
                       : (guessesUsed == 1 ? 'One guess left' : 'Round over'),
                   style: TextStyle(
-                    color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted),
+                    color: CurioTokens.textSecondary,
                     fontWeight: FontWeight.w700,
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Semantics(
             label: 'Statement: $statement. Tap the misleading word.',
             child: Wrap(
-              spacing: 7,
-              runSpacing: 9,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 for (var i = 0; i < tokens.length; i++)
                   _TokenChip(
@@ -475,7 +508,8 @@ class _StatementCard extends StatelessWidget {
   _TokenState _stateFor(int index) {
     if (revealedTarget == index) return _TokenState.correct;
     if (revealedTarget != null && lastTapped == index) return _TokenState.wrong;
-    if (revealedTarget == null && lastTapped == index) return _TokenState.missed;
+    if (revealedTarget == null && lastTapped == index)
+      return _TokenState.missed;
     return _TokenState.idle;
   }
 }
@@ -503,31 +537,57 @@ class _TokenChipState extends State<_TokenChip> {
     final scale = _pressed && !reduceMotion ? 0.94 : 1.0;
 
     final (bg, fg, border) = switch (widget.state) {
-      _TokenState.correct => (curioColor(context, CurioColors.successSoft, CurioColorsLight.successSoft), curioColor(context, CurioColors.success, CurioColorsLight.success), curioColor(context, CurioColors.success, CurioColorsLight.success)),
-      _TokenState.wrong => (curioColor(context, CurioColors.dangerSoft, CurioColorsLight.dangerSoft), curioColor(context, CurioColors.danger, CurioColorsLight.danger), curioColor(context, CurioColors.danger, CurioColorsLight.danger)),
-      _TokenState.missed => (curioColor(context, CurioColors.saffronSoft, CurioColorsLight.saffronSoft), curioColor(context, CurioColors.saffron, CurioColorsLight.saffron), curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
-      _TokenState.idle => (curioColor(context, CurioColors.surfaceMuted, CurioColorsLight.surfaceMuted), curioColor(context, CurioColors.ink, CurioColorsLight.ink), curioColor(context, CurioColors.outlineSoft, CurioColorsLight.outlineSoft)),
+      _TokenState.correct => (
+        CurioTokens.surfaceRaised,
+        CurioTokens.correct,
+        CurioTokens.correct,
+      ),
+      _TokenState.wrong => (
+        CurioTokens.surfaceRaised,
+        CurioTokens.wrong,
+        CurioTokens.wrong,
+      ),
+      _TokenState.missed => (
+        CurioTokens.surfaceRaised,
+        CurioTokens.tintMaths,
+        CurioTokens.tintMaths,
+      ),
+      _TokenState.idle => (
+        CurioTokens.surface,
+        CurioTokens.textPrimary,
+        CurioTokens.border,
+      ),
     };
 
     return GestureDetector(
       onTap: widget.onTap,
-      onTapDown: widget.onTap == null ? null : (_) => setState(() => _pressed = true),
-      onTapUp: widget.onTap == null ? null : (_) => setState(() => _pressed = false),
-      onTapCancel: widget.onTap == null ? null : () => setState(() => _pressed = false),
+      onTapDown: widget.onTap == null
+          ? null
+          : (_) => setState(() => _pressed = true),
+      onTapUp: widget.onTap == null
+          ? null
+          : (_) => setState(() => _pressed = false),
+      onTapCancel: widget.onTap == null
+          ? null
+          : () => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: scale,
-        duration: const Duration(milliseconds: 90),
+        duration: CurioTokens.fast,
         child: AnimatedContainer(
           duration: Duration(milliseconds: reduceMotion ? 0 : 180),
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
             border: Border.all(color: border, width: 1.2),
           ),
           child: Text(
             widget.label,
-            style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 15),
+            style: TextStyle(
+              color: fg,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
           ),
         ),
       ),
@@ -549,13 +609,20 @@ class _ExplanationCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb_outline_rounded, size: 18, color: curioColor(context, CurioColors.saffron, CurioColorsLight.saffron)),
-              const SizedBox(width: 7),
+              Icon(
+                Icons.lightbulb_outline_rounded,
+                size: 18,
+                color: CurioTokens.tintMaths,
+              ),
+              const SizedBox(width: 8),
               Text('Why', style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
-          const SizedBox(height: 9),
-          Text(text, style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft), height: 1.5)),
+          const SizedBox(height: 8),
+          Text(
+            text,
+            style: TextStyle(color: CurioTokens.textSecondary, height: 1.5),
+          ),
         ],
       ),
     );
@@ -572,18 +639,22 @@ class _ErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(28),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off_rounded, size: 34, color: curioColor(context, CurioColors.inkMuted, CurioColorsLight.inkMuted)),
-            const SizedBox(height: 14),
+            Icon(
+              Icons.cloud_off_rounded,
+              size: 34,
+              color: CurioTokens.textSecondary,
+            ),
+            const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: curioColor(context, CurioColors.inkSoft, CurioColorsLight.inkSoft), height: 1.5),
+              style: TextStyle(color: CurioTokens.textSecondary, height: 1.5),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             PrimaryButton(label: 'Try again', onPressed: onRetry),
           ],
         ),
@@ -595,7 +666,11 @@ class _ErrorState extends StatelessWidget {
 /// One pip per statement: filled as each is finished, coloured by how it
 /// went, so progress through the day is readable at a glance.
 class _RoundPips extends StatelessWidget {
-  const _RoundPips({required this.total, required this.marks, required this.current});
+  const _RoundPips({
+    required this.total,
+    required this.marks,
+    required this.current,
+  });
 
   final int total;
   final List<int> marks;
@@ -610,17 +685,17 @@ class _RoundPips extends StatelessWidget {
           final Color color;
           if (index < marks.length) {
             color = switch (marks[index]) {
-              2 => curioColor(context, CurioColors.success, CurioColorsLight.success),
-              1 => curioColor(context, CurioColors.saffron, CurioColorsLight.saffron),
-              _ => curioColor(context, CurioColors.danger, CurioColorsLight.danger),
+              2 => CurioTokens.correct,
+              1 => CurioTokens.tintMaths,
+              _ => CurioTokens.wrong,
             };
           } else {
-            color = index == current ? curioColor(context, CurioColors.coral, CurioColorsLight.coral) : curioColor(context, CurioColors.outlineSoft, CurioColorsLight.outlineSoft);
+            color = index == current ? CurioTokens.wrong : CurioTokens.border;
           }
           return Container(
             width: 9,
             height: 9,
-            margin: const EdgeInsets.only(left: 5),
+            margin: const EdgeInsets.only(left: 4),
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           );
         }),

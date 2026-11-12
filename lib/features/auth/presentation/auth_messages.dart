@@ -18,7 +18,7 @@ String authErrorMessage(Object error) {
     case 'email_exists':
       return 'There’s already a Curio account for this email. Try signing in instead.';
     case 'weak_password':
-      return 'Please choose a stronger password — at least 8 characters, with letters and numbers.';
+      return 'Please choose a stronger password, at least 8 characters, with letters and numbers.';
     case 'otp_expired':
       return 'That code isn’t right or has expired. Check the newest email, or send a fresh code.';
     case 'otp_disabled':

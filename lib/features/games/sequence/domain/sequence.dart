@@ -1,6 +1,6 @@
 /// Sequence: numbers appear one at a time, linked by a hidden rule. After
 /// each reveal the player either commits to the next number or pays to see
-/// another — cracking it early is worth far more.
+/// another, cracking it early is worth far more.
 ///
 /// The fairness problem is ambiguity: from 2, 4 alone, "add 2" and "double"
 /// both fit, and a player could be right but marked wrong. So guessing only
@@ -48,7 +48,9 @@ Set<int> plausibleNextTerms(List<int> prefix) {
 
   if (n >= 3) {
     // Differences grow by the same amount (squares, triangular numbers…).
-    final second = [for (var i = 1; i < diffs.length; i++) diffs[i] - diffs[i - 1]];
+    final second = [
+      for (var i = 1; i < diffs.length; i++) diffs[i] - diffs[i - 1],
+    ];
     if (second.every((s) => s == second.first)) {
       out.add(prefix.last + diffs.last + second.first);
     }
@@ -122,7 +124,9 @@ class SequenceRound {
   /// Keep at least one number hidden, and don't sell evidence that would
   /// leave nothing to win.
   bool get canReveal =>
-      !over && shown < rule.terms.length - 1 && points - revealCost >= minPoints;
+      !over &&
+      shown < rule.terms.length - 1 &&
+      points - revealCost >= minPoints;
 
   void reveal() {
     if (!canReveal) throw StateError('No more numbers to reveal.');
@@ -171,14 +175,22 @@ final sequenceBank = <SequenceRule>[
   ),
   SequenceRule(
     name: 'Square numbers',
-    explanation: '1 × 1, 2 × 2, 3 × 3… The gaps grow by 2 each time: 3, 5, 7, 9.',
+    explanation:
+        '1 × 1, 2 × 2, 3 × 3… The gaps grow by 2 each time: 3, 5, 7, 9.',
     terms: _build(8, (i, t) => (i + 1) * (i + 1)),
   ),
   SequenceRule(
     name: 'Add the two before',
     explanation:
-        'Each number is the sum of the two before it — the Fibonacci pattern, found in sunflower seeds and pinecones.',
-    terms: _build(9, (i, t) => i == 0 ? 2 : i == 1 ? 3 : t[i - 1] + t[i - 2]),
+        'Each number is the sum of the two before it, the Fibonacci pattern, found in sunflower seeds and pinecones.',
+    terms: _build(
+      9,
+      (i, t) => i == 0
+          ? 2
+          : i == 1
+          ? 3
+          : t[i - 1] + t[i - 2],
+    ),
   ),
   SequenceRule(
     name: 'Multiply by 3',
@@ -199,7 +211,8 @@ final sequenceBank = <SequenceRule>[
   ),
   SequenceRule(
     name: 'Add 5, take away 2',
-    explanation: 'Two steps take turns: add 5, then subtract 2, again and again.',
+    explanation:
+        'Two steps take turns: add 5, then subtract 2, again and again.',
     terms: _build(8, (i, t) => i == 0 ? 10 : t.last + (i.isOdd ? 5 : -2)),
   ),
   SequenceRule(

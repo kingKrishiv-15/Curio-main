@@ -46,7 +46,7 @@ class SqueezeEngine {
       return 'Clue: five divides this number without leftovers.';
     }
     if (_isPrime(target)) {
-      return 'Clue: this number is prime—it only shares with 1 and itself.';
+      return 'Clue: this number is prime, it only shares with 1 and itself.';
     }
     return 'Clue: the digits add up to ${target.toString().split('').fold<int>(0, (sum, digit) => sum + int.parse(digit))}.';
   }
