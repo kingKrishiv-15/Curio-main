@@ -226,5 +226,21 @@ IconData skillIcon(String skill) => switch (skill) {
 
 /// Today's set as Home shows it: the anchor game, then one rotating game
 /// from each section.
-({GameEntry anchor, List<GameEntry> others}) todaysSet({DateTime? date}) =>
-    (anchor: gameById(anchorGameId), others: todaysPicks(date: date));
+///
+/// [ids] is the set as the server listed it (anchor first). When it is
+/// missing or names a game this build does not have, the same rotation is
+/// worked out on the device from [date].
+({GameEntry anchor, List<GameEntry> others}) todaysSet({
+  DateTime? date,
+  List<String>? ids,
+}) {
+  if (ids != null &&
+      ids.length > 1 &&
+      ids.every((id) => findGame(id) != null)) {
+    return (
+      anchor: gameById(ids.first),
+      others: [for (final id in ids.skip(1)) gameById(id)],
+    );
+  }
+  return (anchor: gameById(anchorGameId), others: todaysPicks(date: date));
+}

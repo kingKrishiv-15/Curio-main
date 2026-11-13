@@ -145,6 +145,17 @@ class MinigameService {
     );
   }
 
+  /// The server's date and today's set of games, anchor first.
+  Future<({DateTime date, List<String> games})> fetchDailySet() async {
+    final result = Map<String, dynamic>.from(
+      await _db.rpc('get_daily_set') as Map,
+    );
+    return (
+      date: DateTime.parse(result['date'] as String),
+      games: [for (final g in (result['games'] as List? ?? const [])) '$g'],
+    );
+  }
+
   /// Today's puzzle of [type], where "today" is the server's date.
   Future<DailyPuzzle?> fetchTodaysPuzzle(String type) async {
     final rows =

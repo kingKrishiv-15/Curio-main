@@ -45,7 +45,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
     final today = state.today;
-    final set = todaysSet(date: today);
+    final set = todaysSet(date: today, ids: state.dailySetIds);
     return CurioPage(
       maxWidth: 720,
       child: ListView(

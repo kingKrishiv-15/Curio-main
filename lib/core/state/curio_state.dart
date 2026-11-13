@@ -8,6 +8,7 @@ import '../services/cached_progress_store.dart';
 import '../services/family_service.dart';
 import '../../features/games/common/daily_schedule.dart';
 import '../../features/games/common/game_rewards.dart';
+import '../services/minigame_service.dart';
 
 class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   CurioState({this.store, this.isGuest = false, DateTime Function()? now})
@@ -15,7 +16,33 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
   }
   final DateTime Function() _now;
-  DateTime get today => _now();
+
+  /// How far the server's calendar day is from this device's. Zero until
+  /// the server has been asked (and always zero in demo mode).
+  Duration _serverOffset = Duration.zero;
+
+  /// The games in today's set as the server listed them, anchor first.
+  /// Null until the server has answered; screens then fall back to the
+  /// same rotation worked out on the device.
+  List<String>? dailySetIds;
+
+  /// Today. Once the server has reported its date this follows the server,
+  /// so changing the device clock does not move the day.
+  DateTime get today => _now().add(_serverOffset);
+
+  /// Adopts the server's date and set (from get_daily_set).
+  void adoptDailySet({required DateTime serverDate, List<String>? games}) {
+    final local = _now();
+    _serverOffset = DateTime(
+      serverDate.year,
+      serverDate.month,
+      serverDate.day,
+    ).difference(DateTime(local.year, local.month, local.day));
+    dailySetIds = games;
+    streak = calculateStreak(completedActivities, today);
+    notifyListeners();
+  }
+
   Timer? _dayTimer;
 
   /// Refresh the plan even if the app stays open across midnight.
@@ -129,7 +156,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
       try {
         dailyGoal = (await FamilyService().loadSettings()).dailyGoal.clamp(
           1,
-          3,
+          dailyGameCount,
         );
       } catch (_) {
         /* Settings can be retried separately. */
@@ -137,6 +164,15 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
       if (store is CachedProgressStore &&
           (store as CachedProgressStore).offline) {
         syncError = 'Offline, showing progress saved on this device.';
+      }
+      try {
+        final service = MinigameService();
+        if (service.isSignedIn) {
+          final set = await service.fetchDailySet();
+          adoptDailySet(serverDate: set.date, games: set.games);
+        }
+      } catch (_) {
+        /* Offline or not yet migrated: the device rotation is used. */
       }
       childName = snapshot.childName;
       totalXp = snapshot.totalXp;
