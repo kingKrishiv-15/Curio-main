@@ -85,6 +85,18 @@ class GameHeader extends StatelessWidget {
 
   final String title, subtitle;
   final List<Widget> chips;
+
+  /// Live state only (mistakes, guesses left). How long a game takes and
+  /// which skill it trains are not repeated on every screen.
+  String get _status {
+    final skills = {for (final r in gameRewards.values) r.skill};
+    return [
+      for (final chip in chips.whereType<GameMetaChip>())
+        if (!chip.label.endsWith(' min') && !skills.contains(chip.label))
+          chip.label,
+    ].join(', ');
+  }
+
   final Widget? trailing;
 
   @override
@@ -103,7 +115,7 @@ class GameHeader extends StatelessWidget {
       const SizedBox(height: 16),
       Row(
         children: [
-          Expanded(child: Wrap(spacing: 16, runSpacing: 8, children: chips)),
+          Expanded(child: Text(_status, style: CurioTokens.label)),
           ?trailing,
         ],
       ),
@@ -309,16 +321,11 @@ class GameResultCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 16),
-          // The share line sits in a well pressed into the card.
-          SizedBox(
-            width: double.infinity,
-            child: CurioClay(
-              radius: CurioTokens.radiusCard,
-              pressed: true,
-              padding: const EdgeInsets.all(16),
-              child: Text(shareText, style: const TextStyle(height: 1.6)),
-            ),
-          ),
+          const Divider(),
+          const SizedBox(height: 12),
+          Text(shareText, style: CurioTokens.bodySmall),
+          const SizedBox(height: 12),
+          const Divider(),
           const SizedBox(height: 12),
           // Stacked, not side by side, so long labels and large text fit.
           FilledButton.icon(

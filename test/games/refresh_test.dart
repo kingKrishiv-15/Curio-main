@@ -367,7 +367,7 @@ void main() {
         final xp = state.totalXp;
         await tester.pumpWidget(play(LinkLabPage(date: day), state));
         await solveLinkLab(tester, LinkLabGame.forDay(linkLabDay(dayNumber)));
-        await reveal(tester, find.text('No mistakes').last);
+        await reveal(tester, find.textContaining('No mistakes').last);
         expect(find.text('Flawless links!'), findsOneWidget);
         expect(state.completedToday('link_lab'), isTrue);
         expect(state.totalXp, xp + 90);
@@ -378,7 +378,7 @@ void main() {
           tester,
           LinkLabGame.forDay(linkLabDay(dayNumber, practice: 1)),
         );
-        await reveal(tester, find.text('No mistakes').last);
+        await reveal(tester, find.textContaining('No mistakes').last);
         expect(state.totalXp, xp + 90, reason: 'practice earns nothing');
         expect(tester.takeException(), isNull);
       },
@@ -400,9 +400,9 @@ void main() {
         await tap(tester, find.byKey(Key('link_$w')));
       }
       await tap(tester, find.byKey(const Key('link_submit')));
-      expect(find.text('1 mistake'), findsOneWidget);
+      expect(find.textContaining('1 mistake'), findsOneWidget);
       await tap(tester, find.byKey(const Key('link_hint')));
-      expect(find.text('1 hint'), findsOneWidget);
+      expect(find.textContaining('1 hint'), findsOneWidget);
       expect(find.text('Your hints'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
