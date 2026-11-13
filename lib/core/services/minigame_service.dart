@@ -145,6 +145,32 @@ class MinigameService {
     );
   }
 
+  /// Today's puzzle of [type], where "today" is the server's date.
+  Future<DailyPuzzle?> fetchTodaysPuzzle(String type) async {
+    final rows =
+        await _db.rpc('todays_puzzle', params: {'p_puzzle_type': type})
+            as List<dynamic>;
+    if (rows.isEmpty) return null;
+    final row = rows.first as Map<String, dynamic>;
+    return DailyPuzzle(
+      id: row['id'] as String,
+      date: DateTime.parse(row['puzzle_date'] as String),
+      type: row['puzzle_type'] as String,
+      config: Map<String, dynamic>.from(row['public_config'] as Map),
+    );
+  }
+
+  /// Opens or resumes a Second Opinion attempt. The server starts the
+  /// countdown and reports how many seconds are left.
+  Future<Map<String, dynamic>> openSecondOpinion(String puzzleId) async {
+    final childId = await _childProfileId();
+    final result = await _db.rpc(
+      'open_second_opinion',
+      params: {'p_child_id': childId, 'p_puzzle_id': puzzleId},
+    );
+    return Map<String, dynamic>.from(result as Map);
+  }
+
   Future<PuzzleAttempt> startAttempt(String puzzleId) async {
     final childId = await _childProfileId();
     final row =

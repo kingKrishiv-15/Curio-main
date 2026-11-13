@@ -97,7 +97,19 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     };
   }
 
-  int get dailyGoalCompleted => sectionsCompleted().length.clamp(0, dailyGoal);
+  /// How many different games from today's set are finished.
+  int get gamesCompletedToday {
+    final suffix = '_${_dateKey(today)}';
+    return {
+      for (final id in completedActivities)
+        if (id.endsWith(suffix) &&
+            gameRewards.containsKey(activityGame(id)) &&
+            !retiredGames.contains(activityGame(id)))
+          activityGame(id),
+    }.length;
+  }
+
+  int get dailyGoalCompleted => gamesCompletedToday.clamp(0, dailyGoal);
 
   int get todayXp => completedActivities
       .where((id) => id.endsWith('_${_dateKey(today)}'))

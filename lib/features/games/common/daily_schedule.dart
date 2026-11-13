@@ -23,7 +23,9 @@ int calendarDayNumber(DateTime date) =>
     DateTime.utc(date.year, date.month, date.day).difference(_epoch).inDays;
 
 LearningSection sectionForGame(String id) {
-  if (id == 'frostlands_night_1') return LearningSection.thinking;
+  if (id == 'frostlands_night_1' || id == anchorGameId) {
+    return LearningSection.thinking;
+  }
   return sectionRotation.entries.firstWhere((e) => e.value.contains(id)).key;
 }
 
@@ -49,5 +51,9 @@ String get sectionNames {
   return '${titles.sublist(0, titles.length - 1).join(', ')} and ${titles.last}';
 }
 
-/// How many games make up a day's set. Every count in the UI reads this.
-int get dailyGameCount => LearningSection.values.length;
+/// The game that is on every day. The other games rotate, one per section.
+const anchorGameId = 'second_opinion';
+
+/// How many games make up a day's set: the anchor plus one per section.
+/// Every count in the UI reads this.
+int get dailyGameCount => LearningSection.values.length + 1;

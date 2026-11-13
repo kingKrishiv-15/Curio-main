@@ -11,6 +11,7 @@ import 'common/game_rewards.dart';
 import 'link_lab/presentation/link_lab_page.dart';
 import 'mirror/presentation/mirror_page.dart';
 import 'scale/presentation/scale_page.dart';
+import 'second_opinion/presentation/second_opinion_page.dart';
 import 'sequence/presentation/sequence_page.dart';
 import 'signal_grid/presentation/signal_grid_page.dart';
 import 'squeeze/presentation/squeeze_page.dart';
@@ -56,6 +57,15 @@ class GameEntry {
 }
 
 final gameCatalog = <GameEntry>[
+  GameEntry(
+    id: anchorGameId,
+    title: 'Second Opinion',
+    tagline:
+        'An AI wrote the brief. Three of its claims do not hold up. Find them.',
+    icon: Icons.fact_check_rounded,
+    duration: '5 min',
+    builder: (_) => const SecondOpinionPage(),
+  ),
   GameEntry(
     id: 'crowns',
     title: 'Crowns',
@@ -214,8 +224,7 @@ IconData skillIcon(String skill) => switch (skill) {
   _ => Icons.psychology_rounded,
 };
 
-/// Today's set as Home shows it: one anchor game and the rest.
-({GameEntry anchor, List<GameEntry> others}) todaysSet({DateTime? date}) {
-  final picks = todaysPicks(date: date);
-  return (anchor: picks.first, others: picks.sublist(1));
-}
+/// Today's set as Home shows it: the anchor game, then one rotating game
+/// from each section.
+({GameEntry anchor, List<GameEntry> others}) todaysSet({DateTime? date}) =>
+    (anchor: gameById(anchorGameId), others: todaysPicks(date: date));

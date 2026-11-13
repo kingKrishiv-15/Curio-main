@@ -281,7 +281,7 @@ class GameResultCard extends StatelessWidget {
         unlocked = discoveries.where((d) => d.id == reward.factId).firstOrNull;
       }
     }
-    final doneToday = state?.sectionsCompleted().length ?? 0;
+    final doneToday = state?.gamesCompletedToday ?? 0;
 
     return GlassCard(
       padding: const EdgeInsets.all(24),
@@ -351,14 +351,11 @@ class GameResultCard extends StatelessWidget {
           if (state != null && reward != null) ...[
             const SizedBox(height: 16),
             Text(
-              '$doneToday of ${LearningSection.values.length} sections complete today',
+              '$doneToday of $dailyGameCount games done today',
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            CurioProgressBar(
-              value: doneToday / LearningSection.values.length,
-              height: 6,
-            ),
+            CurioProgressBar(value: doneToday / dailyGameCount, height: 6),
             const SizedBox(height: 12),
             OutlinedButton.icon(
               key: const Key('result_more_games'),

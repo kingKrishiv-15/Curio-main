@@ -1,0 +1,3112 @@
+[
+ {
+  "public": {
+   "number": 1,
+   "topic": "how honeybees make honey",
+   "brief": "Honeybees make honey from nectar, the sugary liquid inside flowers. A forager sucks nectar into a special honey stomach and carries it home, where house bees pass it from mouth to mouth and fan it with their wings until most of the water has evaporated. A single worker makes only about a twelfth of a teaspoon of honey in her whole life. Bees tell each other where good flowers are with a waggle dance, first decoded by Karl von Frisch, who shared a Nobel Prize for it in 1973. A hive has one queen, and in summer she can lay more than a thousand eggs a day. Honey keeps for a very long time because it holds so little water. Scientists have proved that bees can count to exactly 12. A 2019 study by Dr Helena Marsh at the Oslo Bee Institute found that a hive visits 4.2 million flowers a week. All bees die after they sting.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "A single worker bee makes about a twelfth of a teaspoon of honey in her life."
+    },
+    {
+     "id": "c2",
+     "text": "Karl von Frisch decoded the waggle dance and shared a Nobel Prize in 1973."
+    },
+    {
+     "id": "c3",
+     "text": "In summer a queen can lay more than a thousand eggs a day."
+    },
+    {
+     "id": "c4",
+     "text": "Scientists have proved that bees can count to exactly 12."
+    },
+    {
+     "id": "c5",
+     "text": "A 2019 study by Dr Helena Marsh found a hive visits 4.2 million flowers a week."
+    },
+    {
+     "id": "c6",
+     "text": "All bees die after they sting."
+    },
+    {
+     "id": "c7",
+     "text": "Honey keeps for a very long time because it holds so little water."
+    },
+    {
+     "id": "c8",
+     "text": "House bees fan the nectar with their wings to evaporate the water."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The waggle dance and the egg-laying figures come from standard bee biology. I cannot find a Dr Helena Marsh or an Oslo Bee Institute, so I should not have quoted that study. On counting, experiments show bees telling apart small numbers up to about four or five. I have no evidence for exactly 12.",
+    "current": "Yes. How bees make honey has not changed, and the waggle dance findings from the last century still stand.",
+    "example": "One example is the waggle dance itself. A bee that runs straight up the comb is telling the others to fly towards the sun.",
+    "counter": "The strongest objection is to the stinging line. Only honeybee workers have a barbed sting that tears out, and usually only when they sting thick skin like ours. Bumblebees and queen honeybees can sting repeatedly, so it is not true of all bees.",
+    "scope": "You asked how honeybees make honey. I covered the nectar, the evaporation and the hive, then added some extra facts about bees.",
+    "unsure": "I am not certain how much honey a single hive makes in a year, because it depends heavily on the weather and the flowers nearby."
+   },
+   "exposes": {
+    "source": [
+     "c4",
+     "c5"
+    ],
+    "counter": [
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Experiments show bees can tell apart small numbers, up to about four or five. Nothing shows a limit of exactly 12. A tidy number was stated as if it had been proved."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no Dr Helena Marsh and no Oslo Bee Institute. The study and its number were invented."
+    },
+    "c6": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "It is true of a honeybee worker stinging thick skin, and that one case was stretched to cover every bee. Bumblebees and queen honeybees can sting again and again."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 2,
+   "topic": "Mount Everest",
+   "brief": "Mount Everest, on the border of Nepal and China, is the highest mountain on Earth above sea level. The first people confirmed to reach the top were Edmund Hillary of New Zealand and Tenzing Norgay, a Sherpa from Nepal, on 29 May 1953. The mountain is still rising by a few millimetres each year, because the Indian plate keeps pushing north into Asia. Near the top there is only about a third of the oxygen found at sea level. Nobody has ever reached the summit without bottled oxygen. Everest is not the tallest mountain if you measure from base to peak: Mauna Kea in Hawaii is taller, but most of it is under the sea. The record for the most climbs is 21, held by Apa Sherpa. Climbing it has become safe and simple, since more than 600 people reached the summit in a single season. The mountain was named in 1865 after George Everest, a British surveyor who never saw it himself.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Edmund Hillary and Tenzing Norgay reached the top on 29 May 1953."
+    },
+    {
+     "id": "c2",
+     "text": "Everest is still rising by a few millimetres each year."
+    },
+    {
+     "id": "c3",
+     "text": "Nobody has ever reached the summit without bottled oxygen."
+    },
+    {
+     "id": "c4",
+     "text": "Near the top there is about a third of the oxygen found at sea level."
+    },
+    {
+     "id": "c5",
+     "text": "The record for the most climbs is 21, held by Apa Sherpa."
+    },
+    {
+     "id": "c6",
+     "text": "Measured from base to peak, Mauna Kea in Hawaii is taller."
+    },
+    {
+     "id": "c7",
+     "text": "Climbing it is now safe and simple, since 600 people summited in one season."
+    },
+    {
+     "id": "c8",
+     "text": "It was named in 1865 after the surveyor George Everest."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The 1953 ascent and the naming are recorded history, and the rise of a few millimetres a year comes from satellite measurements of how the plates are moving.",
+    "current": "Two things I said are behind the times. Reinhold Messner and Peter Habeler reached the top without bottled oxygen in 1978, and many have since. And Apa Sherpa's 21 climbs was passed years ago by Kami Rita Sherpa, who has now climbed it about 30 times.",
+    "example": "A specific example of the thin air: near the summit a climber without extra oxygen may need several breaths for every single step.",
+    "counter": "The strongest argument is against calling the climb safe and simple. I picked the one number that sounds reassuring. Climbers still die on Everest in most years, from falls, avalanches and thin air, and queues near the top make it more dangerous, not less.",
+    "scope": "You asked about Mount Everest, and everything I said was about the mountain, its height and its climbers.",
+    "unsure": "I am unsure exactly how fast it is rising, since estimates range from about two to four millimetres a year."
+   },
+   "exposes": {
+    "current": [
+     "c3",
+     "c5"
+    ],
+    "counter": [
+     "c7"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "That stopped being true in 1978, when Reinhold Messner and Peter Habeler climbed it without bottled oxygen. Many climbers have done so since."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Apa Sherpa's 21 climbs was the record years ago. Kami Rita Sherpa has since climbed Everest about 30 times."
+    },
+    "c7": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "One reassuring number was picked out. Climbers still die on Everest in most years, and the crowds near the top add to the danger."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 3,
+   "topic": "the 100 metres sprint",
+   "brief": "The 100 metres is the shortest sprint in outdoor athletics and decides who gets called the fastest person in the world. Runners start from blocks, and a false start now means instant disqualification. The first man to run it in under ten seconds with electronic timing was Jim Hines of the United States, in 1968. The men's world record is 9.69 seconds, set by Usain Bolt of Jamaica at the Beijing Olympics. The women's world record of 10.49 seconds has stood since Florence Griffith Joyner ran it in 1988. A sprinter reaches top speed somewhere after 60 metres and is actually slowing down by the finish. A tailwind helps, so a record only counts if the wind is no stronger than two metres per second. Scientists have proved that no human will ever run the distance in under 9.40 seconds. Coach Viktor Hallberg showed in 2015 that each blink costs a sprinter 0.04 seconds. Bolt also holds the 200 metres record of 19.19 seconds.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "A false start now means instant disqualification."
+    },
+    {
+     "id": "c2",
+     "text": "Jim Hines was the first to break ten seconds with electronic timing, in 1968."
+    },
+    {
+     "id": "c3",
+     "text": "The men's world record is 9.69 seconds, set by Usain Bolt in Beijing."
+    },
+    {
+     "id": "c4",
+     "text": "The women's record of 10.49 seconds has stood since 1988."
+    },
+    {
+     "id": "c5",
+     "text": "Sprinters are slowing down by the time they reach the finish."
+    },
+    {
+     "id": "c6",
+     "text": "Scientists have proved no human will ever run under 9.40 seconds."
+    },
+    {
+     "id": "c7",
+     "text": "Coach Viktor Hallberg showed in 2015 that a blink costs 0.04 seconds."
+    },
+    {
+     "id": "c8",
+     "text": "A record only counts if the tailwind is two metres per second or less."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The records and the wind rule come from World Athletics. I cannot find a coach called Viktor Hallberg or any blinking study, so I should not have included that. And nobody has proved a hard limit for the 100 metres. Some scientists have estimated one, but those are predictions, not proof.",
+    "current": "Not quite. Bolt ran 9.69 in Beijing in 2008, but a year later in Berlin he lowered his own record to 9.58 seconds, and that is the record today.",
+    "example": "Take the 2009 final in Berlin. The fastest runners hit their top speed between 60 and 80 metres, and every one of them was slowing a little by the line.",
+    "counter": "Some people argue the 100 metres is too short to show who is really the best athlete, because one slow reaction at the start can decide the whole race.",
+    "scope": "You asked about the 100 metres. I described the rules, the records and how the race unfolds, and I mentioned the 200 metres only for comparison.",
+    "unsure": "I am unsure how much of a sprinter's time comes from the start compared with top speed, since coaches still argue about that."
+   },
+   "exposes": {
+    "current": [
+     "c3"
+    ],
+    "source": [
+     "c6",
+     "c7"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Bolt did run 9.69 in Beijing in 2008, but a year later in Berlin he lowered the record to 9.58 seconds, which still stands."
+    },
+    "c6": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Some scientists have estimated a limit, but an estimate is a prediction. Nobody has proved where the limit is."
+    },
+    "c7": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no coach called Viktor Hallberg and no blinking study. The name, the year and the figure were made up."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 4,
+   "topic": "why Pluto is no longer called a planet",
+   "brief": "Pluto was discovered in 1930 by Clyde Tombaugh at the Lowell Observatory in Arizona, and for 76 years it was counted as the ninth planet. In 2006 the International Astronomical Union agreed a definition of a planet with three tests. A planet must orbit the Sun, be massive enough to pull itself into a round shape, and have cleared other objects out of its orbit. Pluto passes the first two but fails the third, because it shares its region with many icy bodies in the Kuiper belt. It is now called a dwarf planet. The decision was made official in 2011 by a vote of 4,000 schoolchildren in Prague. Pluto has five known moons, and the largest, Charon, is about half as wide as Pluto itself. No spacecraft has ever visited Pluto, so our best pictures are blurry dots. Pluto is smaller than our own Moon. Astronomers are certain that a ninth giant planet is hiding beyond it. The name was suggested by Venetia Burney, an eleven-year-old girl from Oxford.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Clyde Tombaugh discovered Pluto in 1930."
+    },
+    {
+     "id": "c2",
+     "text": "Pluto fails the test of having cleared its orbit of other objects."
+    },
+    {
+     "id": "c3",
+     "text": "A vote of 4,000 schoolchildren in Prague made the decision official in 2011."
+    },
+    {
+     "id": "c4",
+     "text": "Charon, its largest moon, is about half as wide as Pluto."
+    },
+    {
+     "id": "c5",
+     "text": "No spacecraft has ever visited Pluto."
+    },
+    {
+     "id": "c6",
+     "text": "Pluto is smaller than our Moon."
+    },
+    {
+     "id": "c7",
+     "text": "Astronomers are certain a ninth giant planet is hiding beyond Pluto."
+    },
+    {
+     "id": "c8",
+     "text": "The name was suggested by an eleven-year-old, Venetia Burney."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The discovery and the 2006 definition are on record with the International Astronomical Union. I cannot find any vote by schoolchildren in Prague, so that line has no source. As for a ninth giant planet, it is a hypothesis based on the odd orbits of a few distant objects. Nobody has observed it.",
+    "current": "One thing is out of date. In July 2015 the New Horizons spacecraft flew past Pluto and returned detailed pictures, including a huge heart-shaped plain of ice.",
+    "example": "An example of an object sharing Pluto's region is Eris, found in 2005. It is almost the same size as Pluto, which helped push astronomers to agree a definition.",
+    "counter": "Some planetary scientists argue the third test is unfair, because even Earth shares its orbit with thousands of asteroids, and they would rather define a planet by its roundness alone.",
+    "scope": "You asked why Pluto is no longer called a planet. I gave the three tests and the one it fails, then added background about its moons and its name.",
+    "unsure": "I am unsure how many more dwarf planets are out there, since estimates for the Kuiper belt run from dozens to hundreds."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c7"
+    ],
+    "current": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "No such vote happened. Astronomers at the International Astronomical Union decided it in 2006. The children, the city and the year were invented."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "That was true until July 2015, when the New Horizons probe flew past Pluto and sent back sharp pictures of mountains and ice plains."
+    },
+    "c7": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "A distant ninth planet is an idea some astronomers are testing. Nobody has seen it, so \"certain\" claims far more than is known."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 5,
+   "topic": "bananas",
+   "brief": "To a botanist a banana is a berry, while a strawberry is not. The banana plant is not a tree either. It is a giant herb, and its trunk is made of tightly rolled leaves. Wild bananas are full of hard seeds, but the ones in shops are seedless and are grown from cuttings, so every plant is a copy of its parent. The Gros Michel is the variety sold in most supermarkets today. India grows more bananas than any other country. Bananas are very slightly radioactive because they contain potassium, though far too little to matter. A fungus that lives in soil is now spreading through plantations, and growers are worried. Bananas will be extinct by exactly 2035. The world's longest banana, grown in Ecuador in 2003 by a farmer named Luis Ortega, measured 47 centimetres. Bananas float in water, and they ripen faster when kept next to other ripe fruit because of a gas called ethylene.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "To a botanist, a banana is a berry and a strawberry is not."
+    },
+    {
+     "id": "c2",
+     "text": "The banana plant is a giant herb, not a tree."
+    },
+    {
+     "id": "c3",
+     "text": "The Gros Michel is the variety sold in most supermarkets today."
+    },
+    {
+     "id": "c4",
+     "text": "India grows more bananas than any other country."
+    },
+    {
+     "id": "c5",
+     "text": "Bananas will be extinct by exactly 2035."
+    },
+    {
+     "id": "c6",
+     "text": "Farmer Luis Ortega grew a record 47 centimetre banana in Ecuador in 2003."
+    },
+    {
+     "id": "c7",
+     "text": "Shop bananas are grown from cuttings, so each plant is a copy."
+    },
+    {
+     "id": "c8",
+     "text": "Bananas ripen faster next to ripe fruit because of ethylene gas."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The botany is standard, and the production figures come from the United Nations food agency. I cannot find any record of a Luis Ortega or a 47 centimetre banana. I also have no source for 2035. Scientists are worried about the fungus, but none of them gives a date.",
+    "current": "One line is decades out of date. The Gros Michel was the banana everyone ate until the 1950s, when a soil fungus destroyed the plantations. The banana in shops today is a different variety, the Cavendish.",
+    "example": "A specific example of ethylene at work: put a green banana in a paper bag with a ripe apple and it will turn yellow a day or two sooner.",
+    "counter": "A fair objection is that calling a banana a berry confuses people, because the botanical meaning of berry has little to do with how cooks use the word.",
+    "scope": "You asked about bananas, and I stayed with what they are, how they are grown and a few odd facts about them.",
+    "unsure": "I am unsure how many varieties of banana exist, since counts range from several hundred to more than a thousand."
+   },
+   "exposes": {
+    "current": [
+     "c3"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "The Gros Michel was the main export banana until the 1950s, when a soil fungus wiped out the plantations. Shops have sold the Cavendish ever since."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The fungus is a real threat, but nobody knows whether or when bananas might disappear. An exact year is a guess presented as fact."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such record and no such farmer on record. The name, the place, the year and the length were invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 6,
+   "topic": "the marathon",
+   "brief": "A marathon is 42.195 kilometres long. The distance was first run at the 1908 London Olympics and became the standard in 1921. The race is named after a Greek legend in which a messenger ran from the battlefield of Marathon to Athens. The first modern Olympic marathon, in 1896, was won by a Greek water carrier called Spyridon Louis. Women were not given an Olympic marathon until 1984. The men's world record is 2 hours 1 minute 39 seconds, set by Eliud Kipchoge in Berlin. The women's world record is 2 hours 15 minutes 25 seconds, set by Paula Radcliffe. In 2019 Kipchoge ran the distance in 1 hour 59 minutes 40 seconds in Vienna, but it did not count as a record because he used a rotating team of pacemakers. The 1904 Olympic winner took 3 hours 28 minutes, which shows that early marathon runners were simply unfit. Most big city marathons now have tens of thousands of finishers.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "A marathon is 42.195 kilometres long."
+    },
+    {
+     "id": "c2",
+     "text": "Spyridon Louis won the first modern Olympic marathon in 1896."
+    },
+    {
+     "id": "c3",
+     "text": "The men's world record is 2:01:39, set by Eliud Kipchoge in Berlin."
+    },
+    {
+     "id": "c4",
+     "text": "Women were not given an Olympic marathon until 1984."
+    },
+    {
+     "id": "c5",
+     "text": "The women's world record is 2:15:25, set by Paula Radcliffe."
+    },
+    {
+     "id": "c6",
+     "text": "Kipchoge's 1:59:40 in Vienna did not count because of rotating pacemakers."
+    },
+    {
+     "id": "c7",
+     "text": "The 1904 winner took 3:28, which shows early runners were simply unfit."
+    },
+    {
+     "id": "c8",
+     "text": "The distance was first run at the 1908 London Olympics."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The distance and the Olympic results are in the official records of the Games, and the record times come from World Athletics lists.",
+    "current": "Both records I gave are old. The men's mark of 2:01:39 dates from 2018. Kipchoge improved it in 2022 and Kelvin Kiptum ran 2:00:35 in 2023. Radcliffe's 2:15:25 dates from 2003 and has been beaten several times. Ruth Chepngetich ran 2:09:56 in 2024.",
+    "example": "A specific example of a big city race is the New York City Marathon, which crosses all five boroughs and regularly has more than 50,000 finishers.",
+    "counter": "The weakest thing I said was about 1904. I chose the slowest winning time in Olympic history. That race was run in about 32 degree heat on dusty roads with one water stop. In 1896 the winner ran 2:58:50 and in 1908 it was 2:55:18, so early runners were far from unfit.",
+    "scope": "You asked about the marathon. I gave its distance, where it came from and its records, which all belong to the question.",
+    "unsure": "I am unsure whether the Greek messenger story really happened, because the oldest accounts were written centuries later."
+   },
+   "exposes": {
+    "current": [
+     "c3",
+     "c5"
+    ],
+    "counter": [
+     "c7"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "That was the record in 2018. Kipchoge lowered it in 2022, and in 2023 Kelvin Kiptum ran 2:00:35 in Chicago."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Radcliffe's 2003 time stood for 16 years but has been beaten several times since. In 2024 Ruth Chepngetich ran 2:09:56."
+    },
+    "c7": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "One freak race was chosen. The 1904 marathon was run in fierce heat on dusty roads with almost no water. The 1896 and 1908 winners both finished in under three hours."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 7,
+   "topic": "octopuses",
+   "brief": "An octopus has three hearts and blue blood. Two hearts push blood through the gills and the third sends it round the body. The blood is blue because it carries oxygen with copper instead of iron. About two thirds of an octopus's nerve cells are in its arms, not its head, so each arm can explore and react partly on its own. With no bones at all, an octopus can squeeze through any gap wider than its beak, the only hard part of its body. Most species live for only a year or two. The largest octopus ever found weighed exactly 272 kilograms. Scientists have confirmed that octopuses dream about hunting. In 2016 an octopus called Marlo at the Lisbon Sea Lab opened a lock with fourteen separate steps. Octopuses can change the colour and texture of their skin in less than a second, and many squirt a cloud of dark ink to confuse an attacker while they jet away.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "An octopus has three hearts."
+    },
+    {
+     "id": "c2",
+     "text": "Its blood is blue because it carries oxygen with copper."
+    },
+    {
+     "id": "c3",
+     "text": "About two thirds of its nerve cells are in its arms."
+    },
+    {
+     "id": "c4",
+     "text": "The largest octopus ever found weighed exactly 272 kilograms."
+    },
+    {
+     "id": "c5",
+     "text": "Scientists have confirmed that octopuses dream about hunting."
+    },
+    {
+     "id": "c6",
+     "text": "An octopus called Marlo opened a fourteen-step lock in Lisbon in 2016."
+    },
+    {
+     "id": "c7",
+     "text": "It can squeeze through any gap wider than its beak."
+    },
+    {
+     "id": "c8",
+     "text": "Most species live for only a year or two."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The hearts, the copper in the blood and the nerve cells in the arms are in any marine biology textbook. The 272 kilogram figure is an old unverified report, and the heaviest one properly weighed was about 71 kilograms. The dreaming claim comes from colour changes seen during sleep, which is a hint and nothing more. I cannot find any record of Marlo or a Lisbon Sea Lab.",
+    "current": "Yes. Octopus anatomy has not changed, and these basic facts have been known for a long time.",
+    "example": "A good example of squeezing through gaps: an octopus as wide as a dinner plate has been filmed pouring itself through a hole the size of a coin.",
+    "counter": "Some scientists object to calling an octopus intelligent in the human sense, because its nervous system is organised so differently that comparing the two may not mean much.",
+    "scope": "You asked about octopuses, and I described their bodies, their lifespan and how they escape danger.",
+    "unsure": "I am not sure how many species of octopus exist, since new ones are still being described from the deep sea."
+   },
+   "exposes": {
+    "source": [
+     "c4",
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The 272 kilogram animal is an old report that nobody could check. The heaviest octopus actually weighed and recorded was about 71 kilograms."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Sleeping octopuses change colour, and some researchers think that might be something like dreaming. That is an idea, not a confirmed finding, and nobody knows what they would dream about."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no Lisbon Sea Lab and no octopus called Marlo. The whole story was invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 8,
+   "topic": "lightning",
+   "brief": "Lightning is a giant electric spark. Inside a storm cloud, ice crystals and soft hail rub together and separate electric charge, until the difference is large enough for a spark to jump. A bolt heats the air around it to about 30,000 degrees Celsius, several times hotter than the surface of the Sun. That air expands so fast that it makes the bang we call thunder. Light travels much faster than sound, so you can estimate the distance: about three seconds for every kilometre. Across the world there are roughly 45 flashes every second. The place with the most lightning is Lake Maracaibo in Venezuela, where storms flicker on most nights of the year. Lightning never strikes the same place twice. The longest flash ever recorded stretched 321 kilometres across Oklahoma. In 2021 the physicist Dr Anton Reyes measured a single bolt in Chile at exactly 1.8 billion volts. Most lightning never reaches the ground at all and stays inside the clouds.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "A bolt heats the air to about 30,000 degrees Celsius."
+    },
+    {
+     "id": "c2",
+     "text": "Thunder is the sound of air expanding very fast."
+    },
+    {
+     "id": "c3",
+     "text": "Sound takes about three seconds to travel each kilometre."
+    },
+    {
+     "id": "c4",
+     "text": "Lightning never strikes the same place twice."
+    },
+    {
+     "id": "c5",
+     "text": "The longest flash ever recorded stretched 321 kilometres across Oklahoma."
+    },
+    {
+     "id": "c6",
+     "text": "Dr Anton Reyes measured a bolt in Chile at exactly 1.8 billion volts in 2021."
+    },
+    {
+     "id": "c7",
+     "text": "Lake Maracaibo in Venezuela has more lightning than anywhere else."
+    },
+    {
+     "id": "c8",
+     "text": "Most lightning stays inside the clouds."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The temperature and the flash rate come from weather agencies and satellite counts. The line about never striking twice is only a proverb, and it is wrong: tall towers are hit many times every year. I cannot find a Dr Anton Reyes or that measurement in Chile.",
+    "current": "One figure is old. The 321 kilometre flash over Oklahoma in 2007 held the record for a while, but the World Meteorological Organization has since certified much longer ones, the longest being 829 kilometres.",
+    "example": "A specific example of counting the delay: if you see a flash and hear thunder nine seconds later, the strike was about three kilometres away.",
+    "counter": "Some researchers argue that the rubbing of ice and hail cannot fully explain how clouds build up enough charge, and that cosmic rays may help to trigger the spark.",
+    "scope": "You asked about lightning. I explained what causes it, how hot and how common it is, and where it happens most.",
+    "unsure": "I am unsure exactly how a bolt chooses its path to the ground, because the final few metres are still being studied with high-speed cameras."
+   },
+   "exposes": {
+    "source": [
+     "c4",
+     "c6"
+    ],
+    "current": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It is a saying, not a finding. Tall buildings and towers are struck again and again, some of them dozens of times a year."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "That flash, from 2007, was the record once. Far longer ones have been certified since, including one of 829 kilometres across the central United States."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such physicist and no such measurement. The name, the place and the precise voltage were invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 9,
+   "topic": "the pyramids of Giza",
+   "brief": "The Great Pyramid of Giza was built as a tomb for the pharaoh Khufu around 2560 BC. It was originally about 146 metres tall and is a little shorter today because its smooth outer casing and capstone are gone. For roughly 3,800 years it was the tallest structure made by people, until Lincoln Cathedral in England passed it in about 1311. It contains around 2.3 million blocks of stone. It is the only one of the Seven Wonders of the Ancient World still standing. The pyramids were built by slaves. The work took exactly 20 years and 100,000 workers. A stone tablet written by the overseer Senmehy lists 4,812 oxen used to drag the blocks. Most of the stone was quarried close to the site, while the granite for the inner chambers was floated down the Nile from Aswan, about 800 kilometres to the south. The three main pyramids line up closely with the points of the compass.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The Great Pyramid was built for the pharaoh Khufu around 2560 BC."
+    },
+    {
+     "id": "c2",
+     "text": "It was the tallest structure made by people for about 3,800 years."
+    },
+    {
+     "id": "c3",
+     "text": "The pyramids were built by slaves."
+    },
+    {
+     "id": "c4",
+     "text": "The work took exactly 20 years and 100,000 workers."
+    },
+    {
+     "id": "c5",
+     "text": "A tablet by the overseer Senmehy lists 4,812 oxen used to drag blocks."
+    },
+    {
+     "id": "c6",
+     "text": "It is the only one of the Seven Wonders still standing."
+    },
+    {
+     "id": "c7",
+     "text": "It contains around 2.3 million blocks of stone."
+    },
+    {
+     "id": "c8",
+     "text": "Granite for the inner chambers came from Aswan, far to the south."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates and sizes come from archaeological surveys. The 20 years and 100,000 workers come from the Greek writer Herodotus, who was repeating stories two thousand years after the event, and modern estimates are much lower. I cannot find any tablet by an overseer called Senmehy.",
+    "current": "One statement reflects an older view. For a long time people thought slaves built the pyramids. Excavations since the 1990s found the workers' town, their bakeries and their own tombs beside the pyramids, and historians now describe them as paid and fed labourers.",
+    "example": "A specific example of the precision: the sides of the Great Pyramid's base differ in length by only a few centimetres over 230 metres.",
+    "counter": "Some people argue that calling it only a tomb is too simple, since the pyramid was also a statement of the king's power and a centre for his cult long after he died.",
+    "scope": "You asked about the pyramids of Giza, and I covered who built the largest one, when, and what it is made of.",
+    "unsure": "I am unsure exactly how the upper blocks were raised, since ramps of several shapes have been proposed and none is proven."
+   },
+   "exposes": {
+    "current": [
+     "c3"
+    ],
+    "source": [
+     "c4",
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Historians believed this for a long time. Digs since the 1990s uncovered the workers' own town, bakeries and honoured tombs, which show they were paid and fed labourers."
+    },
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Those numbers come from a Greek writer who visited 2,000 years later. Modern estimates of the workforce are far lower, around 20,000 to 30,000, and nobody knows the exact time."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no tablet and no overseer called Senmehy. The name and the tidy count of oxen were invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 10,
+   "topic": "the printing press",
+   "brief": "Around 1450 a goldsmith called Johannes Gutenberg set up a printing press in the German city of Mainz. He combined several ideas: small metal letters that could be rearranged and reused, an oily ink that stuck to metal, and a screw press like the ones used for making wine. His most famous book, the Gutenberg Bible, was finished around 1455. About 180 copies were printed and fewer than 50 survive. Printing with movable type was not new. A Chinese craftsman called Bi Sheng had made type from baked clay about four centuries earlier, and a Korean book was printed with metal type in 1377. Gutenberg died a very rich man. His first printed sheet, dated 3 March 1449, is kept at the Vienna Type Museum. Printing made books so cheap that within ten years almost everyone in Europe could read. By 1500, presses in Europe had already turned out millions of books.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Gutenberg set up his press in Mainz around 1450."
+    },
+    {
+     "id": "c2",
+     "text": "About 180 copies of the Gutenberg Bible were printed."
+    },
+    {
+     "id": "c3",
+     "text": "Bi Sheng made movable type from baked clay centuries earlier."
+    },
+    {
+     "id": "c4",
+     "text": "Gutenberg died a very rich man."
+    },
+    {
+     "id": "c5",
+     "text": "His first printed sheet, dated 3 March 1449, is kept in Vienna."
+    },
+    {
+     "id": "c6",
+     "text": "Within ten years almost everyone in Europe could read."
+    },
+    {
+     "id": "c7",
+     "text": "A Korean book was printed with metal type in 1377."
+    },
+    {
+     "id": "c8",
+     "text": "His press was adapted from a screw press used for making wine."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates and the Bible figures come from library records. I have no evidence that Gutenberg became rich. Court papers show he lost a lawsuit to his backer and gave up his workshop. I also cannot find a sheet dated 3 March 1449 or a Vienna Type Museum.",
+    "current": "Yes. These events are more than five hundred years old and the account has not changed in any important way.",
+    "example": "A specific example of reusable type: once a page had been printed, the same metal letters were taken apart and set again for the next page.",
+    "counter": "The weakest claim is that nearly everyone could read within ten years. I took the fact that books became cheaper and ignored everything else. Most Europeans could not read for several more centuries, because reading needs teaching, and few children went to school.",
+    "scope": "You asked about the printing press. I described how it worked, who built it and what came before it.",
+    "unsure": "I am not sure exactly what Gutenberg's first press looked like, because no drawing of it survives from his lifetime."
+   },
+   "exposes": {
+    "source": [
+     "c4",
+     "c5"
+    ],
+    "counter": [
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The records point the other way. Gutenberg lost a lawsuit to his financial backer, had to hand over his workshop, and lived modestly at the end of his life."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "No such sheet exists and there is no Vienna Type Museum. The exact date was invented to sound convincing."
+    },
+    "c6": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "Cheaper books are only one part of the story. Most people still could not read for centuries, because learning to read took schooling that few could get."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 11,
+   "topic": "the Wright brothers' first flight",
+   "brief": "On 17 December 1903, near Kitty Hawk in North Carolina, Orville Wright made the first powered, controlled flight in an aeroplane. It lasted 12 seconds and covered about 37 metres. The brothers took turns and flew four times that day. The longest flight, by Wilbur, lasted 59 seconds. Orville and Wilbur ran a bicycle shop in Dayton, Ohio, and paid for their experiments themselves. They built their own wind tunnel to test wing shapes, and their mechanic, Charlie Taylor, built the engine because no manufacturer could supply one light enough. A local reporter called Edna Halloway photographed the first flight. The next morning the story was on the front page of every major newspaper in America. The original aircraft is on display at the Science Museum in London. The brothers chose Kitty Hawk for its steady winds and its soft sand, which made crash landings less risky. Their aircraft was built mostly of spruce wood and cotton cloth.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Orville made the first flight on 17 December 1903."
+    },
+    {
+     "id": "c2",
+     "text": "The first flight lasted 12 seconds."
+    },
+    {
+     "id": "c3",
+     "text": "A local reporter called Edna Halloway photographed the first flight."
+    },
+    {
+     "id": "c4",
+     "text": "The story was on every major front page the next morning."
+    },
+    {
+     "id": "c5",
+     "text": "The original aircraft is on display at the Science Museum in London."
+    },
+    {
+     "id": "c6",
+     "text": "The brothers ran a bicycle shop in Dayton, Ohio."
+    },
+    {
+     "id": "c7",
+     "text": "Their mechanic, Charlie Taylor, built the engine."
+    },
+    {
+     "id": "c8",
+     "text": "The longest flight that day lasted 59 seconds."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The date, the times and the distances come from the brothers' own notebooks and telegram. The photograph was actually taken by John Daniels of the lifesaving station, so I cannot support the name Edna Halloway. And I assumed the newspapers covered it. In fact very few did, and those that did got the details wrong.",
+    "current": "One detail is long out of date. The aircraft was in the Science Museum in London from 1928, but it returned to the United States in 1948. It now hangs in the Smithsonian's National Air and Space Museum in Washington.",
+    "example": "A specific example of their testing: in the wind tunnel they tried about two hundred small wing shapes before choosing one.",
+    "counter": "Some historians point out that others had flown gliders and even hopped in powered machines earlier, so the Wrights' claim rests on the flight being powered, controlled and sustained all at once.",
+    "scope": "You asked about the Wright brothers' first flight, and I described the day, the aircraft and how they prepared for it.",
+    "unsure": "I am not certain exactly how strong the wind was during each of the four flights, because the readings were taken by hand."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c4"
+    ],
+    "current": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There was no reporter called Edna Halloway. The famous photograph was taken by John Daniels, a member of the nearby lifesaving crew who had never used a camera before."
+    },
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It sounds likely, but it did not happen. Most newspapers ignored the flight or printed a garbled version, and the brothers were little known for years."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "It was lent to the Science Museum in London in 1928, but it went back to the United States in 1948 and has been in the Smithsonian in Washington ever since."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 12,
+   "topic": "the ancient Olympic Games",
+   "brief": "The ancient Olympic Games were held at Olympia in Greece, and by tradition the first took place in 776 BC. They came round every four years, as they do now. At the beginning there was only one event, a sprint of about 192 metres called the stadion. Later Games added longer races, wrestling, boxing, chariot racing and the pentathlon. Only free Greek men could compete, and they did so without clothes. The winner of each event received a wreath of olive leaves. Athletes competed purely for honour, since that wreath was the only prize. Exactly 45,000 spectators attended every Games. A runner called Kallides of Thera won the sprint at nine Games in a row. The Games carried on for more than a thousand years until a Roman emperor ended them in about AD 393. They were revived in Athens in 1896, largely through the efforts of a Frenchman, Pierre de Coubertin.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "By tradition the first Games took place in 776 BC."
+    },
+    {
+     "id": "c2",
+     "text": "At the beginning the only event was a sprint called the stadion."
+    },
+    {
+     "id": "c3",
+     "text": "Athletes competed purely for honour, since a wreath was the only prize."
+    },
+    {
+     "id": "c4",
+     "text": "Exactly 45,000 spectators attended every Games."
+    },
+    {
+     "id": "c5",
+     "text": "Kallides of Thera won the sprint at nine Games in a row."
+    },
+    {
+     "id": "c6",
+     "text": "The winner of each event received a wreath of olive leaves."
+    },
+    {
+     "id": "c7",
+     "text": "A Roman emperor ended the Games in about AD 393."
+    },
+    {
+     "id": "c8",
+     "text": "The Games were revived in Athens in 1896."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates and events come from ancient lists of winners and from digs at Olympia. The figure of 45,000 is only a modern estimate of how many the stadium could hold. Nobody counted. I cannot find a runner called Kallides of Thera in any list of victors.",
+    "current": "Yes. These are events from the ancient world, and the outline has been agreed by historians for a long time.",
+    "example": "A specific example of a later event is the pentathlon, which combined running, jumping, discus, javelin and wrestling.",
+    "counter": "The strongest objection is to the idea that athletes competed only for honour. I mentioned the olive wreath and left out the rest. A winner's home city often gave him money, free meals for life and a statue, so victory could make a man rich.",
+    "scope": "You asked about the ancient Olympic Games. I covered where and when they were held, the events and how they ended.",
+    "unsure": "I am unsure whether 776 BC is the true starting date, since it comes from a list drawn up centuries later."
+   },
+   "exposes": {
+    "counter": [
+     "c3"
+    ],
+    "source": [
+     "c4",
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "The wreath was the only prize handed out at Olympia, but that is half the picture. Winners went home to cash rewards, free meals for life and statues from their own cities."
+    },
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The stadium could hold roughly that many, which is an estimate from its size. Nobody counted the crowd, and it cannot have been the same at every Games for a thousand years."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "No such runner is recorded. The name and the nine victories were invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 13,
+   "topic": "the Rosetta Stone",
+   "brief": "The Rosetta Stone is a broken slab of dark stone found in 1799 by French soldiers near the Egyptian town of Rashid, which Europeans called Rosetta. It carries the same announcement written three times: in Egyptian hieroglyphs, in an everyday Egyptian script called Demotic, and in Ancient Greek. The text is a decree issued in 196 BC in the name of the young king Ptolemy V. Because scholars could already read Greek, the stone gave them a way into the two Egyptian scripts. The Frenchman Jean-Francois Champollion announced that he had worked out the hieroglyphs in 1822. He cracked the code entirely on his own. The stone is the oldest piece of writing ever found. In 1998 Dr Paul Renner found a fourth script, in Phoenician, on the back. The stone weighs about 760 kilograms and has been in the British Museum in London since 1802. It is one of the most visited objects in the whole museum.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "French soldiers found the stone in 1799."
+    },
+    {
+     "id": "c2",
+     "text": "It carries the same text in three different scripts."
+    },
+    {
+     "id": "c3",
+     "text": "The text is a decree issued in 196 BC."
+    },
+    {
+     "id": "c4",
+     "text": "Champollion cracked the code entirely on his own."
+    },
+    {
+     "id": "c5",
+     "text": "The stone is the oldest piece of writing ever found."
+    },
+    {
+     "id": "c6",
+     "text": "Dr Paul Renner found a fourth script on the back in 1998."
+    },
+    {
+     "id": "c7",
+     "text": "Champollion announced his breakthrough in 1822."
+    },
+    {
+     "id": "c8",
+     "text": "It has been in the British Museum since 1802."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The discovery, the date of the decree and the museum record are well documented. I have no basis for calling it the oldest writing. The earliest known writing is about three thousand years older than the stone. And I cannot find a Dr Paul Renner. The back of the stone is rough and has no writing on it.",
+    "current": "Yes. The stone is still in the British Museum, and the story of its decipherment has not changed.",
+    "example": "A specific example of how it helped: the name Ptolemy appears in Greek and, ringed by an oval, in hieroglyphs, which let scholars match signs to sounds.",
+    "counter": "The fairest objection is to saying Champollion did it alone. I picked the famous name. Thomas Young had already identified several signs and shown that royal names were written by sound, and Champollion built on that.",
+    "scope": "You asked about the Rosetta Stone. I described what it is, what is written on it and how it was used.",
+    "unsure": "I am unsure how large the complete slab once was, since the top and one corner are missing."
+   },
+   "exposes": {
+    "counter": [
+     "c4"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "Champollion made the final breakthrough, but giving him all the credit leaves others out. The English scholar Thomas Young had already worked out several signs and shown that royal names were spelled by sound."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It is a guess that sounds right because the stone is famous. Writing is about 3,000 years older than the stone, which dates from 196 BC."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "The back of the stone is rough and blank. There is no Dr Paul Renner and no Phoenician text."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 14,
+   "topic": "the first Moon landing",
+   "brief": "The first people to land on the Moon were the crew of Apollo 11, on 20 July 1969. Neil Armstrong stepped out first, followed by Buzz Aldrin, while Michael Collins stayed in orbit in the command module. The two men spent about two and a half hours walking on the surface. They collected 21.5 kilograms of rock and dust to bring home, and they set up experiments, including a reflector that scientists still bounce lasers off to measure the distance to the Moon. Armstrong's first words were written for him by a NASA poet called Harold Vance. The flag they planted is still standing upright today. In all, twelve people have walked on the Moon, the last of them in December 1972. Only two countries have ever landed a spacecraft softly on the Moon. The journey from Earth took about three days, and the computer that guided the landing had less memory than a modern pocket calculator.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Apollo 11 landed on 20 July 1969."
+    },
+    {
+     "id": "c2",
+     "text": "Michael Collins stayed in orbit while the others landed."
+    },
+    {
+     "id": "c3",
+     "text": "Armstrong's first words were written by a NASA poet called Harold Vance."
+    },
+    {
+     "id": "c4",
+     "text": "The flag they planted is still standing upright today."
+    },
+    {
+     "id": "c5",
+     "text": "Scientists still bounce lasers off a reflector the crew left behind."
+    },
+    {
+     "id": "c6",
+     "text": "Only two countries have ever landed a spacecraft softly on the Moon."
+    },
+    {
+     "id": "c7",
+     "text": "Twelve people have walked on the Moon."
+    },
+    {
+     "id": "c8",
+     "text": "The crew brought back 21.5 kilograms of rock and dust."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates, the rock samples and the reflector are in NASA's mission records. There was no NASA poet called Harold Vance, and Armstrong said the words were his own. As for the flag, I assumed it. Aldrin said he saw it knocked over during take-off, so I cannot claim it is upright.",
+    "current": "One statement has been overtaken. For decades only the United States and the Soviet Union had landed softly on the Moon. China did so in 2013, India in 2023 and Japan in 2024.",
+    "example": "A specific example of the reflector in use: timing a laser pulse there and back shows the Moon is drifting away from Earth by nearly four centimetres a year.",
+    "counter": "Some people argue that robot probes could have collected the same rocks for far less money, so the main value of sending people was to prove it could be done.",
+    "scope": "You asked about the first Moon landing, and I covered the crew, what they did on the surface and what they left behind.",
+    "unsure": "I am unsure of the exact spot where the landing craft's top half finally crashed, since it was left in orbit and never tracked."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c4"
+    ],
+    "current": [
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "NASA had no such poet. Armstrong said he chose the words himself after landing. The name was made up."
+    },
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Nobody knows that. Aldrin reported seeing the flag blown over by the rocket blast when they took off, and no later picture shows it standing."
+    },
+    "c6": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "That was true until 2013. Since then China, India and Japan have all made soft landings."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 15,
+   "topic": "the football World Cup",
+   "brief": "The men's football World Cup was first played in 1930 in Uruguay, and the hosts won it. It has been held every four years since, apart from 1942 and 1946, when it was cancelled. Brazil won the trophy in 1958, 1962, 1970, 1994 and 2002. The 2022 final in Qatar was one of the most dramatic: Argentina and France drew 3-3, and Argentina won on penalties. Thirty-two teams take part in the finals. The top scorer in World Cup history is Ronaldo of Brazil, with 15 goals. The host nation has won six times, so playing at home more or less guarantees the trophy. The trophy itself is made of solid gold and stands about 37 centimetres tall, and winning teams take home a gold-plated copy while the original stays with the organisers. The final is one of the most watched events on Earth, with an audience of well over a billion people.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The first World Cup was played in Uruguay in 1930, and the hosts won."
+    },
+    {
+     "id": "c2",
+     "text": "Brazil won the trophy in 1958, 1962, 1970, 1994 and 2002."
+    },
+    {
+     "id": "c3",
+     "text": "Thirty-two teams take part in the finals."
+    },
+    {
+     "id": "c4",
+     "text": "The top scorer in World Cup history is Ronaldo of Brazil, with 15 goals."
+    },
+    {
+     "id": "c5",
+     "text": "Hosts have won six times, so playing at home more or less guarantees it."
+    },
+    {
+     "id": "c6",
+     "text": "Argentina won the 2022 final against France on penalties."
+    },
+    {
+     "id": "c7",
+     "text": "The tournament was cancelled in 1942 and 1946."
+    },
+    {
+     "id": "c8",
+     "text": "Winning teams take home a gold-plated copy of the trophy."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The winners, scores and dates come from the tournament's official records, and the height of the trophy is published by the organisers.",
+    "current": "Two things I said are out of date. Miroslav Klose of Germany passed Ronaldo in 2014, when he scored his 16th World Cup goal. And the finals grew from 32 teams to 48 starting with the 2026 tournament.",
+    "example": "A specific example of home advantage working is England in 1966, who won their only World Cup at Wembley Stadium in London.",
+    "counter": "The strongest argument is against my claim about hosts. I counted the six times a host won and ignored the rest. In most tournaments the host has not won.",
+    "scope": "You asked about the football World Cup. I covered its history, its records and the trophy itself.",
+    "unsure": "I am unsure how many people really watch the final, because viewing figures are estimates and are counted in different ways."
+   },
+   "exposes": {
+    "current": [
+     "c3",
+     "c4"
+    ],
+    "counter": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Thirty-two teams was the format from 1998 to 2022. From the 2026 tournament the finals have 48 teams."
+    },
+    "c4": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Ronaldo held the record until 2014, when Miroslav Klose of Germany scored his 16th World Cup goal."
+    },
+    "c5": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "Six home wins sounds like a lot until you count the other tournaments. Hosts have failed to win far more often than they have won."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 16,
+   "topic": "chess",
+   "brief": "Chess grew out of a game called chaturanga, played in India about 1,500 years ago. It spread through Persia and the Arab world to Europe, where the rules slowly changed. The queen, once a weak piece, became the most powerful one in the fifteenth century. White always moves first. The number of possible chess games is so large that it is greater than the number of atoms in the observable universe. The first official world champion was Wilhelm Steinitz, who won the title in 1886. In 1997 a computer called Deep Blue beat the world champion Garry Kasparov in a six-game match. That result shows computers are now smarter than people. Magnus Carlsen of Norway is the reigning world champion. The youngest grandmaster in history is Sergey Karjakin, who earned the title at 12 years and 7 months. A game can end in a draw in several ways, including stalemate, where the player to move has no legal move but is not in check.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Chess grew out of an Indian game called chaturanga."
+    },
+    {
+     "id": "c2",
+     "text": "The queen became the most powerful piece in the fifteenth century."
+    },
+    {
+     "id": "c3",
+     "text": "There are more possible games than atoms in the observable universe."
+    },
+    {
+     "id": "c4",
+     "text": "Deep Blue's win shows computers are now smarter than people."
+    },
+    {
+     "id": "c5",
+     "text": "Magnus Carlsen of Norway is the reigning world champion."
+    },
+    {
+     "id": "c6",
+     "text": "Sergey Karjakin is the youngest grandmaster in history."
+    },
+    {
+     "id": "c7",
+     "text": "Deep Blue beat Garry Kasparov in a match in 1997."
+    },
+    {
+     "id": "c8",
+     "text": "Wilhelm Steinitz became the first official world champion in 1886."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The history comes from standard accounts of the game, and the size of the game tree is a well known estimate made by the mathematician Claude Shannon in 1950.",
+    "current": "Two records have moved on. Magnus Carlsen chose not to defend his title in 2023. Ding Liren won it, and in December 2024 Gukesh Dommaraju became champion. Karjakin's record as youngest grandmaster was beaten in 2021 by Abhimanyu Mishra, at 12 years and 4 months.",
+    "example": "A specific example of stalemate: a lone king in the corner with no safe square to move to, but not under attack, draws the game on the spot.",
+    "counter": "The claim I would challenge is that Deep Blue shows computers are smarter than people. I took one narrow contest and treated it as the whole of intelligence. Deep Blue could do nothing except play chess.",
+    "scope": "You asked about chess. I covered where it came from, how the rules changed and some of its records.",
+    "unsure": "I am unsure exactly when chaturanga began, because the earliest clear descriptions were written some time after people started playing it."
+   },
+   "exposes": {
+    "counter": [
+     "c4"
+    ],
+    "current": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "One narrow skill was picked to stand for all thinking. A chess program cannot hold a conversation, tie a shoelace or even learn a different board game without being rebuilt."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Carlsen gave up the title in 2023 without defending it. Ding Liren of China won it that year, and Gukesh Dommaraju of India took it in December 2024."
+    },
+    "c6": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Karjakin held that record for 19 years. In 2021 Abhimanyu Mishra of the United States became a grandmaster at 12 years and 4 months."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 17,
+   "topic": "the Wimbledon tennis championships",
+   "brief": "Wimbledon is the oldest tennis tournament in the world. It was first held in 1877 at a croquet club in south-west London, and only 22 men entered. It is still played on grass, the surface the game began on. Players must dress almost entirely in white, a rule that goes back to the nineteenth century. The longest match in tennis history was played there in 2010, when John Isner beat Nicolas Mahut after 11 hours and 5 minutes spread over three days. Final sets have no tie-break, so they continue until one player leads by two games. Line calls are made by human line judges. The 1931 final had to be replayed after the umpire, Cecil Darnley, lost the scorecard. Martina Navratilova won the women's singles nine times, a record. Spectators famously eat strawberries and cream, and a roof over Centre Court has let play continue in the rain since 2009.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Wimbledon was first held in 1877."
+    },
+    {
+     "id": "c2",
+     "text": "Players must dress almost entirely in white."
+    },
+    {
+     "id": "c3",
+     "text": "Final sets have no tie-break and go on until someone leads by two games."
+    },
+    {
+     "id": "c4",
+     "text": "Line calls are made by human line judges."
+    },
+    {
+     "id": "c5",
+     "text": "The 1931 final was replayed after umpire Cecil Darnley lost the scorecard."
+    },
+    {
+     "id": "c6",
+     "text": "The longest match lasted 11 hours and 5 minutes over three days."
+    },
+    {
+     "id": "c7",
+     "text": "Martina Navratilova won the women's singles nine times."
+    },
+    {
+     "id": "c8",
+     "text": "Centre Court has had a roof since 2009."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates and records come from the tournament's own history. I cannot find any umpire called Cecil Darnley or any replayed final. In 1931 the men's final was never played, because one finalist withdrew with an injury.",
+    "current": "Two rules have changed. The marathon match of 2010 led to a final-set tie-break being introduced in 2019, and since 2022 it is played at six games all. And from 2025 the line judges were replaced by an electronic line-calling system.",
+    "example": "A specific example of the white clothing rule: players have been asked to change shoes because the soles were a bright colour.",
+    "counter": "Some players argue that grass is an outdated surface, because the bounce is low and uneven and very few other tournaments still use it.",
+    "scope": "You asked about Wimbledon. I covered its history, its rules and its most famous records.",
+    "unsure": "I am not sure exactly how many strawberries are eaten each year, since the figures quoted vary widely."
+   },
+   "exposes": {
+    "current": [
+     "c3",
+     "c4"
+    ],
+    "source": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "That was the rule when Isner and Mahut played. Since 2019 a tie-break has settled the final set, and since 2022 it is played at six games all."
+    },
+    "c4": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Line judges worked at Wimbledon for 147 years, but from 2025 an electronic system makes every line call."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "Nothing of the kind happened. In 1931 the final was not even played, because one finalist was injured. The umpire and the lost scorecard were invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 18,
+   "topic": "basketball",
+   "brief": "Basketball was invented in December 1891 by James Naismith, a teacher in Springfield, Massachusetts, who needed an indoor game to keep his students busy in winter. He nailed two peach baskets to a balcony rail and wrote out thirteen rules. The first game ended with a score of 1-0. Someone had to climb a ladder to fetch the ball after every basket until the bottoms were cut out. The hoop is ten feet, or 3.05 metres, above the floor, the height of that original balcony. The league now called the NBA began in 1946, and it added the three-point line in 1979. In 1962 Wilt Chamberlain scored 100 points in a single game, a record that still stands. Kareem Abdul-Jabbar is the NBA's all-time leading scorer. A 1903 rule added by the referee Walter Brandt let a goalkeeper stand under the basket. Scientists have shown that the perfect shot always leaves the hand at exactly 45 degrees.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "James Naismith invented basketball in December 1891."
+    },
+    {
+     "id": "c2",
+     "text": "The first game ended with a score of 1-0."
+    },
+    {
+     "id": "c3",
+     "text": "The hoop is ten feet above the floor."
+    },
+    {
+     "id": "c4",
+     "text": "Kareem Abdul-Jabbar is the NBA's all-time leading scorer."
+    },
+    {
+     "id": "c5",
+     "text": "A 1903 rule by the referee Walter Brandt allowed a goalkeeper under the basket."
+    },
+    {
+     "id": "c6",
+     "text": "Scientists have shown the perfect shot always leaves at exactly 45 degrees."
+    },
+    {
+     "id": "c7",
+     "text": "Wilt Chamberlain scored 100 points in one game in 1962."
+    },
+    {
+     "id": "c8",
+     "text": "The NBA added the three-point line in 1979."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "Naismith's own account gives the date, the baskets and the thirteen rules. I cannot find a referee called Walter Brandt or any goalkeeper rule. On the angle, studies give a range of roughly 45 to 55 degrees depending on the shooter, so exactly 45 for everyone is not supported.",
+    "current": "One record has fallen. Kareem Abdul-Jabbar was the leading scorer from 1984 until February 2023, when LeBron James passed him.",
+    "example": "A specific example of how the early game differed: players could not dribble at first, and had to pass the ball from the spot where they caught it.",
+    "counter": "Some coaches argue that the three-point line has made the game less varied, because teams now take so many long shots that skilful play close to the basket has declined.",
+    "scope": "You asked about basketball. I described how it was invented and a few of its rules and records.",
+    "unsure": "I am unsure who scored the single basket in the first game, since accounts written later do not all agree."
+   },
+   "exposes": {
+    "current": [
+     "c4"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "He held the record for almost 39 years. LeBron James passed him in February 2023."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "Basketball has never had a goalkeeper rule, and there was no referee called Walter Brandt. Both were invented."
+    },
+    "c6": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "There is no single perfect angle. The best one depends on the player's height and distance from the hoop, and studies put it anywhere from about 45 to 55 degrees."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 19,
+   "topic": "the Amazon River",
+   "brief": "The Amazon carries more water than any other river on Earth. About a fifth of all the river water that reaches the oceans flows out of its mouth. It begins high in the Andes of Peru and crosses Brazil to the Atlantic, a journey of well over 6,000 kilometres. The Amazon is definitely the longest river in the world, longer than the Nile. In the rainy season the river spreads into the forest and parts of it become tens of kilometres wide. Remarkably, there is not a single bridge across the main river along its whole length. Its waters are home to pink river dolphins, giant otters and piranhas. The rainforest around it produces 20 percent of the world's oxygen. The explorer Henrik Solberg swam the entire length of the river in 1987. More than a thousand smaller rivers feed into the Amazon, and several of those are themselves over 1,500 kilometres long.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The Amazon carries more water than any other river."
+    },
+    {
+     "id": "c2",
+     "text": "About a fifth of the river water reaching the oceans comes from it."
+    },
+    {
+     "id": "c3",
+     "text": "The Amazon is definitely the longest river in the world."
+    },
+    {
+     "id": "c4",
+     "text": "There is no bridge across the main river anywhere along its length."
+    },
+    {
+     "id": "c5",
+     "text": "The rainforest around it produces 20 percent of the world's oxygen."
+    },
+    {
+     "id": "c6",
+     "text": "The explorer Henrik Solberg swam its entire length in 1987."
+    },
+    {
+     "id": "c7",
+     "text": "It begins high in the Andes of Peru."
+    },
+    {
+     "id": "c8",
+     "text": "Pink river dolphins live in its waters."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The flow figures come from river surveys. On length, most sources list the Nile as slightly longer, and a few put the Amazon first depending on where the source is taken to be, so I should not have said \"definitely\". The 20 percent oxygen figure is widely repeated but is not supported, because the forest consumes nearly all the oxygen it produces. I cannot find a Henrik Solberg. The swimmer who did it was Martin Strel, in 2007.",
+    "current": "Yes, as far as I know. There is still no bridge over the main channel, and the river's size has not changed.",
+    "example": "A specific example of its size: at the mouth, the fresh water pushes so far out to sea that sailors can drink from the ocean while out of sight of land.",
+    "counter": "Some geographers argue that ranking rivers by length is pointless, because a river has no single obvious starting point and the answer changes with the method.",
+    "scope": "You asked about the Amazon River, and I described its size, its course and what lives in it.",
+    "unsure": "I am not sure how many species of fish live in the Amazon, since hundreds of new ones have been described in recent years."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Most measurements make the Nile a little longer. A few studies put the Amazon ahead, depending on where you say each river starts. It is an open argument, so \"definitely\" is not earned."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It is a figure that gets repeated a great deal, but it does not hold. The forest uses up nearly all the oxygen it makes, so its net contribution is close to zero."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such explorer. A real swimmer, Martin Strel, did swim the Amazon, but in 2007. The name and the year here were made up."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 20,
+   "topic": "the Sahara",
+   "brief": "The Sahara is the largest hot desert in the world. It covers about nine million square kilometres of northern Africa, an area close to the size of the United States. It is not the largest desert of all, because Antarctica is drier and bigger. People often picture endless dunes, but sand covers only about a quarter of the Sahara. The rest is bare rock, gravel plains and mountains. Days are fiercely hot, yet at night the temperature can fall close to freezing, because dry air holds very little heat. The Sahara was not always a desert. Around six thousand years ago it was green, with lakes, grassland and hippos. It will be green again in exactly 15,000 years. In 2018 snow fell on the dunes near the Algerian town of Ain Sefra, which shows the desert is getting colder. The tallest dune, measured by the surveyor Idris Malouf in 1992, is 1,430 metres high.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The Sahara is the largest hot desert in the world."
+    },
+    {
+     "id": "c2",
+     "text": "Antarctica is a larger desert than the Sahara."
+    },
+    {
+     "id": "c3",
+     "text": "Sand covers only about a quarter of the Sahara."
+    },
+    {
+     "id": "c4",
+     "text": "The Sahara will be green again in exactly 15,000 years."
+    },
+    {
+     "id": "c5",
+     "text": "Snow fell near Ain Sefra in 2018, which shows the desert is getting colder."
+    },
+    {
+     "id": "c6",
+     "text": "The tallest dune, measured by Idris Malouf in 1992, is 1,430 metres high."
+    },
+    {
+     "id": "c7",
+     "text": "Around six thousand years ago the Sahara was green, with lakes."
+    },
+    {
+     "id": "c8",
+     "text": "At night the temperature can fall close to freezing."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The area and the share of sand come from geographical surveys. The green Sahara is known from lake beds and rock art. The return of a green Sahara depends on slow changes in the Earth's tilt, and the timing is only approximate, so I have no basis for exactly 15,000 years. I cannot find a surveyor called Idris Malouf, and the tallest dunes are only a few hundred metres high.",
+    "current": "Yes. The size and make-up of the desert have not changed in any way that would alter what I said.",
+    "example": "A specific example of the green Sahara: rock paintings in the middle of the desert show people swimming and herding cattle.",
+    "counter": "The weakest claim is about the snow. I chose one unusual morning and called it a trend. Snow has fallen there a handful of times, but temperature records for the Sahara show it getting warmer, not colder.",
+    "scope": "You asked about the Sahara. I described its size, what it is made of and how it has changed over time.",
+    "unsure": "I am unsure exactly where the Sahara's southern edge lies, because it shifts from year to year with the rains."
+   },
+   "exposes": {
+    "source": [
+     "c4",
+     "c6"
+    ],
+    "counter": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The Sahara does swing between wet and dry as the Earth's tilt slowly wobbles, but the timing is only roughly known and is being changed by today's climate. An exact year is a guess."
+    },
+    "c5": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "One snowy morning was picked out. A single cold snap says nothing about the trend, and long records show the Sahara has been warming."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such surveyor and no dune anywhere near that tall. The highest Saharan dunes are a few hundred metres."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 21,
+   "topic": "whether anyone lives in Antarctica",
+   "brief": "Antarctica is the coldest, windiest and driest continent. The lowest temperature ever measured on the ground, minus 89.2 degrees Celsius, was recorded at the Vostok research station in 1983. About 90 percent of the world's ice is there, in a sheet that is more than four kilometres thick in places. The first people to reach the South Pole were a Norwegian team led by Roald Amundsen, in December 1911. Under a treaty signed in 1959, the continent is set aside for peaceful science and belongs to no country. Along the coasts, penguins gather in colonies of hundreds of thousands, and seals rest on the ice. So the answer to the question is yes, because millions of penguins make their home there. A town called Port Halvorsen has 900 year-round residents and its own primary school. In winter, polar bears hunt along the coast. Scientists drill deep into the ice to study air trapped hundreds of thousands of years ago.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The lowest ground temperature ever measured was minus 89.2 degrees, at Vostok."
+    },
+    {
+     "id": "c2",
+     "text": "About 90 percent of the world's ice is in Antarctica."
+    },
+    {
+     "id": "c3",
+     "text": "Roald Amundsen's team reached the South Pole first, in December 1911."
+    },
+    {
+     "id": "c4",
+     "text": "The answer to the question is yes, because millions of penguins live there."
+    },
+    {
+     "id": "c5",
+     "text": "A town called Port Halvorsen has 900 year-round residents and a primary school."
+    },
+    {
+     "id": "c6",
+     "text": "In winter, polar bears hunt along the coast."
+    },
+    {
+     "id": "c7",
+     "text": "A treaty signed in 1959 sets the continent aside for science."
+    },
+    {
+     "id": "c8",
+     "text": "Scientists drill into the ice to study air trapped long ago."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The temperature record, the ice figures and the treaty are well documented by polar research institutes. I cannot find a Port Halvorsen anywhere. Antarctica has research stations and no town of that size. I also had no source for the polar bears, and they live only in the Arctic.",
+    "current": "Yes. The temperature record still stands and the treaty is still in force.",
+    "example": "A specific example of the ice drilling: one core reached ice that fell as snow about 800,000 years ago.",
+    "counter": "Some people argue that the treaty will not last, because the continent may hold valuable minerals and countries could one day want to mine them.",
+    "scope": "Not really. You asked whether anyone lives there, meaning people, and I answered with penguins. Nobody lives in Antarctica permanently. Between about 1,000 and 5,000 scientists and support staff stay at research stations for months at a time.",
+    "unsure": "I am unsure how thick the ice is at its deepest point, because parts of the continent have still not been fully surveyed by radar."
+   },
+   "exposes": {
+    "scope": [
+     "c4"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "scope_drift",
+     "probe": "scope",
+     "why": "The question was about people. Penguins answer a different question, whether anything lives there. Nobody lives in Antarctica permanently. Between about 1,000 and 5,000 researchers stay for a season at a time."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no Port Halvorsen. Antarctica has research stations, and no town of that size. The name and the numbers were invented."
+    },
+    "c6": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It sounds right for an icy place, but polar bears live only in the Arctic, at the other end of the Earth."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 22,
+   "topic": "the world's tallest buildings",
+   "brief": "For most of history the tallest thing people had built was the Great Pyramid of Giza. Church spires took over in the Middle Ages, and then came iron and steel. The Eiffel Tower, finished in 1889, was the tallest structure in the world until the Chrysler Building in New York passed it in 1930. A year later the Empire State Building opened with 102 floors, and it kept the title of tallest building for about forty years. Tall buildings became possible because of two inventions: the steel frame, which carries the weight instead of the walls, and the safety lift. The tallest building in the world is Taipei 101 in Taiwan. The Jeddah Tower in Saudi Arabia will open in 2028 and will be exactly 1,008 metres tall. In 2014 the engineer Marta Lindqvist proved that no tower can ever be built higher than 1,600 metres. Very tall towers are designed to sway slightly in the wind.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The Eiffel Tower was the tallest structure in the world until 1930."
+    },
+    {
+     "id": "c2",
+     "text": "The Empire State Building opened with 102 floors."
+    },
+    {
+     "id": "c3",
+     "text": "The steel frame carries a tall building's weight instead of its walls."
+    },
+    {
+     "id": "c4",
+     "text": "The tallest building in the world is Taipei 101 in Taiwan."
+    },
+    {
+     "id": "c5",
+     "text": "The Jeddah Tower will open in 2028 and be exactly 1,008 metres tall."
+    },
+    {
+     "id": "c6",
+     "text": "Marta Lindqvist proved in 2014 that no tower can exceed 1,600 metres."
+    },
+    {
+     "id": "c7",
+     "text": "The Empire State Building was the tallest for about forty years."
+    },
+    {
+     "id": "c8",
+     "text": "Very tall towers are designed to sway slightly in the wind."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates and heights of finished buildings come from the body that keeps the official records for tall buildings. For the Jeddah Tower I only have the developer's plans. Work stopped for several years, so the opening year and final height are not settled. I cannot find an engineer called Marta Lindqvist or any proof of a 1,600 metre limit.",
+    "current": "One statement is out of date. Taipei 101 was the tallest building from 2004 to 2010. Since 2010 the record has belonged to the Burj Khalifa in Dubai, which is 828 metres tall.",
+    "example": "A specific example of swaying: the top of a very tall tower can move a metre or more in a strong wind, and a heavy weight hung inside helps to steady it.",
+    "counter": "Some architects argue that the race for height is wasteful, because the upper floors of the very tallest towers are too narrow to use and exist mainly to win the record.",
+    "scope": "You asked about the world's tallest buildings. I traced how the record passed from one structure to the next and why tall buildings became possible.",
+    "unsure": "I am unsure how to compare towers fairly, since some counts include spires and antennas and others do not."
+   },
+   "exposes": {
+    "current": [
+     "c4"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Taipei 101 was the tallest from 2004 until 2010, when the Burj Khalifa in Dubai opened at 828 metres."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The tower is planned to be at least a kilometre tall, but building stopped for years and the finishing date has slipped many times. The year and the exact height are hopes, not facts."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such engineer and no such proof. Engineers disagree about how high a tower could go."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 23,
+   "topic": "goldfish",
+   "brief": "Goldfish were first bred in China more than a thousand years ago from a dull-coloured wild carp. Keepers picked out the rare orange ones and bred them until the colour became normal. A goldfish has a memory of three seconds. Goldfish can see more colours than people can, including ultraviolet light. They have no stomach, so food passes straight into a long intestine, which is why they seem to be hungry all the time. In a pond a goldfish can grow to more than 30 centimetres long. They can also live a surprisingly long time: the oldest on record, a fish called Tish, reached 43. In 2012 the Kyoto Fish Lab taught a goldfish called Miso to count to nine. A goldfish kept in the dark turns completely white within a week. Goldfish have no eyelids, so they cannot close their eyes, and they rest by hovering quietly near the bottom of the tank.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Goldfish were first bred in China more than a thousand years ago."
+    },
+    {
+     "id": "c2",
+     "text": "A goldfish has a memory of three seconds."
+    },
+    {
+     "id": "c3",
+     "text": "Goldfish can see ultraviolet light."
+    },
+    {
+     "id": "c4",
+     "text": "Goldfish have no stomach."
+    },
+    {
+     "id": "c5",
+     "text": "The Kyoto Fish Lab taught a goldfish called Miso to count to nine in 2012."
+    },
+    {
+     "id": "c6",
+     "text": "A goldfish kept in the dark turns completely white within a week."
+    },
+    {
+     "id": "c7",
+     "text": "The oldest goldfish on record, Tish, reached 43."
+    },
+    {
+     "id": "c8",
+     "text": "Goldfish have no eyelids."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The breeding history and the age record are documented. The three second memory is a saying, and tests show the opposite: goldfish remember tasks for months. I cannot find a Kyoto Fish Lab or a fish called Miso. On colour, goldfish may fade slowly in darkness over a long time, and I have no source for a week.",
+    "current": "Yes. Nothing I said about goldfish depends on recent events.",
+    "example": "A specific example of their eyesight: goldfish can be trained to swim to a card of one colour and ignore cards of another.",
+    "counter": "Some fish keepers argue that goldfish are a poor choice as a first pet, because they grow large and live far longer than most people expect.",
+    "scope": "You asked about goldfish. I described where they came from, how their bodies work and how long they live.",
+    "unsure": "I am unsure how well a goldfish can hear, because fish sense sound partly through their whole body and it is hard to measure."
+   },
+   "exposes": {
+    "source": [
+     "c2",
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c2": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It is a popular saying with nothing behind it. In experiments goldfish remember how to push a lever or find their way through a maze for months."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no Kyoto Fish Lab and no counting goldfish called Miso. The lab, the fish and the year were invented."
+    },
+    "c6": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Goldfish can slowly lose some colour without light, over many weeks or months. A complete change in a week was stated with far more confidence than the evidence allows."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 24,
+   "topic": "the QWERTY keyboard",
+   "brief": "The QWERTY layout is named after the first six letters on the top row. It was worked out in the early 1870s by Christopher Latham Sholes, a newspaper man from Milwaukee who was building one of the first practical typewriters. He sold the design to the Remington company, which began selling typewriters in 1874. Early machines had metal arms that could collide and jam. QWERTY was designed to slow typists down. Sholes tested 4,000 different layouts with the help of his niece, Clara Benton. A rival layout was patented in 1936 by August Dvorak, who put the most common letters on the middle row. One study from 1944 found Dvorak typists were faster, which proves Dvorak is the better layout. You can type the word typewriter using only the top row of letters. QWERTY spread from typewriters to computers and then to phones, even though none of them has arms that can jam.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Christopher Latham Sholes worked out the layout in the early 1870s."
+    },
+    {
+     "id": "c2",
+     "text": "Remington began selling typewriters with it in 1874."
+    },
+    {
+     "id": "c3",
+     "text": "QWERTY was designed to slow typists down."
+    },
+    {
+     "id": "c4",
+     "text": "Sholes tested 4,000 layouts with the help of his niece, Clara Benton."
+    },
+    {
+     "id": "c5",
+     "text": "A 1944 study found Dvorak typists faster, which proves Dvorak is better."
+    },
+    {
+     "id": "c6",
+     "text": "August Dvorak patented a rival layout in 1936."
+    },
+    {
+     "id": "c7",
+     "text": "The word typewriter can be typed using only the top row."
+    },
+    {
+     "id": "c8",
+     "text": "Early typewriters had metal arms that could collide and jam."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The dates and the sale to Remington are in patent and company records. The idea that QWERTY was meant to slow typists is a popular story with no document behind it. The likelier aim was to separate letters that are often typed together. I cannot find a Clara Benton or any count of 4,000 layouts.",
+    "current": "Yes. The history has not changed, and QWERTY is still the standard layout for English.",
+    "example": "A specific example of separating letter pairs: T and H, the most common pair in English, sit on different rows and are struck by different hands.",
+    "counter": "The weakest thing I said was about the 1944 study. I picked the one that favoured Dvorak, and it was run by Dvorak himself. Independent tests in later years found the two layouts roughly equal, so it proves nothing.",
+    "scope": "You asked about the QWERTY keyboard, and I covered who designed it, why, and what competed with it.",
+    "unsure": "I am unsure which changes to the layout were made by Sholes and which by Remington's engineers before the first sale."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c4"
+    ],
+    "counter": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It is a story told so often that it sounds settled. The evidence suggests the aim was to keep commonly paired letters apart so the arms did not jam, and some historians think telegraph operators shaped it. Nobody recorded a plan to slow people down."
+    },
+    "c4": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no record of a niece called Clara Benton or of 4,000 layouts. Sholes changed the layout a number of times, and that is all that is known."
+    },
+    "c5": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "One favourable study was chosen, and it was run by Dvorak himself. Later independent tests found little or no difference between the two layouts."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 25,
+   "topic": "tea",
+   "brief": "Every true tea comes from the leaves of one plant, a shrub called Camellia sinensis. Green, black, white and oolong teas are not different plants. The difference is in how the leaves are treated after picking, and above all in how long they are left to darken in the air. Drinks made from mint or chamomile are not really tea at all, since they contain no tea leaves. After water, tea is the most widely drunk beverage in the world, and China grows more of it than any other country. Tea was discovered in exactly 2737 BC, when leaves blew into a pot of water being boiled for the emperor Shennong. Britain drinks more tea per person than any other country. The first tea bag factory was opened in Leeds in 1899 by Hannah Whitlow. Tea bags became popular after about 1908, when a New York merchant, Thomas Sullivan, sent out samples in small silk pouches.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Every true tea comes from the plant Camellia sinensis."
+    },
+    {
+     "id": "c2",
+     "text": "Green and black tea differ in how the leaves are treated, not in the plant."
+    },
+    {
+     "id": "c3",
+     "text": "Tea was discovered in exactly 2737 BC by the emperor Shennong."
+    },
+    {
+     "id": "c4",
+     "text": "Britain drinks more tea per person than any other country."
+    },
+    {
+     "id": "c5",
+     "text": "The first tea bag factory was opened in Leeds in 1899 by Hannah Whitlow."
+    },
+    {
+     "id": "c6",
+     "text": "After water, tea is the most widely drunk beverage in the world."
+    },
+    {
+     "id": "c7",
+     "text": "Mint and chamomile drinks contain no tea leaves."
+    },
+    {
+     "id": "c8",
+     "text": "Thomas Sullivan sent out tea samples in silk pouches around 1908."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The botany is standard, and the production figures come from the United Nations food agency. The Shennong story is a legend, so I should not have given it a date. On drinking, the figures I can find put Turkey first and Ireland ahead of Britain. I cannot find a Hannah Whitlow or a tea bag factory in Leeds.",
+    "current": "Yes. China is still the largest grower, and the way tea is made has not changed.",
+    "example": "A specific example of treatment: green tea leaves are heated soon after picking to stop them darkening, while black tea leaves are rolled and left to darken fully.",
+    "counter": "Some growers argue that sorting tea into a few colours hides more than it shows, because the hillside, the weather and the season change the taste as much as the processing does.",
+    "scope": "You asked about tea. I explained what it is made from, how the types differ and where tea bags came from.",
+    "unsure": "I am unsure how many cups of tea are drunk each day worldwide, since the estimates I have seen differ by billions."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c4",
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "That is a legend, and the emperor himself may be a legend too. Nobody knows when or how tea was first drunk. A story was given a precise date and stated as fact."
+    },
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "It fits the picture people have of Britain, but the figures do not agree. People in Turkey drink the most tea per person, and Ireland is also ahead of Britain."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no record of a Hannah Whitlow or of a tea bag factory in Leeds in 1899. The person, the place and the date were made up."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 26,
+   "topic": "rainbows",
+   "brief": "A rainbow appears when sunlight shines into falling rain. Each drop bends the light as it enters, reflects it off the back of the drop and bends it again on the way out. Different colours bend by slightly different amounts, so white light is spread into a band. A rainbow is always on the opposite side of the sky from the Sun, which is why you see one with the Sun behind you. A rainbow has exactly seven colours. Seen from an aeroplane, a rainbow can be a complete circle, because the ground no longer cuts off the bottom half. In a double rainbow the second bow is fainter and its colours run in the opposite order. The longest-lasting rainbow on record shone for six hours over Sheffield in England in 1994. In 2009 Dr Mirela Costa photographed a triangular rainbow over Lisbon. No two people ever see exactly the same rainbow, because each eye catches light from different drops.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Each raindrop bends the light, reflects it and bends it again."
+    },
+    {
+     "id": "c2",
+     "text": "A rainbow is always on the opposite side of the sky from the Sun."
+    },
+    {
+     "id": "c3",
+     "text": "A rainbow has exactly seven colours."
+    },
+    {
+     "id": "c4",
+     "text": "From an aeroplane a rainbow can be a complete circle."
+    },
+    {
+     "id": "c5",
+     "text": "The longest-lasting rainbow on record shone for six hours over Sheffield."
+    },
+    {
+     "id": "c6",
+     "text": "Dr Mirela Costa photographed a triangular rainbow over Lisbon in 2009."
+    },
+    {
+     "id": "c7",
+     "text": "In a double rainbow the second bow has its colours in the opposite order."
+    },
+    {
+     "id": "c8",
+     "text": "No two people see exactly the same rainbow."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The bending and reflecting inside raindrops is standard physics. The number seven comes from Isaac Newton, who chose it when he named the colours. The band itself is continuous, so exactly seven is a convention, not a measurement. I cannot find a Dr Mirela Costa, and a triangular rainbow is not physically possible.",
+    "current": "One record is old. The six hour rainbow over Sheffield in 1994 was beaten in 2017 by one over Taipei that lasted nearly nine hours.",
+    "example": "A specific example you can try: with the Sun low behind you, spray a fine mist from a garden hose and a small rainbow will appear in the spray.",
+    "counter": "Some people argue that it is misleading to call a rainbow a thing at all, since it has no position in space and moves whenever the observer moves.",
+    "scope": "You asked about rainbows. I explained how they form, where they appear and a few unusual kinds.",
+    "unsure": "I am unsure how often a third bow can be seen, because it is extremely faint and has only been photographed a few times."
+   },
+   "exposes": {
+    "source": [
+     "c3",
+     "c6"
+    ],
+    "current": [
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "A rainbow is a smooth spread of colour with no edges between the bands. Seven is the number Isaac Newton chose to name. Many people can pick out more shades, and some cultures name fewer."
+    },
+    "c5": {
+     "type": "out_of_date",
+     "probe": "current",
+     "why": "Six hours over Sheffield was the record from 1994. In 2017 a rainbow over Taipei was recorded for just under nine hours."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "A rainbow cannot be a triangle, because of how round drops bend light. There is no Dr Mirela Costa and no such photograph."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 27,
+   "topic": "sharks",
+   "brief": "Sharks have been swimming in the oceans for about 450 million years, which makes them older than trees. A shark has no bones. Its skeleton is made of cartilage, the same bendy material as the tip of your nose. Sharks grow new teeth all their lives and may get through thousands of them. The largest fish in the sea is a shark, the whale shark, which eats tiny plankton. The Greenland shark may live for 250 years or more, longer than any other animal with a backbone. Sharks can sense the faint electricity given off by living things. Sharks must keep swimming or they die. Sharks never sleep. A study by Dr Oskar Lind in 2011 measured a shark smelling a single drop of blood from ten kilometres away. In 2003 and 2004 a tagged great white shark nicknamed Nicole swam from South Africa to Australia and back again, a round trip of about 20,000 kilometres.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Sharks are older than trees."
+    },
+    {
+     "id": "c2",
+     "text": "A shark's skeleton is made of cartilage, not bone."
+    },
+    {
+     "id": "c3",
+     "text": "Sharks must keep swimming or they die."
+    },
+    {
+     "id": "c4",
+     "text": "Sharks never sleep."
+    },
+    {
+     "id": "c5",
+     "text": "Dr Oskar Lind measured a shark smelling one drop of blood from ten kilometres."
+    },
+    {
+     "id": "c6",
+     "text": "The Greenland shark may live for 250 years or more."
+    },
+    {
+     "id": "c7",
+     "text": "A great white nicknamed Nicole swam from South Africa to Australia and back."
+    },
+    {
+     "id": "c8",
+     "text": "The largest fish in the sea is the whale shark."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The age of sharks, their cartilage and the Greenland shark's lifespan come from fossil and tagging studies. I cannot find a Dr Oskar Lind or any measurement of ten kilometres. Sharks smell well, but over hundreds of metres. On sleep, researchers have recorded restful states in several species, so I had no grounds to say never.",
+    "current": "Yes. These facts about sharks are long established and have not been overturned.",
+    "example": "A specific example of the electric sense: a shark will bite at a buried metal plate giving off a tiny current, mistaking it for a hidden fish.",
+    "counter": "The claim I would challenge is that sharks must keep swimming. I took what is true of a few fast species and applied it to all of them. Nurse sharks and many others rest on the bottom and pump water across their gills.",
+    "scope": "You asked about sharks. I described how old they are, how their bodies work and how far they travel.",
+    "unsure": "I am unsure exactly how old the oldest Greenland sharks are, because the dating method gives a range of more than a century."
+   },
+   "exposes": {
+    "counter": [
+     "c3"
+    ],
+    "source": [
+     "c4",
+     "c5"
+    ]
+   },
+   "flawed": {
+    "c3": {
+     "type": "cherry_picked",
+     "probe": "counter",
+     "why": "It is true of some sharks, such as the great white, and it was stretched to cover all of them. Many kinds, like nurse sharks, lie still on the sea bed and pump water over their gills."
+    },
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Sharks have been seen in still, restful states, and whether that counts as sleep is still being studied. \"Never\" is a guess."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such study. A shark's sense of smell is good, but it works over hundreds of metres at most, and the scientist and the figure were invented."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 28,
+   "topic": "volcanoes",
+   "brief": "A volcano is an opening in the Earth's crust where molten rock, ash and gas escape. Below ground the molten rock is called magma, and once it reaches the surface it is called lava. Lava is usually between 700 and 1,200 degrees Celsius. About three quarters of the world's active volcanoes lie around the edge of the Pacific Ocean, in a belt known as the Ring of Fire. When Krakatoa in Indonesia exploded in 1883, the sound was heard about 4,800 kilometres away. Scientists can now predict the exact day a volcano will erupt. Yellowstone is overdue and will erupt within the next hundred years. In 1977 the geologist Rosa Menendez walked across a lava lake in special boots. The tallest volcano we know of is not on Earth at all: Olympus Mons on Mars is about 22 kilometres high. Pumice, a rock formed from frothy lava, is so full of bubbles that it floats on water.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Molten rock is called magma below ground and lava at the surface."
+    },
+    {
+     "id": "c2",
+     "text": "About three quarters of active volcanoes lie around the Pacific."
+    },
+    {
+     "id": "c3",
+     "text": "Krakatoa's 1883 explosion was heard about 4,800 kilometres away."
+    },
+    {
+     "id": "c4",
+     "text": "Scientists can now predict the exact day a volcano will erupt."
+    },
+    {
+     "id": "c5",
+     "text": "Yellowstone is overdue and will erupt within the next hundred years."
+    },
+    {
+     "id": "c6",
+     "text": "The geologist Rosa Menendez walked across a lava lake in 1977."
+    },
+    {
+     "id": "c7",
+     "text": "Olympus Mons on Mars is about 22 kilometres high."
+    },
+    {
+     "id": "c8",
+     "text": "Pumice is so full of bubbles that it floats on water."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The temperatures, the Ring of Fire and Krakatoa are in standard geology references. Prediction is much weaker than I made it sound: scientists can see warning signs but cannot name a day. Volcanoes are never overdue, and the people who monitor Yellowstone rate a big eruption as extremely unlikely in any given century. I cannot find a Rosa Menendez, and crossing a lava lake on foot is not possible.",
+    "current": "Yes. None of the measurements I gave have changed.",
+    "example": "A specific example of the Ring of Fire: Japan alone has more than a hundred active volcanoes.",
+    "counter": "Some geologists argue that the word active is too loose, because a volcano that last erupted thousands of years ago may be counted as active in one list and dormant in another.",
+    "scope": "You asked about volcanoes. I explained what they are, where most of them are and gave some records.",
+    "unsure": "I am unsure how many volcanoes are erupting under the sea at any moment, since most of the ocean floor is not watched."
+   },
+   "exposes": {
+    "source": [
+     "c4",
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Scientists can often tell that a volcano is becoming restless, from small earthquakes, swelling ground and gas. They cannot name the day, and some eruptions still come with little warning."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "Volcanoes do not run to a timetable, so \"overdue\" means nothing. The scientists who monitor Yellowstone put the chance of a large eruption in any given year at far below one in a hundred thousand."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "Nobody can walk on a lava lake, in any boots. There is no geologist of that name with such a feat on record."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 29,
+   "topic": "whether it is quicker to fly or take the train from London to Paris",
+   "brief": "London and Paris are about 340 kilometres apart in a straight line. Since 1994 a railway tunnel under the sea has joined Britain and France. The Channel Tunnel is about 50 kilometres long, and 38 kilometres of it are under the seabed, the longest undersea stretch of any tunnel. High-speed trains run from the middle of London to the middle of Paris in roughly two hours and twenty minutes, reaching 300 kilometres an hour. A passenger jet cruises at around 850 kilometres an hour, and the flight itself takes little more than an hour. Flying is the quicker way to make this trip, because a plane travels about three times as fast as the train. In 2019 a race organised by the traveller Tom Hadley timed the plane at two hours and five minutes from door to door. The train is always exactly on time. Both airports serving the route are well outside the city centres, and air passengers must arrive early for security checks.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "The Channel Tunnel opened in 1994."
+    },
+    {
+     "id": "c2",
+     "text": "The tunnel is about 50 kilometres long."
+    },
+    {
+     "id": "c3",
+     "text": "The train takes roughly two hours and twenty minutes, centre to centre."
+    },
+    {
+     "id": "c4",
+     "text": "Flying is quicker for this trip, because a plane is about three times as fast."
+    },
+    {
+     "id": "c5",
+     "text": "A 2019 race by Tom Hadley timed the plane at 2 hours 5 minutes door to door."
+    },
+    {
+     "id": "c6",
+     "text": "The train is always exactly on time."
+    },
+    {
+     "id": "c7",
+     "text": "The flight itself takes little more than an hour."
+    },
+    {
+     "id": "c8",
+     "text": "The trains reach 300 kilometres an hour."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The tunnel's length and opening date come from its operator, and the train times are from the published timetable. I cannot find any race run by a Tom Hadley, and the door to door comparisons I can find put the plane at around four hours. I also had no grounds for saying the train is always on time. No railway is.",
+    "current": "Yes. The tunnel and the timetable are much as I described them.",
+    "example": "A specific example of the train's speed: on the French side it covers the 300 kilometres or so from the coast to Paris in about an hour and a half.",
+    "counter": "Some travellers argue that price matters more than time, and that a cheap flight can be worth the extra hours.",
+    "scope": "No. You asked which is quicker for the trip, and I answered which vehicle moves faster. Counting the journey to the airport, the wait for security and the ride into the city at the other end, flying usually takes about four hours, against two hours twenty by train.",
+    "unsure": "I am unsure how often the trains are delayed in a typical month, because the figures change from year to year."
+   },
+   "exposes": {
+    "scope": [
+     "c4"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c4": {
+     "type": "scope_drift",
+     "probe": "scope",
+     "why": "The question was about the whole trip. Top speed answers a different one. Once you add travel to the airport, security and the ride into the city, the journey by air usually takes longer than the train."
+    },
+    "c5": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no record of this race or of a traveller called Tom Hadley. Real door to door comparisons put the plane at around four hours."
+    },
+    "c6": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "No railway is always exactly on time. It was said with a certainty nobody could have."
+    }
+   }
+  }
+ },
+ {
+  "public": {
+   "number": 30,
+   "topic": "why the sea is salty",
+   "brief": "Seawater tastes salty because it has minerals dissolved in it. The sea is salty because it contains about 35 grams of salt in every litre. Most of that salt is sodium chloride, the same substance as table salt. Rain is very slightly acidic, and over a long time it wears away rocks on land. Rivers carry the dissolved minerals down to the sea. When the Sun warms the ocean, water evaporates but the minerals stay behind, so they have built up over an immense span of time. Hot springs on the sea floor add more minerals from inside the Earth. Rivers contain the same minerals, but in such small amounts that we cannot taste them. The oceans were fresh water until about one million years ago. In 1998 the oceanographer Dr Peter Lang calculated that the sea gets two percent saltier every century. Some enclosed lakes with no outlet, where water can only leave by evaporating, are far saltier than the ocean.",
+   "seconds": 300,
+   "probes": [
+    {
+     "id": "source",
+     "question": "How do you know that?"
+    },
+    {
+     "id": "current",
+     "question": "Is that still true?"
+    },
+    {
+     "id": "example",
+     "question": "Give me a specific example."
+    },
+    {
+     "id": "counter",
+     "question": "What is the strongest argument against this?"
+    },
+    {
+     "id": "scope",
+     "question": "Did you answer what I actually asked?"
+    },
+    {
+     "id": "unsure",
+     "question": "What are you unsure about here?"
+    }
+   ],
+   "claims": [
+    {
+     "id": "c1",
+     "text": "Most of the salt in the sea is sodium chloride."
+    },
+    {
+     "id": "c2",
+     "text": "The sea is salty because it contains about 35 grams of salt in every litre."
+    },
+    {
+     "id": "c3",
+     "text": "Rain slowly wears away rocks, and rivers carry the minerals to the sea."
+    },
+    {
+     "id": "c4",
+     "text": "When seawater evaporates, the minerals stay behind."
+    },
+    {
+     "id": "c5",
+     "text": "The oceans were fresh water until about one million years ago."
+    },
+    {
+     "id": "c6",
+     "text": "Dr Peter Lang calculated in 1998 that the sea gets two percent saltier a century."
+    },
+    {
+     "id": "c7",
+     "text": "Hot springs on the sea floor add more minerals."
+    },
+    {
+     "id": "c8",
+     "text": "Lakes with no outlet can be far saltier than the ocean."
+    }
+   ]
+  },
+  "answer": {
+   "replies": {
+    "source": "The salt content and the role of rivers and sea-floor springs come from standard ocean science. I have nothing to support a date of one million years, and the oceans have in fact been salty for billions of years. I also cannot find a Dr Peter Lang or any sign that the sea is getting steadily saltier.",
+    "current": "Yes. The saltiness of the sea changes far too slowly for any of this to be out of date.",
+    "example": "A specific example of evaporation leaving salt behind: in shallow coastal pans, seawater is left to dry in the sun and the salt is raked up from the bottom.",
+    "counter": "Some scientists argue that sea-floor springs matter as much as rivers do, so describing rivers as the main source tells only part of the story.",
+    "scope": "Only partly. You asked why the sea is salty, and one of my sentences just said how salty it is, which explains nothing. The real answer is the part about rivers bringing in minerals and evaporation leaving them behind.",
+    "unsure": "I am unsure how much of the sea's salt comes from sea-floor springs compared with rivers, because estimates differ."
+   },
+   "exposes": {
+    "scope": [
+     "c2"
+    ],
+    "source": [
+     "c5",
+     "c6"
+    ]
+   },
+   "flawed": {
+    "c2": {
+     "type": "scope_drift",
+     "probe": "scope",
+     "why": "The question was why. This says how much, which only restates that the sea is salty. The reason is that rivers have carried minerals in for an immense time while evaporation leaves them behind."
+    },
+    "c5": {
+     "type": "confident_guess",
+     "probe": "source",
+     "why": "The oceans have been salty for billions of years. A recent date was stated with nothing to support it."
+    },
+    "c6": {
+     "type": "fabricated",
+     "probe": "source",
+     "why": "There is no such calculation and no oceanographer of that name on record. The sea's saltiness has stayed roughly steady for a very long time."
+    }
+   }
+  }
+ }
+]

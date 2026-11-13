@@ -58,7 +58,10 @@ void main() {
         );
       }
     }
-    expect(seen, dailyGames.map((g) => g.id).toSet());
+    expect(seen, {
+      for (final g in dailyGames)
+        if (g.id != anchorGameId) g.id,
+    }, reason: 'everything but the anchor rotates');
     expect(gameCatalog.map((g) => g.id).toSet().length, gameCatalog.length);
     for (final g in gameCatalog) {
       expect(g.section, isA<LearningSection>());

@@ -222,4 +222,12 @@ const discoveries = <Discovery>[
     category: 'Thinking',
     icon: Icons.fact_check_rounded,
   ),
+  Discovery(
+    id: 'fluent_not_right',
+    title: 'Fluent is not the same as right',
+    fact:
+        'A confident, well written answer can still hold a made-up name, an old number or a guess. Asking “How do you know that?” is the quickest way to find out which.',
+    category: 'Thinking',
+    icon: Icons.fact_check_rounded,
+  ),
 ];

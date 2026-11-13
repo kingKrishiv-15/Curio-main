@@ -65,6 +65,7 @@ const gameRewards = <String, GameReward>{
   'memory_grid': GameReward(80, 'Memory', 'memory_chunks'),
   'word_trails': GameReward(80, 'English', 'context_clues'),
   'crowns': GameReward(100, 'Reasoning', 'elimination'),
+  'second_opinion': GameReward(120, 'Evidence', 'fluent_not_right'),
 };
 
 final _dateSuffix = RegExp(r'_[0-9]{8}$');
