@@ -95,9 +95,7 @@ void main() {
     await tester.pumpWidget(play(SequencePage(date: day), state));
     final d = DailyPick.dayNumber(day);
     for (var i = 0; i < 3; i++) {
-      final round = SequenceRound(
-        sequenceBank[(d * 3 + i) % sequenceBank.length],
-      );
+      final round = SequenceRound(sequenceRulesForDay(d)[i]);
       await tester.enterText(
         find.byKey(const Key('sequence_input')),
         '${round.target}',

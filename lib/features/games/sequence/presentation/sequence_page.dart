@@ -42,12 +42,7 @@ class _SequencePageState extends State<SequencePage> {
 
   List<SequenceRound> _newRounds() {
     final day = DailyPick.dayNumber(widget.date) + _practiceShift;
-    return [
-      for (var i = 0; i < _roundsPerDay; i++)
-        SequenceRound(
-          sequenceBank[(day * _roundsPerDay + i) % sequenceBank.length],
-        ),
-    ];
+    return [for (final rule in sequenceRulesForDay(day)) SequenceRound(rule)];
   }
 
   @override

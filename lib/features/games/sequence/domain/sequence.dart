@@ -236,3 +236,74 @@ final sequenceBank = <SequenceRule>[
     terms: _build(8, (i, t) => i == 0 ? 384 : t.last ~/ 2),
   ),
 ];
+
+/// The three rules for [day], generated so no two days in a long run share
+/// a set: an add-or-subtract rule, a growing-gaps rule, then either a
+/// "sum of the two before" or a "multiply then add" rule. Negative days
+/// (practice) fold back onto the same families.
+List<SequenceRule> sequenceRulesForDay(int day) {
+  final d = day.abs();
+  return [
+    _stepRule(d),
+    _gapRule(d),
+    d.isEven ? _sumRule(d ~/ 2) : _affineRule(d ~/ 2),
+  ];
+}
+
+SequenceRule _stepRule(int i) {
+  const steps = [3, 4, 6, 7, 8, 9, 11, 12, 13, -3, -4, -6, -7];
+  final step = steps[i % steps.length];
+  final block = i ~/ steps.length;
+  final start = step > 0 ? 2 + block * 5 + i % 4 : 120 + block * 9 + i % 4;
+  return SequenceRule(
+    name: step > 0 ? 'Add $step' : 'Take away ${-step}',
+    explanation: step > 0
+        ? 'Each number is $step more than the one before.'
+        : 'Each number is ${-step} less than the one before.',
+    terms: _build(8, (n, t) => n == 0 ? start : t.last + step),
+  );
+}
+
+SequenceRule _gapRule(int i) {
+  final a = 1 + i % 3;
+  final b = (i ~/ 3) % 4;
+  final c = i ~/ 12;
+  return SequenceRule(
+    name: 'Growing gaps',
+    explanation:
+        'The gap between numbers grows by ${2 * a} each time, so each jump is ${2 * a} bigger than the last.',
+    terms: _build(8, (n, t) => a * (n + 1) * (n + 1) + b * (n + 1) + c),
+  );
+}
+
+SequenceRule _sumRule(int i) {
+  final first = 1 + i % 6;
+  final second = first + 1 + i ~/ 6;
+  return SequenceRule(
+    name: 'Add the two before',
+    explanation:
+        'Each number is the sum of the two before it, starting from $first and $second.',
+    terms: _build(
+      9,
+      (n, t) => n == 0
+          ? first
+          : n == 1
+          ? second
+          : t[n - 1] + t[n - 2],
+    ),
+  );
+}
+
+SequenceRule _affineRule(int i) {
+  const adds = [1, -1, 2, 3, -2];
+  final times = 2 + i % 2;
+  final add = adds[(i ~/ 2) % adds.length];
+  final start = 3 + i ~/ 10;
+  final change = add > 0 ? 'add $add' : 'take away ${-add}';
+  return SequenceRule(
+    name: times == 2 ? 'Double, then $change' : 'Times 3, then $change',
+    explanation:
+        'Multiply each number by $times, then $change, to get the next.',
+    terms: _build(7, (n, t) => n == 0 ? start : t.last * times + add),
+  );
+}
