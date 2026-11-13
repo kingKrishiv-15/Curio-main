@@ -28,15 +28,18 @@ enum Probe {
 
 /// The five ways a claim can fail.
 enum Flaw {
-  fabricated('fabricated', 'Fabricated'),
-  confidentGuess('confident_guess', 'Confident guess'),
-  outOfDate('out_of_date', 'Out of date'),
-  scopeDrift('scope_drift', 'Scope drift'),
-  cherryPicked('cherry_picked', 'Cherry-picked');
+  fabricated('fabricated', 'Fabricated', 'was fabricated'),
+  confidentGuess('confident_guess', 'Confident guess', 'was a confident guess'),
+  outOfDate('out_of_date', 'Out of date', 'was out of date'),
+  scopeDrift('scope_drift', 'Scope drift', 'drifted from the question'),
+  cherryPicked('cherry_picked', 'Cherry-picked', 'was cherry-picked');
 
-  const Flaw(this.id, this.label);
+  const Flaw(this.id, this.label, this.phrase);
   final String id;
   final String label;
+
+  /// Completes "This claim ..." in the debrief.
+  final String phrase;
 
   static Flaw byId(String? id) =>
       values.firstWhere((f) => f.id == id, orElse: () => Flaw.fabricated);
@@ -158,16 +161,16 @@ class SecondOpinionVerdict {
   /// The teaching line for one flawed claim: what was asked against what
   /// would have caught it.
   String lesson(FlawedClaim claim) {
-    final kind = claim.flaw.label.toLowerCase();
     final catcher = '"${claim.catcher.question}"';
+    final what = 'This claim ${claim.flaw.phrase}';
     if (asked.contains(claim.catcher)) {
-      return 'You asked $catcher, and that is the question that exposes a $kind claim.';
+      return '$what. You asked $catcher, which is the question that exposes it.';
     }
     if (asked.isEmpty) {
-      return 'You asked nothing. $catcher would have exposed this $kind claim.';
+      return '$what. You asked nothing, and $catcher would have exposed it.';
     }
     final first = '"${asked.first.question}"';
-    return 'You asked $first. This claim was $kind, and $catcher would have exposed it.';
+    return 'You asked $first. $what, and $catcher would have exposed it.';
   }
 }
 

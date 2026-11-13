@@ -41,7 +41,7 @@ class CurioTokens extends ThemeExtension<CurioTokens> {
   // Elevation: 2. shadowRaised belongs to one element per screen.
   static const shadowNone = <BoxShadow>[];
   static const shadowRaised = <BoxShadow>[
-    BoxShadow(color: Color(0x73000000), blurRadius: 32, offset: Offset(0, 16)),
+    BoxShadow(color: Color(0x59000000), blurRadius: 24, offset: Offset(0, 8)),
   ];
 
   // Spacing: one scale.

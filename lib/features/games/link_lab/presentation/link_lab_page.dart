@@ -295,7 +295,7 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = CurioTokens.wrong;
+    final coral = CurioTokens.accent;
     final surface = CurioTokens.surface;
     final outline = CurioTokens.border;
     final ink = CurioTokens.textPrimary;

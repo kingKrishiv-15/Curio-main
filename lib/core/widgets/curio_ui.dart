@@ -287,10 +287,7 @@ class PrimaryButton extends StatelessWidget {
       child: FilledButton.icon(
         onPressed: onPressed,
         icon: icon == null ? const SizedBox.shrink() : Icon(icon, size: 18),
-        label: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(label),
-        ),
+        label: Text(label),
         style: color == null
             ? null
             : FilledButton.styleFrom(backgroundColor: color),

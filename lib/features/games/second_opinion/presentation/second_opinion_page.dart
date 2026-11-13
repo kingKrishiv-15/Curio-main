@@ -544,7 +544,17 @@ class _Debrief extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Text(share, key: const Key('so_share'), style: CurioTokens.bodySmall),
+        Text(
+          share,
+          key: const Key('so_share'),
+          style: CurioTokens.bodySmall.copyWith(
+            fontFamilyFallback: const [
+              'Segoe UI Emoji',
+              'Apple Color Emoji',
+              'Noto Color Emoji',
+            ],
+          ),
+        ),
         const SizedBox(height: 32),
         Semantics(
           header: true,

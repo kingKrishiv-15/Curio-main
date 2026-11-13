@@ -131,8 +131,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final (eyebrow, title, subtitle) = switch (_step) {
       0 => (
         'Meet your explorer',
-        'Who’s exploring with Curio?',
-        'What should Nova call them? A nickname is perfect, there’s no need for a real name.',
+        'Who is playing?',
+        'A nickname is enough. There is no need for a real name.',
       ),
       1 => (
         'A gentle rhythm',
@@ -209,7 +209,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       height: 22,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_step == _steps - 1 ? 'Start exploring' : 'Continue'),
+                  : Text(_step == _steps - 1 ? 'Start' : 'Continue'),
             ),
             const SizedBox(height: 8),
             if (_step > 0)
@@ -230,8 +230,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _nameStep() => Column(
     children: [
-      const CurioLogoMark(size: 104),
-      const SizedBox(height: 24),
       Form(
         key: _nameForm,
         child: TextFormField(
@@ -510,7 +508,7 @@ class _StepBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = CurioTokens.wrong;
+    final coral = CurioTokens.accent;
     final idle = CurioTokens.border;
     return Semantics(
       label: 'Setup step ${step + 1} of $count',
@@ -519,7 +517,7 @@ class _StepBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'STEP ${step + 1} OF $count',
+            'Step ${step + 1} of $count',
             style: Theme.of(
               context,
             ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w800),
@@ -570,7 +568,7 @@ class _ChoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = CurioTokens.wrong;
+    final coral = CurioTokens.accent;
     final surface = CurioTokens.surface;
     final outline = CurioTokens.border;
     final muted = CurioTokens.textSecondary;
