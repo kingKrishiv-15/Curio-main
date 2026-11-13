@@ -16,15 +16,25 @@ class GameReward {
   final bool dated;
 }
 
-/// Skills tracked within the four learning sections, in display order.
-const learningSkills = [
-  'Number sense',
-  'Patterns',
-  'Evidence',
-  'Reasoning',
-  'Memory',
-  'English',
-];
+/// Skills tracked across the learning sections, in display order.
+const learningSkills = ['Number sense', 'Patterns', 'Evidence', 'Reasoning'];
+
+/// Games removed from Curio. Their rows stay in [gameRewards] (and on the
+/// server) so XP already earned from them still counts, but nothing lists
+/// or opens them any more.
+const retiredGames = {
+  'number_hunt',
+  'odd_cluster',
+  'pattern_forge',
+  'memory_match',
+  'memory_trail',
+  'memory_grid',
+  'word_wise',
+  'word_builder',
+  'word_trails',
+  'evidence_garden',
+  'loophole',
+};
 
 const gameRewards = <String, GameReward>{
   'memory_match': GameReward(80, 'Memory', 'memory_pairs'),

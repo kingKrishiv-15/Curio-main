@@ -255,11 +255,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
   );
 
   Widget _goalStep() {
-    const options = [
-      (1, 'A quick spark', 'About 5 minutes a day'),
-      (2, 'A little adventure', 'About 10 minutes a day'),
-      (3, 'A steady habit', 'About 15 minutes a day'),
-      (4, 'The full set', 'About 20 minutes a day'),
+    final options = [
+      for (var g = 1; g <= dailyGameCount; g++)
+        (
+          g,
+          g == dailyGameCount
+              ? 'The full set'
+              : g == 1
+              ? 'One game a day'
+              : '$g games a day',
+          'About ${g * 5} minutes',
+        ),
     ];
     return Column(
       children: [
@@ -269,7 +275,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             selected: _goal == goal,
             title: title,
             detail: detail,
-            badge: goal == 3 ? 'Recommended' : null,
+            badge: goal == dailyGameCount - 1 ? 'Recommended' : null,
             leading: '$goal',
             onTap: () => setState(() => _goal = goal),
           ),

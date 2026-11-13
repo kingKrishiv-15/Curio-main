@@ -1,3 +1,5 @@
+import '../../features/games/common/daily_schedule.dart';
+
 class FamilySettings {
   const FamilySettings({
     this.dailyGoal = 3,
@@ -100,7 +102,7 @@ class FamilySettings {
   }
 
   factory FamilySettings.fromJson(Map<String, dynamic> json) => FamilySettings(
-    dailyGoal: ((json['daily_goal'] as int?) ?? 3).clamp(1, 4),
+    dailyGoal: ((json['daily_goal'] as int?) ?? 3).clamp(1, dailyGameCount),
     remindersEnabled: json['reminders_enabled'] == true,
     reminderHour: json['reminder_hour'] as int? ?? 18,
     timezone: json['timezone'] as String? ?? 'UTC',

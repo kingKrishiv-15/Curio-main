@@ -7,24 +7,15 @@ import 'cascade/presentation/cascade_page.dart';
 import 'crowns/presentation/crowns_page.dart';
 import 'common/daily_game_session.dart';
 import 'common/daily_schedule.dart';
-import 'memory/presentation/memory_page.dart';
-import 'memory_grid/presentation/memory_grid_page.dart';
-import 'english/presentation/english_page.dart';
 import 'common/game_rewards.dart';
-import 'evidence/presentation/evidence_detective_page.dart';
 import 'link_lab/presentation/link_lab_page.dart';
-import 'loophole/presentation/loophole_page.dart';
 import 'mirror/presentation/mirror_page.dart';
-import 'number_hunt/presentation/number_hunt_page.dart';
-import 'odd_cluster/presentation/odd_cluster_page.dart';
-import 'pattern/presentation/pattern_forge_page.dart';
 import 'scale/presentation/scale_page.dart';
 import 'sequence/presentation/sequence_page.dart';
 import 'signal_grid/presentation/signal_grid_page.dart';
 import 'squeeze/presentation/squeeze_page.dart';
 import 'verdict/presentation/verdict_page.dart';
 import 'whos_who/presentation/whos_who_page.dart';
-import 'word_trails/presentation/word_trails_page.dart';
 
 /// Every activity in Curio, in one place. Home, the Learn tab and Skill
 /// Quest all read from here, so a game has one name, one skill, one
@@ -66,69 +57,12 @@ class GameEntry {
 
 final gameCatalog = <GameEntry>[
   GameEntry(
-    id: 'memory_match',
-    title: 'Memory Match',
-    tagline: 'Turn over two cards. Remember where each picture is hiding.',
-    icon: Icons.style_rounded,
-    duration: '3 min',
-    builder: (date) => MemoryPage(date: date),
-  ),
-  GameEntry(
-    id: 'memory_trail',
-    title: 'Memory Trail',
-    tagline: 'Study a trail of pictures, then remember their order.',
-    icon: Icons.route_rounded,
-    duration: '3 min',
-    builder: (date) => MemoryPage(date: date, trail: true),
-  ),
-  GameEntry(
-    id: 'memory_grid',
-    title: 'Memory Grid',
-    tagline: 'Squares glow, then vanish. Tap the same ones back.',
-    icon: Icons.grid_view_rounded,
-    duration: '3 min',
-    builder: (date) => MemoryGridPage(date: date),
-  ),
-  GameEntry(
-    id: 'word_wise',
-    title: 'Word Wise',
-    tagline:
-        'Find the right word, explore its meaning and finish the sentence.',
-    icon: Icons.menu_book_rounded,
-    duration: '3 min',
-    builder: (date) => EnglishPage(date: date),
-  ),
-  GameEntry(
-    id: 'word_builder',
-    title: 'Word Builder',
-    tagline: 'Use the clue and put the letters in order to build a word.',
-    icon: Icons.abc_rounded,
-    duration: '3 min',
-    builder: (date) => EnglishPage(date: date, builder: true),
-  ),
-  GameEntry(
-    id: 'word_trails',
-    title: 'Word Trails',
-    tagline: 'Trace the story’s missing words, then say what they mean.',
-    icon: Icons.gesture_rounded,
-    duration: '3 to 4 min',
-    builder: (date) => WordTrailsPage(date: date),
-  ),
-  GameEntry(
     id: 'crowns',
     title: 'Crowns',
     tagline: 'One crown in every row, column and colour, and none touching.',
     icon: Icons.workspace_premium_rounded,
     duration: '3 to 5 min',
     builder: (date) => CrownsPage(date: date),
-  ),
-  GameEntry(
-    id: 'odd_cluster',
-    title: 'Odd Cluster',
-    tagline: 'Sixteen tiles, four hidden groups, and one of them is a trap.',
-    icon: Icons.workspaces_rounded,
-    duration: '3 to 5 min',
-    builder: (date) => OddClusterPage(date: date),
   ),
   GameEntry(
     id: 'sequence',
@@ -188,28 +122,12 @@ final gameCatalog = <GameEntry>[
     builder: (date) => WhosWhoPage(date: date),
   ),
   GameEntry(
-    id: 'loophole',
-    title: 'Loophole',
-    tagline: 'Find the one word making a true statement mislead.',
-    icon: Icons.format_quote_rounded,
-    duration: '2 min',
-    builder: (date) => LoopholePage(date: date),
-  ),
-  GameEntry(
     id: 'squeeze',
     title: 'Squeeze',
     tagline: 'Find the secret number before the range closes in.',
     icon: Icons.calculate_rounded,
     duration: '2 to 4 min',
     builder: (date) => SqueezePage(date: date),
-  ),
-  GameEntry(
-    id: 'number_hunt',
-    title: 'Number Hunt',
-    tagline: 'One number from 1 to 1,000. Ten guesses. Follow the clues.',
-    icon: Icons.travel_explore_rounded,
-    duration: '3 to 4 min',
-    builder: (date) => NumberHuntPage(date: date),
   ),
   GameEntry(
     id: 'link_lab',
@@ -226,23 +144,6 @@ final gameCatalog = <GameEntry>[
     icon: Icons.grid_view_rounded,
     duration: '4 to 6 min',
     builder: (date) => SignalGridPage(date: date),
-  ),
-  GameEntry(
-    id: 'pattern_forge',
-    title: 'Pattern Forge',
-    tagline: 'Pick the next number, name the rule, fix the broken pattern.',
-    icon: Icons.blur_on_rounded,
-    duration: '3 to 5 min',
-    builder: (date) => PatternForgePage(date: date),
-  ),
-  GameEntry(
-    id: 'evidence_garden',
-    title: 'Evidence Detective',
-    tagline:
-        'A new case each day: rank the clues before you jump to conclusions.',
-    icon: Icons.manage_search_rounded,
-    duration: '4 to 6 min',
-    builder: (date) => EvidenceDetectivePage(date: date),
   ),
   GameEntry(
     id: 'frostlands_night_1',
@@ -284,18 +185,16 @@ GameEntry featuredGame({DateTime? date}) => todaysPicks(date: date).first;
 
 IconData sectionIcon(LearningSection section) => switch (section) {
   LearningSection.maths => Icons.calculate_rounded,
-  LearningSection.memory => Icons.psychology_rounded,
-  LearningSection.english => Icons.menu_book_rounded,
   LearningSection.logic => Icons.extension_rounded,
+  LearningSection.thinking => Icons.psychology_rounded,
 };
 
 Color sectionColor(BuildContext context, LearningSection section) =>
-    skillColor(context, switch (section) {
-      LearningSection.maths => 'Number sense',
-      LearningSection.memory => 'Patterns',
-      LearningSection.english => 'Evidence',
-      LearningSection.logic => 'Reasoning',
-    });
+    switch (section) {
+      LearningSection.maths => CurioTokens.tintMaths,
+      LearningSection.logic => CurioTokens.tintLogic,
+      LearningSection.thinking => CurioTokens.tintThinking,
+    };
 
 /// The skill colours from design.md §3: number sense gold, patterns coral,
 /// evidence blue, reasoning plum.
@@ -314,10 +213,6 @@ IconData skillIcon(String skill) => switch (skill) {
   'Evidence' => Icons.manage_search_rounded,
   _ => Icons.psychology_rounded,
 };
-
-// Kept only until the games that still call them are removed in Phase 4.
-Color gameColor(String id, Color fallback) => fallback;
-Color bannerFill(BuildContext context, Color color) => CurioTokens.wash(color);
 
 /// Today's set as Home shows it: one anchor game and the rest.
 ({GameEntry anchor, List<GameEntry> others}) todaysSet({DateTime? date}) {

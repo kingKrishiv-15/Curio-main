@@ -1,13 +1,8 @@
 import 'package:curio/core/state/curio_state.dart';
 import 'package:curio/core/theme/curio_theme.dart';
 import 'package:curio/features/games/common/game_kit.dart';
-import 'package:curio/features/games/evidence/domain/evidence_cases.dart';
-import 'package:curio/features/games/evidence/presentation/evidence_detective_page.dart';
 import 'package:curio/features/games/link_lab/domain/link_lab.dart';
 import 'package:curio/features/games/link_lab/presentation/link_lab_page.dart';
-import 'package:curio/features/games/pattern/domain/pattern_forge.dart';
-import 'package:curio/features/games/pattern/presentation/pattern_forge_page.dart';
-import 'package:curio/features/games/sequence/domain/sequence.dart';
 import 'package:curio/features/story/domain/frostlands.dart';
 import 'package:curio/features/story/presentation/frostlands_story_page.dart';
 import 'package:flutter/material.dart';
@@ -73,27 +68,6 @@ Future<void> solveLinkLab(WidgetTester tester, LinkLabGame game) async {
     }
     await tap(tester, find.byKey(const Key('link_submit')));
   }
-}
-
-Future<void> solveForge(WidgetTester tester, ForgeDay forge) async {
-  for (var i = 0; i < 3; i++) {
-    final q = forge.questions[i];
-    final key = switch (q) {
-      NextQuestion(:final options, :final answer) =>
-        'forge_option_${options.indexOf(answer)}',
-      RuleQuestion(:final answer) => 'forge_option_$answer',
-      RepairQuestion(:final wrongIndex) => 'forge_number_$wrongIndex',
-    };
-    await tap(tester, find.byKey(Key(key)));
-    if (i < 2) await tap(tester, find.byKey(const Key('forge_next')));
-  }
-}
-
-Future<void> solveCase(WidgetTester tester, EvidenceCase c) async {
-  for (var i = 0; i < c.clues.length; i++) {
-    await tap(tester, find.byKey(Key('rank_${i}_${c.clues[i].rank.name}')));
-  }
-  await tap(tester, find.byKey(const Key('evidence_submit')));
 }
 
 Future<void> playStory(WidgetTester tester, int choice) async {
@@ -176,145 +150,6 @@ void main() {
       expect(rows.length, game.history.length);
       expect(rows.last, '🟪🟪🟪🟪');
       expect(game.shareGrid(), isNot(contains('MARS')));
-    });
-  });
-
-  group('Pattern Forge generator', () {
-    final generated = [for (var d = -30; d < 230; d++) ForgeDay.forDay(d)];
-
-    test('three question types from three different rule families', () {
-      for (final f in generated) {
-        expect(f.questions.map((q) => q.kind).toList(), ForgeKind.values);
-        expect(f.questions.map((q) => q.rule.kind).toSet().length, 3);
-      }
-      expect(
-        generated.map((f) => f.questions.first.terms.join(',')).toSet().length,
-        greaterThan(100),
-        reason: 'days really differ',
-      );
-    });
-
-    test('what comes next: unambiguous prefix, right answer exactly once', () {
-      for (final f in generated) {
-        final q = f.questions[0] as NextQuestion;
-        expect(plausibleNextTerms(q.shown), {q.answer}, reason: '${q.shown}');
-        expect(opensAt(q.terms), lessThanOrEqualTo(q.shown.length));
-        expect(q.shown.length, greaterThanOrEqualTo(4));
-        expect(q.options.length, 4);
-        expect(q.options.toSet().length, 4, reason: 'distinct options');
-        expect(q.options.where((o) => o == q.answer).length, 1);
-        expect(q.options.every((o) => o >= 0), isTrue);
-        expect(q.rule.fits(q.terms), isTrue);
-      }
-    });
-
-    test('which rule: exactly one option makes the pattern', () {
-      for (final f in generated) {
-        final q = f.questions[1] as RuleQuestion;
-        expect(q.options.length, 4);
-        expect(q.options.map((o) => o.description).toSet().length, 4);
-        final fitting = [
-          for (final o in q.options)
-            if (o.fits(q.shown)) o,
-        ];
-        expect(fitting, [q.rule], reason: '${q.shown} ${q.options}');
-        expect(q.options[q.answer], q.rule);
-      }
-    });
-
-    test('repair it: one wrong number, and no other single fix works', () {
-      for (final f in generated) {
-        final q = f.questions[2] as RepairQuestion;
-        final changed = [
-          for (var i = 0; i < q.shown.length; i++)
-            if (q.shown[i] != q.terms[i]) i,
-        ];
-        expect(changed, [q.wrongIndex]);
-        expect(followsPlausibleRule(q.shown), isFalse, reason: '${q.shown}');
-        expect(followsPlausibleRule(q.terms), isTrue);
-        // Independent brute force: every value at every position.
-        final lo = q.shown.reduce((a, b) => a < b ? a : b);
-        final hi = q.shown.reduce((a, b) => a > b ? a : b);
-        final span = hi - lo;
-        for (var i = 0; i < q.shown.length; i++) {
-          for (var v = lo - 3 * span - 40; v <= hi + 3 * span + 40; v++) {
-            if (v == q.shown[i]) continue;
-            final fixed = List.of(q.shown)..[i] = v;
-            final expected = i == q.wrongIndex && v == q.correctValue;
-            expect(
-              followsPlausibleRule(fixed),
-              expected,
-              reason: '${q.shown}: [$i] = $v',
-            );
-          }
-        }
-      }
-    });
-
-    test('practice steps back a day, never forward', () {
-      expect(forgeDay(300), 300);
-      expect(forgeDay(300, practice: 1), 299);
-      expect(forgeDay(300, practice: 5), 295);
-    });
-  });
-
-  group('Evidence cases', () {
-    test('at least 7 cases, 3 explained clues each, every label used', () {
-      expect(evidenceCases.length, greaterThanOrEqualTo(7));
-      final ranks = <EvidenceRank>{};
-      for (var i = 0; i < evidenceCases.length; i++) {
-        final c = evidenceCases[i];
-        expect(c.number, i + 1);
-        expect(
-          c.heading,
-          startsWith('CASE ${(i + 1).toString().padLeft(3, '0')}, '),
-        );
-        expect(c.question, isNotEmpty);
-        expect(c.summary, isNotEmpty);
-        expect(c.clues.length, 3);
-        for (final clue in c.clues) {
-          expect(clue.title, isNotEmpty);
-          expect(clue.detail, isNotEmpty);
-          expect(clue.why, isNotEmpty);
-          ranks.add(clue.rank);
-        }
-      }
-      expect(ranks, EvidenceRank.values.toSet());
-      expect(
-        evidenceCases
-            .map((c) => c.clues.map((k) => k.rank).toSet().length)
-            .toSet()
-            .length,
-        greaterThan(1),
-        reason: 'not always one of each',
-      );
-      expect(evidenceCases[3].heading, 'CASE 004, THE LIBRARY BOOK');
-    });
-
-    test(
-      'rotates daily, repeats per date, practice skips today and tomorrow',
-      () {
-        expect(evidenceCaseFor(dayNumber), same(evidenceCaseFor(dayNumber)));
-        final seen = {
-          for (var d = 0; d < evidenceCases.length; d++)
-            evidenceCaseFor(dayNumber + d),
-        };
-        expect(seen.length, evidenceCases.length);
-        for (var today = 270; today < 290; today++) {
-          for (var round = 1; round <= 20; round++) {
-            final p = evidenceCaseFor(today, practice: round);
-            expect(p, isNot(same(evidenceCaseFor(today))));
-            expect(p, isNot(same(evidenceCaseFor(today + 1))));
-          }
-        }
-      },
-    );
-
-    test('scores each right ranking', () {
-      final c = evidenceCases.first;
-      expect(c.score({for (var i = 0; i < 3; i++) i: c.clues[i].rank}), 3);
-      expect(c.score({0: c.clues[0].rank}), 1);
-      expect(c.score({}), 0);
     });
   });
 
@@ -407,95 +242,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Pattern Forge: three right answers, then practice for no XP', (
-      tester,
-    ) async {
-      await phone(tester);
-      final state = CurioState();
-      final xp = state.totalXp;
-      await tester.pumpWidget(play(PatternForgePage(date: day), state));
-      await solveForge(tester, ForgeDay.forDay(forgeDay(dayNumber)));
-      await reveal(tester, find.text('3 / 3'));
-      expect(find.text('Master forger!'), findsOneWidget);
-      expect(state.completedToday('pattern_forge'), isTrue);
-      expect(state.totalXp, xp + 60);
-
-      await tap(tester, find.byKey(const Key('game_practice')));
-      await reveal(tester, find.text('Practice'));
-      await solveForge(
-        tester,
-        ForgeDay.forDay(forgeDay(dayNumber, practice: 1)),
-      );
-      await reveal(tester, find.text('3 / 3'));
-      expect(state.totalXp, xp + 60);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('Pattern Forge: a wrong repair tap shows the right fix', (
-      tester,
-    ) async {
-      await phone(tester);
-      await tester.pumpWidget(play(PatternForgePage(date: day), CurioState()));
-      final forge = ForgeDay.forDay(forgeDay(dayNumber));
-      final next = forge.questions[0] as NextQuestion;
-      final wrong = next.options.indexWhere((o) => o != next.answer);
-      await tap(tester, find.byKey(Key('forge_option_$wrong')));
-      expect(find.textContaining('Not quite'), findsOneWidget);
-      await tap(tester, find.byKey(const Key('forge_next')));
-      await tap(tester, find.byKey(const Key('forge_option_0')));
-      await tap(tester, find.byKey(const Key('forge_next')));
-      final repair = forge.questions[2] as RepairQuestion;
-      final other = repair.wrongIndex == 0 ? 1 : 0;
-      await tap(tester, find.byKey(Key('forge_number_$other')));
-      expect(
-        find.textContaining('should be ${repair.correctValue}'),
-        findsWidgets,
-      );
-      await reveal(tester, find.byKey(const Key('game_practice')));
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('Evidence Detective: rank the day’s clues, then practice', (
-      tester,
-    ) async {
-      await phone(tester);
-      final state = CurioState();
-      final xp = state.totalXp;
-      await tester.pumpWidget(play(EvidenceDetectivePage(date: day), state));
-      final today = evidenceCaseFor(dayNumber);
-      expect(find.text(today.heading), findsOneWidget);
-      await solveCase(tester, today);
-      await reveal(tester, find.text('3 / 3'));
-      expect(find.text('Case cracked!'), findsOneWidget);
-      expect(state.completedToday('evidence_garden'), isTrue);
-      expect(state.totalXp, xp + 70);
-
-      await tap(tester, find.byKey(const Key('game_practice')));
-      final practice = evidenceCaseFor(dayNumber, practice: 1);
-      await reveal(tester, find.text('Practice'));
-      expect(find.text(practice.heading), findsOneWidget);
-      await solveCase(tester, practice);
-      await reveal(tester, find.text('3 / 3'));
-      expect(state.totalXp, xp + 70);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('Evidence Detective: a replay says the XP was already earned', (
-      tester,
-    ) async {
-      await phone(tester);
-      final state = CurioState();
-      state.completedActivities.add(
-        CurioState.dailyActivityId('evidence_garden'),
-      );
-      final xp = state.totalXp;
-      await tester.pumpWidget(play(EvidenceDetectivePage(date: day), state));
-      await solveCase(tester, evidenceCaseFor(dayNumber));
-      await reveal(tester, find.textContaining('already earned'));
-      expect(find.textContaining('already earned'), findsOneWidget);
-      expect(state.totalXp, xp);
-    });
-
     testWidgets('Frostlands: choices change the ending, XP once ever', (
       tester,
     ) async {
@@ -557,14 +303,6 @@ void main() {
         await check(
           LinkLabPage(date: day),
           () => solveLinkLab(tester, LinkLabGame.forDay(linkLabDay(dayNumber))),
-        );
-        await check(
-          PatternForgePage(date: day),
-          () => solveForge(tester, ForgeDay.forDay(forgeDay(dayNumber))),
-        );
-        await check(
-          EvidenceDetectivePage(date: day),
-          () => solveCase(tester, evidenceCaseFor(dayNumber)),
         );
         await check(const FrostlandsStoryPage(), () => playStory(tester, 2));
       });

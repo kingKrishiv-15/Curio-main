@@ -60,7 +60,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void setDailyGoal(int value) {
-    dailyGoal = value.clamp(1, LearningSection.values.length);
+    dailyGoal = value.clamp(1, dailyGameCount);
     notifyListeners();
   }
 

@@ -1,9 +1,8 @@
-/// The four daily learning sections. Keep the order stable across screens.
+/// The three learning sections. Keep the order stable across screens.
 enum LearningSection {
-  maths('Maths', 'Numbers, patterns and problem solving'),
-  memory('Memory', 'Remember pictures, places and sequences'),
-  english('English', 'Words, reading and understanding clues'),
-  logic('Logic', 'Puzzles, clues and careful reasoning');
+  maths('Maths', 'Numbers, patterns and symmetry'),
+  logic('Logic', 'Grids, clues and careful deduction'),
+  thinking('Thinking', 'Evidence, claims and what follows from them');
 
   const LearningSection(this.title, this.description);
   final String title;
@@ -13,32 +12,9 @@ enum LearningSection {
 /// One game from each pool per calendar day, each pool holding the games
 /// that best match what its section teaches.
 const sectionRotation = <LearningSection, List<String>>{
-  LearningSection.maths: [
-    'squeeze',
-    'number_hunt',
-    'bridge',
-    'scale',
-    'sequence',
-    'pattern_forge',
-    'mirror',
-  ],
-  LearningSection.memory: ['memory_match', 'memory_trail', 'memory_grid'],
-  LearningSection.english: [
-    'word_wise',
-    'word_builder',
-    'word_trails',
-    'loophole',
-    'verdict',
-  ],
-  LearningSection.logic: [
-    'crowns',
-    'whos_who',
-    'signal_grid',
-    'odd_cluster',
-    'link_lab',
-    'cascade',
-    'evidence_garden',
-  ],
+  LearningSection.maths: ['squeeze', 'bridge', 'scale', 'sequence', 'mirror'],
+  LearningSection.logic: ['crowns', 'whos_who', 'signal_grid', 'link_lab'],
+  LearningSection.thinking: ['verdict', 'cascade'],
 };
 
 final _epoch = DateTime.utc(2026);
@@ -47,7 +23,7 @@ int calendarDayNumber(DateTime date) =>
     DateTime.utc(date.year, date.month, date.day).difference(_epoch).inDays;
 
 LearningSection sectionForGame(String id) {
-  if (id == 'frostlands_night_1') return LearningSection.english;
+  if (id == 'frostlands_night_1') return LearningSection.thinking;
   return sectionRotation.entries.firstWhere((e) => e.value.contains(id)).key;
 }
 
@@ -65,7 +41,7 @@ DateTime puzzleDateForGame(String id, DateTime date) {
   return DateTime.utc(2026, 1, 1 + appearance);
 }
 
-/// "Maths, Memory, English and Logic". Every screen that names the
+/// "Maths, Logic and Thinking". Every screen that names the
 /// sections reads this, so the list can never disagree with the catalogue.
 String get sectionNames {
   final titles = [for (final s in LearningSection.values) s.title];

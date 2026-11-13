@@ -10,10 +10,6 @@ import 'package:curio/features/games/bridge/presentation/bridge_page.dart';
 import 'package:curio/features/games/cascade/domain/cascade.dart';
 import 'package:curio/features/games/cascade/presentation/cascade_page.dart';
 import 'package:curio/features/games/common/game_kit.dart';
-import 'package:curio/features/games/loophole/domain/loophole_bank.dart';
-import 'package:curio/features/games/loophole/presentation/loophole_page.dart';
-import 'package:curio/features/games/odd_cluster/domain/odd_cluster.dart';
-import 'package:curio/features/games/odd_cluster/presentation/odd_cluster_page.dart';
 import 'package:curio/features/games/sequence/domain/sequence.dart';
 import 'package:curio/features/games/sequence/presentation/sequence_page.dart';
 import 'package:flutter/material.dart';
@@ -93,27 +89,6 @@ class NoSessionAuth extends AuthService {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('Odd Cluster: solve all four groups and earn the day', (
-    tester,
-  ) async {
-    await phone(tester);
-    final state = CurioState();
-    await tester.pumpWidget(play(OddClusterPage(date: day), state));
-    final puzzle =
-        oddClusterPuzzles[DailyPick.dayNumber(day) % oddClusterPuzzles.length];
-    for (final group in puzzle.groups) {
-      for (final word in group.words) {
-        await tap(tester, find.byKey(Key('cluster_$word')));
-      }
-      await tap(tester, find.byKey(const Key('cluster_submit')));
-    }
-    await reveal(tester, find.text('Flawless!'));
-    expect(find.text('Flawless!'), findsOneWidget);
-    expect(state.completedToday('odd_cluster'), isTrue);
-    expect(state.collectedFacts, contains('giant_rings'));
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('Sequence: three right answers finish the day', (tester) async {
     await phone(tester);
     final state = CurioState();
@@ -177,25 +152,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Loophole works offline without an account', (tester) async {
-    await phone(tester);
-    final state = CurioState();
-    await tester.pumpWidget(play(const LoopholePage(), state));
-    await tester.pumpAndSettle();
-    final rounds = loopholeDays[DailyPick.index(loopholeDays.length)];
-    for (var r = 0; r < rounds.length; r++) {
-      await tap(tester, find.text(rounds[r].tokens[rounds[r].target]).first);
-      // After the last statement the result card sits above it.
-      await reveal(tester, find.text(rounds[r].explanation));
-      expect(find.text(rounds[r].explanation), findsOneWidget);
-      if (r < rounds.length - 1) await tap(tester, find.text('Next statement'));
-    }
-    await reveal(tester, find.text('6 / 6'));
-    expect(find.text('6 / 6'), findsOneWidget);
-    expect(state.completedToday('loophole'), isTrue);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('Practice rounds never earn XP twice', (tester) async {
     await phone(tester);
     final state = CurioState();
@@ -254,11 +210,9 @@ void main() {
       ) async {
         await phone(tester, size);
         final pages = <Widget>[
-          OddClusterPage(date: day),
           SequencePage(date: day),
           CascadePage(date: day),
           BridgePage(date: day),
-          const LoopholePage(),
         ];
         for (final page in pages) {
           await tester.pumpWidget(
