@@ -171,6 +171,7 @@ class AuthService {
 
   Future<void> completeOnboarding(
     String name, {
+    int? age,
     FamilySettings? settings,
   }) async {
     final user = _client.auth.currentUser;
@@ -189,18 +190,40 @@ class AuthService {
         .order('created_at')
         .limit(1)
         .maybeSingle();
-    if (existing == null) {
-      await _client.from('child_profiles').insert({
-        'parent_id': user.id,
-        'name': cleaned,
-        'total_xp': 0,
-        'streak': 0,
-      });
-    } else {
-      await _client
-          .from('child_profiles')
-          .update({'name': cleaned})
-          .eq('id', existing['id']);
+    Future<void> save({required bool withAge}) async {
+      final learner = {'name': cleaned, if (withAge && age != null) 'age': age};
+      if (existing == null) {
+        await _client.from('child_profiles').insert({
+          'parent_id': user.id,
+          ...learner,
+          'total_xp': 0,
+          'streak': 0,
+        });
+      } else {
+        await _client
+            .from('child_profiles')
+            .update(learner)
+            .eq('id', existing['id']);
+      }
+    }
+
+    // The age is kept on this device as well, so it is not lost if the
+    // database has not had the age column added yet.
+    if (age != null) {
+      try {
+        await (await SharedPreferences.getInstance()).setInt(
+          'curio_learner_age',
+          age,
+        );
+      } catch (_) {
+        /* Storage is best effort. */
+      }
+    }
+    try {
+      await save(withAge: true);
+    } on PostgrestException {
+      if (age == null) rethrow;
+      await save(withAge: false);
     }
     await _client.auth.updateUser(
       UserAttributes(data: {'onboarding_complete': true}),

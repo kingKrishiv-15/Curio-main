@@ -1,13 +1,16 @@
 import 'dart:async';
-import 'package:curio/theme/curio_tokens.dart';
 
 import 'package:flutter/material.dart';
 
 import '../../../core/config/supabase_config.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_ui.dart';
 import 'auth_layout.dart';
 import 'auth_messages.dart';
 import 'widgets/otp_code_field.dart';
+import 'widgets/welcome_art.dart';
 
 /// Where a parent types the code Supabase emailed them. A correct code
 /// creates a session; the [AuthGate] notices and moves on (to learner setup,
@@ -150,14 +153,20 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = CurioTokens.textSecondary;
-    final ink = CurioTokens.textPrimary;
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
+    final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
     final minutes = _resendIn ~/ 60;
     final seconds = (_resendIn % 60).toString().padLeft(2, '0');
     return AuthFrame(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const Align(alignment: Alignment.centerLeft, child: InboxArt()),
+          const SizedBox(height: 18),
           Semantics(
             header: true,
             child: Text(
@@ -190,10 +199,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             ],
           ),
           if (_info != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             AuthNotice(_info!),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           OtpCodeField(
             controller: _code,
             length: _length,
@@ -207,10 +216,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             style: TextStyle(color: muted, fontSize: 13),
           ),
           if (_error != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             AuthNotice(_error!, error: true),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           ListenableBuilder(
             listenable: _code,
             builder: (context, _) => FilledButton(
@@ -230,7 +239,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                   : Text(_cta),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Center(
             child: _resendIn > 0
                 ? Padding(
@@ -254,7 +263,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     label: const Text('Send a new code'),
                   ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           const _Tip(),
         ],
       ),
@@ -267,22 +276,30 @@ class _Tip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final muted = CurioTokens.textSecondary;
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: CurioTokens.surface,
-        borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+        color: curioColor(
+          context,
+          CurioColors.surfaceMuted,
+          CurioColorsLight.surfaceMuted,
+        ),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_outline_rounded, size: 18, color: muted),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               'Emails can take a minute to arrive. Check your spam or promotions folder, and use the code from the newest email. Got a link instead of a code? Open it on this phone and it signs you in too.',
-              style: TextStyle(color: muted, fontSize: 13, height: 1.5),
+              style: TextStyle(color: muted, fontSize: 12.5, height: 1.5),
             ),
           ),
         ],

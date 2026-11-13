@@ -26,7 +26,7 @@ class ThemeController extends ChangeNotifier {
     }
   }
 
-  ThemeMode _mode = ThemeMode.dark;
+  ThemeMode _mode = ThemeMode.light;
   ThemeMode get mode => _mode;
   bool get isDark => _mode == ThemeMode.dark;
 
@@ -39,11 +39,7 @@ class ThemeController extends ChangeNotifier {
         1.5,
       );
       notifyListeners();
-      final saved = prefs.getString(_prefsKey);
-      if (saved == 'light') {
-        _mode = ThemeMode.light;
-        notifyListeners();
-      }
+      // Curio is light only for now, so a saved dark choice is ignored.
     } catch (_) {
       // No local storage available (e.g. some web/test contexts), keep
       // the in-memory default and simply don't persist.

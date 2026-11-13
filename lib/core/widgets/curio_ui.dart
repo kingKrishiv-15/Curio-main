@@ -1,4 +1,6 @@
 import 'curio_clay.dart';
+import '../theme/curio_colors_light.dart';
+import '../theme/curio_colors.dart';
 import 'package:curio/theme/curio_tokens.dart';
 import 'curio_logo.dart';
 import 'dart:math' as math;
@@ -54,6 +56,14 @@ class CurioPage extends StatelessWidget {
             ),
       body: Stack(
         children: [
+          if (backgroundColor == null)
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: CurioColorsLight.pageGradient,
+                ),
+              ),
+            ),
           SafeArea(
             top: title == null,
             bottom: !extendBehindBottom,
@@ -447,7 +457,7 @@ class ExplorerAvatar extends StatelessWidget {
       textScaler: TextScaler.noScaling,
       style: TextStyle(
         fontFamily: 'Fraunces',
-        color: CurioTokens.textPrimary,
+        color: Colors.white,
         fontSize: size * .4,
         fontWeight: FontWeight.w600,
       ),
@@ -552,6 +562,192 @@ class CurioRow extends StatelessWidget {
     return Semantics(
       button: true,
       child: InkWell(onTap: onTap, child: row),
+    );
+  }
+}
+
+/// Resolves a colour to its dark/light counterpart based on the current
+/// `Theme.of(context).brightness`. Used throughout this file so every
+/// shared widget adapts to both modes automatically, callers that just
+/// use the defaults never need to think about which mode is active.
+/// [CurioColors] and [CurioColorsLight] share field names by design
+/// specifically so this is always a direct 1:1 swap.
+Color curioColor(BuildContext context, Color darkColor, Color lightColor) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? darkColor
+      : lightColor;
+}
+
+class CurioEyebrow extends StatelessWidget {
+  const CurioEyebrow(this.label, {this.color, super.key});
+
+  final String label;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final resolved =
+        color ??
+        curioColor(context, CurioColors.forest, CurioColorsLight.forest);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 18,
+          height: 2,
+          decoration: BoxDecoration(
+            color: resolved,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: resolved,
+              fontSize: 9.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.35,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class MascotBadge extends StatelessWidget {
+  const MascotBadge({this.size = 72, super.key});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final forestSoft = dark
+        ? CurioColors.forestSoft
+        : CurioColorsLight.forestSoft;
+    final surface = dark ? CurioColors.surface : CurioColorsLight.surface;
+    final forest = dark ? CurioColors.forest : CurioColorsLight.forest;
+    final saffron = dark ? CurioColors.saffron : CurioColorsLight.saffron;
+    final ink = dark ? CurioColors.ink : CurioColorsLight.ink;
+    return Semantics(
+      label: 'Nova, your Curio companion',
+      child: SizedBox.square(
+        dimension: size,
+        // The sparkle pokes past the badge's rounded corner, so the clay
+        // body sits behind the face instead of clipping it.
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: CurioClay(
+                radius: size * .36,
+                color: forestSoft,
+                child: const SizedBox.expand(),
+              ),
+            ),
+            Transform.rotate(
+              angle: -.08,
+              child: SizedBox(
+                width: size * .7,
+                height: size * .62,
+                child: CurioClay(
+                  radius: size * .28,
+                  color: forest,
+                  child: Center(
+                    child: Container(
+                      width: size * .48,
+                      height: size * .28,
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(size * .14),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _MascotEye(size: size * .065, color: ink),
+                          SizedBox(width: size * .13),
+                          _MascotEye(size: size * .065, color: ink),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              right: size * .015,
+              top: size * .01,
+              child: Transform.rotate(
+                angle: .18,
+                child: Icon(
+                  Icons.auto_awesome,
+                  color: saffron,
+                  size: size * .27,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MascotEye extends StatelessWidget {
+  const _MascotEye({required this.size, required this.color});
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+}
+
+class ProgressRing extends StatelessWidget {
+  const ProgressRing({
+    required this.value,
+    required this.child,
+    this.color,
+    this.size = 54,
+    super.key,
+  });
+
+  final double value;
+  final Widget child;
+  final Color? color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final resolved = color ?? Theme.of(context).colorScheme.primary;
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox.expand(
+            child: CircularProgressIndicator(
+              value: value.clamp(0, 1),
+              strokeWidth: 5,
+              strokeCap: StrokeCap.round,
+              color: resolved,
+              backgroundColor: resolved.withValues(alpha: .12),
+            ),
+          ),
+          child,
+        ],
+      ),
     );
   }
 }

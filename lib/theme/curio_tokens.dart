@@ -12,20 +12,21 @@ class CurioTokens extends ThemeExtension<CurioTokens> {
   static CurioTokens of(BuildContext context) =>
       Theme.of(context).extension<CurioTokens>() ?? const CurioTokens();
 
-  // Colour: 13 tokens.
-  static const base = Color(0xFF05100D);
-  static const surface = Color(0xFF15191A);
-  static const surfaceRaised = Color(0xFF232A2C);
-  static const border = Color(0x24FFFFFF);
-  static const textPrimary = Color(0xFFF4FAF6);
-  static const textSecondary = Color(0xFF8D948F);
-  static const accent = Color(0xFF49BB8C);
-  static const onAccent = Color(0xFF05100D);
-  static const correct = Color(0xFF4FD69B);
-  static const wrong = Color(0xFFF0685A);
-  static const tintMaths = Color(0xFFE7BE6B);
-  static const tintLogic = Color(0xFF8FC3D9);
-  static const tintThinking = Color(0xFFBFA6E0);
+  // Colour: 13 tokens, taken from the original light palette (the warm
+  // cream, coral and forest of the onboarding screens).
+  static const base = Color(0xFFFDF1E2);
+  static const surface = Color(0xFFFFFFFF);
+  static const surfaceRaised = Color(0xFFF3E9D8);
+  static const border = Color(0x1F2E2417);
+  static const textPrimary = Color(0xFF2E2417);
+  static const textSecondary = Color(0xFF5B4E3B);
+  static const accent = Color(0xFFF2564A);
+  static const onAccent = Color(0xFF2E2417);
+  static const correct = Color(0xFF15803F);
+  static const wrong = Color(0xFFD8362B);
+  static const tintMaths = Color(0xFFDB9A2C);
+  static const tintLogic = Color(0xFF2E9FD6);
+  static const tintThinking = Color(0xFF8467E0);
 
   /// A section tint as a flat, opaque panel wash (the tint at low opacity
   /// over [surface]).
@@ -41,7 +42,7 @@ class CurioTokens extends ThemeExtension<CurioTokens> {
   // Elevation: 2. shadowRaised belongs to one element per screen.
   static const shadowNone = <BoxShadow>[];
   static const shadowRaised = <BoxShadow>[
-    BoxShadow(color: Color(0x59000000), blurRadius: 24, offset: Offset(0, 8)),
+    BoxShadow(color: Color(0x242E2417), blurRadius: 24, offset: Offset(0, 8)),
   ];
 
   // Spacing: one scale.

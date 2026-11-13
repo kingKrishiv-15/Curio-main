@@ -77,7 +77,7 @@ class ProfilePage extends StatelessWidget {
           CurioClay(
             key: const Key('profile_identity'),
             raised: true,
-            color: CurioTokens.surfaceRaised,
+            color: CurioTokens.surface,
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

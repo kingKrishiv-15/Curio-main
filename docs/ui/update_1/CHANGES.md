@@ -1,5 +1,33 @@
 # update_1: what changed
 
+## Revision after review (read this first)
+
+After the first contact sheet these were changed back or added, on request:
+
+- **Colours are the original warm palette again** (cream, coral, forest,
+  from the original light theme), used on every screen. Dark mode is off.
+  There is no dark theme to switch to at the moment: the tokens hold one
+  palette.
+- **The original onboarding is back**: the Welcome screen with the orbit
+  art, the three slide intro, the five step learner setup with Nova, and
+  the original headings and buttons. The only edits are the section names
+  (now Maths, Logic and Thinking), the daily goal wording, and dashes.
+- **Onboarding asks the learner's age** (6 to 18) on step 1. It is saved
+  with the learner profile (new `age` column, migration
+  `202611130003_learner_age.sql`) and on the device. Nothing reads it yet,
+  and the screen says so. If the column has not been added to the database
+  the save still succeeds without it.
+- **Home is lighter and puts games first**: the logo, today's four games
+  (Second Opinion with its Play button, then three icon tiles showing only
+  icon, name and section), and below that one streak and XP row and Family
+  messages. Taglines are gone from Home.
+- The restored onboarding files keep their own colours, corners, shadows
+  and gradients, so `test/design_rules_test.dart` now skips them (the no
+  dash rule still covers everything). The original type scale is back in
+  the theme. Where anything below says "dark only", "eyebrows deleted" or
+  "mascot deleted", that now holds for the signed-in app but not for
+  onboarding.
+
 Branch `update_1`, cut from `main` at `d700a52`. Nothing on `main`, `krishiv`
 or `krishiv-2` was touched and no pull request was opened.
 

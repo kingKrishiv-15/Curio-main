@@ -31,8 +31,7 @@ class _CurioAppState extends State<CurioApp> {
             title: 'Curio',
             debugShowCheckedModeBanner: false,
             theme: CurioTheme.light,
-            darkTheme: CurioTheme.dark,
-            themeMode: _themeController.mode,
+            themeMode: ThemeMode.light,
             builder: (context, child) {
               final media = MediaQuery.of(context);
               return MediaQuery(

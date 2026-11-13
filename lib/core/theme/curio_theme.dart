@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme/curio_tokens.dart';
 
-/// Maps [CurioTokens] onto Material. Curio is dark only.
+/// Maps [CurioTokens] onto Material. Curio is light, in the original warm
+/// palette. There is no dark theme at the moment.
 abstract final class CurioTheme {
   static ThemeData get dark => _theme;
   static ThemeData get light => _theme;
@@ -12,7 +13,7 @@ abstract final class CurioTheme {
   static ThemeData _build() {
     const t = CurioTokens.textPrimary;
     const muted = CurioTokens.textSecondary;
-    const scheme = ColorScheme.dark(
+    const scheme = ColorScheme.light(
       primary: CurioTokens.accent,
       onPrimary: CurioTokens.onAccent,
       secondary: CurioTokens.accent,
@@ -34,13 +35,23 @@ abstract final class CurioTheme {
     );
     const shape = RoundedRectangleBorder(borderRadius: CurioTokens.cardShape);
     const pill = StadiumBorder();
-    final buttonText = CurioTokens.body.copyWith(fontWeight: FontWeight.w600);
-    const buttonPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 16);
+    final buttonText = CurioTokens.bodySmall.copyWith(
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    );
     final labelStrong = CurioTokens.label.copyWith(color: t);
+    TextStyle display(double size, double height, double tracking) => TextStyle(
+      fontFamily: CurioTokens.faceDisplay,
+      color: t,
+      fontSize: size,
+      height: height,
+      fontWeight: FontWeight.w500,
+      letterSpacing: tracking,
+    );
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       colorScheme: scheme,
       scaffoldBackgroundColor: CurioTokens.base,
       canvasColor: CurioTokens.base,
@@ -48,19 +59,36 @@ abstract final class CurioTheme {
       splashFactory: InkRipple.splashFactory,
       dividerColor: CurioTokens.border,
       extensions: const [CurioTokens()],
+      // The original type scale, restored so the onboarding screens look
+      // as they did. Newer screens read their styles from CurioTokens.
       textTheme: TextTheme(
-        displayLarge: CurioTokens.display,
-        displayMedium: CurioTokens.display,
-        displaySmall: CurioTokens.display,
-        headlineLarge: CurioTokens.display,
-        headlineMedium: CurioTokens.title,
-        headlineSmall: CurioTokens.title,
-        titleLarge: CurioTokens.title,
-        titleMedium: CurioTokens.body.copyWith(fontWeight: FontWeight.w600),
+        displayLarge: display(52, .91, -2.6),
+        displayMedium: display(44, .95, -2.2),
+        displaySmall: display(38, .96, -2),
+        headlineLarge: display(38, .96, -2),
+        headlineMedium: display(29, 1.02, -1.2),
+        headlineSmall: display(24, 1.08, -.8),
+        titleLarge: display(21, 1.18, -.55),
+        titleMedium: CurioTokens.body.copyWith(
+          height: 1.28,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -.15,
+        ),
         titleSmall: labelStrong,
-        bodyLarge: CurioTokens.body,
-        bodyMedium: CurioTokens.bodySmall.copyWith(color: t),
-        bodySmall: CurioTokens.bodySmall,
+        bodyLarge: CurioTokens.body.copyWith(
+          height: 1.52,
+          fontWeight: FontWeight.w500,
+        ),
+        bodyMedium: CurioTokens.bodySmall.copyWith(
+          color: t,
+          height: 1.48,
+          fontWeight: FontWeight.w500,
+        ),
+        bodySmall: CurioTokens.bodySmall.copyWith(
+          fontSize: 12,
+          height: 1.42,
+          fontWeight: FontWeight.w500,
+        ),
         labelLarge: labelStrong,
         labelMedium: CurioTokens.label,
         labelSmall: CurioTokens.label,
@@ -97,7 +125,7 @@ abstract final class CurioTheme {
           disabledForegroundColor: muted,
           elevation: 0,
           shape: pill,
-          padding: buttonPadding,
+          minimumSize: const Size(48, 54),
           textStyle: buttonText,
         ),
       ),
@@ -109,7 +137,7 @@ abstract final class CurioTheme {
           disabledForegroundColor: muted,
           elevation: 0,
           shape: pill,
-          padding: buttonPadding,
+          minimumSize: const Size(48, 54),
           textStyle: buttonText,
         ),
       ),
@@ -118,7 +146,7 @@ abstract final class CurioTheme {
           foregroundColor: t,
           side: const BorderSide(color: CurioTokens.border),
           shape: pill,
-          padding: buttonPadding,
+          minimumSize: const Size(48, 54),
           textStyle: buttonText,
         ),
       ),

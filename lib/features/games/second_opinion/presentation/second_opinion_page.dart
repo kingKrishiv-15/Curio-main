@@ -194,7 +194,7 @@ class _SecondOpinionPageState extends State<SecondOpinionPage> {
         const SizedBox(height: 12),
         CurioClay(
           raised: true,
-          color: CurioTokens.surfaceRaised,
+          color: CurioTokens.surface,
           padding: const EdgeInsets.all(24),
           child: Text(puzzle.brief, style: CurioTokens.body),
         ),
@@ -492,7 +492,7 @@ class _Debrief extends StatelessWidget {
       children: [
         CurioClay(
           raised: true,
-          color: CurioTokens.surfaceRaised,
+          color: CurioTokens.surface,
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

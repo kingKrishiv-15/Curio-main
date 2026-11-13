@@ -12,6 +12,7 @@ import 'package:curio/app/curio_app.dart';
 import 'package:curio/core/services/auth_service.dart';
 import 'package:curio/core/state/curio_state.dart';
 import 'package:curio/core/theme/curio_theme.dart';
+import 'package:curio/features/auth/presentation/intro_page.dart';
 import 'package:curio/features/auth/presentation/landing_page.dart';
 import 'package:curio/features/auth/presentation/onboarding_page.dart';
 import 'package:curio/features/games/cascade/presentation/cascade_page.dart';
@@ -118,24 +119,31 @@ void main() {
     DemoSecondOpinionGateway.reset();
   });
 
-  testWidgets('welcome and onboarding', (tester) async {
+  testWidgets('welcome, intro and onboarding', (tester) async {
     await _phone(tester);
-    await tester.pumpWidget(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: CurioTheme.dark,
-        home: LandingPage(authService: _auth()),
+    Widget signedOut(Widget home) => MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: CurioTheme.light,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(disableAnimations: true),
+        child: child!,
       ),
+      home: home,
     );
+    await tester.pumpWidget(signedOut(LandingPage(authService: _auth())));
     await _shot(tester, '02_welcome');
+    await tester.pumpWidget(signedOut(IntroPage(authService: _auth())));
+    await _shot(tester, '02b_intro');
     await tester.pumpWidget(
-      MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: CurioTheme.dark,
-        home: OnboardingPage(authService: _auth(), onComplete: () {}),
-      ),
+      signedOut(OnboardingPage(authService: _auth(), onComplete: () {})),
     );
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.enterText(find.byType(TextFormField), 'Alex');
+    await tester.tap(find.byKey(const Key('age_12')));
     await _shot(tester, '01_onboarding');
+    await tester.tap(find.byKey(const Key('onboarding_continue')));
+    await tester.pump(const Duration(milliseconds: 600));
+    await _shot(tester, '01b_onboarding_goal');
     await tester.pumpWidget(const SizedBox());
   });
 

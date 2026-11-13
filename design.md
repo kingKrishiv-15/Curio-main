@@ -1,6 +1,7 @@
 # Curio design budget
 
-Curio is dark only. Everything visual comes from `lib/theme/curio_tokens.dart`
+Curio is light, in the original warm palette (dark mode is off, and there
+is no dark theme at the moment). Everything visual comes from `lib/theme/curio_tokens.dart`
 (`CurioTokens`, a `ThemeExtension`). If a screen needs a value that is not
 listed here, the screen is wrong, not the list.
 
@@ -10,32 +11,32 @@ listed here, the screen is wrong, not the list.
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `base` | `#05100D` | Page background |
-| `surface` | `#15191A` | Flat panels, inputs, sheets |
-| `surfaceRaised` | `#232A2C` | The one raised element, pressed and selected fills |
-| `border` | white at 14% | The 1px rule between rows and around panels |
-| `textPrimary` | `#F4FAF6` | Headings and body |
-| `textSecondary` | `#8D948F` | Supporting text and metadata |
-| `accent` | `#49BB8C` | Primary action, selection, links |
-| `onAccent` | `#05100D` | Text and icons on `accent` |
-| `correct` | `#4FD69B` | Right answers |
-| `wrong` | `#F0685A` | Wrong answers and errors |
-| `tintMaths` | `#E7BE6B` | Maths section |
-| `tintLogic` | `#8FC3D9` | Logic section |
-| `tintThinking` | `#BFA6E0` | Thinking section |
+| `base` | `#FDF1E2` | Page background (cream) |
+| `surface` | `#FFFFFF` | Panels, inputs, sheets, the raised block |
+| `surfaceRaised` | `#F3E9D8` | Tracks, pressed and disabled fills |
+| `border` | ink at 12% | The 1px rule between rows and around panels |
+| `textPrimary` | `#2E2417` | Headings and body |
+| `textSecondary` | `#5B4E3B` | Supporting text and metadata |
+| `accent` | `#F2564A` | Primary action, selection, links (coral) |
+| `onAccent` | `#2E2417` | Text and icons on `accent` |
+| `correct` | `#15803F` | Right answers |
+| `wrong` | `#D8362B` | Wrong answers and errors |
+| `tintMaths` | `#DB9A2C` | Maths section |
+| `tintLogic` | `#2E9FD6` | Logic section |
+| `tintThinking` | `#8467E0` | Thinking section |
 
 No `Color(0x...)` literal may appear outside the tokens file. A section tint
 may be washed over `surface` at low opacity with `CurioTokens.wash(tint)`.
 Puzzle boards that need several distinguishable regions reuse the six hues
 above (accent, correct, wrong and the three tints), never new ones.
 
-How the old palette maps: canvas, night and cream became `base`. surface and
-surfaceMuted became `surface`. clay, navy and every `*Soft` wash became
-`surfaceRaised`. ink became `textPrimary`, inkSoft and inkMuted became
-`textSecondary`. outline and outlineSoft became `border`. forest, jade, teal
-and ice became `accent`. success became `correct`. danger and coral became
-`wrong`. saffron, gold and spark became `tintMaths`. blue and frost became
-`tintLogic`. plum and rose became `tintThinking`. The light palette is gone.
+These are the values of the original light palette: canvas, white surface,
+ink, coral, forest, saffron, blue and plum.
+
+The signed-out and onboarding screens (`lib/features/auth/`) were restored
+to their original design on request. They use the original palette files,
+clay surfaces, art and type scale, and the tested rules below do not apply
+to them.
 
 ## Radii: 2 (tested)
 

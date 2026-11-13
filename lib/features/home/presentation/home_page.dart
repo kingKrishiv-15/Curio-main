@@ -3,38 +3,17 @@ import 'package:flutter/material.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_clay.dart';
+import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../theme/curio_tokens.dart';
 import '../../family/presentation/family_inbox_page.dart';
+import '../../games/common/daily_schedule.dart';
 import '../../games/game_catalog.dart';
 import '../../games/presentation/game_row.dart';
 
-const _weekdays = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
-const _months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-/// Home, top to bottom: today's anchor game (the one raised block), a
-/// one-line streak strip, then the rest of today's set as plain rows.
+/// Home puts the games first: today's anchor game, then the three rotating
+/// games as small icon tiles. Streak, points and messages sit underneath.
+/// Each game shows its icon, its name and its section, and nothing more.
 class HomePage extends StatelessWidget {
   const HomePage({this.onProfile, super.key});
 
@@ -44,8 +23,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = CurioScope.of(context);
-    final today = state.today;
-    final set = todaysSet(date: today, ids: state.dailySetIds);
+    final set = todaysSet(date: state.today, ids: state.dailySetIds);
+    final done = state.gamesCompletedToday.clamp(0, dailyGameCount);
     return CurioPage(
       maxWidth: 720,
       child: ListView(
@@ -53,64 +32,100 @@ class HomePage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  '${_weekdays[today.weekday - 1]} ${today.day} ${_months[today.month - 1]}',
-                  key: const Key('home_date'),
-                  style: CurioTokens.label,
+              const Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: CurioLogo(markSize: 28),
                 ),
               ),
-              IconButton(
-                tooltip: 'Family messages',
-                onPressed: () => openPage(context, const FamilyInboxPage()),
-                icon: const Icon(Icons.mail_outline_rounded),
-              ),
-              const SizedBox(width: 4),
               ExplorerAvatar(name: state.childName, size: 40, onTap: onProfile),
             ],
           ),
-          const SizedBox(height: 16),
-          _Anchor(game: set.anchor, done: state.completedToday(set.anchor.id)),
           const SizedBox(height: 24),
-          Semantics(
-            label: '${state.streak} day streak. ${state.totalXp} XP in total.',
-            excludeSemantics: true,
-            child: Row(
-              key: const Key('home_streak'),
-              children: [
-                Expanded(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Semantics(
+                  header: true,
                   child: Text(
-                    state.streak == 1
-                        ? '1 day streak'
-                        : '${state.streak} day streak',
-                    style: CurioTokens.bodySmall.copyWith(
-                      color: CurioTokens.textPrimary,
-                    ),
+                    'Today’s games',
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                Text('${state.totalXp} XP', style: CurioTokens.bodySmall),
+              ),
+              Text(
+                '$done of $dailyGameCount done',
+                key: const Key('home_progress'),
+                style: CurioTokens.label,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _Anchor(game: set.anchor, done: state.completedToday(set.anchor.id)),
+          const SizedBox(height: 12),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < set.others.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 12),
+                  Expanded(
+                    child: _GameTile(
+                      game: set.others[i],
+                      done: state.completedToday(set.others[i].id),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
           const SizedBox(height: 32),
-          Semantics(
-            header: true,
-            child: Text(
-              'Also today',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+          const Divider(),
+          CurioRow(
+            key: const Key('home_streak'),
+            title: state.streak == 1
+                ? '1 day streak'
+                : '${state.streak} day streak',
+            trailing: Text('${state.totalXp} XP', style: CurioTokens.bodySmall),
           ),
-          const SizedBox(height: 4),
-          for (final game in set.others)
-            GameRow(game: game, done: state.completedToday(game.id)),
+          CurioRow(
+            title: 'Family messages',
+            onTap: () => openPage(context, const FamilyInboxPage()),
+          ),
         ],
       ),
     );
   }
 }
 
-/// Today's anchor game: the only raised element on Home, the largest
-/// type, and the only full-width primary button.
+/// A game's icon on its section tint.
+class _GameIcon extends StatelessWidget {
+  const _GameIcon({required this.game});
+
+  final GameEntry game;
+  static const double size = 48;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = sectionColor(context, game.section);
+    return ExcludeSemantics(
+      child: SizedBox.square(
+        dimension: size,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: CurioTokens.wash(tint, .18),
+            borderRadius: CurioTokens.cardShape,
+          ),
+          child: Icon(game.icon, color: tint, size: size * .5),
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's anchor game: the only raised element on Home and the only
+/// full-width primary button.
 class _Anchor extends StatelessWidget {
   const _Anchor({required this.game, required this.done});
 
@@ -121,31 +136,92 @@ class _Anchor extends StatelessWidget {
   Widget build(BuildContext context) => CurioClay(
     key: const Key('home_anchor'),
     raised: true,
-    color: CurioTokens.surfaceRaised,
-    padding: const EdgeInsets.all(24),
+    color: CurioTokens.surface,
+    padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          done ? 'Done for today' : 'Today',
-          style: CurioTokens.label.copyWith(
-            color: sectionColor(context, game.section),
-          ),
+        Row(
+          children: [
+            _GameIcon(game: game),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(game.title, style: CurioTokens.title),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    done
+                        ? 'Done for today'
+                        : '${game.section.title}, ${game.duration}',
+                    style: CurioTokens.label,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Semantics(
-          header: true,
-          child: Text(game.title, style: CurioTokens.display),
-        ),
-        const SizedBox(height: 8),
-        Text(game.tagline, style: CurioTokens.body),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         FilledButton(
           key: const Key('home_play'),
           onPressed: () => openGame(context, game),
-          child: Text(done ? 'Play again for practice' : 'Play'),
+          child: Text(done ? 'Play again' : 'Play'),
         ),
       ],
+    ),
+  );
+}
+
+/// One of the three rotating games: icon, name, section. Tapping opens it.
+class _GameTile extends StatelessWidget {
+  const _GameTile({required this.game, required this.done});
+
+  final GameEntry game;
+  final bool done;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: '${game.title}, ${game.section.title}${done ? ', done today' : ''}',
+    excludeSemantics: true,
+    child: CurioClay(
+      color: CurioTokens.surface,
+      child: InkWell(
+        key: Key('game_row_${game.id}'),
+        onTap: () => openGame(context, game),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 16, 8, 12),
+          child: Column(
+            children: [
+              _GameIcon(game: game),
+              const SizedBox(height: 12),
+              Text(
+                game.title,
+                textAlign: TextAlign.center,
+                style: CurioTokens.label.copyWith(
+                  color: CurioTokens.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              done
+                  ? const Icon(
+                      Icons.check_circle_rounded,
+                      size: 16,
+                      color: CurioTokens.correct,
+                    )
+                  : Text(
+                      game.section.title,
+                      textAlign: TextAlign.center,
+                      style: CurioTokens.label,
+                    ),
+            ],
+          ),
+        ),
+      ),
     ),
   );
 }

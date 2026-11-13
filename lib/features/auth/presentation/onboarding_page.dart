@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../games/common/daily_schedule.dart';
-import 'package:curio/core/widgets/curio_logo.dart';
-import 'package:curio/theme/curio_tokens.dart';
 
 import '../../../core/models/family_settings.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/theme/curio_colors.dart';
+import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
+import '../../../core/widgets/curio_ui.dart';
+import '../../games/common/daily_schedule.dart';
 import 'auth_layout.dart';
 import 'widgets/auth_fields.dart';
+import 'widgets/welcome_art.dart';
 
 /// Learner setup, right after a parent's email is confirmed: a nickname, a
 /// gentle daily goal, reading comfort, how they'd like to hear from Curio,
@@ -35,6 +37,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final _name = TextEditingController();
   final _nameForm = GlobalKey<FormState>();
   int _step = 0;
+  int? _age;
+  bool _ageMissing = false;
   int _goal = 3;
   bool _reminders = true;
   int _hour = 18;
@@ -87,6 +91,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Future<void> _continue() async {
     if (_saving) return;
     if (_step == 0 && !_nameForm.currentState!.validate()) return;
+    if (_step == 0 && _age == null) {
+      setState(() => _ageMissing = true);
+      return;
+    }
     FocusScope.of(context).unfocus();
     if (_step < _steps - 1) {
       setState(() => _step++);
@@ -103,6 +111,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     try {
       await widget.authService.completeOnboarding(
         _name.text,
+        age: _age,
         settings: FamilySettings(
           dailyGoal: _goal,
           remindersEnabled: _reminders,
@@ -127,17 +136,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final muted = CurioTokens.textSecondary;
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
     final (eyebrow, title, subtitle) = switch (_step) {
       0 => (
         'Meet your explorer',
-        'Who is playing?',
-        'A nickname is enough. There is no need for a real name.',
+        'Who’s exploring with Curio?',
+        'What should Nova call them, and how old are they? A nickname is perfect, there’s no need for a real name.',
       ),
       1 => (
         'A gentle rhythm',
         'How much play a day?',
-        'Pick a daily goal for $_learner. There’s one daily game each in Maths, Memory, English and Logic. You can change the goal anytime.',
+        'Pick a daily goal for $_learner. There are $dailyGameCount games a day: Second Opinion, and one each in $sectionNames. You can change the goal anytime.',
       ),
       2 => (
         'Made for your explorer',
@@ -166,13 +179,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _StepBar(step: _step, count: _steps),
-            const SizedBox(height: 24),
+            const SizedBox(height: 26),
             CurioFadeSlideIn(
               key: ValueKey(_step),
               offset: 12,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  CurioEyebrow(eyebrow),
+                  const SizedBox(height: 12),
                   Semantics(
                     header: true,
                     child: Text(
@@ -184,7 +199,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(subtitle, style: TextStyle(color: muted, height: 1.55)),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 26),
                   switch (_step) {
                     0 => _nameStep(),
                     1 => _goalStep(),
@@ -196,10 +211,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
             if (_error != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               AuthNotice(_error!, error: true),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: 26),
             FilledButton(
               key: const Key('onboarding_continue'),
               onPressed: _saving ? null : _continue,
@@ -209,7 +224,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       height: 22,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_step == _steps - 1 ? 'Start' : 'Continue'),
+                  : Text(_step == _steps - 1 ? 'Start exploring' : 'Continue'),
             ),
             const SizedBox(height: 8),
             if (_step > 0)
@@ -230,6 +245,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _nameStep() => Column(
     children: [
+      const CurioFloat(distance: 4, child: MascotBadge(size: 104)),
+      const SizedBox(height: 26),
       Form(
         key: _nameForm,
         child: TextFormField(
@@ -239,7 +256,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           textCapitalization: TextCapitalization.words,
           textInputAction: TextInputAction.done,
           decoration: const InputDecoration(
-            labelText: 'Learner’s nickname',
+            labelText: 'Explorer’s nickname',
             hintText: 'e.g. Alex',
             prefixIcon: Icon(Icons.face_outlined),
           ),
@@ -249,21 +266,56 @@ class _OnboardingPageState extends State<OnboardingPage> {
           onFieldSubmitted: (_) => _continue(),
         ),
       ),
+      const SizedBox(height: 16),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          'How old are they?',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (var age = 6; age <= 18; age++)
+              ChoiceChip(
+                key: Key('age_$age'),
+                label: Text('$age'),
+                selected: _age == age,
+                onSelected: (_) => setState(() {
+                  _age = age;
+                  _ageMissing = false;
+                }),
+              ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 8),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          _ageMissing
+              ? 'Choose an age to continue.'
+              : 'Curio will use this to match games to their age. For now every explorer gets the same games.',
+          key: const Key('age_note'),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: _ageMissing ? Theme.of(context).colorScheme.error : null,
+          ),
+        ),
+      ),
     ],
   );
 
   Widget _goalStep() {
-    final options = [
-      for (var g = 1; g <= dailyGameCount; g++)
-        (
-          g,
-          g == dailyGameCount
-              ? 'The full set'
-              : g == 1
-              ? 'One game a day'
-              : '$g games a day',
-          'About ${g * 5} minutes',
-        ),
+    const options = [
+      (1, 'A quick spark', 'One game a day, about 5 minutes'),
+      (2, 'A little adventure', 'Two games a day, about 10 minutes'),
+      (3, 'A steady habit', 'Three games a day, about 15 minutes'),
+      (4, 'The full set', 'All four games, about 20 minutes'),
     ];
     return Column(
       children: [
@@ -273,7 +325,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             selected: _goal == goal,
             title: title,
             detail: detail,
-            badge: goal == dailyGameCount - 1 ? 'Recommended' : null,
+            badge: goal == 3 ? 'Recommended' : null,
             leading: '$goal',
             onTap: () => setState(() => _goal = goal),
           ),
@@ -287,15 +339,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       CurioClay(
-        radius: CurioTokens.radiusCard,
-        padding: const EdgeInsets.all(24),
+        radius: 26,
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CurioLogoMark(size: 64),
+            const CurioFloat(distance: 3, child: MascotBadge(size: 64)),
             const SizedBox(height: 16),
             Text(
-              'Comfort settings',
+              'A little wonder, every day.',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -303,7 +355,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ],
         ),
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 20),
       for (final (scale, title, detail) in const [
         (1.0, 'Standard', 'The usual reading size'),
         (1.2, 'Larger', 'A little more room for every word'),
@@ -334,8 +386,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _loopStep() {
     return CurioClay(
-      radius: CurioTokens.radiusCard,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      radius: 22,
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
       child: Column(
         children: [
           SwitchListTile.adaptive(
@@ -399,7 +451,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   Widget _readyStep() {
-    final forest = CurioTokens.accent;
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
     final summary = [
       (
         Icons.flag_rounded,
@@ -431,18 +487,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: CurioTokens.surfaceRaised,
-            borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+            color: curioColor(
+              context,
+              CurioColors.forestSoft,
+              CurioColorsLight.forestSoft,
+            ),
+            borderRadius: BorderRadius.circular(22),
           ),
           child: Column(
             children: [
-              const CurioLogoMark(size: 92),
-              const SizedBox(height: 16),
+              const CurioFloat(distance: 4, child: MascotBadge(size: 92)),
+              const SizedBox(height: 18),
               for (final (icon, label, value) in summary)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Row(
                     children: [
                       Icon(icon, size: 20, color: forest),
@@ -461,14 +521,33 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
         Text(
-          '$dailyGameCount games a day: $sectionNames.',
-          key: const Key('onboarding_sections'),
+          'Four little adventures, refreshed daily.',
           style: Theme.of(context).textTheme.titleMedium,
         ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final section in WelcomeSkill.all)
+              Chip(
+                avatar: Icon(
+                  section.icon,
+                  size: 18,
+                  color: section.ink(context),
+                ),
+                label: Text(section.label),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Second Opinion every day, plus one game from each section.',
+        ),
         if (_needsConsent) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           CheckboxListTile(
             key: const Key('onboarding_consent'),
             contentPadding: EdgeInsets.zero,
@@ -485,7 +564,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
             subtitle: _consentMissing
                 ? Text(
                     'Please confirm to finish setting up.',
-                    style: TextStyle(color: CurioTokens.wrong),
+                    style: TextStyle(
+                      color: curioColor(
+                        context,
+                        CurioColors.danger,
+                        CurioColorsLight.danger,
+                      ),
+                    ),
                   )
                 : null,
           ),
@@ -508,8 +593,16 @@ class _StepBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = CurioTokens.accent;
-    final idle = CurioTokens.border;
+    final coral = curioColor(
+      context,
+      CurioColors.coral,
+      CurioColorsLight.coral,
+    );
+    final idle = curioColor(
+      context,
+      CurioColors.outlineSoft,
+      CurioColorsLight.outline,
+    );
     return Semantics(
       label: 'Setup step ${step + 1} of $count',
       excludeSemantics: true,
@@ -517,27 +610,26 @@ class _StepBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Step ${step + 1} of $count',
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w800),
+            'STEP ${step + 1} OF $count',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              letterSpacing: 1.3,
+              fontWeight: FontWeight.w800,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
               for (var i = 0; i < count; i++) ...[
-                if (i > 0) const SizedBox(width: 8),
+                if (i > 0) const SizedBox(width: 6),
                 Expanded(
                   child: AnimatedContainer(
                     duration: MediaQuery.disableAnimationsOf(context)
                         ? Duration.zero
-                        : CurioTokens.slow,
+                        : const Duration(milliseconds: 280),
                     height: 5,
                     decoration: BoxDecoration(
                       color: i <= step ? coral : idle,
-                      borderRadius: BorderRadius.circular(
-                        CurioTokens.radiusCard,
-                      ),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),
@@ -568,11 +660,31 @@ class _ChoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = CurioTokens.accent;
-    final surface = CurioTokens.surface;
-    final outline = CurioTokens.border;
-    final muted = CurioTokens.textSecondary;
-    final forest = CurioTokens.accent;
+    final coral = curioColor(
+      context,
+      CurioColors.coral,
+      CurioColorsLight.coral,
+    );
+    final surface = curioColor(
+      context,
+      CurioColors.surface,
+      CurioColorsLight.surface,
+    );
+    final outline = curioColor(
+      context,
+      CurioColors.outline,
+      CurioColorsLight.outline,
+    );
+    final muted = curioColor(
+      context,
+      CurioColors.inkSoft,
+      CurioColorsLight.inkSoft,
+    );
+    final forest = curioColor(
+      context,
+      CurioColors.forest,
+      CurioColorsLight.forest,
+    );
     return Semantics(
       selected: selected,
       button: true,
@@ -581,17 +693,17 @@ class _ChoiceCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+          borderRadius: BorderRadius.circular(20),
           child: AnimatedContainer(
             duration: MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
-                : CurioTokens.slow,
+                : const Duration(milliseconds: 180),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: selected
                   ? Color.alphaBlend(coral.withValues(alpha: .1), surface)
                   : surface,
-              borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: selected ? coral : outline,
                 width: selected ? 2 : 1.2,
@@ -605,7 +717,7 @@ class _ChoiceCard extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: selected ? coral : coral.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(CurioTokens.radiusCard),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Text(
                     leading,
@@ -614,11 +726,17 @@ class _ChoiceCard extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       // Coral is bright in both modes: dark ink on it (§7).
-                      color: selected ? CurioTokens.base : coral,
+                      color: selected
+                          ? curioColor(
+                              context,
+                              CurioColors.night,
+                              CurioColorsLight.ink,
+                            )
+                          : coral,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,26 +754,24 @@ class _ChoiceCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
-                                vertical: 4,
+                                vertical: 3,
                               ),
                               decoration: BoxDecoration(
                                 color: forest.withValues(alpha: .14),
-                                borderRadius: BorderRadius.circular(
-                                  CurioTokens.radiusPill,
-                                ),
+                                borderRadius: BorderRadius.circular(99),
                               ),
                               child: Text(
                                 badge!,
                                 style: TextStyle(
                                   color: forest,
-                                  fontSize: 13,
+                                  fontSize: 10.5,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         detail,
                         style: TextStyle(color: muted, fontSize: 13),
