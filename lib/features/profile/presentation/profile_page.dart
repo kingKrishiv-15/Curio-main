@@ -5,6 +5,7 @@ import '../../../core/navigation/open_page.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_clay.dart';
+import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/parental_gate.dart';
 import '../../../core/widgets/text_prompt_dialog.dart';
@@ -18,8 +19,6 @@ import '../../skills/presentation/skill_quest_page.dart';
 import '../domain/badges.dart';
 import 'badges_view.dart';
 
-/// Profile: who is playing (the one raised block), one row of three
-/// numbers, then everything else as plain rows.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -67,18 +66,17 @@ class ProfilePage extends StatelessWidget {
       totalXp: state.totalXp,
       longestStreak: state.longestStreak,
     );
-    final earned = badges.where((b) => b.earned).length;
-
     return CurioPage(
-      maxWidth: 720,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
         children: [
+          const CurioTabHeader(),
+          const SizedBox(height: 16),
           CurioClay(
             key: const Key('profile_identity'),
             raised: true,
-            color: CurioTokens.surface,
-            padding: const EdgeInsets.all(24),
+            color: CurioTokens.wash(CurioTokens.tintThinking, .08),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -105,70 +103,119 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                CurioProgressBar(value: state.xpIntoStage / 250),
-                const SizedBox(height: 8),
-                Text(
-                  'Stage ${state.companionStage}. '
-                  '${250 - state.xpIntoStage} XP to stage ${state.companionStage + 1}.',
-                  style: CurioTokens.bodySmall,
+                const SizedBox(height: 16),
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 12,
+                  runSpacing: 4,
+                  children: [
+                    Text(
+                      'Stage ${state.companionStage}',
+                      style: CurioTokens.label.copyWith(
+                        color: CurioTokens.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      '${250 - state.xpIntoStage} XP to the next stage',
+                      style: CurioTokens.label,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                ExcludeSemantics(
+                  child: CurioProgressBar(
+                    value: state.xpIntoStage / 250,
+                    color: CurioTokens.tintThinking,
+                    height: 6,
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          Row(
+          const SizedBox(height: 16),
+          IntrinsicHeight(
             key: const Key('profile_stats'),
-            children: [
-              _Stat(value: '${state.totalXp}', label: 'Total XP'),
-              _Stat(value: '${state.streak}', label: 'Day streak'),
-              _Stat(value: '$collected', label: 'Ideas collected'),
-            ],
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Stat(
+                  value: '${state.totalXp}',
+                  label: 'Total XP',
+                  icon: Icons.bolt_rounded,
+                  tint: CurioTokens.tintMaths,
+                ),
+                const SizedBox(width: 8),
+                _Stat(
+                  value: '${state.streak}',
+                  label: 'Day streak',
+                  icon: Icons.local_fire_department_rounded,
+                  tint: CurioTokens.accent,
+                ),
+                const SizedBox(width: 8),
+                _Stat(
+                  value: '$collected',
+                  label: 'Ideas collected',
+                  icon: Icons.collections_bookmark_rounded,
+                  tint: CurioTokens.tintLogic,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
-          const Divider(),
-          CurioRow(
-            title: 'Badges',
-            subtitle: '$earned of ${badges.length} earned',
-            onTap: () => showBadgesSheet(context, badges),
+          BadgeShelf(badges: badges),
+          const SizedBox(height: 24),
+          Semantics(
+            header: true,
+            child: const Text(
+              'Learning and settings',
+              style: CurioTokens.title,
+            ),
           ),
-          CurioRow(
+          const SizedBox(height: 8),
+          _ProfileLink(
             title: 'Skills',
-            subtitle: 'Which skills each game has moved',
+            subtitle: 'See your learning progress',
+            icon: Icons.route_rounded,
             onTap: () => openPage(context, const SkillQuestPage()),
           ),
-          CurioRow(
+          _ProfileLink(
             title: 'Parent dashboard',
             subtitle: 'Progress and family controls',
+            icon: Icons.groups_outlined,
             onTap: () =>
                 ParentalGate.open(context, const ParentDashboardPage()),
           ),
-          CurioRow(
+          _ProfileLink(
             title: 'Accessibility',
             subtitle: 'Motion and reading size',
+            icon: Icons.accessibility_new_rounded,
             onTap: () => openPage(context, const AccessibilityPage()),
           ),
-          CurioRow(
+          _ProfileLink(
             title: 'Help and feedback',
+            icon: Icons.help_outline_rounded,
             onTap: () => openPage(context, const HelpPage()),
           ),
-          CurioRow(
+          _ProfileLink(
             title: 'Privacy and account',
+            icon: Icons.lock_outline_rounded,
             onTap: () => ParentalGate.open(context, const PrivacyPage()),
           ),
           if (SupabaseConfig.isConfigured) ...[
-            CurioRow(
+            _ProfileLink(
               title: state.isSyncing
                   ? 'Syncing progress'
                   : state.syncError == null
                   ? 'Progress is backed up'
                   : 'Sync needs attention',
+              icon: Icons.cloud_outlined,
               subtitle: state.syncError,
               onTap: state.retrySync,
             ),
-            CurioRow(
+            _ProfileLink(
               key: const Key('profile_sign_out'),
               title: 'Sign out',
+              icon: Icons.logout_rounded,
               onTap: () => _signOut(context, state),
             ),
           ],
@@ -178,26 +225,61 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-/// One number over its label. Three of these make Profile's single stat
-/// row: plain text, no tiles.
 class _Stat extends StatelessWidget {
-  const _Stat({required this.value, required this.label});
+  const _Stat({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.tint,
+  });
 
   final String value, label;
+  final IconData icon;
+  final Color tint;
 
   @override
   Widget build(BuildContext context) => Expanded(
     child: Semantics(
       label: '$value $label',
       excludeSemantics: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(value, style: CurioTokens.title),
-          const SizedBox(height: 4),
-          Text(label, style: CurioTokens.label),
-        ],
+      child: CurioClay(
+        color: CurioTokens.wash(tint, .15),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, size: 20, color: CurioTokens.textPrimary),
+            const SizedBox(height: 4),
+            Text(value, style: CurioTokens.title),
+            Text(label, textAlign: TextAlign.center, style: CurioTokens.label),
+          ],
+        ),
       ),
     ),
+  );
+}
+
+class _ProfileLink extends StatelessWidget {
+  const _ProfileLink({
+    required this.title,
+    required this.icon,
+    required this.onTap,
+    this.subtitle,
+    super.key,
+  });
+
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => CurioRow(
+    title: title,
+    subtitle: subtitle,
+    leading: ExcludeSemantics(
+      child: CurioIconTile(icon: icon, color: CurioTokens.textSecondary),
+    ),
+    onTap: onTap,
   );
 }

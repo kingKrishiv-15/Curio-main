@@ -325,7 +325,7 @@ class CurioProgressBar extends StatelessWidget {
     // inside IntrinsicHeight rows (equal-height card grids).
     return TweenAnimationBuilder<double>(
       tween: Tween(end: value.clamp(0, 1).toDouble()),
-      duration: CurioTokens.slow,
+      duration: CurioTokens.motion(context, CurioTokens.slow),
       curve: CurioTokens.curve,
       // A groove pressed into the card, a little deeper than [height] asks
       // so the clay reads, filled with a puffy strip.
@@ -492,6 +492,7 @@ class CurioRow extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.tint,
+    this.leading,
     this.trailing,
     this.onTap,
     super.key,
@@ -500,6 +501,7 @@ class CurioRow extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Color? tint;
+  final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -523,6 +525,10 @@ class CurioRow extends StatelessWidget {
                   ),
                   child: const SizedBox(width: 3),
                 ),
+                const SizedBox(width: 12),
+              ],
+              if (leading != null) ...[
+                Center(child: leading),
                 const SizedBox(width: 12),
               ],
               Expanded(

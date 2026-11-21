@@ -6,9 +6,17 @@ import '../../../core/widgets/curio_ui.dart';
 import '../../../theme/curio_tokens.dart';
 import '../game_catalog.dart';
 
-/// Opens [game] for today.
-void openGame(BuildContext context, GameEntry game) =>
-    openPage(context, game.open(date: CurioScope.of(context).today));
+/// Pins a run to the date and eligibility it had when opened.
+void openGame(BuildContext context, GameEntry game) {
+  final state = CurioScope.of(context);
+  openPage(
+    context,
+    game.open(
+      date: state.today,
+      practice: game.isDaily && !state.todayGameIds.contains(game.id),
+    ),
+  );
+}
 
 /// A game in a list: its name, one short line, its section tint on the
 /// left edge and a chevron (a tick once today's round is done).

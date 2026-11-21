@@ -18,7 +18,7 @@ listed here, the screen is wrong, not the list.
 | `textPrimary` | `#2E2417` | Headings and body |
 | `textSecondary` | `#5B4E3B` | Supporting text and metadata |
 | `accent` | `#F2564A` | Primary action, selection, links (coral) |
-| `onAccent` | `#2E2417` | Text and icons on `accent` |
+| `onAccent` | `#2A2014` | Text and icons on `accent` |
 | `correct` | `#15803F` | Right answers |
 | `wrong` | `#D8362B` | Wrong answers and errors |
 | `tintMaths` | `#DB9A2C` | Maths section |
@@ -58,7 +58,8 @@ multiple of 48.
 
 ## Gradients (tested)
 
-None, except inside a progress or timer fill.
+Use solid fills for app surfaces. Progress fills, timer fills and the
+original game emblem artwork may use gradients.
 
 ## Type: 2 faces, 5 roles
 

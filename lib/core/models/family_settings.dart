@@ -102,7 +102,7 @@ class FamilySettings {
   }
 
   factory FamilySettings.fromJson(Map<String, dynamic> json) => FamilySettings(
-    dailyGoal: ((json['daily_goal'] as int?) ?? 3).clamp(1, dailyGameCount),
+    dailyGoal: ((json['daily_goal'] as int?) ?? 3).clamp(1, maxDailyGoal),
     remindersEnabled: json['reminders_enabled'] == true,
     reminderHour: json['reminder_hour'] as int? ?? 18,
     timezone: json['timezone'] as String? ?? 'UTC',

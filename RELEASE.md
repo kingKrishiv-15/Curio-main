@@ -1,6 +1,6 @@
 # Curio Android release
 
-Package: `com.krishiv.curio`. This build: `1.0.0+3`.
+Package: `com.krishiv.curio`. This build: `1.1.0+4`.
 Support: **krishivkedia@gmail.com**.
 
 ## Backend setup
@@ -32,11 +32,9 @@ the original keystore's actual path; do not substitute another app's keystore
 or the Android debug keystore. The previous version's upload key remains the
 authority even if an unrelated local bundle was signed differently.
 
-The local signing path is now `~/Downloads/upload-keystore.jks`, using the
-existing `upload` alias and configured credentials. Build `1.0.0+3` was signed
-successfully and its signature was verified against that keystore. Its public
-certificate is `build/release/curio-upload-certificate.pem`; the bundle checksum
-and signing details are in `build/release/release-info.json`.
+The previous `1.0.0+3` signing record used `~/Downloads/upload-keystore.jks`.
+Its public certificate is `build/release/curio-upload-certificate.pem`. The
+build checksum and signing record are in `build/release/release-info.json`.
 
 Upload certificate SHA-256:
 
@@ -44,9 +42,9 @@ Upload certificate SHA-256:
 7D:98:E4:89:44:06:4D:3C:7F:59:B4:E4:9D:38:EB:4E:99:76:EE:E4:ED:47:F3:9D:9A:FB:C3:A2:C3:0F:F7:18
 ```
 
-This has not yet been checked against Curio's registered upload certificate in
-Play Console. Compare the **Upload key certificate**, which may differ from
-Google's app-signing certificate ([Android signing documentation](https://developer.android.com/studio/publish/app-signing)).
+Verify the signed bundle's certificate fingerprint against the **Upload key
+certificate** in Play Console. Use the upload fingerprint listed under App
+integrity. [Android signing documentation](https://developer.android.com/studio/publish/app-signing)
 The previous local bundle was preserved at
 `build/release-reference/previous-app-release.aab` for reference.
 
@@ -59,8 +57,8 @@ flutter build appbundle --release
 ```
 
 Upload `build/app/outputs/bundle/release/app-release.aab` to an internal testing
-track first. The version code must exceed the latest version already in Play
-Console; raise the `+3` in `pubspec.yaml` if needed.
+track first. The version code must exceed the latest version in Play Console.
+Adjust the build number in `pubspec.yaml` if Play Console already has a higher one.
 
 Publish the files in `docs/` on your public support site and use the hosted
 `privacy.html` and `delete-account.html` URLs in the listing. The support address
@@ -73,11 +71,14 @@ Android internal-test installation:
 
 1. A parent signs up, receives the code, submits every digit and completes setup.
 2. Sign-out, password sign-in, email-code sign-in and password recovery work.
-3. Home and Games show the same Maths, Memory and English daily games.
+3. Home shows a featured challenge and one game each in Maths, Logic, Thinking,
+   Memory and English. The Games tab shows the same six daily picks.
 4. Complete each game, reopen it, and confirm XP is awarded once. Restart the
    app and verify saved XP, discoveries and badges remain.
 5. Complete a game offline, restart, reconnect and verify it syncs once.
 6. Account export and account deletion work through the deployed backend.
+7. A verified family opts into weekly reports and receives the next completed
+   week's report in the app and in their email inbox.
 
 Local tests and builds cannot verify hosted email delivery, hosted function
 deployment or Play Console's current upload certificate. These checks require

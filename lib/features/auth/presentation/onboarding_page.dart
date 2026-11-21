@@ -9,9 +9,9 @@ import '../../../core/widgets/curio_clay.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/daily_schedule.dart';
+import '../../games/game_catalog.dart';
 import 'auth_layout.dart';
 import 'widgets/auth_fields.dart';
-import 'widgets/welcome_art.dart';
 
 /// Learner setup, right after a parent's email is confirmed: a nickname, a
 /// gentle daily goal, reading comfort, how they'd like to hear from Curio,
@@ -150,7 +150,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       1 => (
         'A gentle rhythm',
         'How much play a day?',
-        'Pick a daily goal for $_learner. There are $dailyGameCount games a day: Second Opinion, and one each in $sectionNames. You can change the goal anytime.',
+        'Pick a daily goal for $_learner. Each day has a featured challenge and one game each in $sectionNames. You can change the goal anytime.',
       ),
       2 => (
         'Made for your explorer',
@@ -315,7 +315,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       (1, 'A quick spark', 'One game a day, about 5 minutes'),
       (2, 'A little adventure', 'Two games a day, about 10 minutes'),
       (3, 'A steady habit', 'Three games a day, about 15 minutes'),
-      (4, 'The full set', 'All four games, about 20 minutes'),
+      (maxDailyGoal, 'More time to play', 'Four games a day, about 20 minutes'),
     ];
     return Column(
       children: [
@@ -523,7 +523,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         ),
         const SizedBox(height: 20),
         Text(
-          'Four little adventures, refreshed daily.',
+          '$dailyGameCount games, refreshed daily.',
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
@@ -531,21 +531,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
           spacing: 10,
           runSpacing: 10,
           children: [
-            for (final section in WelcomeSkill.all)
+            for (final section in LearningSection.values)
               Chip(
                 avatar: Icon(
-                  section.icon,
+                  sectionIcon(section),
                   size: 18,
-                  color: section.ink(context),
+                  color: sectionColor(context, section),
                 ),
-                label: Text(section.label),
+                label: Text(section.title),
               ),
           ],
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Second Opinion every day, plus one game from each section.',
-        ),
+        const Text('A featured challenge and one game from each section.'),
         if (_needsConsent) ...[
           const SizedBox(height: 18),
           CheckboxListTile(

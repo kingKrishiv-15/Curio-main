@@ -18,7 +18,7 @@ class SkillQuestPage extends StatelessWidget {
   /// The skill with the least mastery, and a game for it, preferring one
   /// not yet played today.
   static (String, GameEntry) recommendation(CurioState state) {
-    final todays = todaysPicks(date: state.today);
+    final todays = state.todayGameIds.map(gameById).toList();
     final fresh = todays.where((g) => !state.completedToday(g.id)).toList();
     final options = fresh.isEmpty ? todays : fresh;
     options.sort(

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:curio/features/discoveries/domain/discovery.dart';
@@ -5,6 +7,9 @@ import 'package:curio/features/games/bridge/domain/bridge.dart';
 import 'package:curio/features/games/cascade/domain/cascade.dart';
 import 'package:curio/features/games/common/game_kit.dart';
 import 'package:curio/features/games/sequence/domain/sequence.dart';
+import 'package:curio/features/games/loophole/domain/loophole_bank.dart';
+import 'package:curio/features/games/loophole/domain/loophole_local.dart';
+import 'package:curio/features/games/odd_cluster/domain/odd_cluster.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -18,6 +23,86 @@ void main() {
         DailyPick.index(5, date: DateTime(2026, 10, 8)),
         inInclusiveRange(0, 4),
       );
+    });
+  });
+
+  group('Odd Cluster', () {
+    test('every puzzle has 16 distinct tiles in four tiered groups', () {
+      for (final puzzle in oddClusterPuzzles) {
+        expect(puzzle.groups.length, 4);
+        expect(puzzle.words.toSet().length, 16, reason: puzzle.words.join(','));
+        expect(puzzle.groups.map((g) => g.tier).toSet(), {0, 1, 2, 3});
+        for (final g in puzzle.groups) {
+          expect(g.words.length, 4);
+          expect(g.explanation, isNotEmpty);
+        }
+      }
+    });
+
+    test('the number puzzle: each rule fits exactly its own four tiles', () {
+      final puzzle = oddClusterPuzzles.firstWhere(
+        (p) => p.groups.any((g) => g.title == 'Palindromes in binary'),
+      );
+      final board = puzzle.words.map(int.parse).toList();
+      bool prime(int n) =>
+          n > 1 &&
+          [for (var d = 2; d * d <= n; d++) d].every((d) => n % d != 0);
+      bool square(int n) => pow(sqrt(n).round(), 2) == n;
+      bool cube(int n) => pow(pow(n, 1 / 3).round(), 3) == n;
+      bool binaryPalindrome(int n) {
+        final b = n.toRadixString(2);
+        return b == b.split('').reversed.join();
+      }
+
+      final rules = {
+        'Prime numbers': prime,
+        'Square numbers': square,
+        'Cube numbers': cube,
+        'Palindromes in binary': binaryPalindrome,
+      };
+      for (final MapEntry(key: title, value: rule) in rules.entries) {
+        final group = puzzle.groups.firstWhere((g) => g.title == title);
+        expect(
+          board.where(rule).toSet(),
+          group.words.map(int.parse).toSet(),
+          reason: '$title must match only its own tiles',
+        );
+      }
+    });
+
+    test('one away, repeats, four strikes and a win', () {
+      final puzzle = oddClusterPuzzles.first;
+      final easy = puzzle.groups[0].words;
+      final other = puzzle.groups[1].words;
+
+      final game = OddClusterGame(puzzle, seed: 1);
+      final nearMiss = {...easy.take(3), other.first};
+      expect(game.guess(nearMiss), ClusterVerdict.oneAway);
+      expect(game.guess(nearMiss), ClusterVerdict.repeat);
+      expect(game.mistakes, 1, reason: 'a repeat costs nothing');
+      expect(game.guess(easy.toSet()), ClusterVerdict.found);
+      expect(game.board.length, 12);
+
+      final loser = OddClusterGame(puzzle);
+      final mixes = [
+        {easy[0], easy[1], other[0], other[1]},
+        {easy[0], easy[2], other[0], other[2]},
+        {easy[0], easy[3], other[0], other[3]},
+        {easy[1], easy[2], other[1], other[2]},
+      ];
+      for (final mix in mixes) {
+        expect(loser.guess(mix), ClusterVerdict.wrong);
+      }
+      expect(loser.lost, isTrue);
+      expect(loser.revealed.length, 4);
+
+      final winner = OddClusterGame(puzzle);
+      for (final g in puzzle.groups) {
+        winner.guess(g.words.toSet());
+      }
+      expect(winner.won, isTrue);
+      expect(winner.shareGrid().split('\n').length, 4);
+      expect(winner.shareGrid(), isNot(contains('PENGUIN')));
     });
   });
 
@@ -169,6 +254,54 @@ void main() {
       while (round.hint()) {}
       expect(round.solved, isTrue);
       expect(round.points, greaterThanOrEqualTo(20));
+    });
+  });
+
+  group('Loophole offline', () {
+    test('matches the statements seeded on the server', () {
+      final sql = File('supabase/seed_loophole.sql').readAsStringSync();
+      final json = RegExp(
+        r'\$json\$(.*)\$json\$',
+        dotAll: true,
+      ).firstMatch(sql)!.group(1)!;
+      final days = jsonDecode(json) as List;
+      expect(loopholeDays.length, days.length);
+      for (var d = 0; d < days.length; d++) {
+        final public = days[d]['public']['rounds'] as List;
+        final answer = days[d]['answer']['rounds'] as List;
+        for (var r = 0; r < public.length; r++) {
+          final local = loopholeDays[d][r];
+          expect(local.statement, public[r]['statement']);
+          expect(local.tokens, List<String>.from(public[r]['tokens']));
+          expect(local.target, answer[r]['target']);
+          expect(local.explanation, answer[r]['explanation']);
+          expect(local.target, lessThan(local.tokens.length));
+        }
+      }
+    });
+
+    test('scores like the server: 2 first try, 1 second, 0 missed', () {
+      final game = LoopholeLocalGame(loopholeDays.first);
+      final rounds = loopholeDays.first;
+      int wrong(int r) => rounds[r].target == 0 ? 1 : 0;
+
+      expect(game.submit(round: 0, tokenIndex: rounds[0].target)['marks'], [2]);
+      final first = game.submit(round: 1, tokenIndex: wrong(1));
+      expect(first['round_over'], isFalse);
+      expect(
+        first.containsKey('target'),
+        isFalse,
+        reason: 'no answer before the round ends',
+      );
+      expect(game.submit(round: 1, tokenIndex: rounds[1].target)['marks'], [
+        2,
+        1,
+      ]);
+      game.submit(round: 2, tokenIndex: wrong(2));
+      final last = game.submit(round: 2, tokenIndex: wrong(2));
+      expect(last['finished'], isTrue);
+      expect(last['score'], 3);
+      expect(last['marks'], [2, 1, 0]);
     });
   });
 

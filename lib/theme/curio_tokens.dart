@@ -21,7 +21,7 @@ class CurioTokens extends ThemeExtension<CurioTokens> {
   static const textPrimary = Color(0xFF2E2417);
   static const textSecondary = Color(0xFF5B4E3B);
   static const accent = Color(0xFFF2564A);
-  static const onAccent = Color(0xFF2E2417);
+  static const onAccent = Color(0xFF2A2014);
   static const correct = Color(0xFF15803F);
   static const wrong = Color(0xFFD8362B);
   static const tintMaths = Color(0xFFDB9A2C);

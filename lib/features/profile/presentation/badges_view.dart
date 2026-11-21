@@ -147,6 +147,52 @@ class _ProgressLine extends StatelessWidget {
   }
 }
 
+class BadgeShelf extends StatelessWidget {
+  const BadgeShelf({required this.badges, super.key});
+
+  final List<CurioBadge> badges;
+
+  @override
+  Widget build(BuildContext context) {
+    final earned = badges.where((badge) => badge.earned).toList();
+    final next = nextBadge(badges);
+    final preview = [
+      ...earned,
+      ?next,
+      ...badges.where((badge) => !badge.earned && badge != next),
+    ].take(3);
+
+    return CurioCard(
+      key: const Key('badge_shelf'),
+      onTap: () => showBadgesSheet(context, badges),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Expanded(child: Text('Badges', style: CurioTokens.title)),
+              ExcludeSemantics(child: Icon(Icons.chevron_right_rounded)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${earned.length} of ${badges.length} earned',
+            style: CurioTokens.bodySmall,
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final badge in preview) BadgeMedal(badge: badge, size: 40),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Every badge in a tall sheet: what's earned, then what's left, closest first.
 Future<void> showBadgesSheet(BuildContext context, List<CurioBadge> badges) {
   return showModalBottomSheet<void>(

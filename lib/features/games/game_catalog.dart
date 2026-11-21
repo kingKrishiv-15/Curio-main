@@ -3,6 +3,15 @@ import 'package:curio/theme/curio_tokens.dart';
 
 import '../story/presentation/frostlands_story_page.dart';
 import 'bridge/presentation/bridge_page.dart';
+import 'memory/presentation/memory_page.dart';
+import 'memory_grid/presentation/memory_grid_page.dart';
+import 'english/presentation/english_page.dart';
+import 'evidence/presentation/evidence_detective_page.dart';
+import 'loophole/presentation/loophole_page.dart';
+import 'number_hunt/presentation/number_hunt_page.dart';
+import 'odd_cluster/presentation/odd_cluster_page.dart';
+import 'pattern/presentation/pattern_forge_page.dart';
+import 'word_trails/presentation/word_trails_page.dart';
 import 'cascade/presentation/cascade_page.dart';
 import 'crowns/presentation/crowns_page.dart';
 import 'common/daily_game_session.dart';
@@ -41,12 +50,17 @@ class GameEntry {
   final Widget Function(DateTime date) builder;
   LearningSection get section => sectionForGame(id);
 
-  Widget open({DateTime? date}) {
+  Widget open({DateTime? date, bool practice = false}) {
     final started = date ?? DateTime.now();
     return DailyGameSession(
       gameId: id,
       date: started,
-      child: builder(isDaily ? puzzleDateForGame(id, started) : started),
+      practice: practice,
+      child: builder(
+        isDaily && id != anchorGameId
+            ? puzzleDateForGame(id, started)
+            : started,
+      ),
     );
   }
 
@@ -64,7 +78,7 @@ final gameCatalog = <GameEntry>[
         'An AI wrote the brief. Three of its claims do not hold up. Find them.',
     icon: Icons.fact_check_rounded,
     duration: '5 min',
-    builder: (_) => const SecondOpinionPage(),
+    builder: (date) => SecondOpinionPage(date: date),
   ),
   GameEntry(
     id: 'crowns',
@@ -156,6 +170,96 @@ final gameCatalog = <GameEntry>[
     builder: (date) => SignalGridPage(date: date),
   ),
   GameEntry(
+    id: 'memory_match',
+    title: 'Memory Match',
+    tagline: 'Turn over two cards. Remember where each picture is hiding.',
+    icon: Icons.style_rounded,
+    duration: '3 min',
+    builder: (date) => MemoryPage(date: date),
+  ),
+  GameEntry(
+    id: 'memory_trail',
+    title: 'Memory Trail',
+    tagline: 'Study a trail of pictures, then remember their order.',
+    icon: Icons.route_rounded,
+    duration: '3 min',
+    builder: (date) => MemoryPage(date: date, trail: true),
+  ),
+  GameEntry(
+    id: 'memory_grid',
+    title: 'Memory Grid',
+    tagline: 'Squares glow, then vanish. Tap the same ones back.',
+    icon: Icons.grid_view_rounded,
+    duration: '3 min',
+    builder: (date) => MemoryGridPage(date: date),
+  ),
+  GameEntry(
+    id: 'word_wise',
+    title: 'Word Wise',
+    tagline:
+        'Find the right word, explore its meaning and finish the sentence.',
+    icon: Icons.menu_book_rounded,
+    duration: '3 min',
+    builder: (date) => EnglishPage(date: date),
+  ),
+  GameEntry(
+    id: 'word_builder',
+    title: 'Word Builder',
+    tagline: 'Use the clue and put the letters in order to build a word.',
+    icon: Icons.abc_rounded,
+    duration: '3 min',
+    builder: (date) => EnglishPage(date: date, builder: true),
+  ),
+  GameEntry(
+    id: 'word_trails',
+    title: 'Word Trails',
+    tagline: 'Trace the story’s missing words, then say what they mean.',
+    icon: Icons.gesture_rounded,
+    duration: '3 to 4 min',
+    builder: (date) => WordTrailsPage(date: date),
+  ),
+  GameEntry(
+    id: 'odd_cluster',
+    title: 'Odd Cluster',
+    tagline: 'Sixteen tiles, four hidden groups, and one of them is a trap.',
+    icon: Icons.workspaces_rounded,
+    duration: '3 to 5 min',
+    builder: (date) => OddClusterPage(date: date),
+  ),
+  GameEntry(
+    id: 'loophole',
+    title: 'Loophole',
+    tagline: 'Find the one word making a true statement mislead.',
+    icon: Icons.format_quote_rounded,
+    duration: '2 min',
+    builder: (date) => LoopholePage(date: date),
+  ),
+  GameEntry(
+    id: 'number_hunt',
+    title: 'Number Hunt',
+    tagline: 'One number from 1 to 1,000. Ten guesses. Follow the clues.',
+    icon: Icons.travel_explore_rounded,
+    duration: '3 to 4 min',
+    builder: (date) => NumberHuntPage(date: date),
+  ),
+  GameEntry(
+    id: 'pattern_forge',
+    title: 'Pattern Forge',
+    tagline: 'Pick the next number, name the rule, fix the broken pattern.',
+    icon: Icons.blur_on_rounded,
+    duration: '3 to 5 min',
+    builder: (date) => PatternForgePage(date: date),
+  ),
+  GameEntry(
+    id: 'evidence_garden',
+    title: 'Evidence Detective',
+    tagline:
+        'A new case each day: rank the clues before you jump to conclusions.',
+    icon: Icons.manage_search_rounded,
+    duration: '4 to 6 min',
+    builder: (date) => EvidenceDetectivePage(date: date),
+  ),
+  GameEntry(
     id: 'frostlands_night_1',
     title: 'Frostlands Story',
     tagline: 'Help Ash home, careful, brave or kind? Four endings to find.',
@@ -181,22 +285,27 @@ List<GameEntry> get dailyGames => [
 ];
 
 /// Exactly one game per section; this is the shared daily plan for all screens.
-List<GameEntry> todaysPicks({DateTime? date, int count = 4}) {
+List<GameEntry> todaysPicks({DateTime? date, int? count}) {
   final today = date ?? DateTime.now();
   return [
     for (final section in LearningSection.values.take(
-      count.clamp(0, LearningSection.values.length),
+      (count ?? LearningSection.values.length).clamp(
+        0,
+        LearningSection.values.length,
+      ),
     ))
       gameById(scheduledGameId(section, today)),
   ];
 }
 
-GameEntry featuredGame({DateTime? date}) => todaysPicks(date: date).first;
+GameEntry featuredGame({DateTime? date}) => todaysSet(date: date).anchor;
 
 IconData sectionIcon(LearningSection section) => switch (section) {
   LearningSection.maths => Icons.calculate_rounded,
   LearningSection.logic => Icons.extension_rounded,
   LearningSection.thinking => Icons.psychology_rounded,
+  LearningSection.memory => Icons.style_rounded,
+  LearningSection.english => Icons.menu_book_rounded,
 };
 
 Color sectionColor(BuildContext context, LearningSection section) =>
@@ -204,6 +313,8 @@ Color sectionColor(BuildContext context, LearningSection section) =>
       LearningSection.maths => CurioTokens.tintMaths,
       LearningSection.logic => CurioTokens.tintLogic,
       LearningSection.thinking => CurioTokens.tintThinking,
+      LearningSection.memory => CurioTokens.accent,
+      LearningSection.english => CurioTokens.correct,
     };
 
 /// The skill colours from design.md §3: number sense gold, patterns coral,
@@ -234,13 +345,9 @@ IconData skillIcon(String skill) => switch (skill) {
   DateTime? date,
   List<String>? ids,
 }) {
-  if (ids != null &&
-      ids.length > 1 &&
-      ids.every((id) => findGame(id) != null)) {
-    return (
-      anchor: gameById(ids.first),
-      others: [for (final id in ids.skip(1)) gameById(id)],
-    );
-  }
-  return (anchor: gameById(anchorGameId), others: todaysPicks(date: date));
+  final games = dailyGameIds(date ?? DateTime.now(), serverIds: ids);
+  return (
+    anchor: gameById(games.first),
+    others: [for (final id in games.skip(1)) gameById(id)],
+  );
 }

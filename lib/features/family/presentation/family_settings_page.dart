@@ -124,14 +124,16 @@ class _FamilySettingsPageState extends State<FamilySettingsPage> {
                     Slider(
                       value: _goal.toDouble(),
                       min: 1,
-                      max: 4,
-                      divisions: 3,
+                      max: maxDailyGoal.toDouble(),
+                      divisions: maxDailyGoal - 1,
                       label: '$_goal ${_goal == 1 ? 'activity' : 'activities'}',
                       onChanged: _saving
                           ? null
                           : (v) => setState(() => _goal = v.round()),
                     ),
-                    Text('One daily game each in $sectionNames.'),
+                    Text(
+                      'Each day has a featured challenge and one game each in $sectionNames.',
+                    ),
                   ],
                 ),
               ),

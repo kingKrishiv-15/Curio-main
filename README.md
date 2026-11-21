@@ -18,17 +18,17 @@ knowledge rewards and family insight in one responsive product experience.
 
 ## Daily learning
 
-- Three daily sections: **Maths**, **Memory**, and **English**.
-- Exactly one scheduled game per section, shared by Home and Games.
-- Games rotate by the device's local calendar date and refresh at midnight or
-  when the app resumes. A run opened before midnight keeps its original date.
-- A game's puzzle bank advances on each appearance so the rotation does not
-  accidentally repeat the same puzzle every time.
-- Memory Match and Memory Trail teach picture and sequence recall. Word Wise
-  and Word Builder add vocabulary, reading, grammar and spelling practice.
-- Existing number, pattern, logic and reading games join their section's rotation.
-- Daily goals range from one to three sections. XP is earned once per daily
-  game; practice rounds add no extra XP. New learners start at zero.
+- Six daily games: one each in **Maths**, **Logic**, **Thinking**, **Memory**
+  and **English**, plus a featured challenge.
+- The featured challenge is Second Opinion when its daily case is published.
+  A rotating Thinking game takes the slot on other days.
+- Signed-in play follows the server's UTC date. Demo play follows the device's
+  local date. Home refreshes at midnight, when the app resumes, and when pulled
+  down. A run opened before midnight keeps its original date.
+- Home and the **Games** tab start with the same daily lineup. The Games tab
+  includes a short description of each puzzle. The lineup and puzzles advance by date.
+- Daily goals range from one to four games. XP is earned once per scheduled
+  daily game. Practice rounds add no extra XP.
 - Total XP, today's XP, daily completion and weekly progress are shown separately.
 - Guest progress is saved on the device. Signed-in progress uses Supabase with
   a durable retry queue; unsynced rewards remain on the device.

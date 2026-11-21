@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
+import '../../common/daily_game_session.dart';
 import '../../common/game_kit.dart';
 import '../../common/game_rewards.dart';
 import '../domain/squeeze_engine.dart';
@@ -26,6 +27,9 @@ class _SqueezePageState extends State<SqueezePage> {
   bool _awarded = false;
   bool _alreadyDone = false;
 
+  bool get _isPractice =>
+      _practice || DailyGameSession.of(context)?.practice == true;
+
   @override
   void dispose() {
     _controller.dispose();
@@ -44,7 +48,7 @@ class _SqueezePageState extends State<SqueezePage> {
     });
     // The day counts once it's finished, found or not, otherwise losing,
     // reopening and typing the revealed number would farm the XP.
-    if (_engine.finished && !_practice && !_awarded) {
+    if (_engine.finished && !_isPractice && !_awarded) {
       _awarded = true;
       _alreadyDone = awardDaily(context, 'squeeze');
     }
@@ -73,7 +77,7 @@ class _SqueezePageState extends State<SqueezePage> {
     final tealDark = CurioTokens.accent;
     final goldSoft = CurioTokens.surfaceRaised;
     return CurioPage(
-      title: 'Daily Squeeze',
+      title: _isPractice ? 'Squeeze practice' : 'Daily Squeeze',
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
@@ -82,7 +86,7 @@ class _SqueezePageState extends State<SqueezePage> {
             child: Column(
               children: [
                 Text(
-                  _practice ? 'Practice range' : 'Secret range',
+                  _isPractice ? 'Practice range' : 'Secret range',
                   style: TextStyle(
                     color: cardLabel,
                     fontWeight: FontWeight.w900,
@@ -184,7 +188,7 @@ class _SqueezePageState extends State<SqueezePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _practice
+                    _isPractice
                         ? 'Practice round, no XP, just sharper guessing.'
                         : _alreadyDone
                         ? 'Today’s XP was already earned, this one was for fun.'

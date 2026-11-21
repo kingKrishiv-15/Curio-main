@@ -38,15 +38,14 @@ abstract final class DailyPick {
 /// the result card can say "no new XP" instead of claiming it again. Safe
 /// without a [CurioScope] (e.g. a page pumped alone in a test).
 bool awardDaily(BuildContext context, String game) {
+  final session = DailyGameSession.of(context);
+  if (session?.practice == true) return false;
   final reward = gameRewards[game];
   assert(reward != null, 'No reward for $game, add it to gameRewards');
   final state = context.getInheritedWidgetOfExactType<CurioScope>()?.notifier;
   if (state == null || reward == null) return false;
   final id = reward.dated
-      ? CurioState.dailyActivityId(
-          game,
-          DailyGameSession.of(context)?.date ?? state.today,
-        )
+      ? CurioState.dailyActivityId(game, session?.date ?? state.today)
       : game;
   final already = state.completedActivities.contains(id);
   state.completeActivity(
@@ -269,11 +268,13 @@ class GameResultCard extends StatelessWidget {
         .dependOnInheritedWidgetOfExactType<CurioScope>()
         ?.notifier;
     final reward = gameRewards[gameId];
+    final practice = DailyGameSession.of(context)?.practice == true;
+    final earnedXp = practice ? null : xp;
 
     // A game's discovery is collected the first time it's ever finished, so
     // it's news only when this is the one recorded play of the game.
     Discovery? unlocked;
-    if (state != null && reward != null && xp != null && !alreadyDone) {
+    if (state != null && reward != null && earnedXp != null && !alreadyDone) {
       final plays = state.completedActivities
           .where((id) => activityGame(id) == gameId)
           .length;
@@ -292,19 +293,21 @@ class GameResultCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(score, style: Theme.of(context).textTheme.displayLarge),
           const SizedBox(height: 8),
-          if (xp != null && !alreadyDone)
+          if (earnedXp != null && !alreadyDone)
             Row(
               children: [
                 Icon(Icons.bolt_rounded, color: gold, size: 20),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    '+$xp XP earned',
+                    '+$earnedXp XP earned',
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
               ],
             )
+          else if (practice)
+            const Text('Practice round', style: CurioTokens.bodySmall)
           else if (alreadyDone)
             Text(
               'Today’s XP was already earned, this one was for fun.',
@@ -361,12 +364,12 @@ class GameResultCard extends StatelessWidget {
               key: const Key('result_more_games'),
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.grid_view_rounded, size: 18),
-              label: const Text('Back to today’s games'),
+              label: Text(practice ? 'Back to games' : 'Back to today’s games'),
             ),
           ],
           const SizedBox(height: 12),
           Text(
-            'New games arrive in Maths, Memory, English and Logic tomorrow.',
+            'A new set of games arrives tomorrow.',
             style: TextStyle(color: muted, fontSize: 13),
           ),
         ],

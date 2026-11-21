@@ -190,9 +190,8 @@ void main() {
     });
   });
 
-  test('Second Opinion is the anchor and the set is anchor plus one per '
-      'section', () {
-    final set = todaysSet(date: DateTime(2026, 11, 13));
+  test('a published Second Opinion leads the five section picks', () {
+    final set = todaysSet(date: DateTime(2026, 11, 13), ids: [anchorGameId]);
     expect(set.anchor.id, anchorGameId);
     expect(set.others.map((g) => g.section), LearningSection.values);
     expect(set.others.length + 1, dailyGameCount);

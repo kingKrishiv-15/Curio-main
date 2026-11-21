@@ -6,16 +6,20 @@ class DailyGameSession extends InheritedWidget {
     required this.gameId,
     required this.date,
     required super.child,
+    this.practice = false,
     super.key,
   });
 
   final String gameId;
   final DateTime date;
+  final bool practice;
 
   static DailyGameSession? of(BuildContext context) =>
       context.getInheritedWidgetOfExactType<DailyGameSession>();
 
   @override
   bool updateShouldNotify(DailyGameSession oldWidget) =>
-      gameId != oldWidget.gameId || date != oldWidget.date;
+      gameId != oldWidget.gameId ||
+      date != oldWidget.date ||
+      practice != oldWidget.practice;
 }

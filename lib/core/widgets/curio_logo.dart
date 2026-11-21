@@ -344,3 +344,26 @@ class CurioLogo extends StatelessWidget {
     );
   }
 }
+
+/// The shared wordmark at the top of the main tabs.
+class CurioTabHeader extends StatelessWidget {
+  const CurioTabHeader({this.actions = const [], super.key});
+
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(minHeight: 48),
+    child: Row(
+      children: [
+        const Expanded(
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: CurioLogo(markSize: 28),
+          ),
+        ),
+        ...actions,
+      ],
+    ),
+  );
+}

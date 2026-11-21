@@ -7,6 +7,7 @@ import '../../../../core/services/minigame_service.dart';
 import '../../../../core/widgets/curio_clay.dart';
 import '../../../../core/widgets/curio_ui.dart';
 import '../../../../theme/curio_tokens.dart';
+import '../../common/daily_game_session.dart';
 import '../../common/game_kit.dart';
 import '../data/second_opinion_gateways.dart';
 import '../domain/second_opinion.dart';
@@ -16,7 +17,9 @@ enum _Phase { loading, failed, brief, verdict, debrief }
 /// The daily anchor game. One five minute clock runs across reading the
 /// brief, asking follow-ups and flagging claims; it never pauses.
 class SecondOpinionPage extends StatefulWidget {
-  const SecondOpinionPage({this.gateway, super.key});
+  const SecondOpinionPage({this.date, this.gateway, super.key});
+
+  final DateTime? date;
 
   /// Injected in tests. By default the server gateway is used when a
   /// learner is signed in, and the demo gateway otherwise.
@@ -36,8 +39,9 @@ class SecondOpinionPage extends StatefulWidget {
 class _SecondOpinionPageState extends State<SecondOpinionPage> {
   late final SecondOpinionGateway _gateway =
       widget.gateway ??
-      (MinigameService().isSignedIn
-          ? ServerSecondOpinionGateway()
+      (DailyGameSession.of(context)?.practice != true &&
+              MinigameService().isSignedIn
+          ? ServerSecondOpinionGateway(date: widget.date)
           : DemoSecondOpinionGateway());
 
   _Phase _phase = _Phase.loading;

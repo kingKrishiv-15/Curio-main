@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/widgets/curio_clay.dart';
 import '../../../theme/curio_tokens.dart';
 import '../../discoveries/presentation/discoveries_page.dart';
+import '../../games/presentation/today_games.dart';
 import '../../home/presentation/home_page.dart';
 import '../../profile/presentation/profile_page.dart';
 
-/// The three places in Curio: Home, Discover, Profile.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -14,47 +15,47 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _Tab {
+enum _Tab {
+  home('Home', Icons.home_outlined, Icons.home_rounded),
+  games('Games', Icons.sports_esports_outlined, Icons.sports_esports_rounded),
+  discover('Discover', Icons.explore_outlined, Icons.explore_rounded),
+  profile('Profile', Icons.person_outline_rounded, Icons.person_rounded);
+
   const _Tab(this.label, this.icon, this.selectedIcon);
   final String label;
   final IconData icon, selectedIcon;
 }
 
-const _tabs = [
-  _Tab('Home', Icons.home_outlined, Icons.home_rounded),
-  _Tab('Discover', Icons.explore_outlined, Icons.explore_rounded),
-  _Tab('Profile', Icons.person_outline_rounded, Icons.person_rounded),
-];
-
 class _MainShellState extends State<MainShell> {
-  int _index = 0;
+  _Tab _selected = _Tab.home;
 
-  late final List<Widget> _pages = <Widget>[
-    HomePage(onProfile: () => _select(2)),
-    const DiscoveriesPage(),
-    const ProfilePage(),
-  ];
+  late final _pages = <_Tab, Widget>{
+    _Tab.home: HomePage(onProfile: () => _select(_Tab.profile)),
+    _Tab.games: const TodayGamesPage(),
+    _Tab.discover: DiscoveriesPage(onHome: () => _select(_Tab.home)),
+    _Tab.profile: const ProfilePage(),
+  };
 
-  void _select(int value) {
-    if (_index == value) return;
+  void _select(_Tab tab) {
+    if (_selected == tab) return;
     HapticFeedback.selectionClick();
-    setState(() => _index = value);
+    setState(() => _selected = tab);
   }
 
   @override
   Widget build(BuildContext context) {
     final content = IndexedStack(
       key: const Key('tab_transition'),
-      index: _index,
+      index: _selected.index,
       children: [
-        for (var i = 0; i < _pages.length; i++)
-          TickerMode(enabled: i == _index, child: _pages[i]),
+        for (final tab in _Tab.values)
+          TickerMode(enabled: tab == _selected, child: _pages[tab]!),
       ],
     );
     return PopScope(
-      canPop: _index == 0,
+      canPop: _selected == _Tab.home,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _select(0);
+        if (!didPop) _select(_Tab.home);
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -73,7 +74,7 @@ class _MainShellState extends State<MainShell> {
                   ? Row(
                       children: [
                         _Bar(
-                          index: _index,
+                          selected: _selected,
                           onSelected: _select,
                           vertical: true,
                         ),
@@ -83,7 +84,7 @@ class _MainShellState extends State<MainShell> {
                   : content,
               bottomNavigationBar: wide
                   ? null
-                  : _Bar(index: _index, onSelected: _select),
+                  : _Bar(selected: _selected, onSelected: _select),
             ),
           );
         },
@@ -92,55 +93,58 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-/// Flat navigation: a rule, three labelled icons, no capsule and no shadow.
 class _Bar extends StatelessWidget {
   const _Bar({
-    required this.index,
+    required this.selected,
     required this.onSelected,
     this.vertical = false,
   });
 
-  final int index;
-  final ValueChanged<int> onSelected;
+  final _Tab selected;
+  final ValueChanged<_Tab> onSelected;
   final bool vertical;
 
   @override
   Widget build(BuildContext context) {
     final items = [
-      for (var i = 0; i < _tabs.length; i++)
+      for (final tab in _Tab.values)
         _BarItem(
-          key: Key('nav_${_tabs[i].label}'),
-          tab: _tabs[i],
-          selected: i == index,
-          onTap: () => onSelected(i),
+          key: Key('nav_${tab.label}'),
+          tab: tab,
+          selected: tab == selected,
+          onTap: () => onSelected(tab),
         ),
     ];
-    const rule = BorderSide(color: CurioTokens.border);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: CurioTokens.base,
-        border: vertical ? const Border(right: rule) : const Border(top: rule),
-      ),
-      child: SafeArea(
-        top: vertical,
-        right: !vertical,
-        child: vertical
-            ? Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: SizedBox(
-                  width: 96,
-                  child: Column(
-                    children: [
-                      for (final item in items)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: item,
-                        ),
-                    ],
-                  ),
-                ),
-              )
-            : Row(children: [for (final item in items) Expanded(child: item)]),
+    if (vertical) {
+      return SafeArea(
+        right: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 0, 16),
+          child: SizedBox(
+            width: 96,
+            child: CurioClay(
+              padding: const EdgeInsets.all(4),
+              child: Column(mainAxisSize: MainAxisSize.min, children: items),
+            ),
+          ),
+        ),
+      );
+    }
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Center(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: CurioClay(
+            radius: CurioTokens.radiusPill,
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              children: [for (final item in items) Expanded(child: item)],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -160,25 +164,36 @@ class _BarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? CurioTokens.accent : CurioTokens.textSecondary;
+    final color = selected
+        ? CurioTokens.textPrimary
+        : CurioTokens.textSecondary;
     return Semantics(
       button: true,
       selected: selected,
-      label: tab.label,
-      excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+        borderRadius: CurioTokens.pillShape,
+        child: AnimatedContainer(
+          duration: CurioTokens.motion(context),
+          curve: CurioTokens.curve,
+          decoration: BoxDecoration(
+            color: selected ? CurioTokens.wash(CurioTokens.accent, .20) : null,
+            borderRadius: CurioTokens.pillShape,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(selected ? tab.selectedIcon : tab.icon, color: color),
+              ExcludeSemantics(
+                child: Icon(
+                  selected ? tab.selectedIcon : tab.icon,
+                  color: color,
+                ),
+              ),
               const SizedBox(height: 4),
               Text(
                 tab.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
                 style: CurioTokens.label.copyWith(color: color),
               ),
             ],

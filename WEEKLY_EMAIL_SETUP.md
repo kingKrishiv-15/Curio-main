@@ -9,6 +9,8 @@ and practice days for the completed Monday–Sunday week, lifetime XP, discoveri
 and the full skill snapshot, including Memory and English. A report is queued
 after 8 AM on Monday in the family's selected time zone. The hourly job retries
 delivery; it uses an idempotency key to avoid duplicate emails during retries.
+If a parent first enables email after the latest inbox report is created,
+the next run queues that report for email.
 These are progress summaries, not formal assessments.
 
 ## One-time live setup
@@ -36,5 +38,5 @@ These are progress summaries, not formal assessments.
    `parent-digest` logs if delivery fails. Opting out cancels future delivery;
    the sender checks the preference again immediately before sending.
 
-Resend is not configured for the live project yet. No real report email has
-been sent or verified from this workspace.
+Check the recipient's mailbox for delivery confirmation. A `sent` outbox row
+records that the provider accepted the message.

@@ -1,6 +1,13 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../features/games/common/daily_schedule.dart';
 import '../config/supabase_config.dart';
+
+typedef DailySetSnapshot = ({
+  DateTime date,
+  DateTime? serverTime,
+  List<String> games,
+});
 
 /// One day's puzzle, as much of it as a client is allowed to see. The answer
 /// is not in here and never comes down the wire - `config` holds only what
@@ -146,13 +153,22 @@ class MinigameService {
   }
 
   /// The server's date and today's set of games, anchor first.
-  Future<({DateTime date, List<String> games})> fetchDailySet() async {
+  Future<DailySetSnapshot> fetchDailySet() async {
     final result = Map<String, dynamic>.from(
       await _db.rpc('get_daily_set') as Map,
     );
+    final puzzles = result['puzzles'] as List? ?? const [];
+    final hasSecondOpinion = puzzles.any(
+      (puzzle) => puzzle is Map && puzzle['puzzle_type'] == anchorGameId,
+    );
     return (
       date: DateTime.parse(result['date'] as String),
-      games: [for (final g in (result['games'] as List? ?? const [])) '$g'],
+      serverTime: DateTime.tryParse('${result['server_time'] ?? ''}'),
+      games: [
+        for (final id
+            in (result['games'] as List? ?? const []).whereType<String>())
+          if (id != anchorGameId || hasSecondOpinion) id,
+      ],
     );
   }
 
@@ -213,7 +229,7 @@ class MinigameService {
     return MoveVerdict(Map<String, dynamic>.from(result as Map));
   }
 
-  Future<int> currentStreak(String type) async {
+  Future<int> currentStreak(String type, {DateTime? date}) async {
     final childId = await _childProfileId();
     final row = await _db
         .from('puzzle_streaks')
@@ -224,7 +240,7 @@ class MinigameService {
     // The stored count only changes when a day is played, so a streak that
     // has since lapsed must be read as 0 rather than its old number.
     final last = DateTime.tryParse('${row?['last_qualified_date'] ?? ''}');
-    final now = DateTime.now();
+    final now = date ?? DateTime.now();
     final yesterday = DateTime(now.year, now.month, now.day - 1);
     if (last == null || last.isBefore(yesterday)) return 0;
     return (row?['current_count'] as int?) ?? 0;

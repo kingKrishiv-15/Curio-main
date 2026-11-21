@@ -11,36 +11,90 @@ import '../../features/games/common/game_rewards.dart';
 import '../services/minigame_service.dart';
 
 class CurioState extends ChangeNotifier with WidgetsBindingObserver {
-  CurioState({this.store, this.isGuest = false, DateTime Function()? now})
-    : _now = now ?? DateTime.now {
+  CurioState({
+    this.store,
+    this.isGuest = false,
+    DateTime Function()? now,
+    Future<DailySetSnapshot?> Function()? fetchDailySet,
+  }) : _nowOverride = now,
+       _fetchDailySet = fetchDailySet ?? _fetchSignedInDailySet {
     WidgetsBinding.instance.addObserver(this);
   }
-  final DateTime Function() _now;
+  final DateTime Function()? _nowOverride;
+  final Future<DailySetSnapshot?> Function() _fetchDailySet;
+  final _serverElapsed = Stopwatch();
+  DateTime? _serverTime, _syncedAt;
+  int? _dailySetDay;
+  List<String>? _serverGameIds;
+  Future<void>? _dailySetRefresh;
 
-  /// How far the server's calendar day is from this device's. Zero until
-  /// the server has been asked (and always zero in demo mode).
-  Duration _serverOffset = Duration.zero;
+  DateTime _now() => _nowOverride?.call() ?? DateTime.now();
 
-  /// The games in today's set as the server listed them, anchor first.
-  /// Null until the server has answered; screens then fall back to the
-  /// same rotation worked out on the device.
-  List<String>? dailySetIds;
+  /// Demo play follows the device. Signed-in play follows the UTC server
+  /// clock, advanced by elapsed time since the last successful refresh.
+  DateTime get today {
+    final serverTime = _serverTime;
+    if (serverTime == null) return _now();
+    final elapsed = _nowOverride == null
+        ? _serverElapsed.elapsed
+        : _now().difference(_syncedAt!);
+    return serverTime.add(elapsed);
+  }
 
-  /// Today. Once the server has reported its date this follows the server,
-  /// so changing the device clock does not move the day.
-  DateTime get today => _now().add(_serverOffset);
+  List<String>? get dailySetIds =>
+      _dailySetDay == calendarDayNumber(today) ? _serverGameIds : null;
 
-  /// Adopts the server's date and set (from get_daily_set).
-  void adoptDailySet({required DateTime serverDate, List<String>? games}) {
-    final local = _now();
-    _serverOffset = DateTime(
-      serverDate.year,
-      serverDate.month,
-      serverDate.day,
-    ).difference(DateTime(local.year, local.month, local.day));
-    dailySetIds = games;
+  List<String> get todayGameIds => dailyGameIds(today, serverIds: dailySetIds);
+
+  void adoptDailySet({
+    required DateTime serverDate,
+    DateTime? serverTime,
+    List<String>? games,
+  }) {
+    final deviceTime = _now();
+    final utc = deviceTime.toUtc();
+    _syncedAt = deviceTime;
+    _serverTime =
+        serverTime?.toUtc() ??
+        DateTime.utc(
+          serverDate.year,
+          serverDate.month,
+          serverDate.day,
+          utc.hour,
+          utc.minute,
+          utc.second,
+          utc.millisecond,
+        );
+    _serverElapsed
+      ..reset()
+      ..start();
+    _dailySetDay = calendarDayNumber(serverDate);
+    _serverGameIds = games == null ? null : List.unmodifiable(games);
     streak = calculateStreak(completedActivities, today);
+    if (_dayTimer != null) startDailyClock();
     notifyListeners();
+  }
+
+  static Future<DailySetSnapshot?> _fetchSignedInDailySet() async {
+    final service = MinigameService();
+    return service.isSignedIn ? await service.fetchDailySet() : null;
+  }
+
+  Future<void> refreshDailySet() => _dailySetRefresh ??= _loadDailySet()
+      .whenComplete(() => _dailySetRefresh = null);
+
+  Future<void> _loadDailySet() async {
+    try {
+      final set = await _fetchDailySet();
+      if (_disposed || set == null) return;
+      adoptDailySet(
+        serverDate: set.date,
+        serverTime: set.serverTime,
+        games: set.games,
+      );
+    } catch (_) {
+      // The dated fallback stays playable when the server is unreachable.
+    }
   }
 
   Timer? _dayTimer;
@@ -49,12 +103,15 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   void startDailyClock() {
     _dayTimer?.cancel();
     final now = today;
-    final midnight = DateTime(now.year, now.month, now.day + 1);
+    final midnight = now.isUtc
+        ? DateTime.utc(now.year, now.month, now.day + 1)
+        : DateTime(now.year, now.month, now.day + 1);
     _dayTimer = Timer(midnight.difference(now) + CurioTokens.fast, () {
       if (_disposed) return;
       streak = calculateStreak(completedActivities, today);
       notifyListeners();
       startDailyClock();
+      unawaited(refreshDailySet());
     });
   }
 
@@ -66,6 +123,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   void dispose() {
     _disposed = true;
     _dayTimer?.cancel();
+    _serverElapsed.stop();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -82,12 +140,13 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
     // streak are all date-based, so recompute rather than show yesterday.
     streak = calculateStreak(completedActivities, today);
     notifyListeners();
+    unawaited(refreshDailySet());
     // Only resend when a save is actually waiting.
     if (store != null && syncError != null) unawaited(retrySync());
   }
 
   void setDailyGoal(int value) {
-    dailyGoal = value.clamp(1, dailyGameCount);
+    dailyGoal = value.clamp(1, maxDailyGoal);
     notifyListeners();
   }
 
@@ -125,16 +184,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// How many different games from today's set are finished.
-  int get gamesCompletedToday {
-    final suffix = '_${_dateKey(today)}';
-    return {
-      for (final id in completedActivities)
-        if (id.endsWith(suffix) &&
-            gameRewards.containsKey(activityGame(id)) &&
-            !retiredGames.contains(activityGame(id)))
-          activityGame(id),
-    }.length;
-  }
+  int get gamesCompletedToday => todayGameIds.where(completedToday).length;
 
   int get dailyGoalCompleted => gamesCompletedToday.clamp(0, dailyGoal);
 
@@ -156,7 +206,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
       try {
         dailyGoal = (await FamilyService().loadSettings()).dailyGoal.clamp(
           1,
-          dailyGameCount,
+          maxDailyGoal,
         );
       } catch (_) {
         /* Settings can be retried separately. */
@@ -165,15 +215,7 @@ class CurioState extends ChangeNotifier with WidgetsBindingObserver {
           (store as CachedProgressStore).offline) {
         syncError = 'Offline, showing progress saved on this device.';
       }
-      try {
-        final service = MinigameService();
-        if (service.isSignedIn) {
-          final set = await service.fetchDailySet();
-          adoptDailySet(serverDate: set.date, games: set.games);
-        }
-      } catch (_) {
-        /* Offline or not yet migrated: the device rotation is used. */
-      }
+      await refreshDailySet();
       childName = snapshot.childName;
       totalXp = snapshot.totalXp;
       completedActivities

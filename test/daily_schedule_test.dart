@@ -42,6 +42,7 @@ void main() {
     final seen = <String>{};
     for (final section in LearningSection.values) {
       final length = sectionRotation[section]!.length;
+      final puzzleStep = section == LearningSection.thinking ? 2 : 1;
       for (var i = 0; i < length; i++) {
         final today = DateTime(date.year, date.month, date.day + i);
         final nextAppearance = DateTime(
@@ -54,7 +55,7 @@ void main() {
         expect(scheduledGameId(section, nextAppearance), id);
         expect(
           calendarDayNumber(puzzleDateForGame(id, nextAppearance)),
-          calendarDayNumber(puzzleDateForGame(id, today)) + 1,
+          calendarDayNumber(puzzleDateForGame(id, today)) + puzzleStep,
         );
       }
     }
@@ -67,6 +68,22 @@ void main() {
       expect(g.section, isA<LearningSection>());
     }
   });
+
+  test(
+    'six distinct games rotate across 120 days without a repeated lineup',
+    () {
+      final plans = <String>{};
+      List<String> previous = [];
+      for (var day = 1; day <= 120; day++) {
+        final plan = dailyGameIds(DateTime(2026, 11, day));
+        expect(plan.length, 6);
+        expect(plan.toSet().length, 6);
+        expect(plan.toSet().intersection(previous.toSet()), isEmpty);
+        expect(plans.add(plan.join(',')), isTrue);
+        previous = plan;
+      }
+    },
+  );
 
   test('fresh learners have no fabricated points, skills or streaks', () {
     final state = CurioState();
@@ -119,13 +136,10 @@ void main() {
     },
   );
 
-  test('an oversized daily goal is capped to the size of the daily set', () {
-    expect(
-      FamilySettings.fromJson({'daily_goal': 9}).dailyGoal,
-      dailyGameCount,
-    );
+  test('an oversized daily goal is capped to the supported family goal', () {
+    expect(FamilySettings.fromJson({'daily_goal': 9}).dailyGoal, maxDailyGoal);
     final state = CurioState()..setDailyGoal(9);
-    expect(state.dailyGoal, dailyGameCount);
+    expect(state.dailyGoal, maxDailyGoal);
     state.setDailyGoal(0);
     expect(state.dailyGoal, 1);
     state.dispose();
