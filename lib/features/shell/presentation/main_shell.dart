@@ -30,7 +30,10 @@ class _MainShellState extends State<MainShell> {
   _Tab _selected = _Tab.home;
 
   late final _pages = <_Tab, Widget>{
-    _Tab.home: HomePage(onProfile: () => _select(_Tab.profile)),
+    _Tab.home: HomePage(
+      onProfile: () => _select(_Tab.profile),
+      onGames: () => _select(_Tab.games),
+    ),
     _Tab.games: const TodayGamesPage(),
     _Tab.discover: DiscoveriesPage(onHome: () => _select(_Tab.home)),
     _Tab.profile: const ProfilePage(),
@@ -70,6 +73,9 @@ class _MainShellState extends State<MainShell> {
             ),
             child: Scaffold(
               backgroundColor: CurioTokens.base,
+              // Every tab scrolls under the floating navigation pill, so no
+              // band shows behind it; each tab pads its end to clear it.
+              extendBody: !wide,
               body: wide
                   ? Row(
                       children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 import '../../../core/services/family_service.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/services/auth_service.dart';
@@ -109,12 +110,11 @@ class _PrivacyPageState extends State<PrivacyPage> {
   @override
   Widget build(BuildContext context) {
     final muted = CurioTokens.textSecondary;
-    final forest = CurioTokens.accent;
     final danger = CurioTokens.wrong;
     return CurioPage(
       title: 'Privacy and your data',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           Text(
             'Your family, your choices.',
@@ -150,72 +150,31 @@ class _PrivacyPageState extends State<PrivacyPage> {
             const SizedBox(height: 24),
             const SectionHeading('Your data'),
             const SizedBox(height: 12),
-            CurioCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  ListTile(
-                    enabled: !_busy,
-                    onTap: _export,
-                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
-                    leading: CurioIconTile(
-                      icon: Icons.download_rounded,
-                      color: forest,
-                      size: 38,
-                      iconSize: 19,
-                      radius: CurioTokens.radiusCard,
-                    ),
-                    title: const Text(
-                      'Export my account data',
-                      style: TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    subtitle: const Text('A copy of everything, as JSON'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                  ),
-                  const Divider(height: 1, indent: 64),
-                  ListTile(
-                    key: const Key('change_email'),
-                    enabled: !_busy,
-                    onTap: () => openPage(context, const ChangeEmailPage()),
-                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
-                    leading: CurioIconTile(
-                      icon: Icons.alternate_email_rounded,
-                      color: forest,
-                      size: 38,
-                      iconSize: 19,
-                      radius: CurioTokens.radiusCard,
-                    ),
-                    title: const Text(
-                      'Change account email',
-                      style: TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    subtitle: const Text('Confirmed with a code'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                  ),
-                  const Divider(height: 1, indent: 64),
-                  ListTile(
-                    enabled: !_busy,
-                    onTap: _delete,
-                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
-                    leading: CurioIconTile(
-                      icon: Icons.delete_outline_rounded,
-                      color: danger,
-                      size: 38,
-                      iconSize: 19,
-                      radius: CurioTokens.radiusCard,
-                    ),
-                    title: Text(
-                      'Delete family account',
-                      style: TextStyle(
-                        color: danger,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    subtitle: const Text('Permanently, with all progress'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                  ),
-                ],
-              ),
+            CurioListGroup(
+              children: [
+                CurioListRow(
+                  icon: Icons.download_rounded,
+                  title: 'Export my account data',
+                  subtitle: 'A copy of everything, as JSON',
+                  onTap: _busy ? null : _export,
+                ),
+                CurioListRow(
+                  key: const Key('change_email'),
+                  icon: Icons.alternate_email_rounded,
+                  title: 'Change account email',
+                  subtitle: 'Confirmed with a code',
+                  onTap: _busy
+                      ? null
+                      : () => openPage(context, const ChangeEmailPage()),
+                ),
+                CurioListRow(
+                  icon: Icons.delete_outline_rounded,
+                  title: 'Delete family account',
+                  subtitle: 'Permanently, with all progress',
+                  color: danger,
+                  onTap: _busy ? null : _delete,
+                ),
+              ],
             ),
           ],
           if (_busy) ...[

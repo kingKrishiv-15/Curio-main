@@ -75,36 +75,43 @@ void main() {
   });
 
   for (final size in [const Size(390, 844), const Size(1280, 900)]) {
-    testWidgets('Home shows six full-width game rows at $size', (tester) async {
-      tester.view.physicalSize = size;
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(const CurioApp());
-      await tester.pump(const Duration(seconds: 1));
-      expect(
-        tester.getBottomLeft(find.text('This week')).dy,
-        lessThan(tester.getTopLeft(find.text('Today’s games')).dy),
-      );
-      final set = todaysSet();
-      final anchor = find.byKey(Key('game_row_${set.anchor.id}'));
-      expect(anchor, findsOneWidget);
-      expect(find.text(set.anchor.title), findsOneWidget);
-      final firstBounds = tester.getRect(anchor);
-      var previousBounds = firstBounds;
-      for (final game in set.others) {
-        final row = find.byKey(Key('game_row_${game.id}'));
-        expect(row, findsOneWidget);
-        final bounds = tester.getRect(row);
-        expect(bounds.left, firstBounds.left);
-        expect(bounds.width, firstBounds.width);
-        expect(bounds.top, greaterThanOrEqualTo(previousBounds.bottom));
-        previousBounds = bounds;
-      }
-      expect(set.others.length + 1, dailyGameCount);
-      expect(find.byKey(const Key('nav_Games')), findsOneWidget);
-      expect(find.byKey(const Key('nav_Discover')), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-    });
+    testWidgets(
+      'Home shows the calendar, the daily challenge, then today’s games as a grid at $size',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(const CurioApp());
+        await tester.pump(const Duration(seconds: 1));
+        expect(
+          tester.getBottomLeft(find.text('This week')).dy,
+          lessThan(tester.getTopLeft(find.text('Today’s games')).dy),
+        );
+        final set = todaysSet();
+        final anchor = find.byKey(Key('game_row_${set.anchor.id}'));
+        expect(anchor, findsOneWidget);
+        expect(find.text(set.anchor.title), findsOneWidget);
+        final challengeWidth = tester.getRect(anchor).width;
+        final page = find.byWidgetPredicate(
+          (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+        );
+        double? cardWidth;
+        for (final game in set.others) {
+          final card = find.byKey(Key('game_row_${game.id}'));
+          await tester.scrollUntilVisible(card, 200, scrollable: page.first);
+          expect(card, findsOneWidget);
+          final width = tester.getRect(card).width;
+          // Listing cards share one width, two or three to a row.
+          expect(width, closeTo(cardWidth ?? width, .5));
+          expect(width, lessThan(challengeWidth * .6));
+          cardWidth = width;
+        }
+        expect(set.others.length + 1, dailyGameCount);
+        expect(find.byKey(const Key('nav_Games')), findsOneWidget);
+        expect(find.byKey(const Key('nav_Discover')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
   }
 }

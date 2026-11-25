@@ -119,12 +119,12 @@ class _BridgePageState extends State<BridgePage> {
             ),
           ],
           const SizedBox(height: 16),
-          _EndPoint(label: 'START', value: round.puzzle.start),
+          _EndPoint(label: 'Start', value: round.puzzle.start),
           const SizedBox(height: 8),
           _TileList(round: round, onMove: _move),
           const SizedBox(height: 8),
           _EndPoint(
-            label: 'TARGET',
+            label: 'Target',
             value: round.puzzle.target,
             reached: round.solved,
             current: round.values.last,
@@ -190,8 +190,8 @@ class _EndPoint extends StatelessWidget {
     final navy = CurioTokens.surfaceRaised;
     final success = CurioTokens.correct;
     // `navy` is coral in light mode, where gold text wouldn't read (§7).
-    final labelColor = CurioTokens.tintMaths;
-    final isTarget = current != null || label == 'TARGET';
+    final labelColor = CurioTokens.textSecondary;
+    final isTarget = current != null || label == 'Target';
     return Semantics(
       label:
           '$label $value${isTarget && !reached ? ', currently ${current ?? 'not a whole number'}' : ''}',
@@ -212,7 +212,7 @@ class _EndPoint extends StatelessWidget {
                     label,
                     style: TextStyle(
                       color: reached ? CurioTokens.onAccent : labelColor,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                       fontSize: 13,
                     ),
                   ),
@@ -242,9 +242,9 @@ class _EndPoint extends StatelessWidget {
                 child: Text(
                   '$value',
                   style: TextStyle(
-                    fontFamily: 'Fraunces',
+                    fontFamily: CurioTokens.faceBody,
                     fontSize: 32,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: reached
                         ? CurioTokens.base.withValues(alpha: .87)
                         : CurioTokens.textPrimary,
@@ -338,7 +338,7 @@ class _OpRow extends StatelessWidget {
               child: Text(
                 op.label,
                 style: const TextStyle(
-                  fontFamily: 'Fraunces',
+                  fontFamily: CurioTokens.faceBody,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),

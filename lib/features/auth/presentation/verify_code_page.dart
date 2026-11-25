@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/config/supabase_config.dart';
@@ -282,24 +283,28 @@ class _Tip extends StatelessWidget {
       CurioColorsLight.inkSoft,
     );
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(CurioTokens.s16),
       decoration: BoxDecoration(
         color: curioColor(
           context,
           CurioColors.surfaceMuted,
           CurioColorsLight.surfaceMuted,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: CurioTokens.cardShape,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.lightbulb_outline_rounded, size: 18, color: muted),
-          const SizedBox(width: 10),
+          const SizedBox(width: CurioTokens.s12),
           Expanded(
             child: Text(
               'Emails can take a minute to arrive. Check your spam or promotions folder, and use the code from the newest email. Got a link instead of a code? Open it on this phone and it signs you in too.',
-              style: TextStyle(color: muted, fontSize: 12.5, height: 1.5),
+              style: CurioTokens.label.copyWith(
+                color: muted,
+                fontWeight: FontWeight.w400,
+                height: 1.5,
+              ),
             ),
           ),
         ],

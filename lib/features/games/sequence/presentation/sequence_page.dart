@@ -332,9 +332,9 @@ class _NumberChip extends StatelessWidget {
         value,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontFamily: 'Fraunces',
+          fontFamily: CurioTokens.faceBody,
           fontSize: 20,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: mystery ? coral : null,
         ),
       ),

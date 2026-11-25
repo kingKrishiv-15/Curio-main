@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/services/auth_service.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../games/common/daily_schedule.dart';
@@ -134,7 +136,9 @@ class _IntroPageState extends State<IntroPage> {
                     IconButton(
                       tooltip: 'Back',
                       onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back_rounded),
+                      icon: const CurioRoundIcon(
+                        Icons.arrow_back_ios_new_rounded,
+                      ),
                     ),
                     const Expanded(
                       child: Center(child: CurioLogo(markSize: 28)),
@@ -342,7 +346,7 @@ class _Dots extends StatelessWidget {
               height: 8,
               decoration: BoxDecoration(
                 color: i == index ? coral : idle,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: CurioTokens.pillShape,
               ),
             ),
         ],

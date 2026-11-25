@@ -46,7 +46,7 @@ class _FrostlandsStoryPageState extends State<FrostlandsStoryPage> {
       title: 'Frostlands, night 1',
       actions: const [HowToPlayButton(rules: _rules)],
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           _SceneArt(
             icon: _complete

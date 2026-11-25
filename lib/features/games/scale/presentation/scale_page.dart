@@ -944,10 +944,10 @@ class _ValueText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = TextStyle(
-      fontFamily: 'Fraunces',
+      fontFamily: CurioTokens.faceBody,
       fontSize: 32,
       height: 1.1,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w700,
       color: CurioTokens.textPrimary,
     );
     final parts = <Widget>[];

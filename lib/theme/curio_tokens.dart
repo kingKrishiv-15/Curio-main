@@ -12,11 +12,12 @@ class CurioTokens extends ThemeExtension<CurioTokens> {
   static CurioTokens of(BuildContext context) =>
       Theme.of(context).extension<CurioTokens>() ?? const CurioTokens();
 
-  // Colour: 13 tokens, taken from the original light palette (the warm
-  // cream, coral and forest of the onboarding screens).
-  static const base = Color(0xFFFDF1E2);
+  // Colour: 13 tokens. The page is a whisper of coral over white and
+  // panels are white, as on Airbnb; quiet fills (round buttons, tracks,
+  // empty cells) are a neutral grey. Accents keep the original palette.
+  static const base = Color(0xFFFEF7F6);
   static const surface = Color(0xFFFFFFFF);
-  static const surfaceRaised = Color(0xFFF3E9D8);
+  static const surfaceRaised = Color(0xFFF2F2F1);
   static const border = Color(0x1F2E2417);
   static const textPrimary = Color(0xFF2E2417);
   static const textSecondary = Color(0xFF5B4E3B);
@@ -54,21 +55,24 @@ class CurioTokens extends ThemeExtension<CurioTokens> {
   static const s32 = 32.0;
   static const s48 = 48.0;
 
-  // Type: 2 faces, 5 roles.
-  static const faceDisplay = 'Fraunces';
+  // Type: one face, 5 roles. Like Airbnb, everything is set in one sans
+  // (DM Sans) and weight does the work: headings bold and slightly tight.
+  // Fraunces survives only in the "curio" wordmark.
   static const faceBody = 'DM Sans';
   static const display = TextStyle(
-    fontFamily: faceDisplay,
+    fontFamily: faceBody,
     fontSize: 32,
     height: 1.15,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -.6,
     color: textPrimary,
   );
   static const title = TextStyle(
-    fontFamily: faceDisplay,
+    fontFamily: faceBody,
     fontSize: 20,
     height: 1.25,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -.2,
     color: textPrimary,
   );
   static const body = TextStyle(

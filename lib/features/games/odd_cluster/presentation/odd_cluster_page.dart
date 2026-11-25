@@ -345,22 +345,21 @@ class _GroupBar extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  group.title.toUpperCase(),
+                  group.title,
                   style: TextStyle(
                     color: curioColor(
                       context,
                       CurioColors.ink,
                       CurioColorsLight.ink,
                     ),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12.5,
-                    letterSpacing: .6,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
                   ),
                 ),
               ),
               if (revealed)
                 Text(
-                  'REVEALED',
+                  'Revealed',
                   style: TextStyle(
                     color: muted,
                     fontSize: 10,

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/curio_colors.dart';
@@ -450,9 +451,9 @@ class _GameCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontFamily: 'Fraunces',
+              fontFamily: CurioTokens.faceBody,
               fontSize: width * .12,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: ink,
               letterSpacing: -.3,
             ),
@@ -621,22 +622,21 @@ class _FactCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'NEW DISCOVERY',
+                    'New discovery',
                     style: TextStyle(
                       color: color,
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     discovery.title,
                     style: TextStyle(
-                      fontFamily: 'Fraunces',
+                      fontFamily: CurioTokens.faceBody,
                       color: ink,
                       fontSize: 17,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       letterSpacing: -.4,
                     ),
                   ),
@@ -758,22 +758,21 @@ class GrowthArt extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'THIS WEEK',
+                                  'This week',
                                   style: TextStyle(
                                     color: muted,
-                                    fontSize: 9,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w800,
-                                    letterSpacing: 1.2,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'Alex is growing',
                                   style: TextStyle(
-                                    fontFamily: 'Fraunces',
+                                    fontFamily: CurioTokens.faceBody,
                                     color: ink,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
                                     letterSpacing: -.4,
                                   ),
                                 ),

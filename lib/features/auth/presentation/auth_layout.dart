@@ -1,12 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../../core/widgets/curio_kit.dart';
 
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../core/widgets/curio_clay.dart';
+import '../../../theme/curio_tokens.dart';
 import 'widgets/welcome_art.dart';
 
 /// Pushes a signed-out step with the same fade-and-drift as `openPage`
@@ -75,7 +77,8 @@ class AuthFrame extends StatelessWidget {
                           tooltip: 'Back',
                           onPressed:
                               onBack ?? () => Navigator.of(context).maybePop(),
-                          icon: const Icon(Icons.arrow_back_rounded),
+                          // The same round back button as every other page.
+                          icon: const CurioRoundIcon(Icons.arrow_back_ios_new_rounded),
                         )
                       : null,
                 ),
@@ -126,8 +129,7 @@ class AuthFrame extends StatelessWidget {
                       Expanded(
                         child: SingleChildScrollView(
                           child: CurioClay(
-                            radius: 28,
-                            padding: const EdgeInsets.all(36),
+                            padding: const EdgeInsets.all(CurioTokens.s32),
                             child: content,
                           ),
                         ),
@@ -155,12 +157,12 @@ class WelcomePanel extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: dark
-            ? CurioColors.heroGradient
-            : CurioColorsLight.heroGradient,
+        borderRadius: CurioTokens.cardShape,
+        color: dark
+            ? CurioColors.coralSoft
+            : CurioTokens.wash(CurioTokens.accent, .1),
       ),
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(CurioTokens.s32),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final art = math
@@ -169,15 +171,7 @@ class WelcomePanel extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'A LITTLE WONDER, EVERY DAY',
-                style: TextStyle(
-                  color: ink,
-                  fontSize: 11,
-                  letterSpacing: 1.6,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              const CurioEyebrow('A little wonder, every day'),
               Expanded(
                 child: Center(child: OrbitHero(size: art)),
               ),
@@ -220,8 +214,9 @@ class AuthLayout extends StatelessWidget {
               builder: (context, constraints) {
                 final wide = constraints.maxWidth >= 800;
                 final form = CurioClay(
-                  radius: 28,
-                  padding: EdgeInsets.all(wide ? 36 : 24),
+                  padding: EdgeInsets.all(
+                    wide ? CurioTokens.s32 : CurioTokens.s24,
+                  ),
                   child: child,
                 );
                 if (wide) {
@@ -269,10 +264,10 @@ class CurioWelcomeBanner extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: dark
-            ? CurioColors.heroGradient
-            : CurioColorsLight.heroGradient,
+        borderRadius: CurioTokens.cardShape,
+        color: dark
+            ? CurioColors.coralSoft
+            : CurioTokens.wash(CurioTokens.accent, .1),
       ),
       child: Stack(
         children: [
@@ -291,15 +286,7 @@ class CurioWelcomeBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'A LITTLE WONDER, EVERY DAY',
-                  style: TextStyle(
-                    color: ink,
-                    fontSize: 11,
-                    letterSpacing: 1.6,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                const CurioEyebrow('A little wonder, every day'),
                 SizedBox(height: expanded ? 26 : 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -384,27 +371,43 @@ class _Orbit extends StatelessWidget {
   );
 }
 
+/// A short status line in a soft panel: a tinted wash with an icon,
+/// red-tinted for errors, as Airbnb shows inline messages.
 class AuthNotice extends StatelessWidget {
   const AuthNotice(this.message, {this.error = false, super.key});
   final String message;
   final bool error;
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final tone = error ? CurioTokens.wrong : CurioTokens.tintLogic;
     return Semantics(
       liveRegion: true,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(CurioTokens.s16),
         decoration: BoxDecoration(
-          color: error ? scheme.errorContainer : scheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(14),
+          color: CurioTokens.wash(tone, .1),
+          borderRadius: CurioTokens.cardShape,
         ),
-        child: Text(
-          message,
-          style: TextStyle(
-            color: error ? scheme.onErrorContainer : scheme.onSurface,
-            height: 1.5,
-          ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ExcludeSemantics(
+              child: Icon(
+                error ? Icons.error_outline_rounded : Icons.info_outline_rounded,
+                size: 20,
+                color: tone,
+              ),
+            ),
+            const SizedBox(width: CurioTokens.s12),
+            Expanded(
+              child: Text(
+                message,
+                style: CurioTokens.bodySmall.copyWith(
+                  color: CurioTokens.textPrimary,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

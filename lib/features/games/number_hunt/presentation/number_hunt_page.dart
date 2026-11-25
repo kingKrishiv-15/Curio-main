@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -235,12 +236,10 @@ class _RangeCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              hunt.found ? 'FOUND' : 'SOMEWHERE BETWEEN',
-              style: TextStyle(
+              hunt.found ? 'Found' : 'Somewhere between',
+              style: CurioTokens.label.copyWith(
                 color: muted,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.3,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 6),

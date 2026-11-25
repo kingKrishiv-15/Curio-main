@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_clay.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../discoveries/domain/discovery.dart';
 import 'daily_schedule.dart';
@@ -127,10 +128,11 @@ class HowToPlayButton extends StatelessWidget {
   const HowToPlayButton({required this.rules, super.key});
   final List<String> rules;
 
+  /// Drawn like the round back button opposite it, as on Airbnb.
   @override
   Widget build(BuildContext context) => IconButton(
     tooltip: 'How to play',
-    icon: const Icon(Icons.help_outline_rounded),
+    icon: const CurioRoundIcon(Icons.question_mark_rounded),
     onPressed: () => showHowToPlay(context, rules),
   );
 }
@@ -383,20 +385,9 @@ class PracticeBadge extends StatelessWidget {
   const PracticeBadge({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final plum = CurioTokens.tintThinking;
-    return CurioClay(
-      radius: CurioTokens.radiusPill,
-      color: plum.withValues(alpha: .16),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Text(
-        'Practice',
-        style: TextStyle(
-          color: plum,
-          fontSize: 13,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const CurioChip(
+    'Practice',
+    icon: Icons.replay_rounded,
+    tint: CurioTokens.tintThinking,
+  );
 }

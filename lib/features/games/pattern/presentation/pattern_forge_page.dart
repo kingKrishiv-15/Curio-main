@@ -248,12 +248,10 @@ class _QuestionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'QUESTION ${index + 1} OF 3',
-            style: TextStyle(
+            'Question ${index + 1} of 3',
+            style: CurioTokens.label.copyWith(
               color: muted,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
@@ -369,9 +367,9 @@ class _NumberChip extends StatelessWidget {
       null => mystery ? coral : null,
     };
     final style = TextStyle(
-      fontFamily: 'Fraunces',
+      fontFamily: CurioTokens.faceBody,
       fontSize: 22,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w700,
       color: curioColor(context, CurioColors.ink, CurioColorsLight.ink),
     );
     final chip = Container(
@@ -565,9 +563,9 @@ class _OptionTile extends StatelessWidget {
                       style: big
                           ? TextStyle(
                               color: ink,
-                              fontFamily: 'Fraunces',
+                              fontFamily: CurioTokens.faceBody,
                               fontSize: 24,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                             )
                           : TextStyle(
                               color: ink,

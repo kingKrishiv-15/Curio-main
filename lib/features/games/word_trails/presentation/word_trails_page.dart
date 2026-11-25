@@ -1,3 +1,4 @@
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -280,12 +281,10 @@ class _StoryRibbon extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'STORY',
-            style: TextStyle(
+            'Story',
+            style: CurioTokens.label.copyWith(
               color: muted,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.3,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
@@ -463,12 +462,10 @@ class _MeaningGate extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'WHAT DOES ${word.toUpperCase()} MEAN?',
-            style: TextStyle(
+            'What does “$word” mean?',
+            style: CurioTokens.label.copyWith(
               color: muted,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 12),

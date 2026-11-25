@@ -168,7 +168,6 @@ class _DigitBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coral = CurioTokens.wrong;
     final danger = CurioTokens.wrong;
     final ink = CurioTokens.textPrimary;
     final outline = CurioTokens.border;
@@ -176,7 +175,7 @@ class _DigitBox extends StatelessWidget {
     final border = hasError
         ? danger
         : active
-        ? coral
+        ? ink
         : digit != null
         ? ink.withValues(alpha: .32)
         : outline;
@@ -197,14 +196,14 @@ class _DigitBox extends StatelessWidget {
               digit!,
               textScaler: TextScaler.noScaling,
               style: TextStyle(
-                fontFamily: 'Fraunces',
-                fontSize: (width * .6).clamp(14.0, 28.0),
-                fontWeight: FontWeight.w600,
+                fontFamily: CurioTokens.faceBody,
+                fontSize: (width * .55).clamp(14.0, 26.0),
+                fontWeight: FontWeight.w700,
                 color: ink,
               ),
             )
           : active
-          ? _Caret(color: coral, height: height * .4)
+          ? _Caret(color: ink, height: height * .4)
           : null,
     );
   }

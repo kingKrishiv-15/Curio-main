@@ -2,50 +2,51 @@ import 'package:flutter/material.dart';
 
 import '../../../core/state/curio_state.dart';
 import '../../../core/widgets/curio_clay.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../../../theme/curio_tokens.dart';
 import '../../games/game_catalog.dart';
+import '../../games/presentation/game_emblem.dart';
 import '../domain/discovery.dart';
 
+/// Discover, laid out like Airbnb's Wishlists: a big title, a summary of
+/// the collection, then every idea collected as a pastel picture card.
 class DiscoveriesPage extends StatelessWidget {
   const DiscoveriesPage({this.onHome, super.key});
 
   final VoidCallback? onHome;
 
-  Color _tint(Discovery discovery) => switch (discovery.category) {
+  static Color _tint(Discovery discovery) => switch (discovery.category) {
     'Maths' || 'Patterns' => CurioTokens.tintMaths,
     'Thinking' => CurioTokens.tintThinking,
     _ => CurioTokens.tintLogic,
   };
 
-  Widget _icon(Discovery discovery) => ExcludeSemantics(
-    child: CurioIconTile(
-      icon: discovery.icon,
-      color: CurioTokens.textPrimary,
-      background: CurioTokens.wash(_tint(discovery), .23),
-    ),
-  );
-
   void _open(BuildContext context, Discovery discovery) {
+    final tint = _tint(discovery);
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (context) => SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+          padding: const EdgeInsets.fromLTRB(
+            CurioTokens.s24,
+            0,
+            CurioTokens.s24,
+            CurioTokens.s32,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _icon(discovery),
-              const SizedBox(height: 12),
-              Text(
-                discovery.title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
+              _IdeaPicture(discovery: discovery, tint: tint, height: 160),
+              const SizedBox(height: CurioTokens.s16),
+              CurioChip(discovery.category, tint: tint),
+              const SizedBox(height: CurioTokens.s12),
+              Text(discovery.title, style: CurioTokens.title),
+              const SizedBox(height: CurioTokens.s12),
               Text(discovery.fact, style: CurioTokens.body),
             ],
           ),
@@ -71,51 +72,57 @@ class DiscoveriesPage extends StatelessWidget {
     final empty = collected.isEmpty;
 
     return CurioPage(
+      // Scrolls under the floating navigation; the list clears it below.
+      extendBehindBottom: true,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        padding: EdgeInsets.fromLTRB(
+          CurioTokens.s24,
+          CurioTokens.s16,
+          CurioTokens.s24,
+          MediaQuery.paddingOf(context).bottom + CurioTokens.s24,
+        ),
         children: [
           const CurioTabHeader(),
-          const SizedBox(height: 16),
+          const SizedBox(height: CurioTokens.s24),
           Semantics(
             header: true,
             child: const Text('Discover', style: CurioTokens.display),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: CurioTokens.s8),
+          const Text(
+            'Surprising ideas you collect by playing.',
+            style: CurioType.meta,
+          ),
+          const SizedBox(height: CurioTokens.s24),
           CurioClay(
             raised: true,
-            color: CurioTokens.wash(CurioTokens.tintMaths, .12),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(CurioTokens.s16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
-                    const SizedBox(width: 4),
                     ExcludeSemantics(
                       child: ProgressRing(
-                        value: collected.length / total,
-                        color: CurioTokens.textSecondary,
-                        size: 60,
+                        value: total == 0 ? 0 : collected.length / total,
+                        color: CurioTokens.accent,
+                        size: 56,
                         child: const Icon(
                           Icons.collections_bookmark_outlined,
                           color: CurioTokens.textPrimary,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: CurioTokens.s16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Your collection',
-                            style: CurioTokens.title,
-                          ),
-                          const SizedBox(height: 4),
+                          Text('Your collection', style: CurioType.cardTitle),
                           Text(
                             '${collected.length} of $total ideas collected',
                             key: const Key('discover_summary'),
-                            style: CurioTokens.bodySmall,
+                            style: CurioType.meta,
                           ),
                         ],
                       ),
@@ -123,13 +130,13 @@ class DiscoveriesPage extends StatelessWidget {
                   ],
                 ),
                 if (empty) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: CurioTokens.s16),
                   const Text(
                     'Nothing here yet. Finish a game to collect your first idea.',
                     style: CurioTokens.body,
                   ),
                   if (onHome != null) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: CurioTokens.s16),
                     FilledButton(
                       onPressed: onHome,
                       child: const Text('Play today’s games'),
@@ -140,39 +147,85 @@ class DiscoveriesPage extends StatelessWidget {
             ),
           ),
           if (!empty) ...[
-            const SizedBox(height: 24),
-            for (final discovery in collected) ...[
-              CurioCard(
-                key: Key('discovery_${discovery.id}'),
-                onTap: () => _open(context, discovery),
-                child: Row(
-                  children: [
-                    _icon(discovery),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(discovery.title, style: CurioTokens.title),
-                          const SizedBox(height: 4),
-                          Text(
-                            discovery.category,
-                            style: CurioTokens.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const ExcludeSemantics(
-                      child: Icon(Icons.chevron_right_rounded),
-                    ),
-                  ],
-                ),
+            const SizedBox(height: CurioTokens.s32),
+            SectionHeading(
+              'Collected',
+              subtitle: 'Tap one to read it again',
+              trailing: CurioChip(
+                '${collected.length}',
+                icon: Icons.auto_awesome_rounded,
+                iconColor: CurioTokens.tintMaths,
+                tint: CurioTokens.tintMaths,
               ),
-              const SizedBox(height: 8),
-            ],
+            ),
+            const SizedBox(height: CurioTokens.s16),
+            CurioGrid(
+              children: [
+                for (final discovery in collected)
+                  CurioPressable(
+                    key: Key('discovery_${discovery.id}'),
+                    onTap: () => _open(context, discovery),
+                    semanticLabel:
+                        '${discovery.title}, ${discovery.category}. Open',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _IdeaPicture(
+                          discovery: discovery,
+                          tint: _tint(discovery),
+                        ),
+                        const SizedBox(height: CurioTokens.s12),
+                        Text(
+                          discovery.title,
+                          style: CurioType.cardTitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(discovery.category, style: CurioType.meta),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ],
         ],
       ),
     );
+  }
+}
+
+/// An idea's picture: its icon as a little 3D toy on its pale colour,
+/// square in the grid or a wide banner in the sheet.
+class _IdeaPicture extends StatelessWidget {
+  const _IdeaPicture({required this.discovery, required this.tint, this.height});
+
+  final Discovery discovery;
+  final Color tint;
+
+  /// A fixed height for the sheet's banner; the grid uses a square.
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    final picture = DecoratedBox(
+      decoration: BoxDecoration(
+        color: CurioTokens.wash(tint, .16),
+        borderRadius: CurioTokens.cardShape,
+      ),
+      child: Center(
+        child: FractionallySizedBox(
+          widthFactor: .62,
+          heightFactor: .62,
+          child: FittedBox(
+            child: GameEmblem(icon: discovery.icon, color: tint, size: 160),
+          ),
+        ),
+      ),
+    );
+    final height = this.height;
+    if (height != null) {
+      return SizedBox(height: height, width: double.infinity, child: picture);
+    }
+    return AspectRatio(aspectRatio: 1, child: picture);
   }
 }

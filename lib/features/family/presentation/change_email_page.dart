@@ -279,7 +279,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     return CurioPage(
       title: 'Account email',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           ...children,
           if (_error != null) ...[

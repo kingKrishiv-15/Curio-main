@@ -1,3 +1,4 @@
+import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/models/family_settings.dart';
@@ -339,8 +340,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       CurioClay(
-        radius: 26,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(CurioTokens.s24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -386,8 +386,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Widget _loopStep() {
     return CurioClay(
-      radius: 22,
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
+      padding: const EdgeInsets.fromLTRB(
+        CurioTokens.s16,
+        CurioTokens.s8,
+        CurioTokens.s16,
+        CurioTokens.s16,
+      ),
       child: Column(
         children: [
           SwitchListTile.adaptive(
@@ -487,14 +491,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.all(22),
+          padding: const EdgeInsets.all(CurioTokens.s24),
           decoration: BoxDecoration(
             color: curioColor(
               context,
               CurioColors.forestSoft,
-              CurioColorsLight.forestSoft,
+              CurioTokens.wash(CurioTokens.correct, .1),
             ),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: CurioTokens.cardShape,
           ),
           child: Column(
             children: [
@@ -608,11 +612,8 @@ class _StepBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'STEP ${step + 1} OF $count',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              letterSpacing: 1.3,
-              fontWeight: FontWeight.w800,
-            ),
+            'Step ${step + 1} of $count',
+            style: CurioTokens.label.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 10),
           Row(
@@ -627,7 +628,7 @@ class _StepBar extends StatelessWidget {
                     height: 5,
                     decoration: BoxDecoration(
                       color: i <= step ? coral : idle,
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: CurioTokens.pillShape,
                     ),
                   ),
                 ),
@@ -691,20 +692,19 @@ class _ChoiceCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: CurioTokens.cardShape,
           child: AnimatedContainer(
             duration: MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
                 : const Duration(milliseconds: 180),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(CurioTokens.s16),
+            // Chosen the way Airbnb marks a choice: a dark 2px outline.
             decoration: BoxDecoration(
-              color: selected
-                  ? Color.alphaBlend(coral.withValues(alpha: .1), surface)
-                  : surface,
-              borderRadius: BorderRadius.circular(20),
+              color: surface,
+              borderRadius: CurioTokens.cardShape,
               border: Border.all(
-                color: selected ? coral : outline,
-                width: selected ? 2 : 1.2,
+                color: selected ? CurioTokens.textPrimary : outline,
+                width: selected ? 2 : 1,
               ),
             ),
             child: Row(
@@ -715,14 +715,14 @@ class _ChoiceCard extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: selected ? coral : coral.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(14),
+                    shape: BoxShape.circle,
                   ),
                   child: Text(
                     leading,
                     style: TextStyle(
-                      fontFamily: 'Fraunces',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontFamily: CurioTokens.faceBody,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
                       // Coral is bright in both modes: dark ink on it (§7).
                       color: selected
                           ? curioColor(
@@ -756,14 +756,13 @@ class _ChoiceCard extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: forest.withValues(alpha: .14),
-                                borderRadius: BorderRadius.circular(99),
+                                borderRadius: CurioTokens.pillShape,
                               ),
                               child: Text(
                                 badge!,
-                                style: TextStyle(
-                                  color: forest,
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w800,
+                                style: CurioTokens.label.copyWith(
+                                  color: CurioTokens.textPrimary,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
@@ -782,7 +781,9 @@ class _ChoiceCard extends StatelessWidget {
                   selected
                       ? Icons.radio_button_checked_rounded
                       : Icons.radio_button_off_rounded,
-                  color: selected ? coral : outline,
+                  color: selected
+                      ? CurioTokens.textPrimary
+                      : CurioTokens.textSecondary,
                 ),
               ],
             ),

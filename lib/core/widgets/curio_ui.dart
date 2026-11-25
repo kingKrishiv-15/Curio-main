@@ -54,34 +54,23 @@ class CurioPage extends StatelessWidget {
               actions: actions,
               backgroundColor: pageColor,
             ),
-      body: Stack(
-        children: [
-          if (backgroundColor == null)
-            const Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: CurioColorsLight.pageGradient,
-                ),
-              ),
-            ),
-          SafeArea(
-            top: title == null,
-            bottom: !extendBehindBottom,
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxWidth),
-                child: DefaultTextStyle.merge(
-                  style: TextStyle(color: CurioTokens.textPrimary),
-                  child: IconTheme.merge(
-                    data: IconThemeData(color: CurioTokens.textSecondary),
-                    child: child,
-                  ),
-                ),
+      // One flat page colour, as on Airbnb; panels sit on it in white.
+      body: SafeArea(
+        top: title == null,
+        bottom: !extendBehindBottom,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: DefaultTextStyle.merge(
+              style: TextStyle(color: CurioTokens.textPrimary),
+              child: IconTheme.merge(
+                data: IconThemeData(color: CurioTokens.textSecondary),
+                child: child,
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -169,37 +158,87 @@ class CurioCard extends StatelessWidget {
   }
 }
 
+/// A section title in the Airbnb manner: bold sans, a quiet line under
+/// it, and, when the section leads somewhere, a small round arrow right
+/// after the words ("Explore experiences nearby (→)"). [trailing] sits at
+/// the far end, for a chip or a count.
 class SectionHeading extends StatelessWidget {
-  const SectionHeading(this.title, {this.trailing, this.subtitle, super.key});
+  const SectionHeading(
+    this.title, {
+    this.trailing,
+    this.subtitle,
+    this.onMore,
+    super.key,
+  });
 
   final String title;
   final String? subtitle;
   final Widget? trailing;
 
+  /// Makes the title a link, with the round arrow after it.
+  final VoidCallback? onMore;
+
   @override
   Widget build(BuildContext context) {
-    final inkMuted = CurioTokens.textSecondary;
+    final heading = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Semantics(
+            header: true,
+            child: Text(title, style: CurioTokens.title),
+          ),
+        ),
+        if (onMore != null) ...[
+          const SizedBox(width: CurioTokens.s8),
+          const ExcludeSemantics(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: CurioTokens.surfaceRaised,
+                shape: BoxShape.circle,
+              ),
+              child: SizedBox.square(
+                dimension: 32,
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 18,
+                  color: CurioTokens.textPrimary,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: inkMuted),
+              if (onMore == null)
+                heading
+              else
+                Semantics(
+                  button: true,
+                  hint: 'See all',
+                  child: InkWell(
+                    onTap: onMore,
+                    borderRadius: CurioTokens.pillShape,
+                    child: heading,
+                  ),
                 ),
+              if (subtitle != null) ...[
+                const SizedBox(height: CurioTokens.s4),
+                Text(subtitle!, style: CurioTokens.bodySmall),
               ],
             ],
           ),
         ),
-        ?trailing,
+        if (trailing != null) ...[
+          const SizedBox(width: CurioTokens.s12),
+          trailing!,
+        ],
       ],
     );
   }
@@ -456,10 +495,10 @@ class ExplorerAvatar extends StatelessWidget {
       letter,
       textScaler: TextScaler.noScaling,
       style: TextStyle(
-        fontFamily: 'Fraunces',
+        fontFamily: CurioTokens.faceBody,
         color: Colors.white,
         fontSize: size * .4,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
       ),
     );
     final avatar = SizedBox(
@@ -584,6 +623,8 @@ Color curioColor(BuildContext context, Color darkColor, Color lightColor) {
       : lightColor;
 }
 
+/// A short label above a heading, drawn as a soft pill in sentence case
+/// (Airbnb's "Guest favourite" chip) rather than tracked capitals.
 class CurioEyebrow extends StatelessWidget {
   const CurioEyebrow(this.label, {this.color, super.key});
 
@@ -592,36 +633,39 @@ class CurioEyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolved =
-        color ??
-        curioColor(context, CurioColors.forest, CurioColorsLight.forest);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 18,
-          height: 2,
-          decoration: BoxDecoration(
-            color: resolved,
-            borderRadius: BorderRadius.circular(2),
-          ),
+    final resolved = color ?? CurioTokens.accent;
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: CurioTokens.wash(resolved, .14),
+          borderRadius: CurioTokens.pillShape,
         ),
-        const SizedBox(width: 8),
-        Flexible(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: CurioTokens.s12,
+            vertical: CurioTokens.s4,
+          ),
           child: Text(
-            label.toUpperCase(),
+            _sentenceCase(label),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: resolved,
-              fontSize: 9.5,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.35,
+            style: CurioTokens.label.copyWith(
+              color: CurioTokens.textPrimary,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
-      ],
+      ),
     );
+  }
+
+  /// "DAILY REASONING" or "Daily reasoning" both read "Daily reasoning".
+  static String _sentenceCase(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty || trimmed != trimmed.toUpperCase()) return trimmed;
+    final lower = trimmed.toLowerCase();
+    return lower[0].toUpperCase() + lower.substring(1);
   }
 }
 

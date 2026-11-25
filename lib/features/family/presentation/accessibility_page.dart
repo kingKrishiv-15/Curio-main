@@ -14,12 +14,12 @@ class AccessibilityPage extends StatelessWidget {
     final controller = CurioThemeScope.of(context);
     final muted = CurioTokens.textSecondary;
     final forest = CurioTokens.accent;
-    final sunken = CurioTokens.surface;
+    final sunken = CurioTokens.surfaceRaised;
     final percent = (controller.readingScale * 100).round();
     return CurioPage(
       title: 'Reading and motion',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           Text(
             'Make yourself comfortable.',

@@ -9,13 +9,15 @@ import 'package:flutter/material.dart';
 /// See [design.md](../../../design.md) for the full system and the
 /// per-token rationale.
 abstract final class CurioColorsLight {
-  static const canvas = Color(0xFFFDF1E2);
-  static const canvasDeep = Color(0xFFFFF8EE);
+  // Matches CurioTokens: the soft blush page, white panels and neutral
+  // grey fills of the Airbnb-style screens.
+  static const canvas = Color(0xFFFEF7F6);
+  static const canvasDeep = Color(0xFFFEF7F6);
   static const surface = Color(0xFFFFFFFF);
-  static const surfaceMuted = Color(0xFFF3E9D8);
+  static const surfaceMuted = Color(0xFFF2F2F1);
 
-  /// The default clay body (`CurioClay`): warm white on cream.
-  static const clay = Color(0xFFFFFCF7);
+  /// The default panel body: plain white.
+  static const clay = Color(0xFFFFFFFF);
   static const onDark = Color(0xFFFFFFFF);
   static const ink = Color(0xFF2E2417);
   static const inkSoft = Color(0xFF5B4E3B);
@@ -76,10 +78,11 @@ abstract final class CurioColorsLight {
     colors: [coral, coralStrong],
   );
 
+  /// Kept for older call sites; the page is now one flat colour.
   static const pageGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFFFF8EE), canvas],
+    colors: [canvas, canvas],
     stops: [0, 1],
   );
 

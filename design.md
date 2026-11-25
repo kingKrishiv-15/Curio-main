@@ -1,9 +1,12 @@
 # Curio design budget
 
-Curio is light, in the original warm palette (dark mode is off, and there
-is no dark theme at the moment). Everything visual comes from `lib/theme/curio_tokens.dart`
-(`CurioTokens`, a `ThemeExtension`). If a screen needs a value that is not
-listed here, the screen is wrong, not the list.
+Curio follows Airbnb's style: a soft blush page, white panels with a 1px
+hairline, one sans face where weight does the work, rounded pictures,
+round grey buttons and plenty of whitespace. It is light only (there is
+no dark theme at the moment). Everything visual comes from
+`lib/theme/curio_tokens.dart` (`CurioTokens`, a `ThemeExtension`). If a
+screen needs a value that is not listed here, the screen is wrong, not the
+list.
 
 `test/design_rules_test.dart` enforces the rules marked (tested).
 
@@ -11,9 +14,9 @@ listed here, the screen is wrong, not the list.
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `base` | `#FDF1E2` | Page background (cream) |
+| `base` | `#FEF7F6` | Page background (a whisper of coral over white) |
 | `surface` | `#FFFFFF` | Panels, inputs, sheets, the raised block |
-| `surfaceRaised` | `#F3E9D8` | Tracks, pressed and disabled fills |
+| `surfaceRaised` | `#F2F2F1` | Quiet grey fills: round buttons, tracks, empty cells, disabled |
 | `border` | ink at 12% | The 1px rule between rows and around panels |
 | `textPrimary` | `#2E2417` | Headings and body |
 | `textSecondary` | `#5B4E3B` | Supporting text and metadata |
@@ -30,13 +33,14 @@ may be washed over `surface` at low opacity with `CurioTokens.wash(tint)`.
 Puzzle boards that need several distinguishable regions reuse the six hues
 above (accent, correct, wrong and the three tints), never new ones.
 
-These are the values of the original light palette: canvas, white surface,
-ink, coral, forest, saffron, blue and plum.
+The accents are the original palette's coral, forest, saffron, blue and
+plum. The logo mark keeps its own cream tile (`curio_logo.dart`).
 
-The signed-out and onboarding screens (`lib/features/auth/`) were restored
-to their original design on request. They use the original palette files,
-clay surfaces, art and type scale, and the tested rules below do not apply
-to them.
+The signed-out and onboarding screens (`lib/features/auth/`) follow the
+same style. They still read some colours from the original palette files
+(`CurioColorsLight`, now flattened to the same canvas and white panels),
+and their illustrations keep their own art, so the tested rules below do
+not apply to them.
 
 ## Radii: 2 (tested)
 
@@ -61,12 +65,37 @@ multiple of 48.
 Use solid fills for app surfaces. Progress fills, timer fills and the
 original game emblem artwork may use gradients.
 
-## Type: 2 faces, 5 roles
+## Type: 1 face, 5 roles
 
-Fraunces for `display` (32) and `title` (20). DM Sans for `body` (16),
-`bodySmall` (14) and `label` (13). `label` is the body face one step
-smaller, sentence case, untracked. No tracked capitals, no small caps, no
-eyebrow line above a heading.
+DM Sans for everything, as Airbnb uses one face: `display` (32, bold),
+`title` (20, bold), `body` (16), `bodySmall` (14) and `label` (13).
+Headings are bold and slightly tight; the Material text theme maps onto
+the same face. Fraunces appears only in the "curio" wordmark. Sentence
+case everywhere: no tracked capitals, no small caps. A short pill label
+(`CurioEyebrow`) may sit above a heading.
+
+## Components (lib/core/widgets/curio_kit.dart and curio_ui.dart)
+
+Build screens from these so every page reads the same:
+
+- `CurioPage` with a `title` gives the top bar: a round back button on the
+  left (`CurioRoundIcon`), a small bold title in the middle.
+- `SectionHeading`: a bold title, an optional quiet line under it, and,
+  with `onMore`, a small round arrow after the words.
+- `CurioClay` / `CurioCard`: white panels with a hairline. A screen's one
+  primary block may be `raised`.
+- `CurioListGroup` of `CurioListRow`: settings and links, line icon,
+  name, quiet line, chevron, hairlines between.
+- `CurioChip`, `XpChip`, `DoneBadge`: small pills and the done tick.
+- `CurioIconButton`: a round grey icon button.
+- `CurioPressable`: cards scale a touch when pressed instead of splashing.
+- `CurioGrid`: cards two to a row on phones, three when wider.
+- Games: `GameTile`, `GameListingCard` and `GameCompactCard`
+  (`lib/features/games/presentation/game_cards.dart`) show a game as a
+  pastel tile with its 3D emblem.
+
+Tab pages run under the floating navigation pill and pad their end to
+clear it, so no band of another colour shows behind it.
 
 ## Motion: 2 durations, 1 curve
 

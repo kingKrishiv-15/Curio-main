@@ -84,14 +84,13 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     final muted = CurioTokens.textSecondary;
-    final forest = CurioTokens.accent;
     final signedIn =
         SupabaseConfig.isConfigured &&
         Supabase.instance.client.auth.currentUser != null;
     return CurioPage(
       title: 'Help and feedback',
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           Text(
             'How can we help?',
@@ -110,23 +109,35 @@ class _HelpPageState extends State<HelpPage> {
             child: Column(
               children: [
                 for (var i = 0; i < _faqs.length; i++) ...[
-                  if (i > 0) const Divider(height: 1, indent: 64),
+                  if (i > 0)
+                    const Divider(
+                      height: 1,
+                      indent: CurioTokens.s48 + CurioTokens.s16,
+                    ),
                   ExpansionTile(
                     shape: const Border(),
                     collapsedShape: const Border(),
-                    tilePadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-                    childrenPadding: const EdgeInsets.fromLTRB(48, 0, 16, 16),
+                    tilePadding: const EdgeInsets.fromLTRB(
+                      CurioTokens.s16,
+                      CurioTokens.s4,
+                      CurioTokens.s12,
+                      CurioTokens.s4,
+                    ),
+                    childrenPadding: const EdgeInsets.fromLTRB(
+                      CurioTokens.s48 + CurioTokens.s8,
+                      0,
+                      CurioTokens.s16,
+                      CurioTokens.s16,
+                    ),
                     expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                    leading: CurioIconTile(
-                      icon: _faqs[i].$1,
-                      color: forest,
-                      size: 38,
-                      iconSize: 19,
-                      radius: CurioTokens.radiusCard,
+                    leading: Icon(
+                      _faqs[i].$1,
+                      size: 24,
+                      color: CurioTokens.textPrimary,
                     ),
                     title: Text(
                       _faqs[i].$2,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     children: [
                       Text(

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/curio_tokens.dart';
+import '../widgets/curio_kit.dart';
 
-/// Maps [CurioTokens] onto Material. Curio is light, in the original warm
-/// palette. There is no dark theme at the moment.
+/// Maps [CurioTokens] onto Material, in the Airbnb style Home set: a soft
+/// blush page, white panels, one bold sans for headings, round back
+/// buttons. There is no dark theme at the moment.
 abstract final class CurioTheme {
   static ThemeData get dark => _theme;
   static ThemeData get light => _theme;
@@ -40,12 +42,15 @@ abstract final class CurioTheme {
       height: 1.2,
     );
     final labelStrong = CurioTokens.label.copyWith(color: t);
+    // Headings in the one sans, bold and a little tight, as Airbnb sets
+    // them. Line heights are opened up from the old serif's so descenders
+    // never clip.
     TextStyle display(double size, double height, double tracking) => TextStyle(
-      fontFamily: CurioTokens.faceDisplay,
+      fontFamily: CurioTokens.faceBody,
       color: t,
       fontSize: size,
       height: height,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w700,
       letterSpacing: tracking,
     );
 
@@ -59,16 +64,14 @@ abstract final class CurioTheme {
       splashFactory: InkRipple.splashFactory,
       dividerColor: CurioTokens.border,
       extensions: const [CurioTokens()],
-      // The original type scale, restored so the onboarding screens look
-      // as they did. Newer screens read their styles from CurioTokens.
       textTheme: TextTheme(
-        displayLarge: display(52, .91, -2.6),
-        displayMedium: display(44, .95, -2.2),
-        displaySmall: display(38, .96, -2),
-        headlineLarge: display(38, .96, -2),
-        headlineMedium: display(29, 1.02, -1.2),
-        headlineSmall: display(24, 1.08, -.8),
-        titleLarge: display(21, 1.18, -.55),
+        displayLarge: display(48, 1.05, -1.4),
+        displayMedium: display(40, 1.08, -1.1),
+        displaySmall: display(34, 1.1, -.9),
+        headlineLarge: display(34, 1.1, -.9),
+        headlineMedium: display(28, 1.14, -.6),
+        headlineSmall: display(24, 1.18, -.4),
+        titleLarge: display(20, 1.25, -.2),
         titleMedium: CurioTokens.body.copyWith(
           height: 1.28,
           fontWeight: FontWeight.w700,
@@ -93,14 +96,22 @@ abstract final class CurioTheme {
         labelMedium: CurioTokens.label,
         labelSmall: CurioTokens.label,
       ),
-      appBarTheme: const AppBarTheme(
+      // Airbnb's top bar: the page colour, a round back button on the
+      // left and a small bold title in the middle.
+      appBarTheme: AppBarTheme(
         backgroundColor: CurioTokens.base,
         foregroundColor: t,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        centerTitle: false,
-        titleTextStyle: CurioTokens.title,
+        centerTitle: true,
+        titleTextStyle: CurioTokens.body.copyWith(fontWeight: FontWeight.w700),
+      ),
+      actionIconTheme: ActionIconThemeData(
+        backButtonIconBuilder: (context) =>
+            const CurioRoundIcon(Icons.arrow_back_ios_new_rounded),
+        closeButtonIconBuilder: (context) =>
+            const CurioRoundIcon(Icons.close_rounded),
       ),
       dividerTheme: const DividerThemeData(
         color: CurioTokens.border,
@@ -197,8 +208,12 @@ abstract final class CurioTheme {
         shape: shape,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: CurioTokens.surfaceRaised,
-        contentTextStyle: CurioTokens.bodySmall.copyWith(color: t),
+        backgroundColor: t,
+        contentTextStyle: CurioTokens.bodySmall.copyWith(
+          color: CurioTokens.surface,
+          fontWeight: FontWeight.w600,
+        ),
+        actionTextColor: CurioTokens.surface,
         behavior: SnackBarBehavior.floating,
         elevation: 0,
         shape: shape,
@@ -226,20 +241,19 @@ abstract final class CurioTheme {
         contentPadding: const EdgeInsets.all(16),
         hintStyle: CurioTokens.body.copyWith(color: muted),
         labelStyle: CurioTokens.bodySmall,
-        floatingLabelStyle: CurioTokens.label.copyWith(
-          color: CurioTokens.accent,
-        ),
+        floatingLabelStyle: CurioTokens.label.copyWith(color: t),
         border: _input(CurioTokens.border),
         enabledBorder: _input(CurioTokens.border),
-        focusedBorder: _input(CurioTokens.accent),
+        focusedBorder: _input(t, width: 1.5),
         errorBorder: _input(CurioTokens.wrong),
         focusedErrorBorder: _input(CurioTokens.wrong),
       ),
     );
   }
 
-  static OutlineInputBorder _input(Color color) => OutlineInputBorder(
-    borderRadius: CurioTokens.cardShape,
-    borderSide: BorderSide(color: color),
-  );
+  static OutlineInputBorder _input(Color color, {double width = 1}) =>
+      OutlineInputBorder(
+        borderRadius: CurioTokens.cardShape,
+        borderSide: BorderSide(color: color, width: width),
+      );
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:curio/core/widgets/curio_logo.dart';
 import 'package:curio/theme/curio_tokens.dart';
 import '../../../core/navigation/open_page.dart';
 import '../../../core/state/curio_state.dart';
@@ -7,6 +6,7 @@ import '../../../core/widgets/curio_ui.dart';
 import '../../games/game_catalog.dart';
 import '../../skills/presentation/skill_quest_page.dart';
 import '../../../core/widgets/curio_clay.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../family/presentation/family_inbox_page.dart';
 import '../../family/presentation/family_settings_page.dart';
 import '../../family/presentation/privacy_page.dart';
@@ -50,26 +50,31 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
     return CurioPage(
       title: 'Parent dashboard',
       child: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(
+          CurioTokens.s24,
+          CurioTokens.s8,
+          CurioTokens.s24,
+          CurioTokens.s32,
+        ),
         children: [
           CurioClay(
-            padding: const EdgeInsets.all(24),
-            radius: CurioTokens.radiusCard,
-            color: Theme.of(context).colorScheme.secondaryContainer,
+            raised: true,
+            padding: const EdgeInsets.all(CurioTokens.s16),
             child: Row(
               children: [
-                const CurioLogoMark(size: 68),
-                const SizedBox(width: 24),
+                ExplorerAvatar(name: state.childName, size: 64),
+                const SizedBox(width: CurioTokens.s16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        state.childName,
-                        style: Theme.of(context).textTheme.headlineMedium,
+                      Semantics(
+                        header: true,
+                        child: Text(state.childName, style: CurioTokens.title),
                       ),
                       Text(
-                        '${state.totalXp} XP, Stage ${state.companionStage}',
+                        '${state.totalXp} XP · Stage ${state.companionStage}',
+                        style: CurioType.meta,
                       ),
                     ],
                   ),
@@ -77,120 +82,128 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          Text(
-            'The last 7 days',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: CurioTokens.s32),
+          const SectionHeading('The last 7 days'),
+          const SizedBox(height: CurioTokens.s16),
           CurioClay(
-            padding: const EdgeInsets.all(24),
-            radius: CurioTokens.radiusCard,
-            child: Wrap(
-              spacing: 32,
-              runSpacing: 24,
-              children: [
-                _Stat('${recent.length}', 'activities'),
-                _Stat('$practiceDays', 'practice days'),
-                _Stat('${state.streak}', 'day streak'),
-              ],
+            padding: const EdgeInsets.symmetric(vertical: CurioTokens.s16),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Stat('${recent.length}', 'activities'),
+                  const VerticalDivider(width: 1),
+                  _Stat('$practiceDays', 'practice days'),
+                  const VerticalDivider(width: 1),
+                  _Stat('${state.streak}', 'day streak'),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
-          Text(
-            'Skill snapshot',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: CurioTokens.s32),
+          const SectionHeading('Skill snapshot'),
+          const SizedBox(height: CurioTokens.s16),
           CurioClay(
-            padding: const EdgeInsets.all(24),
-            radius: CurioTokens.radiusCard,
+            padding: const EdgeInsets.all(CurioTokens.s16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final skill in skills)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${skill.key}, ${(skill.value * 100).round()}%'),
-                        const SizedBox(height: 8),
-                        CurioProgressBar(
-                          value: skill.value,
-                          color: skillColor(context, skill.key),
-                        ),
-                      ],
-                    ),
+                for (final skill in skills) ...[
+                  if (skill != skills.first)
+                    const SizedBox(height: CurioTokens.s16),
+                  Row(
+                    children: [
+                      Expanded(child: Text(skill.key, style: CurioType.strong)),
+                      Text(
+                        '${(skill.value * 100).round()}%',
+                        style: CurioType.meta,
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: CurioTokens.s8),
+                  CurioProgressBar(
+                    value: skill.value,
+                    color: skillColor(context, skill.key),
+                    height: 6,
+                  ),
+                ],
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: CurioTokens.s16),
           CurioClay(
-            padding: const EdgeInsets.all(24),
-            radius: CurioTokens.radiusCard,
-            child: Column(
+            color: CurioTokens.wash(CurioTokens.tintMaths, .1),
+            padding: const EdgeInsets.all(CurioTokens.s16),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'A little encouragement',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  _encouragement(state, skills),
-                  style: const TextStyle(height: 1.6),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Your family space',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
-          WeeklyEmailCard(key: ValueKey(_emailRevision)),
-          const SizedBox(height: 16),
-          CurioClay(
-            radius: CurioTokens.radiusCard,
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                _Link(
-                  Icons.insights_outlined,
-                  'Weekly reports',
-                  'Your learning story, week by week',
-                  () => openPage(
-                    context,
-                    const FamilyInboxPage(reportsOnly: true),
+                const ExcludeSemantics(
+                  child: Icon(
+                    Icons.lightbulb_outline_rounded,
+                    color: CurioTokens.tintMaths,
                   ),
                 ),
-                _Link(
-                  Icons.notifications_outlined,
-                  'Notifications',
-                  'Reminders and report updates',
-                  () => openPage(context, const FamilyInboxPage()),
-                ),
-                _Link(
-                  Icons.tune_rounded,
-                  'Family preferences',
-                  '${state.dailyGoal} activities a day, reminders, email',
-                  _preferences,
-                ),
-                _Link(
-                  Icons.privacy_tip_outlined,
-                  'Privacy and account',
-                  'Review, export, or delete your data',
-                  () => openPage(context, const PrivacyPage()),
+                const SizedBox(width: CurioTokens.s12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'A little encouragement',
+                        style: CurioType.cardTitle,
+                      ),
+                      const SizedBox(height: CurioTokens.s4),
+                      Text(
+                        _encouragement(state, skills),
+                        style: CurioTokens.bodySmall.copyWith(
+                          color: CurioTokens.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: CurioTokens.s32),
+          const SectionHeading('Your family space'),
+          const SizedBox(height: CurioTokens.s16),
+          WeeklyEmailCard(key: ValueKey(_emailRevision)),
+          const SizedBox(height: CurioTokens.s16),
+          CurioListGroup(
+            children: [
+              CurioListRow(
+                icon: Icons.insights_outlined,
+                title: 'Weekly reports',
+                subtitle: 'Your learning story, week by week',
+                onTap: () =>
+                    openPage(context, const FamilyInboxPage(reportsOnly: true)),
+              ),
+              CurioListRow(
+                icon: Icons.notifications_outlined,
+                title: 'Notifications',
+                subtitle: 'Reminders and report updates',
+                onTap: () => openPage(context, const FamilyInboxPage()),
+              ),
+              CurioListRow(
+                icon: Icons.tune_rounded,
+                title: 'Family preferences',
+                subtitle:
+                    '${state.dailyGoal} activities a day, reminders, email',
+                onTap: _preferences,
+              ),
+              CurioListRow(
+                icon: Icons.privacy_tip_outlined,
+                title: 'Privacy and account',
+                subtitle: 'Review, export, or delete your data',
+                onTap: () => openPage(context, const PrivacyPage()),
+              ),
+            ],
+          ),
+          const SizedBox(height: CurioTokens.s16),
           const Text(
             'Mastery reflects completed practice, not a formal assessment.',
-            style: TextStyle(fontSize: 13),
+            style: CurioTokens.label,
           ),
         ],
       ),
@@ -198,32 +211,25 @@ class _ParentDashboardPageState extends State<ParentDashboardPage> {
   }
 }
 
+/// One number in the seven-day card: bold value, its name underneath.
 class _Stat extends StatelessWidget {
   const _Stat(this.value, this.label);
   final String value, label;
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(value, style: Theme.of(context).textTheme.headlineMedium),
-      Text(label),
-    ],
-  );
-}
-
-class _Link extends StatelessWidget {
-  const _Link(this.icon, this.title, this.subtitle, this.onTap);
-  final IconData icon;
-  final String title, subtitle;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-    leading: Icon(icon),
-    title: Text(title),
-    subtitle: Text(subtitle),
-    trailing: const Icon(Icons.chevron_right),
-    onTap: onTap,
+  Widget build(BuildContext context) => Expanded(
+    child: Semantics(
+      label: '$value $label',
+      excludeSemantics: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: CurioTokens.s8),
+        child: Column(
+          children: [
+            Text(value, style: CurioTokens.display),
+            Text(label, textAlign: TextAlign.center, style: CurioTokens.label),
+          ],
+        ),
+      ),
+    ),
   );
 }
 

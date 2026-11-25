@@ -6,6 +6,7 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/theme/curio_colors.dart';
 import '../../../core/theme/curio_colors_light.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../../core/widgets/curio_logo.dart';
 import '../../../core/widgets/curio_motion.dart';
 import '../../../core/widgets/curio_ui.dart';
@@ -100,10 +101,11 @@ class _LandingPageState extends State<LandingPage> {
                               : motionOff
                               ? 'Play welcome animation'
                               : 'Pause welcome animation',
-                          icon: Icon(
+                          // Round, like every other icon button in Curio.
+                          icon: CurioRoundIcon(
                             motionOff
-                                ? Icons.play_circle_outline_rounded
-                                : Icons.pause_circle_outline_rounded,
+                                ? Icons.play_arrow_rounded
+                                : Icons.pause_rounded,
                           ),
                           onPressed: systemReduced
                               ? null

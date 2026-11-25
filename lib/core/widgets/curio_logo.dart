@@ -120,7 +120,9 @@ class CurioMarkColors {
   final Color spark;
 
   static const brand = CurioMarkColors(
-    tile: CurioTokens.surfaceRaised,
+    // The brand cream, fixed here so the mark keeps its tile when the app's
+    // quiet fills change.
+    tile: Color(0xFFF3E9D8),
     glyph: CurioTokens.accent,
     spark: CurioTokens.tintMaths,
   );

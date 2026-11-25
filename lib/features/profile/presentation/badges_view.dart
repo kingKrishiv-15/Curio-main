@@ -4,6 +4,7 @@ import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/curio_clay.dart';
+import '../../../core/widgets/curio_kit.dart';
 import '../../../core/widgets/curio_ui.dart';
 import '../domain/badges.dart';
 
@@ -168,23 +169,44 @@ class BadgeShelf extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Expanded(child: Text('Badges', style: CurioTokens.title)),
-              ExcludeSemantics(child: Icon(Icons.chevron_right_rounded)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Badges', style: CurioType.cardTitle),
+                    Text(
+                      '${earned.length} of ${badges.length} earned',
+                      style: CurioType.meta,
+                    ),
+                  ],
+                ),
+              ),
+              const ExcludeSemantics(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: CurioTokens.surfaceRaised,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SizedBox.square(
+                    dimension: 32,
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 18,
+                      color: CurioTokens.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            '${earned.length} of ${badges.length} earned',
-            style: CurioTokens.bodySmall,
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: CurioTokens.s12),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: CurioTokens.s8,
+            runSpacing: CurioTokens.s8,
             children: [
-              for (final badge in preview) BadgeMedal(badge: badge, size: 40),
+              for (final badge in preview) BadgeMedal(badge: badge, size: 44),
             ],
           ),
         ],
@@ -234,19 +256,16 @@ class _BadgesSheet extends StatelessWidget {
         controller: controller,
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
         children: [
-          Text(
-            'A trail of brave thinking',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
+          Text('Badges', style: CurioTokens.display),
+          const SizedBox(height: CurioTokens.s8),
           Text(
             earned.isEmpty
                 ? 'Finish your first game to earn your first badge.'
                 : '${earned.length} of ${badges.length} earned. Each one comes from something you really did.',
             style: TextStyle(color: muted),
           ),
-          const SizedBox(height: 12),
-          CurioProgressBar(value: earned.length / badges.length, height: 10),
+          const SizedBox(height: CurioTokens.s16),
+          CurioProgressBar(value: earned.length / badges.length, height: 6),
           if (earned.isNotEmpty) ...[
             const SizedBox(height: 24),
             SectionHeading('Earned', subtitle: '${earned.length} so far'),
@@ -299,12 +318,7 @@ class _BadgeRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    badge.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  Text(badge.title, style: CurioType.cardTitle),
                   const SizedBox(height: 4),
                   Text(
                     badge.description,

@@ -190,23 +190,28 @@ class _CaseCard extends StatelessWidget {
     final ink = curioColor(context, CurioColors.ink, CurioColorsLight.ink);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(CurioTokens.s16),
+      // A flat, soft tint rather than a gradient, like every other banner.
       decoration: BoxDecoration(
         borderRadius: CurioTokens.cardShape,
-        gradient: dark
-            ? CurioColors.heroGradient
-            : CurioColorsLight.heroGradient,
+        color: dark
+            ? CurioColors.plumSoft
+            : CurioTokens.wash(CurioTokens.tintThinking, .12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            evidenceCase.heading,
-            style: TextStyle(
+            // "CASE 001 · THE GARDEN" reads "Case 001 · The garden".
+            [
+              for (final part in evidenceCase.heading.split(' · '))
+                part.isEmpty
+                    ? part
+                    : part[0].toUpperCase() + part.substring(1).toLowerCase(),
+            ].join(' · '),
+            style: CurioTokens.label.copyWith(
               color: ink,
-              fontWeight: FontWeight.w900,
-              fontSize: 11.5,
-              letterSpacing: 1.3,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 10),

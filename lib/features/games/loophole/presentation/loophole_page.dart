@@ -304,9 +304,6 @@ class _LoopholePageState extends State<LoopholePage> {
         CurioColors.surface,
         CurioColorsLight.surface,
       ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (context) => Padding(
         padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
         child: Column(
