@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:curio/features/auth/presentation/auth_messages.dart';
 import 'package:curio/core/config/supabase_config.dart';
 import 'package:curio/core/models/family_settings.dart';
 import 'package:curio/core/services/auth_service.dart';
@@ -654,6 +655,24 @@ void main() {
       await settle(tester);
       expect(find.byType(LandingPage), findsOneWidget);
       await auth.changes.close();
+    },
+  );
+
+  test(
+    'Network failures show a friendly sentence, never the raw socket error',
+    () {
+      final raw = AuthRetryableFetchException(
+        message:
+            "ClientException with SocketException: Failed host lookup: 'abc.supabase.co' (OS Error: No address associated with hostname, errno = 7)",
+      );
+      expect(authErrorMessage(raw), contains('internet connection'));
+      expect(authErrorMessage(raw), isNot(contains('SocketException')));
+      expect(
+        authErrorMessage(
+          const AuthException('ClientException: Connection reset'),
+        ),
+        contains('internet connection'),
+      );
     },
   );
 

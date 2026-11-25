@@ -4,8 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// Turns Supabase auth errors into calm, specific sentences a parent can act
 /// on. Anything unrecognised falls back to Supabase's own message.
 String authErrorMessage(Object error) {
-  if (error is! AuthException) {
-    return 'We couldn’t reach Curio. Check your connection and try again.';
+  if (error is! AuthException || isConnectionError(error)) {
+    return 'We couldn’t reach Curio. Check your internet connection and try again.';
   }
   final wait = retryAfterSeconds(error);
   if (wait != null) {
@@ -44,6 +44,18 @@ String authErrorMessage(Object error) {
     return 'That’s a lot of attempts in a row. Take a short break, then try again.';
   }
   return error.message;
+}
+
+/// No network, DNS failure or timeout. Supabase wraps these in an
+/// [AuthRetryableFetchException] whose message is the raw socket error,
+/// which must never reach a parent.
+bool isConnectionError(AuthException error) {
+  if (error is AuthRetryableFetchException) return true;
+  final message = error.message;
+  return message.contains('SocketException') ||
+      message.contains('ClientException') ||
+      message.contains('Failed host lookup') ||
+      message.contains('TimeoutException');
 }
 
 bool isEmailNotConfirmed(Object error) =>
