@@ -12,13 +12,26 @@ Deno.serve(async(req)=>{
   const admin=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data:identity,error}=await admin.auth.getUser(token);
   if(error||!identity.user?.email)return reply(401,'Sign in first');
-  let password:unknown;
-  try { const raw=await req.text();if(raw.length>2048)return reply(413,'Request too large');password=JSON.parse(raw).password; }catch{return reply(400,'Invalid request');}
-  if(typeof password!=='string'||password.length<1||password.length>1024)return reply(400,'Password required');
-  // Password validation uses the public auth endpoint, including its rate limits.
+  // Proof that it's really the parent: a one-time code emailed to the
+  // account (Curio's default), or the password for accounts that have one.
+  let body:{code?:unknown;password?:unknown};
+  try { const raw=await req.text();if(raw.length>2048)return reply(413,'Request too large');body=JSON.parse(raw); }catch{return reply(400,'Invalid request');}
+  const {code,password}=body??{};
+  // Both checks use the public auth endpoints, including their rate limits.
   const verifier=createClient(url,anonKey,{auth:{persistSession:false,autoRefreshToken:false}});
-  const {data:verified,error:verificationError}=await verifier.auth.signInWithPassword({email:identity.user.email,password});
-  if(verificationError||verified.user?.id!==identity.user.id)return reply(403,'Could not verify account');
+  let verifiedId:string|undefined;
+  if(typeof code==='string'&&/^\d{6,10}$/.test(code)){
+    const {data,error:codeError}=await verifier.auth.verifyOtp({email:identity.user.email,token:code,type:'email'});
+    if(codeError)return reply(codeError.status===429?429:403,'Could not verify account');
+    verifiedId=data.user?.id;
+  }else if(typeof password==='string'&&password.length>=1&&password.length<=1024){
+    const {data,error:passwordError}=await verifier.auth.signInWithPassword({email:identity.user.email,password});
+    if(passwordError)return reply(passwordError.status===429?429:403,'Could not verify account');
+    verifiedId=data.user?.id;
+  }else{
+    return reply(400,'Code or password required');
+  }
+  if(verifiedId!==identity.user.id)return reply(403,'Could not verify account');
   const {error:deleteError}=await admin.auth.admin.deleteUser(identity.user.id);
   if(deleteError)return reply(500,'Could not delete account');
   return reply(200,'Account deleted');

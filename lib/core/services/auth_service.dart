@@ -9,27 +9,15 @@ import 'family_service.dart';
 /// Why a verification code was emailed. Each maps to a Supabase email
 /// template and verification type.
 enum CodePurpose {
-  /// "Confirm signup" template, proves a new parent owns the address.
+  /// Creates the account with a code ("Confirm signup" template for a
+  /// new address, "Magic Link" if it already has an account).
   signUp,
 
-  /// "Magic Link" template, password-free sign-in for an existing account.
+  /// "Magic Link" template, sign-in for an existing account.
   signIn,
 
   /// "Reset Password" template, leads to choosing a new password.
   recovery,
-}
-
-/// What happened when a parent tried to create an account.
-enum SignUpOutcome {
-  /// A code is on its way; the account activates once it's entered.
-  codeSent,
-
-  /// Email confirmation is switched off in Supabase, so they're signed in.
-  signedIn,
-
-  /// The address already belongs to a confirmed account. Supabase doesn't
-  /// send anything in this case (to avoid revealing who has an account).
-  alreadyRegistered,
 }
 
 class AuthService {
@@ -81,38 +69,23 @@ class AuthService {
     }
   }
 
-  Future<SignUpOutcome> createAccount({
-    required String email,
-    required String password,
-  }) async {
-    final response = await _client.auth.signUp(
-      email: email.trim(),
-      password: password,
-      emailRedirectTo: SupabaseConfig.authRedirectUrl,
-      data: {
-        'consent_version': FamilySettings.currentConsentVersion,
-        'consent_at': DateTime.now().toUtc().toIso8601String(),
-      },
-    );
-    if (response.session != null) return SignUpOutcome.signedIn;
-    // With confirmations on, an already-confirmed address comes back as a
-    // placeholder user with no identities, and no email is sent.
-    if (response.user?.identities?.isEmpty ?? false) {
-      return SignUpOutcome.alreadyRegistered;
-    }
-    return SignUpOutcome.codeSent;
-  }
-
-  /// Emails a fresh code. For [CodePurpose.signUp] this re-sends the
-  /// confirmation; the others start their flow.
+  /// Emails a code. Curio is passwordless: sign-up and sign-in both send a
+  /// code, and a password is only an optional fallback (e.g. for the App
+  /// Store review account).
   Future<void> sendCode(CodePurpose purpose, String email) async {
     final address = email.trim();
     switch (purpose) {
       case CodePurpose.signUp:
-        await _client.auth.resend(
-          type: OtpType.signup,
+        // Creates the account if it's new (Supabase sends "Confirm signup"),
+        // or just signs an existing parent in ("Magic Link").
+        await _client.auth.signInWithOtp(
           email: address,
+          shouldCreateUser: true,
           emailRedirectTo: SupabaseConfig.authRedirectUrl,
+          data: {
+            'consent_version': FamilySettings.currentConsentVersion,
+            'consent_at': DateTime.now().toUtc().toIso8601String(),
+          },
         );
       case CodePurpose.signIn:
         await _client.auth.signInWithOtp(
@@ -143,6 +116,70 @@ class AuthService {
       email: email.trim(),
       token: code,
     );
+  }
+
+  String? get currentEmail => _client.auth.currentUser?.email;
+
+  /// Emails the signed-in parent a one-time code that proves it's them
+  /// before parent areas open or the account is deleted.
+  Future<void> sendParentCode() async {
+    final email = currentEmail;
+    if (_client.auth.currentUser == null || email == null) {
+      throw const AuthException(
+        'Sign in with your family account to continue.',
+      );
+    }
+    await _client.auth.signInWithOtp(email: email, shouldCreateUser: false);
+  }
+
+  /// Checks a code from [sendParentCode]. Only the same account counts.
+  Future<void> verifyParentCode(String code) async {
+    final parent = _client.auth.currentUser;
+    if (parent == null || parent.email == null || code.isEmpty) {
+      throw const AuthException(
+        'Sign in with your family account to continue.',
+      );
+    }
+    final verified = await _client.auth.verifyOTP(
+      type: OtpType.email,
+      email: parent.email!,
+      token: code.trim(),
+    );
+    if (verified.user?.id != parent.id ||
+        _client.auth.currentUser?.id != parent.id ||
+        verified.session == null) {
+      throw const AuthException('The account changed. Please try again.');
+    }
+  }
+
+  /// Starts moving the account to [newEmail]. Supabase emails a code to
+  /// the new address and, with "Secure email change" on, another to the
+  /// current one; both must be entered.
+  Future<void> requestEmailChange(String newEmail) async {
+    await _client.auth.updateUser(UserAttributes(email: newEmail.trim()));
+  }
+
+  Future<void> resendEmailChange(String newEmail) async {
+    await _client.auth.resend(
+      type: OtpType.emailChange,
+      email: newEmail.trim(),
+    );
+  }
+
+  /// Checks one email-change code. [email] is the address that received
+  /// it. Returns true once the account email has actually changed.
+  Future<bool> verifyEmailChange({
+    required String email,
+    required String code,
+    required String newEmail,
+  }) async {
+    await _client.auth.verifyOTP(
+      type: OtpType.emailChange,
+      email: email.trim(),
+      token: code.trim(),
+    );
+    final user = (await _client.auth.getUser()).user;
+    return user?.email?.toLowerCase() == newEmail.trim().toLowerCase();
   }
 
   Future<UserResponse> updatePassword(String password) {

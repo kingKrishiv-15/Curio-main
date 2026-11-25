@@ -3,8 +3,11 @@ import 'package:curio/theme/curio_tokens.dart';
 import 'package:flutter/services.dart';
 import '../../../core/services/family_service.dart';
 import '../../../core/widgets/curio_ui.dart';
-import '../../../core/widgets/text_prompt_dialog.dart';
+import '../../../core/navigation/open_page.dart';
+import '../../../core/services/auth_service.dart';
+import '../../../core/widgets/parent_code_dialog.dart';
 import '../../auth/presentation/auth_layout.dart';
+import 'change_email_page.dart';
 
 class PrivacyPage extends StatefulWidget {
   const PrivacyPage({super.key});
@@ -64,34 +67,42 @@ class _PrivacyPageState extends State<PrivacyPage> {
   }
 
   Future<void> _delete() async {
-    final value = await showTextPrompt(
-      context,
-      title: 'Delete your family account?',
-      message:
-          'This permanently deletes your account, learner progress, reports, and notification preferences. This cannot be undone. Enter your password to confirm.',
-      label: 'Account password',
-      obscure: true,
-      cancelLabel: 'Keep account',
-      confirmLabel: 'Delete permanently',
-      validator: (value) => value.isEmpty ? 'Enter your password.' : null,
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete your family account?'),
+        content: const Text(
+          'This permanently deletes your account, learner progress, reports, and notification preferences. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep account'),
+          ),
+          FilledButton(
+            key: const Key('delete_continue'),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
     );
-    if (value == null || !mounted) return;
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      await _service.deleteAccount(value);
-      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
-    } catch (_) {
-      if (mounted) {
-        setState(
-          () => _error =
-              'Deletion failed. Check your password and connection, then try again.',
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
+    if (proceed != true || !mounted) return;
+    setState(() => _error = null);
+    final deleted = await showParentCodeDialog(
+      context,
+      auth: AuthService(),
+      title: 'Confirm deletion',
+      message:
+          'To protect your family, enter the code we emailed you. Your account is deleted as soon as the code is confirmed.',
+      confirmLabel: 'Delete permanently',
+      confirmKey: const Key('delete_confirm'),
+      destructive: true,
+      onCode: (code) => _service.deleteAccount(code: code),
+      onPassword: (password) => _service.deleteAccount(password: password),
+    );
+    if (deleted && mounted) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -159,6 +170,26 @@ class _PrivacyPageState extends State<PrivacyPage> {
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                     subtitle: const Text('A copy of everything, as JSON'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                  ),
+                  const Divider(height: 1, indent: 64),
+                  ListTile(
+                    key: const Key('change_email'),
+                    enabled: !_busy,
+                    onTap: () => openPage(context, const ChangeEmailPage()),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
+                    leading: CurioIconTile(
+                      icon: Icons.alternate_email_rounded,
+                      color: forest,
+                      size: 38,
+                      iconSize: 19,
+                      radius: CurioTokens.radiusCard,
+                    ),
+                    title: const Text(
+                      'Change account email',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: const Text('Confirmed with a code'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                   ),
                   const Divider(height: 1, indent: 64),

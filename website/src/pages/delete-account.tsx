@@ -15,7 +15,7 @@ function DeleteAccount() {
           Open the <a href="./family.html">family dashboard</a> and sign in.
         </li>
         <li>
-          Scroll to <strong>Delete family account</strong>, enter your password and confirm.
+          Scroll to <strong>Delete family account</strong>, enter the code we email you, and confirm.
         </li>
       </ol>
       <p>Your account is deleted immediately.</p>
@@ -27,7 +27,7 @@ function DeleteAccount() {
           Go to <strong>Profile → Privacy and account</strong>.
         </li>
         <li>
-          Tap <strong>Delete family account</strong>, enter your password, and confirm.
+          Tap <strong>Delete family account</strong>, enter the code we email you, and confirm.
         </li>
       </ol>
 

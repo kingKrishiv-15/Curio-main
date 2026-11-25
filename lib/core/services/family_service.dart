@@ -154,14 +154,37 @@ class FamilyService {
     });
   }
 
-  Future<void> deleteAccount(String password) async {
+  /// Deletes the signed-in family account. Proof is checked on the server:
+  /// a one-time [code] emailed by [AuthService.sendParentCode], or the
+  /// account [password] for accounts that have one.
+  Future<void> deleteAccount({String? code, String? password}) async {
     final client = _client;
     if (client == null) throw StateError('Sign in first.');
-    final response = await client.functions.invoke(
-      'delete-account',
-      body: {'password': password},
-    );
-    if (response.status != 200) {
+    if ((code == null || code.isEmpty) &&
+        (password == null || password.isEmpty)) {
+      throw ArgumentError('A code or password is required.');
+    }
+    try {
+      final response = await client.functions.invoke(
+        'delete-account',
+        body: {
+          if (code != null && code.isNotEmpty) 'code': code,
+          if (code == null || code.isEmpty) 'password': password,
+        },
+      );
+      if (response.status != 200) {
+        throw StateError('Account could not be deleted.');
+      }
+    } on FunctionException catch (error) {
+      if (error.status == 403) {
+        throw AuthException(
+          'Could not verify account',
+          code: code != null ? 'otp_expired' : 'invalid_credentials',
+        );
+      }
+      if (error.status == 429) {
+        throw const AuthException('Too many attempts', statusCode: '429');
+      }
       throw StateError('Account could not be deleted.');
     }
     final prefs = await SharedPreferences.getInstance();

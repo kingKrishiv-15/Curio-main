@@ -40,7 +40,7 @@ function Privacy() {
           </thead>
           <tbody>
             <tr>
-              <td>Email address and password (stored only as a secure hash)</td>
+              <td>Email address, and a password only if you choose to set one (stored only as a secure hash)</td>
               <td>Parent</td>
               <td>To create the account, sign in, send sign-in and confirmation codes, and reset passwords</td>
             </tr>

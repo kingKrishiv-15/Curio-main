@@ -109,7 +109,7 @@ async function loadFamily(): Promise<Family> {
 }
 
 function SignIn() {
-  const [mode, setMode] = useState<'password' | 'code'>('password');
+  const [mode, setMode] = useState<'password' | 'code'>('code');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
@@ -163,7 +163,7 @@ function SignIn() {
         </p>
       </div>
       <div className="well tabs" role="tablist" aria-label="Sign-in method">
-        {(['password', 'code'] as const).map((m) => (
+        {(['code', 'password'] as const).map((m) => (
           <button
             key={m}
             type="button"
@@ -176,7 +176,7 @@ function SignIn() {
               setCodeSent(false);
             }}
           >
-            {m === 'password' ? 'Password' : 'Email me a code'}
+            {m === 'password' ? 'Password' : 'Email code'}
           </button>
         ))}
       </div>
@@ -366,22 +366,49 @@ function WeeklyEmailToggle({ userId, initial }: { userId: string; initial: boole
   );
 }
 
-function DeleteFamily({ onDeleted }: { onDeleted: () => void }) {
+function DeleteFamily({ email, onDeleted }: { email: string; onDeleted: () => void }) {
+  // Proof it's the parent: a one-time code emailed to the account (the
+  // default, since Curio accounts are passwordless), or the password for
+  // accounts that have one. The delete-account function checks either.
+  const [usePassword, setUsePassword] = useState(false);
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
   const [sure, setSure] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
+
+  async function sendCode() {
+    setBusy(true);
+    setError('');
+    const { error } = await supabase!.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+    setBusy(false);
+    if (error) {
+      setError(explain(error));
+      return;
+    }
+    setCodeSent(true);
+    setInfo(`We emailed a code to ${email}. It may take a minute to arrive.`);
+  }
+
   async function remove(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setError('');
-    const { error } = await supabase!.functions.invoke('delete-account', { body: { password } });
+    setInfo('');
+    const body = usePassword ? { password } : { code: code.trim() };
+    const { error } = await supabase!.functions.invoke('delete-account', { body });
     if (error) {
       const status = (error as { context?: Response }).context?.status;
       setError(
         status === 403
-          ? 'That password isn’t right, so nothing was deleted.'
-          : `We couldn’t delete the account. Please try again, or email ${site.contactEmail}.`,
+          ? usePassword
+            ? 'That password isn’t right, so nothing was deleted.'
+            : 'That code isn’t right or has expired, so nothing was deleted. Send a new one and try again.'
+          : status === 429
+            ? 'Too many attempts. Please wait a few minutes, then try again.'
+            : `We couldn’t delete the account. Please try again, or email ${site.contactEmail}.`,
       );
       setBusy(false);
       return;
@@ -389,6 +416,8 @@ function DeleteFamily({ onDeleted }: { onDeleted: () => void }) {
     await supabase!.auth.signOut();
     onDeleted();
   }
+
+  const proofReady = usePassword ? password.length > 0 : codeSent && /^\d{6,10}$/.test(code.trim());
   return (
     <form id="delete" className="clay report danger-zone" onSubmit={remove}>
       <h3>Delete family account</h3>
@@ -397,27 +426,72 @@ function DeleteFamily({ onDeleted }: { onDeleted: () => void }) {
         can’t be undone.
       </p>
       <div className="stack" style={{ gap: 12 }}>
-        <label>
-          Your password
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+        {usePassword ? (
+          <label>
+            Your password
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+        ) : codeSent ? (
+          <label>
+            Code from your email
+            <input
+              className="code-input"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={10}
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+            />
+          </label>
+        ) : (
+          <div>
+            <p className="soft" style={{ marginBottom: 10 }}>
+              To confirm it’s you, we’ll email a code to <strong>{email}</strong>.
+            </p>
+            <button className="button" type="button" onClick={sendCode} disabled={busy}>
+              {busy ? 'Sending…' : 'Email me a code'}
+            </button>
+          </div>
+        )}
         <label style={{ display: 'flex', gap: 10, alignItems: 'center', fontWeight: 600 }}>
           <input type="checkbox" checked={sure} onChange={(e) => setSure(e.target.checked)} />
           I understand everything will be deleted
         </label>
+        {info ? (
+          <p className="notice" role="status">
+            {info}
+          </p>
+        ) : null}
         {error ? (
           <p className="notice error" role="alert">
             {error}
           </p>
         ) : null}
-        <div>
-          <button className="button danger" type="submit" disabled={!password || !sure || busy}>
-            {busy ? 'Deleting…' : 'Delete everything'}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button className="button danger" type="submit" disabled={!proofReady || !sure || busy}>
+            {busy && (codeSent || usePassword) ? 'Deleting…' : 'Delete everything'}
+          </button>
+          {!usePassword && codeSent ? (
+            <button type="button" className="link-button" onClick={sendCode} disabled={busy}>
+              Send a new code
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => {
+              setUsePassword(!usePassword);
+              setError('');
+              setInfo('');
+            }}
+          >
+            {usePassword ? 'Use an email code instead' : 'Use my password instead'}
           </button>
         </div>
       </div>
@@ -493,7 +567,7 @@ function Dashboard({ session }: { session: Session }) {
           <p className="muted" style={{ fontSize: 14 }}>
             Mastery reflects practice, not a formal assessment.
           </p>
-          <DeleteFamily onDeleted={() => setDeleted(true)} />
+          <DeleteFamily email={session.user.email ?? ''} onDeleted={() => setDeleted(true)} />
         </div>
       )}
     </>

@@ -13,10 +13,11 @@ import 'widgets/auth_fields.dart';
 
 enum AuthMode { signIn, signUp }
 
-/// Email + password sign-in and sign-up. Creating an account emails a
-/// 6-digit code ([VerifyCodePage]); the [AuthGate] takes over the moment
-/// Supabase reports a session, so this page never navigates "forward" on
-/// success itself.
+/// Passwordless sign-in and sign-up: the parent types their email and we
+/// send a code ([VerifyCodePage]). A password is an optional fallback for
+/// sign-in only (accounts that have one, such as the App Store review
+/// account). The [AuthGate] takes over the moment Supabase reports a
+/// session, so this page never navigates "forward" on success itself.
 class AuthPage extends StatefulWidget {
   const AuthPage({
     required this.authService,
@@ -40,11 +41,13 @@ class _AuthPageState extends State<AuthPage> {
   late AuthMode _mode = widget.mode;
   bool _consent = false;
   bool _consentMissing = false;
+  bool _usePassword = false;
   bool _loading = false;
   String? _message;
   bool _messageIsError = true;
 
   bool get _signUp => _mode == AuthMode.signUp;
+  bool get _needsPassword => !_signUp && _usePassword;
 
   @override
   void dispose() {
@@ -59,6 +62,7 @@ class _AuthPageState extends State<AuthPage> {
       _message = message;
       _messageIsError = error;
       _consentMissing = false;
+      _usePassword = false;
       _password.clear();
       _form = GlobalKey<FormState>();
     });
@@ -87,26 +91,11 @@ class _AuthPageState extends State<AuthPage> {
       _message = null;
     });
     try {
-      if (_signUp) {
-        final outcome = await widget.authService.createAccount(
-          email: _email.text,
-          password: _password.text,
-        );
+      if (!_needsPassword) {
+        final purpose = _signUp ? CodePurpose.signUp : CodePurpose.signIn;
+        await widget.authService.sendCode(purpose, _email.text);
         TextInput.finishAutofillContext();
-        if (!mounted) return;
-        switch (outcome) {
-          case SignUpOutcome.codeSent:
-            await _openVerify(CodePurpose.signUp);
-          case SignUpOutcome.alreadyRegistered:
-            _switchMode(
-              AuthMode.signIn,
-              message:
-                  'There’s already a Curio account for ${_email.text.trim()}. Sign in below, or reset your password if you’ve forgotten it.',
-              error: false,
-            );
-          case SignUpOutcome.signedIn:
-            break; // The gate moves on by itself.
-        }
+        if (mounted) await _openVerify(purpose);
       } else {
         await widget.authService.signInWithEmail(
           email: _email.text,
@@ -187,22 +176,31 @@ class _AuthPageState extends State<AuthPage> {
               const SizedBox(height: 12),
               Text(
                 _signUp
-                    ? 'We’ll email you a 6-digit code to confirm it’s you, then you’ll set up your explorer. About a minute in all.'
-                    : 'Sign in to pick up right where your explorer left off.',
+                    ? 'No password to remember. We’ll email you a 6-digit code, then you’ll set up your explorer. About a minute in all.'
+                    : 'Enter your email and we’ll send you a 6-digit code to sign in.',
                 style: TextStyle(color: muted, height: 1.55),
               ),
               const SizedBox(height: 24),
-              EmailField(controller: _email, enabled: !_loading),
-              const SizedBox(height: 16),
-              PasswordField(
-                key: ValueKey(_mode),
-                controller: _password,
-                label: _signUp ? 'Create a password' : 'Password',
-                isNew: _signUp,
+              EmailField(
+                controller: _email,
                 enabled: !_loading,
-                onSubmitted: (_) => _submit(),
+                textInputAction: _needsPassword || _signUp
+                    ? TextInputAction.next
+                    : TextInputAction.done,
+                onSubmitted: _needsPassword || _signUp
+                    ? null
+                    : (_) => _submit(),
               ),
-              if (!_signUp)
+              if (_needsPassword) ...[
+                const SizedBox(height: 16),
+                PasswordField(
+                  key: const ValueKey('sign_in_password'),
+                  controller: _password,
+                  label: 'Password',
+                  isNew: false,
+                  enabled: !_loading,
+                  onSubmitted: (_) => _submit(),
+                ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -212,6 +210,7 @@ class _AuthPageState extends State<AuthPage> {
                     child: const Text('Forgot password?'),
                   ),
                 ),
+              ],
               if (_signUp) ...[
                 const SizedBox(height: 16),
                 _ConsentRow(
@@ -238,21 +237,37 @@ class _AuthPageState extends State<AuthPage> {
                         height: 22,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(_signUp ? 'Create account' : 'Sign in'),
+                    : Text(
+                        _signUp
+                            ? 'Email me a code'
+                            : _usePassword
+                            ? 'Sign in'
+                            : 'Email me a sign-in code',
+                      ),
               ),
               if (!_signUp) ...[
-                const SizedBox(height: 16),
-                const _OrDivider(),
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: _loading
-                      ? null
-                      : () => _requestCode(CodePurpose.signIn),
-                  icon: const Icon(Icons.pin_outlined, size: 20),
-                  label: const Text('Email me a sign-in code'),
+                const SizedBox(height: 8),
+                Center(
+                  child: TextButton(
+                    key: const Key('auth_toggle_password'),
+                    onPressed: _loading
+                        ? null
+                        : () => setState(() {
+                            _usePassword = !_usePassword;
+                            _message = null;
+                            _password.clear();
+                          }),
+                    child: Text(
+                      _usePassword
+                          ? 'Use an email code instead'
+                          : 'Have a password? Use it instead',
+                    ),
+                  ),
                 ),
                 if (SupabaseConfig.enableGoogleAuth) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
+                  const _OrDivider(),
+                  const SizedBox(height: 16),
                   OutlinedButton.icon(
                     onPressed: _loading ? null : _google,
                     icon: const Icon(Icons.account_circle_outlined, size: 20),

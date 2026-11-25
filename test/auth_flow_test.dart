@@ -34,7 +34,6 @@ class FakeAuth extends AuthService {
 
   final changes = StreamController<AuthState>.broadcast();
   Session? session;
-  SignUpOutcome signUpOutcome = SignUpOutcome.codeSent;
   Object? signInError;
   Object? sendError;
   final verifyErrors = <Object>[];
@@ -56,15 +55,6 @@ class FakeAuth extends AuthService {
   bool get hasRecordedConsent => consentRecorded;
 
   @override
-  Future<SignUpOutcome> createAccount({
-    required String email,
-    required String password,
-  }) async {
-    signups++;
-    return signUpOutcome;
-  }
-
-  @override
   Future<AuthResponse> signInWithEmail({
     required String email,
     required String password,
@@ -76,6 +66,7 @@ class FakeAuth extends AuthService {
   @override
   Future<void> sendCode(CodePurpose purpose, String email) async {
     if (sendError != null) throw sendError!;
+    if (purpose == CodePurpose.signUp) signups++;
     sent.add(purpose);
   }
 
@@ -329,64 +320,41 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets(
-    'Sign-up checks email, password rules and consent, then asks for the code',
-    (tester) async {
-      await phone(tester);
-      final auth = FakeAuth();
-      await tester.pumpWidget(
-        calm(app(AuthPage(authService: auth, mode: AuthMode.signUp))),
-      );
-      await tapVisible(tester, find.byKey(const Key('auth_submit')));
-      expect(auth.signups, 0);
-      expect(
-        find.textContaining('Enter a valid email address'),
-        findsOneWidget,
-      );
-      expect(find.textContaining('confirm you’re a parent'), findsOneWidget);
-
-      await tester.enterText(
-        find.byType(TextFormField).at(0),
-        'parent@example.com',
-      );
-      await tester.enterText(find.byType(TextFormField).at(1), 'short');
-      await tapVisible(tester, find.byKey(const Key('auth_submit')));
-      expect(find.text('Use at least 8 characters.'), findsOneWidget);
-      await tester.enterText(find.byType(TextFormField).at(1), 'abcdefgh');
-      await tapVisible(tester, find.byKey(const Key('auth_submit')));
-      expect(
-        find.text('Include at least one letter and one number.'),
-        findsOneWidget,
-      );
-
-      await tester.enterText(find.byType(TextFormField).at(1), 'curious123');
-      await tapVisible(tester, find.byKey(const Key('auth_consent')));
-      await tapVisible(tester, find.byKey(const Key('auth_submit')));
-      expect(auth.signups, 1);
-      expect(find.text('Confirm your email'), findsOneWidget);
-      expect(find.text('parent@example.com'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets('Signing up with a registered email switches to sign-in', (
+  testWidgets('Sign-up is passwordless: email and consent, then the code', (
     tester,
   ) async {
     await phone(tester);
-    final auth = FakeAuth()..signUpOutcome = SignUpOutcome.alreadyRegistered;
+    final auth = FakeAuth();
     await tester.pumpWidget(
       calm(app(AuthPage(authService: auth, mode: AuthMode.signUp))),
     );
-    await tester.enterText(
-      find.byType(TextFormField).at(0),
-      'parent@example.com',
-    );
-    await tester.enterText(find.byType(TextFormField).at(1), 'curious123');
+    expect(find.byType(TextFormField), findsOneWidget, reason: 'no password');
+    await tapVisible(tester, find.byKey(const Key('auth_submit')));
+    expect(auth.signups, 0);
+    expect(find.textContaining('Enter a valid email address'), findsOneWidget);
+    expect(find.textContaining('confirm you’re a parent'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'parent@example.com');
+    await tapVisible(tester, find.byKey(const Key('auth_submit')));
+    expect(auth.signups, 0, reason: 'consent is still missing');
     await tapVisible(tester, find.byKey(const Key('auth_consent')));
     await tapVisible(tester, find.byKey(const Key('auth_submit')));
-    expect(find.text('Good to see you again.'), findsOneWidget);
-    expect(find.textContaining('already a Curio account'), findsOneWidget);
+    expect(auth.sent, [CodePurpose.signUp]);
+    expect(find.text('Confirm your email'), findsOneWidget);
     expect(find.text('parent@example.com'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Sign-in emails a code by default', (tester) async {
+    await phone(tester);
+    final auth = FakeAuth();
+    await tester.pumpWidget(calm(app(AuthPage(authService: auth))));
+    expect(find.byType(TextFormField), findsOneWidget, reason: 'no password');
+    await tester.enterText(find.byType(TextFormField), 'parent@example.com');
+    await tapVisible(tester, find.byKey(const Key('auth_submit')));
+    expect(auth.sent, [CodePurpose.signIn]);
+    expect(find.text('Check your email'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets('Signing in before confirming sends a fresh code and opens it', (
@@ -399,6 +367,7 @@ void main() {
         code: 'email_not_confirmed',
       );
     await tester.pumpWidget(calm(app(AuthPage(authService: auth))));
+    await tapVisible(tester, find.byKey(const Key('auth_toggle_password')));
     await tester.enterText(
       find.byType(TextFormField).at(0),
       'parent@example.com',
@@ -418,6 +387,7 @@ void main() {
         code: 'invalid_credentials',
       );
     await tester.pumpWidget(calm(app(AuthPage(authService: auth))));
+    await tapVisible(tester, find.byKey(const Key('auth_toggle_password')));
     await tester.enterText(
       find.byType(TextFormField).at(0),
       'parent@example.com',
@@ -547,6 +517,7 @@ void main() {
     await phone(tester);
     final auth = FakeAuth();
     await tester.pumpWidget(calm(app(AuthPage(authService: auth))));
+    await tapVisible(tester, find.byKey(const Key('auth_toggle_password')));
     await tester.enterText(
       find.byType(TextFormField).at(0),
       'parent@example.com',
@@ -569,9 +540,8 @@ void main() {
         code: 'otp_disabled',
       );
     await tester.pumpWidget(calm(app(AuthPage(authService: auth))));
-    await tapVisible(tester, find.text('Email me a sign-in code'));
     await tester.enterText(find.byType(TextFormField), 'nobody@example.com');
-    await tapVisible(tester, find.byKey(const Key('code_request_send')));
+    await tapVisible(tester, find.byKey(const Key('auth_submit')));
     expect(
       find.textContaining('couldn’t find a Curio account'),
       findsOneWidget,
