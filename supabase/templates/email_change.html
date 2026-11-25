@@ -2,6 +2,8 @@
 <!--
   Curio · Confirm your new Curio email
   Supabase → Authentication → Emails → Templates → "Change Email Address".
+  Styled like the app: a soft blush page, one white card with a hairline,
+  bold sans headings, a sentence-case pill and the code in a quiet grey box.
   Only a code is sent, never a link: email scanners that pre-open links can
   use up a one-time token before the parent ever sees it.
   Template variables used: {{ .Token }}, {{ .Email }}, {{ .NewEmail }}
@@ -13,56 +15,53 @@
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light">
 <title>Confirm your new Curio email</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body style="margin:0;padding:0;background:#FDF1E2;-webkit-text-size-adjust:100%;">
+<body style="margin:0;padding:0;background:#FEF7F6;-webkit-text-size-adjust:100%;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">Confirm the change to your Curio account email.&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FDF1E2;background-image:linear-gradient(160deg,#FFF6EA 0%,#FDF1E2 55%,#FBE6D4 100%);">
-  <tr><td align="center" style="padding:36px 16px 40px 16px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:540px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FEF7F6;">
+  <tr><td align="center" style="padding:32px 16px 40px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
 
       <!-- Brand -->
-      <tr><td style="padding:0 6px 22px 6px;">
+      <tr><td style="padding:0 4px 20px 4px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-          <td style="vertical-align:middle;"><img src="https://curioeducation.co.in/icon.png" width="44" height="44" alt="Curio" style="display:block;border:0;border-radius:13px;"></td>
-          <td style="vertical-align:middle;padding-left:12px;font-family:Fraunces,Georgia,'Times New Roman',serif;font-size:27px;font-weight:600;letter-spacing:-.6px;color:#2E2417;">curio</td>
+          <td style="vertical-align:middle;"><img src="https://curioeducation.co.in/icon.png" width="40" height="40" alt="Curio" style="display:block;border:0;border-radius:12px;"></td>
+          <td style="vertical-align:middle;padding-left:10px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:600;letter-spacing:-.5px;color:#2E2417;">curio</td>
         </tr></table>
       </td></tr>
 
       <!-- Card -->
-      <tr><td style="background:#FFFFFF;border-radius:28px;overflow:hidden;box-shadow:0 1px 2px rgba(46,36,23,.06),0 22px 44px -22px rgba(242,86,74,.35);">
+      <tr><td style="background:#FFFFFF;border:1px solid #E6E3E0;border-radius:20px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="height:7px;background:#F2564A;background-image:linear-gradient(90deg,#F2564A 0%,#DB9A2C 40%,#2E9FD6 72%,#8467E0 100%);font-size:0;line-height:0;">&nbsp;</td></tr>
-          <tr><td style="padding:34px 38px 0 38px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:12px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#8467E0;">Account update</td></tr>
-          <tr><td style="padding:10px 38px 0 38px;font-family:Fraunces,Georgia,'Times New Roman',serif;font-size:30px;font-weight:600;line-height:1.15;letter-spacing:-.6px;color:#2E2417;">Confirm your email change</td></tr>
-          <tr><td style="padding:14px 38px 22px 38px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#5B4E3B;">Enter this code in Curio to move your family account from <strong style="color:#2E2417;">{{ .Email }}</strong> to <strong style="color:#2E2417;">{{ .NewEmail }}</strong>. We send a code to both addresses, and the change only happens once both are entered.</td></tr>
+          <tr><td style="padding:32px 32px 0 32px;">
+            <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#EEE9FB;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:1.4;color:#2E2417;">Account update</span>
+          </td></tr>
+          <tr><td style="padding:14px 32px 0 32px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:26px;font-weight:700;line-height:1.2;letter-spacing:-.4px;color:#2E2417;">Confirm your email change</td></tr>
+          <tr><td style="padding:12px 32px 24px 32px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#5B4E3B;">Enter this code in Curio to move your family account from <strong style="color:#2E2417;">{{ .Email }}</strong> to <strong style="color:#2E2417;">{{ .NewEmail }}</strong>. We send a code to both addresses, and the change only happens once both are entered.</td></tr>
 
           <!-- Code -->
-          <tr><td style="padding:0 38px;">
+          <tr><td style="padding:0 32px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-              <td align="center" style="padding:20px 12px;border-radius:20px;background:#FFF4EE;border:1.5px dashed #F5A79F;">
-                <div style="font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#B5473D;padding-bottom:8px;">Your code</div>
-                <div style="font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace;font-size:36px;font-weight:700;letter-spacing:10px;white-space:nowrap;color:#2E2417;padding-left:10px;">{{ .Token }}</div>
+              <td align="center" style="padding:22px 12px;border-radius:20px;background:#F2F2F1;">
+                <div style="font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:#5B4E3B;padding-bottom:6px;">Your code</div>
+                <div style="font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:36px;font-weight:800;letter-spacing:8px;white-space:nowrap;color:#2E2417;padding-left:8px;">{{ .Token }}</div>
               </td>
             </tr></table>
           </td></tr>
 
-          <tr><td style="padding:16px 38px 0 38px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#8C7C63;" align="center">Works once &middot; expires in 1 hour &middot; use the newest email</td></tr>
-          <tr><td style="padding:18px 38px 0 38px;font-family:'Noto Sans Devanagari',Mangal,Arial,sans-serif;font-size:14px;line-height:1.7;color:#8C7C63;">अपना नया ईमेल पुष्टि करने के लिए ऐप में यह कोड डालें।</td></tr>
-          <tr><td style="padding:22px 38px 0 38px;"><div style="height:1px;background:#F0E4D0;font-size:0;line-height:0;">&nbsp;</div></td></tr>
-          <tr><td style="padding:18px 38px 34px 38px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:13px;line-height:1.65;color:#5B4E3B;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-              <td style="vertical-align:top;padding-right:10px;font-size:16px;line-height:1.4;">&#128274;</td>
-              <td style="vertical-align:top;">Didn&rsquo;t ask for this? Ignore this email and nothing changes. Your account stays on its current email. Curio will never ask for this code by phone, WhatsApp or SMS, so please don&rsquo;t share it with anyone.</td>
-            </tr></table>
-          </td></tr>
+          <tr><td style="padding:14px 32px 0 32px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#8C7C63;" align="center">Works once · expires in 1 hour · use the newest email</td></tr>
+          <tr><td style="padding:18px 32px 0 32px;font-family:'Noto Sans Devanagari',Mangal,Arial,sans-serif;font-size:14px;line-height:1.7;color:#5B4E3B;">अपना नया ईमेल पुष्टि करने के लिए ऐप में यह कोड डालें।</td></tr>
+          <tr><td style="padding:20px 32px 0 32px;"><div style="height:1px;background:#E6E3E0;font-size:0;line-height:0;">&nbsp;</div></td></tr>
+          <tr><td style="padding:16px 32px 30px 32px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:13px;line-height:1.65;color:#5B4E3B;">Didn&rsquo;t ask for this? Ignore this email and nothing changes. Your account stays on its current email. Curio will never ask for this code by phone, WhatsApp or SMS, so please don&rsquo;t share it with anyone.</td></tr>
         </table>
       </td></tr>
 
       <!-- Footer -->
-      <tr><td align="center" style="padding:26px 8px 0 8px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:12px;line-height:1.7;color:#8C7C63;">
+      <tr><td align="center" style="padding:24px 8px 0 8px;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:12px;line-height:1.7;color:#8C7C63;">
         <strong style="color:#5B4E3B;">Curio</strong> &middot; Little brain games for curious kids<br>
-        Sent to {{ .Email }} &middot; Questions? <a href="mailto:krishivkedia@gmail.com" style="color:#C2410C;text-decoration:underline;">krishivkedia@gmail.com</a><br>
-        <a href="https://curioeducation.co.in" style="color:#C2410C;text-decoration:underline;">curioeducation.co.in</a> &middot; <a href="https://curioeducation.co.in/privacy.html" style="color:#C2410C;text-decoration:underline;">Privacy</a>
+        Sent to {{ .Email }} &middot; Questions? <a href="mailto:krishivkedia@gmail.com" style="color:#2E2417;text-decoration:underline;">krishivkedia@gmail.com</a><br>
+        <a href="https://curioeducation.co.in" style="color:#2E2417;text-decoration:underline;">curioeducation.co.in</a> &middot; <a href="https://curioeducation.co.in/privacy.html" style="color:#2E2417;text-decoration:underline;">Privacy</a>
       </td></tr>
 
     </table>

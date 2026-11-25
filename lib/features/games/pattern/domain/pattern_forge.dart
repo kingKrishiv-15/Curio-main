@@ -323,7 +323,35 @@ class ForgeDay {
   /// Shown numbers and answers stay small enough for mental maths.
   static const maxValue = 500;
 
+  /// Day [day]'s three questions. Days are built in order from day 0, each
+  /// skipping any pattern an earlier day already used, so a learner never
+  /// meets the same sequence twice (until the families genuinely run out,
+  /// years from now, when a repeat is allowed rather than failing). Each
+  /// day is built once and cached, and is the same every time.
   factory ForgeDay.forDay(int day) {
+    if (day < 0) return _generate(day, const {});
+    while (_built.length <= day) {
+      final next = _built.length;
+      ForgeDay made;
+      try {
+        made = _generate(next, _used);
+      } on StateError {
+        made = _generate(next, const {});
+      }
+      _used.addAll(made.questions.map(_signature));
+      _built.add(made);
+    }
+    return _built[day];
+  }
+
+  static final _built = <ForgeDay>[];
+  static final _used = <String>{};
+
+  /// One pattern: the same rule from the same start is the same sequence.
+  static String _signature(ForgeQuestion q) =>
+      '${q.rule.description}@${q.terms.first}';
+
+  static ForgeDay _generate(int day, Set<String> avoid) {
     final random = Random(day * 7919 + 104729);
     final families = List.of(RuleKind.values)..shuffle(random);
     final questions = <ForgeQuestion>[];
@@ -342,6 +370,7 @@ class ForgeDay {
             ForgeKind.rule => _ruleQuestion(rule, start, random),
             ForgeKind.repair => _repair(rule, start, random),
           };
+          if (made != null && avoid.contains(_signature(made))) made = null;
         }
       }
       questions.add(made);
